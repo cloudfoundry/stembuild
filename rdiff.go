@@ -30,6 +30,8 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"os"
+	"unsafe"
 )
 
 var NoTargetSumError = errors.New("Checksum request but missing target hash.")
@@ -86,11 +88,27 @@ func (r RsResult) String() string {
 }
 
 func Patch(basis, delta, newfile string) error {
+	// check file paths before passing into C code.
+	if _, err := os.Stat(basis); err != nil {
+		return fmt.Errorf("patch: basis file: %s", err)
+	}
+	if _, err := os.Stat(delta); err != nil {
+		return fmt.Errorf("patch: delta file: %s", err)
+	}
+	if _, err := os.Stat(newfile); err == nil {
+		return fmt.Errorf("patch: newfile file exists: %s", newfile)
+	}
+
 	cbasis := C.CString(basis)
 	cdelta := C.CString(delta)
 	cnew := C.CString(newfile)
 
 	result := RsResult(C.go_patch(cbasis, cdelta, cnew))
+
+	C.free(unsafe.Pointer(cbasis))
+	C.free(unsafe.Pointer(cdelta))
+	C.free(unsafe.Pointer(cnew))
+
 	if result == 0 {
 		return nil
 	}
