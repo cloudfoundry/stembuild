@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/pcf-make-stemcell/ovftool"
+	"github.com/pivotal-cf-experimental/pcf-make-stemcell/rdiff"
 )
 
 var (
@@ -496,7 +497,7 @@ func (c *Config) ApplyPatch(vhd, delta, vmdk string) error {
 	start := time.Now() // this is sometimes interesting
 
 	Debugf("applying patch with rdiff")
-	if err := Patch(vhd, delta, vmdk); err != nil {
+	if err := rdiff.Patch(vhd, delta, vmdk); err != nil {
 		return err
 	}
 
