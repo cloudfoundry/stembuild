@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/charlievieth/ova2stemcell/ovftool"
+	"github.com/pivotal-cf-experimental/pcf-make-stemcell/ovftool"
 )
 
 var (

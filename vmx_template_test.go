@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/charlievieth/ova2stemcell/ovftool"
+	"github.com/pivotal-cf-experimental/pcf-make-stemcell/ovftool"
 )
 
 func parseVMX(vmx string) (map[string]string, error) {
