@@ -1,3 +1,4 @@
-ova2stemcell
+pcf-make-stemcell
 temp
-vendor/bitbucket.org/kardianos/rsync/rdiff/rd
+rdiff/*.c
+rdiff/*.h

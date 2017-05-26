@@ -61,7 +61,7 @@ func TestExtractOVA_Valid(t *testing.T) {
 	const Count = 9
 	const NameFmt = "file-%d"
 
-	tmpdir, err := ioutil.TempDir("", "test-")
+	tmpdir, err := TempDir("test-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func TestExtractOVA_Invalid(t *testing.T) {
 	}
 
 	for _, x := range tests {
-		tmpdir, err := ioutil.TempDir("", "test-")
+		tmpdir, err := TempDir("test-")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -286,7 +286,7 @@ func readFile(name string) (string, error) {
 func extractGzipArchive(t *testing.T, name string) string {
 	t.Logf("extractGzipArchive: extracting tgz: %s", name)
 
-	tmpdir, err := ioutil.TempDir("", "test-")
+	tmpdir, err := TempDir("test-")
 	if err != nil {
 		t.Fatal(err)
 	}
