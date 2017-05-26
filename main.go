@@ -361,7 +361,7 @@ func (c *Config) CreateStemcell() error {
 
 func (c *Config) WriteManifest() error {
 	const format = `---
-name: bosh-vsphere-esxi-windows-2012R2-go_agent
+name: bosh-vsphere-esxi-windows2012R2-go_agent
 version: %s
 sha1: %s
 operating_system: windows2012R2
