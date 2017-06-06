@@ -1,12 +1,11 @@
 package rdiff
 
-// #cgo CFLAGS: -Wall -O2 -DNDEBUG -Wno-unused-function
+// #cgo CFLAGS: -Wall -O2 -DNDEBUG -Wno-unused-function -Wno-sometimes-uninitialized
 //
 // #include <stdlib.h>   // free
 // #include <stdio.h>    // fopen, fclose
-// #include <time.h>     // difftime
 //
-// #include "librsync.h" // rs_patch_file, rs_result, rs_strerror
+// #include "librsync.h"
 //
 import "C"
 
@@ -94,6 +93,97 @@ func fopen(filename, mode string) (*C.FILE, error) {
 		}
 	}
 	return f, nil
+}
+
+// Delta creates signature file, signature.  If md4 is used the signature is
+// calculated using the md4 hash algorithm, otherwise blake2 is used.
+func Signature(basis, signature string, md4 bool) error {
+	const defaultBlockLen = 2048
+	const strongLen = 0
+
+	fbasis, err := fopen(basis, "rb")
+	if err != nil {
+		return err
+	}
+	defer fclose(fbasis)
+
+	// the 'x' flag is not supported on Windows
+	// so manually check if the file exists
+	if _, err := os.Stat(signature); err == nil {
+		return &os.PathError{
+			Op:   "fopen",
+			Path: signature,
+			Err:  os.ErrExist,
+		}
+	}
+	fsignature, err := fopen(signature, "wb")
+	if err != nil {
+		return err
+	}
+	defer fclose(fsignature)
+
+	var magic C.rs_magic_number = C.RS_BLAKE2_SIG_MAGIC
+	if md4 {
+		magic = C.RS_MD4_SIG_MAGIC
+	}
+
+	result := rsResult(C.rs_sig_file(fbasis, fsignature, defaultBlockLen,
+		strongLen, magic, nil))
+	if result != rs_DONE {
+		return rsError(result)
+	}
+
+	return nil
+}
+
+// Delta creates delta file, delta.
+func Delta(signature, newfile, delta string) error {
+
+	fsignature, err := fopen(signature, "rb")
+	if err != nil {
+		return err
+	}
+	defer fclose(fsignature)
+
+	fnewfile, err := fopen(newfile, "rb")
+	if err != nil {
+		return err
+	}
+	defer fclose(fnewfile)
+
+	// the 'x' flag is not supported on Windows
+	// so manually check if the file exists
+	if _, err := os.Stat(delta); err == nil {
+		return &os.PathError{
+			Op:   "fopen",
+			Path: delta,
+			Err:  os.ErrExist,
+		}
+	}
+	fdelta, err := fopen(delta, "wb")
+	if err != nil {
+		return err
+	}
+	defer fclose(fdelta)
+
+	var sumset *C.rs_signature_t
+	result := rsResult(C.rs_loadsig_file(fsignature, &sumset, nil))
+	if result != rs_DONE {
+		return rsError(result)
+	}
+
+	result = rsResult(C.rs_build_hash_table(sumset))
+	if result != rs_DONE {
+		return rsError(result)
+	}
+
+	result = rsResult(C.rs_delta_file(sumset, fnewfile, fdelta, nil))
+	C.rs_free_sumset(sumset)
+	if result != rs_DONE {
+		return rsError(result)
+	}
+
+	return nil
 }
 
 func Patch(basis, delta, newfile string) error {
