@@ -2,12 +2,26 @@
 
 # Requirements
 
-Only works on Mac right now.
-
 Needs:
 
-* `ovftool` (VMWare)
-* `brew install librsync`
+* `ovftool` (VMWare) on your path 
+* clone librsync: https://github.com/charlievieth/librsync/tree/mingw64-fseeko64-v2.0.0
+
+
+# Build Instructions
+Note: you can only build on your host OS. you cannot cross compile. 
+
+1) download cmake
+1) set source folder to librsync 
+1) set destination folder to librsync/build
+1) set CMAKE_INSTALL_PREFIX=librsync/install
+1) set CMAKE_BUILD_TYPE=release
+1) click configure
+1) click generate
+2) copy all source and header files from librsync/src into rdiff/
+2) copy all source and header files from librsync/build/src into rdiff/
+3) remove rdiff/rdiff.c
+
 
 # Instructions
 

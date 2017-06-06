@@ -3,6 +3,8 @@
 # This *must* be run from the rdiff directory where this
 # file is located!
 
+# Use this fork of librsync: https://github.com/charlievieth/librsync/tree/mingw64-fseeko64-v2.0.0
+#
 # Root directory of librsync
 LIBRSYNC_DIR="PATH_TO_LIBRSYNC_SRC_DIR"
 

@@ -174,7 +174,7 @@ VMX File (%[2]s):
 		t.Fatal(err)
 	}
 	ovfSrc := string(b)
-	if strings.Contains(ovfSrc, "ethernet") {
+	if !strings.Contains(ovfSrc, "ethernet") {
 		t.Fatalf(errorMsgFormat, ovf, vmx, ovfSrc, vmxBuf.String())
 	}
 }

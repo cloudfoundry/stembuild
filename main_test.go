@@ -261,7 +261,7 @@ func TestCreateImage(t *testing.T) {
 			}
 		}
 
-		// the vmx template should generate an ovf file that does not
+		// the vmx template should generate an ovf file that does
 		// contain an ethernet section.
 		//
 		ovf := filepath.Join(imageDir, "image.ovf")
@@ -269,8 +269,8 @@ func TestCreateImage(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if strings.Contains(strings.ToLower(s), "ethernet") {
-			t.Errorf("CreateImage: ovf contains 'ethernet':\n%s\n", s)
+		if !strings.Contains(strings.ToLower(s), "ethernet") {
+			t.Errorf("CreateImage: ovf does not contain 'ethernet' block:\n%s\n", s)
 		}
 	}
 
