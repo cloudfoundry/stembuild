@@ -22,6 +22,8 @@ import (
 	"github.com/pivotal-cf-experimental/pcf-make-stemcell/rdiff"
 )
 
+const DefaultOSVersion = "2012R2"
+
 var (
 	Version     string
 	OutputDir   string
@@ -29,6 +31,7 @@ var (
 	OvfDir      string
 	VHDFile     string
 	VMDKFile    string
+	OSVersion   string
 	DeltaFile   string
 	EnableDebug bool
 	DebugColor  bool
@@ -37,8 +40,9 @@ var (
 var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
-Usage %[1]s: [OPTIONS...] [-VMDK FILENAME] [[-VHD FILENAME] [-DELTA FILENAME]]
-             [-OUTPUT DIRNAME] [-VERSION version]
+Usage %[1]s: [OPTIONS...] [-VMDK FILENAME] [[-VHD FILENAME]
+      %[2]s  [-DELTA FILENAME]] [-OUTPUT DIRNAME]
+      %[2]s  [-VERSION STEMCELL_VERSION] [-OS OS_VERSION]
 
 Creates a BOSH stemcell from a VHD and DELTA (patch) file.
 
@@ -77,17 +81,24 @@ Flags:
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, UsageMessage, filepath.Base(os.Args[0]))
+		exe := filepath.Base(os.Args[0])
+		pad := strings.Repeat(" ", len(exe))
+		fmt.Fprintf(os.Stderr, UsageMessage, exe, pad)
 		flag.PrintDefaults()
 	}
 
 	flag.StringVar(&VHDFile, "vhd", "", "VHD file to patch")
 	flag.StringVar(&VMDKFile, "vmdk", "", "VMDK file to create stemcell from")
 
-	flag.StringVar(&DeltaFile, "delta", "", "Patch file that will be applied to the VHD")
+	flag.StringVar(&DeltaFile, "delta", "",
+		"Patch file that will be applied to the VHD")
 	flag.StringVar(&DeltaFile, "d", "", "Patch file (shorthand)")
 
-	flag.StringVar(&Version, "version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)")
+	flag.StringVar(&OSVersion, "os", DefaultOSVersion,
+		"OS version must be either 2012R2 or 2016")
+
+	flag.StringVar(&Version, "version", "",
+		"Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)")
 	flag.StringVar(&Version, "v", "", "Stemcell version (shorthand)")
 
 	flag.StringVar(&OutputDir, "output", "",
@@ -169,12 +180,20 @@ func ValidateFlags() []error {
 		add(fmt.Errorf("output argument (%s): is not a directory\n", OutputDir))
 	}
 
-	Debugf("validating version string: %s", Version)
+	Debugf("validating stemcell version string: %s", Version)
 	if err := validateVersion(Version); err != nil {
 		add(err)
 	}
 
-	name := filepath.Join(OutputDir, StemcellFilename(Version))
+	Debugf("validating OS version: %s", OSVersion)
+	switch OSVersion {
+	case "2012R2", "2016":
+		// Ok
+	default:
+		add(fmt.Errorf("OS version must be either 2012R2 or 2016 have: %s", OSVersion))
+	}
+
+	name := filepath.Join(OutputDir, StemcellFilename(Version, OSVersion))
 	Debugf("validating that stemcell filename (%s) does not exist", name)
 	if _, err := os.Stat(name); !os.IsNotExist(err) {
 		add(fmt.Errorf("file (%s) already exists - refusing to overwrite", name))
@@ -196,8 +215,9 @@ func validateVersion(s string) error {
 	return nil
 }
 
-func StemcellFilename(version string) string {
-	return fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows2012R2-go_agent.tgz", version)
+func StemcellFilename(version, os string) string {
+	return fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz",
+		version, os)
 }
 
 var ErrInterupt = errors.New("interupt")
@@ -346,7 +366,7 @@ func (c *Config) CreateStemcell() error {
 		return err
 	}
 
-	c.Stemcell = filepath.Join(tmpdir, StemcellFilename(Version))
+	c.Stemcell = filepath.Join(tmpdir, StemcellFilename(Version, OSVersion))
 	stemcell, err := os.OpenFile(c.Stemcell, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
@@ -389,10 +409,10 @@ func (c *Config) CreateStemcell() error {
 
 func (c *Config) WriteManifest() error {
 	const format = `---
-name: bosh-vsphere-esxi-windows2012R2-go_agent
-version: %s
-sha1: %s
-operating_system: windows2012R2
+name: bosh-vsphere-esxi-windows%[1]s-go_agent
+version: %[2]s
+sha1: %[3]s
+operating_system: windows%[1]s
 cloud_properties:
   infrastructure: vsphere
   hypervisor: esxi
@@ -416,7 +436,7 @@ cloud_properties:
 	defer f.Close()
 	Debugf("created temp stemcell.MF file: %s", c.Manifest)
 
-	if _, err := fmt.Fprintf(f, format, Version, c.Sha1sum); err != nil {
+	if _, err := fmt.Fprintf(f, format, OSVersion, Version, c.Sha1sum); err != nil {
 		os.Remove(c.Manifest)
 		return fmt.Errorf("writing stemcell.MF (%s): %s", c.Manifest, err)
 	}
@@ -553,6 +573,8 @@ func ParseFlags() error {
 		Debugf("setting output dir (%s) to working directory: %s", OutputDir, wd)
 		OutputDir = wd
 	}
+
+	OSVersion = strings.ToUpper(OSVersion)
 
 	return nil
 }

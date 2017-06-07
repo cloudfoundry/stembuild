@@ -57,6 +57,62 @@ func readdirnames(dirname string) ([]string, error) {
 	return names, nil
 }
 
+func TestOsVersion(t *testing.T) {
+	const archive = "testdata/patch-test.tar.gz"
+
+	// Reset Version and OSVersion on exit
+	oldVersion := Version
+	oldOSVersion := OSVersion
+	defer func() {
+		Version = oldVersion
+		OSVersion = oldOSVersion
+	}()
+	Version = "9000"
+	OSVersion = "2016"
+
+	var err error
+	OutputDir, err = TempDir("test-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(OutputDir)
+
+	dirname := extractGzipArchive(t, archive)
+	defer os.RemoveAll(dirname)
+	vmdkPath := filepath.Join(dirname, "expected.vmdk")
+
+	conf := Config{stop: make(chan struct{})}
+
+	realMain(&conf, vmdkPath, "", "")
+
+	// assertions
+	stemcellFilename := filepath.Base(conf.Stemcell)
+	stemcellDirname := extractGzipArchive(t, filepath.Join(OutputDir, stemcellFilename))
+	manifestFilepath := filepath.Join(stemcellDirname, "stemcell.MF")
+
+	manifest, err := readFile(manifestFilepath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedOs := fmt.Sprintf("operating_system: windows%s", OSVersion)
+	if !strings.Contains(manifest, expectedOs) {
+		t.Errorf("TestOSVerson: stemcell.MF expected os: %s\n%s\n",
+			expectedOs, manifest)
+	}
+
+	expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", OSVersion)
+	if !strings.Contains(manifest, expectedName) {
+		t.Errorf("TestOSVerson: stemcell.MF expected stemcell filename: %s\n%s\n",
+			expectedName, manifest)
+	}
+
+	if !strings.Contains(stemcellFilename, OSVersion) {
+		t.Errorf("TestOSVerson: expected filename: %s got: %s",
+			OSVersion, stemcellFilename)
+	}
+}
+
 func TestExtractOVA_Valid(t *testing.T) {
 	const Count = 9
 	const NameFmt = "file-%d"
