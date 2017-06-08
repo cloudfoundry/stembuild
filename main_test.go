@@ -13,7 +13,21 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/pivotal-cf-experimental/pcf-make-stemcell/ovftool"
 )
+
+// Run this test first - no point continuing with ovftool!
+func TestOVFTool(t *testing.T) {
+	const format = "locating ovftool executable: %s\n\n" +
+		"The OVF Tool is required to run these tests.\n" +
+		"It may be download from VMware for free from:\n" +
+		"  https://www.vmware.com/support/developer/ovf/\n\n"
+	if _, err := ovftool.Ovftool(); err != nil {
+		t.Logf(format, err)
+		panic("stopping tests now - missing ovftool!")
+	}
+}
 
 var versionTests = []struct {
 	s  string

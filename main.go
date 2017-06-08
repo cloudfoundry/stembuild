@@ -503,10 +503,15 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 	const errFmt = "converting vmx to ova: %s\n" +
 		"-- BEGIN STDERR OUTPUT -- :\n%s\n-- END STDERR OUTPUT --\n"
 
+	ovfpath, err := ovftool.Ovftool()
+	if err != nil {
+		return err
+	}
+
 	// ignore stdout
 	var stderr bytes.Buffer
 
-	cmd := exec.Command("ovftool", vmx, ova)
+	cmd := exec.Command(ovfpath, vmx, ova)
 	cmd.Stderr = &stderr
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("ovftool: %s", err)
