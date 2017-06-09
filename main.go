@@ -18,8 +18,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pivotal-cf-experimental/pcf-make-stemcell/ovftool"
-	"github.com/pivotal-cf-experimental/pcf-make-stemcell/rdiff"
+	"github.com/pivotal-cf-experimental/stembuild/ovftool"
+	"github.com/pivotal-cf-experimental/stembuild/rdiff"
 )
 
 const DefaultOSVersion = "2012R2"
