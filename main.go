@@ -595,7 +595,11 @@ func (c *Config) CreateImage(vmdk string) error {
 	}
 
 	vmxPath := filepath.Join(tmpdir, "image.vmx")
-	if err := WriteVMXTemplate(vmdk, vmxPath); err != nil {
+	vmdkPath, err := filepath.Abs(vmdk)
+	if err != nil {
+		return err
+	}
+	if err := WriteVMXTemplate(vmdkPath, vmxPath); err != nil {
 		return err
 	}
 

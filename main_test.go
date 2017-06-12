@@ -346,6 +346,35 @@ func TestCreateImage(t *testing.T) {
 
 }
 
+// this checks that CreateImage can take the relative path of a VMDK
+func TestCreateImagePathResolution(t *testing.T) {
+	const archive = "testdata/patch-test.tar.gz"
+
+	dirname := extractGzipArchive(t, archive)
+	defer os.RemoveAll(dirname)
+
+	// get current working dir
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Errorf("could not get working dir")
+	}
+
+	if err := os.Chdir(dirname); err != nil {
+		t.Errorf("Could not change to test tmp dir: %s", dirname)
+	}
+
+	conf := Config{stop: make(chan struct{})}
+
+	if err := conf.CreateImage("expected.vmdk"); err != nil {
+		t.Errorf("CreateImage couldn't expand absolute path of VMDK file: %s", err)
+	}
+
+	// change back to current working dir
+	if err := os.Chdir(cwd); err != nil {
+		t.Errorf("Could not change back to working dir: %s", cwd)
+	}
+}
+
 func readFile(name string) (string, error) {
 	b, err := ioutil.ReadFile(name)
 	return string(b), err
