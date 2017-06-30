@@ -1,4 +1,7 @@
-pcf-make-stemcell
+stembuild
+stembuild.exe
+gordiff
+gordiff.exe
 temp
 rdiff/*.c
 rdiff/*.h
