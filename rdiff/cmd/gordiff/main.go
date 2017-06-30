@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pivotal-cf-experimental/pcf-make-stemcell/rdiff"
+	"github.com/pivotal-cf-experimental/stembuild/rdiff"
 )
 
 const UsageMessage = `Usage: %s [OPTIONS] signature [BASIS [SIGNATURE]]
