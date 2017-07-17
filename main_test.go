@@ -57,6 +57,33 @@ func TestValidateVersion(t *testing.T) {
 	}
 }
 
+func errorArrayContains(errors []error, s string) bool {
+	for _, e := range errors {
+		if strings.Contains(e.Error(), s) {
+			return true
+		}
+	}
+	return false
+}
+
+func TestMissingOutputDirectoryAddsToErrorMessage(t *testing.T) {
+	testCommand := "stembuild -vhd arbitrary.vhd -delta arbitrary.patch -v 1200.666 -output idontexist"
+	testArgs := strings.Split(testCommand, " ")
+	os.Args = testArgs
+	Init()
+	ParseFlags()
+
+	errs := ValidateFlags()
+
+	if len(errs) == 0 {
+		t.Errorf("expected error, but got nothing")
+	}
+
+	if !errorArrayContains(errs, "idontexist") {
+		t.Errorf("expected error string to contain output directory but got: %v", errs)
+	}
+}
+
 func readdirnames(dirname string) ([]string, error) {
 	f, err := os.Open(dirname)
 	if err != nil {

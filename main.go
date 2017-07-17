@@ -79,7 +79,7 @@ Examples:
 Flags:
 `
 
-func init() {
+func Init() {
 	flag.Usage = func() {
 		exe := filepath.Base(os.Args[0])
 		pad := strings.Repeat(" ", len(exe))
@@ -173,10 +173,9 @@ func ValidateFlags() []error {
 		add(errors.New("missing required argument 'output'"))
 	}
 	fi, err := os.Stat(OutputDir)
-	if err != nil {
+	if err != nil || fi == nil {
 		add(fmt.Errorf("error opening output directory (%s): %s\n", OutputDir, err))
-	}
-	if !fi.IsDir() {
+	} else if !fi.IsDir() {
 		add(fmt.Errorf("output argument (%s): is not a directory\n", OutputDir))
 	}
 
@@ -691,6 +690,7 @@ func realMain(c *Config, vmdk, vhd, delta string) error {
 }
 
 func main() {
+	Init()
 	Debugf("parsing flags")
 	if err := ParseFlags(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
