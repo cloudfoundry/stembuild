@@ -57,17 +57,49 @@ func TestValidateVersion(t *testing.T) {
 	}
 }
 
-func errorArrayContains(errors []error, s string) bool {
-	for _, e := range errors {
-		if strings.Contains(e.Error(), s) {
-			return true
-		}
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
 	}
-	return false
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
 }
 
-func TestMissingOutputDirectoryAddsToErrorMessage(t *testing.T) {
-	testCommand := "stembuild -vhd arbitrary.vhd -delta arbitrary.patch -v 1200.666 -output idontexist"
+func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
+	// Setup output directory
+	testOutputDir, err := TempDir("testOutputDir-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.RemoveAll(testOutputDir)
+	dirExists, _ := exists(testOutputDir)
+	if dirExists {
+		t.Errorf("%s already exists, not a valid test", testOutputDir)
+	}
+	// defer os.RemoveAll(testOutputDir)
+
+	// Setup input vhd and vmdk
+	testInputDir, err := TempDir("testInputDir-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(testInputDir)
+	testEmptyFilePath := filepath.Join(testInputDir, "testEmptyFile.txt")
+	testEmptyFile, err := os.Create(testEmptyFilePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	testEmptyFile.Close()
+
+	testCommand := fmt.Sprintf(
+		"stembuild -vhd %s -delta %s -v 1200.666 -output %s",
+		testEmptyFilePath,
+		testEmptyFilePath,
+		testOutputDir,
+	)
 	testArgs := strings.Split(testCommand, " ")
 	os.Args = testArgs
 	Init()
@@ -75,12 +107,13 @@ func TestMissingOutputDirectoryAddsToErrorMessage(t *testing.T) {
 
 	errs := ValidateFlags()
 
-	if len(errs) == 0 {
-		t.Errorf("expected error, but got nothing")
+	if len(errs) != 0 {
+		t.Errorf("expected no errors, but got errors: %s", errs)
 	}
 
-	if !errorArrayContains(errs, "idontexist") {
-		t.Errorf("expected error string to contain output directory but got: %v", errs)
+	dirExists, _ = exists(testOutputDir)
+	if !dirExists {
+		t.Errorf("%s was not created", testOutputDir)
 	}
 }
 

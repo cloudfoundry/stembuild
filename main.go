@@ -173,7 +173,11 @@ func ValidateFlags() []error {
 		add(errors.New("missing required argument 'output'"))
 	}
 	fi, err := os.Stat(OutputDir)
-	if err != nil || fi == nil {
+	if err != nil && os.IsNotExist(err) {
+		if err = os.Mkdir(OutputDir, 0700); err != nil {
+			add(err)
+		}
+	} else if err != nil || fi == nil {
 		add(fmt.Errorf("error opening output directory (%s): %s\n", OutputDir, err))
 	} else if !fi.IsDir() {
 		add(fmt.Errorf("output argument (%s): is not a directory\n", OutputDir))
@@ -195,7 +199,7 @@ func ValidateFlags() []error {
 	name := filepath.Join(OutputDir, StemcellFilename(Version, OSVersion))
 	Debugf("validating that stemcell filename (%s) does not exist", name)
 	if _, err := os.Stat(name); !os.IsNotExist(err) {
-		add(fmt.Errorf("file (%s) already exists - refusing to overwrite", name))
+		add(fmt.Errorf("error with output file (%s): %v (file may already exist)", name, err))
 	}
 
 	return errs
