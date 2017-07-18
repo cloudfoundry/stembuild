@@ -40,9 +40,9 @@ var (
 var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
-Usage %[1]s: [OPTIONS...] [-VMDK FILENAME] [[-VHD FILENAME]
-      %[2]s  [-DELTA FILENAME]] [-OUTPUT DIRNAME]
-      %[2]s  [-VERSION STEMCELL_VERSION] [-OS OS_VERSION]
+Usage %[1]s: [OPTIONS...] [-vmdk FILENAME] [-vhd FILENAME]
+      %[2]s  [-delta FILENAME]] [-output DIRNAME]
+      %[2]s  [-version STEMCELL_VERSION] [-os OS_VERSION]
 
 Creates a BOSH stemcell from a VHD and DELTA (patch) file.
 
@@ -50,20 +50,20 @@ Usage:
   The VMware 'ovftool' binary must be on your path or Fusion/Workstation
   must be installed (both include the 'ovftool').
 
-  Patch VHD [-VHD]:
+  Patch VHD [-vhd]:
 
     The [vhd], [delta] and [version] flags must be specified.  If the [output]
     flag is not specified the stemcell will be created in the current working
     directory.
 
-  Convert VMDK [-VMDK]:
+  Convert VMDK [-vmdk]:
     The [vmdk] and [version] flags must be specified.  If the [output] flag is
     not specified the stemcell will be created in the current working directory.
 
 Examples:
   %[1]s -vmdk disk.vmdk -v 1.2
 
-    Will create a stemcell using [vmdk] 'disk.vmkd' with version 1.2 in the current
+    Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
 		working directory.
 
   %[1]s -vhd disk.vhd -delta patch.file -v 1.2
