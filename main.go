@@ -66,10 +66,10 @@ Examples:
     Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
 		working directory.
 
-  %[1]s -vhd disk.vhd -delta patch.file -v 1.2
+  %[1]s -vhd disk.vhd -delta patch.file -v 1.2.3
 
     Will create a stemcell using [vhd] 'disk.vhd' and a patch file with
-		version 1.2 in the current working directory.
+		version 1.2.3 in the current working directory.
 
   %[1]s -vhd disk.vhd -delta patch.file -gzip -v 1.2 -output foo
 
@@ -210,12 +210,20 @@ func validateVersion(s string) error {
 	if s == "" {
 		return errors.New("missing required argument 'version'")
 	}
-	const pattern = `^\d{1,}.\d{1,}$`
-	if !regexp.MustCompile(pattern).MatchString(s) {
-		Debugf("expected version string to match regex: '%s'", pattern)
-		return fmt.Errorf("invalid version (%s) expected format [NUMBER].[NUMBER]", s)
+	patterns := []string{
+		`^\d{1,}\.\d{1,}$`,
+		`^\d{1,}\.\d{1,}-build\.\d{1,}$`,
+		`^\d{1,}\.\d{1,}\.\d{1,}$`,
+		`^\d{1,}\.\d{1,}\.\d{1,}-build\.\d{1,}$`,
 	}
-	return nil
+	for _, pattern := range patterns {
+		if regexp.MustCompile(pattern).MatchString(s) {
+			return nil
+		}
+	}
+	Debugf("expected version string to match any of the regexes: %s", patterns)
+	return fmt.Errorf("invalid version (%s) expected format [NUMBER].[NUMBER] or "+
+		"[NUMBER].[NUMBER].[NUMBER]", s)
 }
 
 func StemcellFilename(version, os string) string {

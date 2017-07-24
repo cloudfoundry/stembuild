@@ -42,6 +42,9 @@ var versionTests = []struct {
 	{"a1.2", false},
 	{"a.2", false},
 	{"1.2 a", false},
+	{"1200.0.3-build.2", true},
+	{"1200.0.3-build.a", false},
+	{"1.2-build.1", true},
 }
 
 func TestValidateVersion(t *testing.T) {
