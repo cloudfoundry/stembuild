@@ -73,19 +73,20 @@ toolsInstallManager.lastInstallError = "0"
 toolsInstallManager.updateCounter = "1"
 vcpu.hotadd = "TRUE"
 virtualHW.productCompatibility = "hosted"
-virtualHW.version = "9"
+virtualHW.version = "{{.HWVersion}}"
 vmci0.pciSlotNumber = "35"
 vmci0.present = "TRUE"
 `
 
-func VMXTemplate(vmdkPath string, w io.Writer) error {
+func VMXTemplate(vmdkPath string, virtualHWVersion int, w io.Writer) error {
 	if vmdkPath == "" {
 		return errors.New("vmx template: empty vmdk filename")
 	}
 	type context struct {
-		VMDKFile string
+		VMDKFile  string
+		HWVersion int
 	}
-	ctxt := context{VMDKFile: vmdkPath}
+	ctxt := context{VMDKFile: vmdkPath, HWVersion: virtualHWVersion}
 	t, err := template.New("vmx template").Parse(vmxTemplate)
 	if err != nil {
 		return err
@@ -94,12 +95,12 @@ func VMXTemplate(vmdkPath string, w io.Writer) error {
 }
 
 // WriteVMXTemplate writes the VMX template for VMDK vmdk to file filename.
-func WriteVMXTemplate(vmdkPath, vmxPath string) error {
+func WriteVMXTemplate(vmdkPath string, virtualHWVersion int, vmxPath string) error {
 	f, err := os.OpenFile(vmxPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
-	err = VMXTemplate(vmdkPath, f)
+	err = VMXTemplate(vmdkPath, virtualHWVersion, f)
 	f.Close()
 	if err != nil {
 		os.Remove(vmxPath)

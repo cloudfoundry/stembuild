@@ -41,56 +41,61 @@ func parseVMX(vmx string) (map[string]string, error) {
 	return m, nil
 }
 
-func checkVMXTemplate(t *testing.T, vmdkPath, vmxContent string) {
-	const keyname = "scsi0:0.fileName"
+func checkVMXTemplate(t *testing.T, hwVersion int, vmdkPath, vmxContent string) {
+	const vmdkPathKeyName = "scsi0:0.fileName"
+	const hwVersionKeyName = "virtualHW.version"
 
 	m, err := parseVMX(vmxContent)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s := m[keyname]; s != vmdkPath {
-		t.Errorf("VMXTemplate: key: %q want: %q got: %q", keyname, vmdkPath, s)
+	if s := m[vmdkPathKeyName]; s != vmdkPath {
+		t.Errorf("VMXTemplate: key: %q want: %q got: %q", vmdkPathKeyName, vmdkPath, s)
+	}
+
+	expectedHWVersion := strconv.Itoa(hwVersion)
+	if s := m[hwVersionKeyName]; s != expectedHWVersion {
+		t.Errorf("VMXTemplate: key: %q want: %q got: %q", hwVersionKeyName, expectedHWVersion, s)
 	}
 }
 
-func TestVMXTemplate(t *testing.T) {
-	const vmdkPath = "FooBarBaz.vmdk"
+const vmdkPath = "FooBarBaz.vmdk"
+const virtualHWVersion = 60
 
+func TestVMXTemplate(t *testing.T) {
 	var buf bytes.Buffer
-	if err := VMXTemplate(vmdkPath, &buf); err != nil {
+	if err := VMXTemplate(vmdkPath, virtualHWVersion, &buf); err != nil {
 		t.Fatal(err)
 	}
-	checkVMXTemplate(t, vmdkPath, buf.String())
+	checkVMXTemplate(t, virtualHWVersion, vmdkPath, buf.String())
 
-	if err := VMXTemplate("", &buf); err == nil {
+	if err := VMXTemplate("", 0, &buf); err == nil {
 		t.Error("VMXTemplate: expected error for empty vmx filename")
 	}
 }
 
 func TestWriteVMXTemplate(t *testing.T) {
-	const vmdkPath = "FooBarBaz.vmdk"
-
 	tmpdir, err := TempDir("test-")
 	if err != nil {
 		t.Fatal(err)
 	}
 	vmxPath := filepath.Join(tmpdir, "FooBarBaz.vmx")
 
-	if err := WriteVMXTemplate(vmdkPath, vmxPath); err != nil {
+	if err := WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
 		t.Fatal(err)
 	}
 	b, err := ioutil.ReadFile(vmxPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	checkVMXTemplate(t, vmdkPath, string(b))
+	checkVMXTemplate(t, virtualHWVersion, vmdkPath, string(b))
 
 	if err := os.Remove(vmxPath); err != nil {
 		t.Fatal(err)
 	}
 
 	// vmx file is deleted if there is an error
-	if err := WriteVMXTemplate("", vmxPath); err == nil {
+	if err := WriteVMXTemplate("", 0, vmxPath); err == nil {
 		t.Error("WriteVMXTemplate: expected error for empty vmx filename")
 	}
 	if _, err := os.Stat(vmxPath); err == nil {
@@ -139,7 +144,7 @@ VMX File (%[2]s):
 	t.Logf("TestVMXTemplateToOVF [vmx]: %s", vmx)
 
 	var vmxBuf bytes.Buffer
-	if err := VMXTemplate("expected.vmdk", &vmxBuf); err != nil {
+	if err := VMXTemplate("expected.vmdk", virtualHWVersion, &vmxBuf); err != nil {
 		t.Fatal(err)
 	}
 	if err := ioutil.WriteFile(vmx, vmxBuf.Bytes(), 0644); err != nil {

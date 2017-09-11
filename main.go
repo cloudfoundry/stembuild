@@ -605,12 +605,20 @@ func (c *Config) CreateImage(vmdk string) error {
 		return err
 	}
 
+	var hwVersion int
+	switch OSVersion {
+	case "2012R2":
+		hwVersion = 9
+	case "2016":
+		hwVersion = 10
+	}
+
 	vmxPath := filepath.Join(tmpdir, "image.vmx")
 	vmdkPath, err := filepath.Abs(vmdk)
 	if err != nil {
 		return err
 	}
-	if err := WriteVMXTemplate(vmdkPath, vmxPath); err != nil {
+	if err := WriteVMXTemplate(vmdkPath, hwVersion, vmxPath); err != nil {
 		return err
 	}
 

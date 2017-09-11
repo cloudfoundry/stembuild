@@ -347,7 +347,6 @@ func TestCreateImage(t *testing.T) {
 	}
 
 	// Make sure the sha1 sum is correct
-
 	h := sha1.New()
 	f, err := os.Open(conf.Image)
 	if err != nil {
@@ -406,7 +405,6 @@ func TestCreateImage(t *testing.T) {
 			t.Errorf("CreateImage: ovf contains 'ethernet' block:\n%s\n", s)
 		}
 	}
-
 }
 
 // this checks that CreateImage can take the relative path of a VMDK
