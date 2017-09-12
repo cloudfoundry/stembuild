@@ -1,11 +1,9 @@
 package rdiff
 
 import (
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 )
 
@@ -23,20 +21,8 @@ func fileExists(name string) bool {
 	return err == nil && fi.Mode().IsRegular()
 }
 
-func tempDir() (string, error) {
-	var dir string
-	if runtime.GOOS == "windows" {
-		windir := os.Getenv("WINDIR")
-		if windir == "" {
-			return "", errors.New("missing WINDIR environment variable")
-		}
-		dir = filepath.Join(windir, "Temp")
-	}
-	return ioutil.TempDir(dir, "rdiff-tests-")
-}
-
 func TestPatchErrorHandling(t *testing.T) {
-	dirname, err := tempDir()
+	dirname, err := ioutil.TempDir("", "rdiff-tests-")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -352,7 +353,7 @@ func (c *Config) TempDir() (string, error) {
 		}
 		return c.tmpdir, nil
 	}
-	name, err := TempDir("stemcell-")
+	name, err := ioutil.TempDir("", "stemcell-")
 	if err != nil {
 		return "", fmt.Errorf("creating temp directory: %s", err)
 	}

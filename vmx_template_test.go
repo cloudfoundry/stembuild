@@ -75,7 +75,7 @@ func TestVMXTemplate(t *testing.T) {
 }
 
 func TestWriteVMXTemplate(t *testing.T) {
-	tmpdir, err := TempDir("test-")
+	tmpdir, err := ioutil.TempDir("", "test-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +160,7 @@ VMX File (%[2]s):
 	}
 	t.Logf("TestVMXTemplateToOVF: ovftool output:\n%s\n", string(out))
 
-	tmpdir, err := TempDir("test-")
+	tmpdir, err := ioutil.TempDir("", "test-")
 	if err != nil {
 		t.Fatal(err)
 	}

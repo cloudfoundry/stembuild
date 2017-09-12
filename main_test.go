@@ -73,7 +73,7 @@ func exists(path string) (bool, error) {
 
 func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
 	// Setup output directory
-	testOutputDir, err := TempDir("testOutputDir-")
+	testOutputDir, err := ioutil.TempDir("", "testOutputDir-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,7 +85,7 @@ func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
 	// defer os.RemoveAll(testOutputDir)
 
 	// Setup input vhd and vmdk
-	testInputDir, err := TempDir("testInputDir-")
+	testInputDir, err := ioutil.TempDir("", "testInputDir-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,7 +148,7 @@ func TestOsVersion(t *testing.T) {
 	OSVersion = "2016"
 
 	var err error
-	OutputDir, err = TempDir("test-")
+	OutputDir, err = ioutil.TempDir("", "test-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +194,7 @@ func TestExtractOVA_Valid(t *testing.T) {
 	const Count = 9
 	const NameFmt = "file-%d"
 
-	tmpdir, err := TempDir("test-")
+	tmpdir, err := ioutil.TempDir("", "test-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -265,7 +265,7 @@ func TestExtractOVA_Invalid(t *testing.T) {
 	}
 
 	for _, x := range tests {
-		tmpdir, err := TempDir("test-")
+		tmpdir, err := ioutil.TempDir("", "test-")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -446,7 +446,7 @@ func readFile(name string) (string, error) {
 func extractGzipArchive(t *testing.T, name string) string {
 	t.Logf("extractGzipArchive: extracting tgz: %s", name)
 
-	tmpdir, err := TempDir("test-")
+	tmpdir, err := ioutil.TempDir("", "test-")
 	if err != nil {
 		t.Fatal(err)
 	}
