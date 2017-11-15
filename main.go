@@ -419,17 +419,7 @@ func (c *Config) CreateStemcell() error {
 	return nil
 }
 
-func (c *Config) WriteManifest() error {
-	const format = `---
-name: bosh-vsphere-esxi-windows%[1]s-go_agent
-version: %[2]s
-sha1: %[3]s
-operating_system: windows%[1]s
-cloud_properties:
-  infrastructure: vsphere
-  hypervisor: esxi
-`
-
+func (c *Config) WriteManifest(manifest string) error {
 	// programming error - this should never happen...
 	if c.Manifest != "" {
 		panic("already created manifest: " + c.Manifest)
@@ -448,13 +438,28 @@ cloud_properties:
 	defer f.Close()
 	Debugf("created temp stemcell.MF file: %s", c.Manifest)
 
-	if _, err := fmt.Fprintf(f, format, OSVersion, Version, c.Sha1sum); err != nil {
+	if _, err := fmt.Fprintf(f, manifest); err != nil {
 		os.Remove(c.Manifest)
 		return fmt.Errorf("writing stemcell.MF (%s): %s", c.Manifest, err)
 	}
 	Debugf("wrote stemcell.MF with sha1: %s and version: %s", c.Sha1sum, Version)
 
 	return nil
+}
+
+func CreateManifest(osVersion, version, sha1sum string) string {
+	const format = `---
+name: bosh-vsphere-esxi-windows%[1]s-go_agent
+version: %[2]s
+sha1: %[3]s
+operating_system: windows%[1]s
+cloud_properties:
+  infrastructure: vsphere
+  hypervisor: esxi
+stemcell_formats: vsphere-ova
+`
+	return fmt.Sprintf(format, osVersion, version, sha1sum)
+
 }
 
 func ExtractOVA(ova, dirname string) error {
@@ -659,18 +664,18 @@ func (c *Config) CreateImage(vmdk string) error {
 	return nil
 }
 
-func (c *Config) ConvertVMDK(vmdk string) (string, error) {
+func (c *Config) ConvertVMDK(vmdk string, outputDir string) (string, error) {
 	if err := c.CreateImage(vmdk); err != nil {
 		return "", err
 	}
-	if err := c.WriteManifest(); err != nil {
+	if err := c.WriteManifest(CreateManifest(OSVersion, Version, c.Sha1sum)); err != nil {
 		return "", err
 	}
 	if err := c.CreateStemcell(); err != nil {
 		return "", err
 	}
 
-	stemcellPath := filepath.Join(OutputDir, filepath.Base(c.Stemcell))
+	stemcellPath := filepath.Join(outputDir, filepath.Base(c.Stemcell))
 	Debugf("moving stemcell (%s) to: %s", c.Stemcell, stemcellPath)
 
 	if err := os.Rename(c.Stemcell, stemcellPath); err != nil {
@@ -699,7 +704,7 @@ func realMain(c *Config, vmdk, vhd, delta string) error {
 		Debugf("main: using vmdk (%s)", vmdk)
 	}
 
-	stemcellPath, err := c.ConvertVMDK(vmdk)
+	stemcellPath, err := c.ConvertVMDK(vmdk, OutputDir)
 	if err != nil {
 		return err
 	}

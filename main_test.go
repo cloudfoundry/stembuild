@@ -358,7 +358,7 @@ func TestCreateImage(t *testing.T) {
 	sum := fmt.Sprintf("%x", h.Sum(nil))
 
 	if conf.Sha1sum != sum {
-		t.Error("CreateImage: expected sha1: %s got: %s", sum, conf.Sha1sum)
+		t.Errorf("CreateImage: expected sha1: %s got: %s", sum, conf.Sha1sum)
 	}
 
 	// extract image
@@ -433,6 +433,23 @@ func TestCreateImagePathResolution(t *testing.T) {
 	// change back to current working dir
 	if err := os.Chdir(cwd); err != nil {
 		t.Errorf("Could not change back to working dir: %s", cwd)
+	}
+}
+
+func TestThatTheManifestIsGeneratedCorrectly(t *testing.T) {
+	result := CreateManifest("1", "version", "sha1sum")
+	expectedManifest := `---
+name: bosh-vsphere-esxi-windows1-go_agent
+version: version
+sha1: sha1sum
+operating_system: windows1
+cloud_properties:
+  infrastructure: vsphere
+  hypervisor: esxi
+stemcell_formats: vsphere-ova
+`
+	if result != expectedManifest {
+		t.Errorf("result:\n%s\ndoes not match expected\n%s\n", result, expectedManifest)
 	}
 }
 
