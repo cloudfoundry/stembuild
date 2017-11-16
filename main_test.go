@@ -446,7 +446,8 @@ operating_system: windows1
 cloud_properties:
   infrastructure: vsphere
   hypervisor: esxi
-stemcell_formats: vsphere-ova
+stemcell_formats:
+- vsphere-ova
 `
 	if result != expectedManifest {
 		t.Errorf("result:\n%s\ndoes not match expected\n%s\n", result, expectedManifest)

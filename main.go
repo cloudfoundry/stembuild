@@ -456,7 +456,8 @@ operating_system: windows%[1]s
 cloud_properties:
   infrastructure: vsphere
   hypervisor: esxi
-stemcell_formats: vsphere-ova
+stemcell_formats:
+- vsphere-ova
 `
 	return fmt.Sprintf(format, osVersion, version, sha1sum)
 
