@@ -447,6 +447,7 @@ cloud_properties:
   infrastructure: vsphere
   hypervisor: esxi
 stemcell_formats:
+- vsphere-ovf
 - vsphere-ova
 `
 	if result != expectedManifest {
