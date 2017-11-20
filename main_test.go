@@ -440,7 +440,7 @@ func TestThatTheManifestIsGeneratedCorrectly(t *testing.T) {
 	result := CreateManifest("1", "version", "sha1sum")
 	expectedManifest := `---
 name: bosh-vsphere-esxi-windows1-go_agent
-version: version
+version: 'version'
 sha1: sha1sum
 operating_system: windows1
 cloud_properties:
