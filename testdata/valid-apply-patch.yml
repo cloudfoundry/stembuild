@@ -1,4 +1,4 @@
 ---
 version: "2012R2"
 vhd_file: "some-vhd-file"
-delta_file: "some-patch-file"
+patch_file: "some-patch-file"

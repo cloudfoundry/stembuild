@@ -1,4 +1,4 @@
-package stembuild
+package main
 
 import (
 	"archive/tar"
@@ -20,13 +20,14 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
+	"github.com/pivotal-cf-experimental/stembuild/patch"
 	"github.com/pivotal-cf-experimental/stembuild/rdiff"
 )
 
 const DefaultOSVersion = "2012R2"
 
 var (
-	applyPatch        ApplyPatch
+	applyPatch        patch.ApplyPatch
 	patchManifestFile string
 
 	EnableDebug bool
@@ -36,41 +37,53 @@ var (
 var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
-Usage %[1]s: [OPTIONS...] [-vmdk FILENAME] [-vhd FILENAME]
-      %[2]s  [-delta FILENAME]] [-output DIRNAME]
-      %[2]s  [-version STEMCELL_VERSION] [-os OS_VERSION]
+Usage %[1]s [OPTIONS...] apply-patch <patch manifest yml>
+      %[2]s [-vhd FILENAME] [-patch FILENAME] [-output DIRNAME]
+      %[2]s [-version STEMCELL_VERSION] [-os OS_VERSION]
 
-Creates a BOSH stemcell from a VHD and DELTA (patch) file.
+Usage %[1]s [OPTIONS...] [-vmdk FILENAME]
+      %[2]s [-output DIRNAME] [-version STEMCELL_VERSION]
+      %[2]s [-os OS_VERSION]
+
+Creates a BOSH stemcell from a VHD and PATCH (patch) file.
 
 Usage:
   The VMware 'ovftool' binary must be on your path or Fusion/Workstation
   must be installed (both include the 'ovftool').
 
-  Patch VHD [-vhd]:
-
-    The [vhd], [delta] and [version] flags must be specified.  If the [output]
-    flag is not specified the stemcell will be created in the current working
-    directory.
+  Patch VHD:
+    The [vhd], [patch], and [version] flags must be specified either on the
+    command line or in the manifest file.  If the [output] flag is not
+    specified the stemcell will be created in the current working directory.
 
   Convert VMDK [-vmdk]:
     The [vmdk] and [version] flags must be specified.  If the [output] flag is
     not specified the stemcell will be created in the current working directory.
 
 Examples:
+  %[1]s patch-manifest.yml
+  where patch-manifest.yml contains
+  %[2]s ---
+  %[2]s version: '1.2.3'
+  %[2]s vhd_file: disk.vhd
+  %[2]s patch_file: patch.file
+
+  and
+
+  %[1]s -vhd disk.vhd -patch patch.file -v 1.2.3
+
+    Will create a stemcell using [vhd] 'disk.vhd' and a patch file with
+    version 1.2.3 in the current working directory.
+
+  %[1]s -vhd disk.vhd -patch patch.file -gzip -v 1.2 -output foo
+
+    Will create a stemcell with version 1.2 in the 'foo' directory using gzip
+    compressed patch file 'patch.file'.
+
   %[1]s -vmdk disk.vmdk -v 1.2
 
     Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
 		working directory.
-
-  %[1]s -vhd disk.vhd -delta patch.file -v 1.2.3
-
-    Will create a stemcell using [vhd] 'disk.vhd' and a patch file with
-		version 1.2.3 in the current working directory.
-
-  %[1]s -vhd disk.vhd -delta patch.file -gzip -v 1.2 -output foo
-
-    Will create a stemcell with version 1.2 in the 'foo' directory using gzip
-    compressed patch file 'patch.file'.
 
 Flags:
 `
@@ -86,9 +99,9 @@ func Init() {
 	flag.StringVar(&applyPatch.VHDFile, "vhd", "", "VHD file to patch")
 	flag.StringVar(&applyPatch.VMDKFile, "vmdk", "", "VMDK file to create stemcell from")
 
-	flag.StringVar(&applyPatch.DeltaFile, "delta", "",
+	flag.StringVar(&applyPatch.PatchFile, "patch", "",
 		"Patch file that will be applied to the VHD")
-	flag.StringVar(&applyPatch.DeltaFile, "d", "", "Patch file (shorthand)")
+	flag.StringVar(&applyPatch.PatchFile, "d", "", "Patch file (shorthand)")
 
 	flag.StringVar(&applyPatch.OSVersion, "os", DefaultOSVersion,
 		"OS version must be either 2012R2 or 2016")
@@ -132,15 +145,15 @@ func ValidateFlags() []error {
 
 	if patchManifestFile != "" {
 		Debugf("loading 'apply patch' manifest file: %q", patchManifestFile)
-		if err := LoadPatchManifest(patchManifestFile, &applyPatch); err != nil {
+		if err := patch.LoadPatchManifest(patchManifestFile, &applyPatch); err != nil {
 			add(fmt.Errorf("invalid patch manifest file: %q", err))
 			return errs
 		}
 		return nil
 	}
 
-	Debugf("validating [vmdk] (%s) [vhd] (%s) and [delta] (%s) flags",
-		applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.DeltaFile)
+	Debugf("validating [vmdk] (%s) [vhd] (%s) and [patch] (%s) flags",
+		applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.PatchFile)
 
 	if applyPatch.VMDKFile != "" && applyPatch.VHDFile != "" {
 		add(errors.New("both VMDK and VHD flags are specified"))
@@ -167,12 +180,12 @@ func ValidateFlags() []error {
 		if err := validFile(applyPatch.VHDFile); err != nil {
 			add(fmt.Errorf("invalid [vhd]: %s", err))
 		}
-		Debugf("validating patch file [delta]: %q", applyPatch.DeltaFile)
-		if applyPatch.DeltaFile == "" {
-			add(errors.New("missing required argument 'delta'"))
+		Debugf("validating patch file [patch]: %q", applyPatch.PatchFile)
+		if applyPatch.PatchFile == "" {
+			add(errors.New("missing required argument 'patch'"))
 		}
-		if err := validFile(applyPatch.DeltaFile); err != nil {
-			add(fmt.Errorf("invalid [delta]: %s", err))
+		if err := validFile(applyPatch.PatchFile); err != nil {
+			add(fmt.Errorf("invalid [patch]: %s", err))
 		}
 	}
 
@@ -564,10 +577,10 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 	return nil
 }
 
-// ApplyPatch, applies patch file delta to base file vhd, to create file vmdk.
+// ApplyPatch, applies patch file patch to base file vhd, to create file vmdk.
 // It is an error if the vmdk file already exists.
-func (c *Config) ApplyPatch(vhd, delta, vmdk string) error {
-	Debugf("preparing to apply patch: vhd: %s delta: %s vmdk: %s", vhd, delta, vmdk)
+func (c *Config) ApplyPatch(vhd, patch, vmdk string) error {
+	Debugf("preparing to apply patch: vhd: %s patch: %s vmdk: %s", vhd, patch, vmdk)
 
 	if _, err := os.Stat(vmdk); err == nil {
 		return fmt.Errorf("creating [vmdk] file: file exists: %s", vmdk)
@@ -576,7 +589,7 @@ func (c *Config) ApplyPatch(vhd, delta, vmdk string) error {
 	start := time.Now() // this is sometimes interesting
 
 	Debugf("applying patch with rdiff")
-	if err := rdiff.Patch(vhd, delta, vmdk); err != nil {
+	if err := rdiff.Patch(vhd, patch, vmdk); err != nil {
 		return err
 	}
 
@@ -693,7 +706,7 @@ func (c *Config) ConvertVMDK(vmdk string, outputDir string) (string, error) {
 	return stemcellPath, nil
 }
 
-func realMain(c *Config, vmdk, vhd, delta string) error {
+func realMain(c *Config, vmdk, vhd, patch string) error {
 	start := time.Now()
 
 	// PATCH HERE
@@ -704,9 +717,9 @@ func realMain(c *Config, vmdk, vhd, delta string) error {
 
 	// This is ugly and I'm sorry
 	if vmdk == "" {
-		Debugf("main: creating vmdk from [vhd] (%s) and [delta] (%s)", vhd, delta)
+		Debugf("main: creating vmdk from [vhd] (%s) and [patch] (%s)", vhd, patch)
 		vmdk = filepath.Join(tmpdir, "image.vmdk")
-		if err := c.ApplyPatch(vhd, delta, vmdk); err != nil {
+		if err := c.ApplyPatch(vhd, patch, vmdk); err != nil {
 			return err
 		}
 	} else {
@@ -766,7 +779,7 @@ func main() {
 		}
 	}()
 
-	if err := realMain(&c, applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.DeltaFile); err != nil {
+	if err := realMain(&c, applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.PatchFile); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 	}
 	c.Cleanup() // remove temp dir

@@ -1,4 +1,4 @@
-package stembuild
+package main
 
 import (
 	"bytes"
@@ -109,7 +109,7 @@ func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
 	testEmptyFile.Close()
 
 	testCommand := fmt.Sprintf(
-		"stembuild -vhd %s -delta %s -v 1200.666 -output %s",
+		"stembuild -vhd %s -patch %s -v 1200.666 -output %s",
 		testEmptyFilePath,
 		testEmptyFilePath,
 		testOutputDir,
@@ -297,7 +297,7 @@ func TestApplyPatch(t *testing.T) {
 	defer os.RemoveAll(dirname)
 
 	vhd := filepath.Join(dirname, "original.vhd")
-	delta := filepath.Join(dirname, "delta.patch")
+	patch := filepath.Join(dirname, "delta.patch")
 	expVMDK := filepath.Join(dirname, "expected.vmdk")
 
 	// output file
@@ -307,7 +307,7 @@ func TestApplyPatch(t *testing.T) {
 
 	// Normal operation
 	{
-		if err := conf.ApplyPatch(vhd, delta, newVMDK); err != nil {
+		if err := conf.ApplyPatch(vhd, patch, newVMDK); err != nil {
 			t.Fatal(err)
 		}
 		expSrc, err := ioutil.ReadFile(expVMDK)
@@ -326,7 +326,7 @@ func TestApplyPatch(t *testing.T) {
 
 	// Error when VMDK file already exists
 	{
-		if err := conf.ApplyPatch(vhd, delta, newVMDK); err == nil {
+		if err := conf.ApplyPatch(vhd, patch, newVMDK); err == nil {
 			t.Error("ApplyPatch: expected an error when the VMDK already exists got")
 		}
 	}
