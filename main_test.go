@@ -1,4 +1,4 @@
-package main
+package stembuild
 
 import (
 	"bytes"
@@ -28,6 +28,10 @@ func TestOVFTool(t *testing.T) {
 		panic("stopping tests now - missing ovftool!")
 	}
 }
+
+var (
+	InitRan = false
+)
 
 var versionTests = []struct {
 	s  string
@@ -71,6 +75,13 @@ func exists(path string) (bool, error) {
 	return true, err
 }
 
+func runInit() {
+	if !InitRan {
+		Init()
+		InitRan = true
+	}
+}
+
 func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
 	// Setup output directory
 	testOutputDir, err := ioutil.TempDir("", "testOutputDir-")
@@ -105,7 +116,7 @@ func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
 	)
 	testArgs := strings.Split(testCommand, " ")
 	os.Args = testArgs
-	Init()
+	runInit()
 	ParseFlags()
 
 	errs := ValidateFlags()
@@ -138,21 +149,22 @@ func TestOsVersion(t *testing.T) {
 	const archive = "testdata/patch-test.tar.gz"
 
 	// Reset Version and OSVersion on exit
-	oldVersion := Version
-	oldOSVersion := OSVersion
+	oldVersion := applyPatch.Version
+	oldOSVersion := applyPatch.OSVersion
 	defer func() {
-		Version = oldVersion
-		OSVersion = oldOSVersion
+		applyPatch.Version = oldVersion
+		applyPatch.OSVersion = oldOSVersion
 	}()
-	Version = "9000"
-	OSVersion = "2016"
+	applyPatch.Version = "9000"
+	applyPatch.OSVersion = "2016"
 
 	var err error
-	OutputDir, err = ioutil.TempDir("", "test-")
+	outputDir, err := ioutil.TempDir("", "test-")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(OutputDir)
+	applyPatch.OutputDir = outputDir
+	defer os.RemoveAll(applyPatch.OutputDir)
 
 	dirname := extractGzipArchive(t, archive)
 	defer os.RemoveAll(dirname)
@@ -164,7 +176,7 @@ func TestOsVersion(t *testing.T) {
 
 	// assertions
 	stemcellFilename := filepath.Base(conf.Stemcell)
-	stemcellDirname := extractGzipArchive(t, filepath.Join(OutputDir, stemcellFilename))
+	stemcellDirname := extractGzipArchive(t, filepath.Join(applyPatch.OutputDir, stemcellFilename))
 	manifestFilepath := filepath.Join(stemcellDirname, "stemcell.MF")
 
 	manifest, err := readFile(manifestFilepath)
@@ -172,21 +184,21 @@ func TestOsVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedOs := fmt.Sprintf("operating_system: windows%s", OSVersion)
+	expectedOs := fmt.Sprintf("operating_system: windows%s", applyPatch.OSVersion)
 	if !strings.Contains(manifest, expectedOs) {
 		t.Errorf("TestOSVerson: stemcell.MF expected os: %s\n%s\n",
 			expectedOs, manifest)
 	}
 
-	expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", OSVersion)
+	expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", applyPatch.OSVersion)
 	if !strings.Contains(manifest, expectedName) {
 		t.Errorf("TestOSVerson: stemcell.MF expected stemcell filename: %s\n%s\n",
 			expectedName, manifest)
 	}
 
-	if !strings.Contains(stemcellFilename, OSVersion) {
+	if !strings.Contains(stemcellFilename, applyPatch.OSVersion) {
 		t.Errorf("TestOSVerson: expected filename: %s got: %s",
-			OSVersion, stemcellFilename)
+			applyPatch.OSVersion, stemcellFilename)
 	}
 }
 
@@ -452,6 +464,40 @@ stemcell_formats:
 `
 	if result != expectedManifest {
 		t.Errorf("result:\n%s\ndoes not match expected\n%s\n", result, expectedManifest)
+	}
+}
+
+func TestValidApplyPatchManifestFile(t *testing.T) {
+	testCommand := fmt.Sprintf(
+		"stembuild -apply-patch %s",
+		"testdata/valid-apply-patch.yml",
+	)
+	testArgs := strings.Split(testCommand, " ")
+	os.Args = testArgs
+	runInit()
+	ParseFlags()
+
+	errs := ValidateFlags()
+
+	if len(errs) != 0 {
+		t.Errorf("expected no errors, but got errors: %s", errs)
+	}
+}
+
+func TestInvalidApplyPatchManifestFile(t *testing.T) {
+	testCommand := fmt.Sprintf(
+		"stembuild -apply-patch %s",
+		"testdata/invalid-apply-patch.yml",
+	)
+	testArgs := strings.Split(testCommand, " ")
+	os.Args = testArgs
+	runInit()
+	ParseFlags()
+
+	errs := ValidateFlags()
+
+	if len(errs) != 1 {
+		t.Error("expected single error; but got no, or more than one, error(s)")
 	}
 }
 

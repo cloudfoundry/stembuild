@@ -1,0 +1,5 @@
+---
+version: "2012R2"
+dhv_flie_nmae "some-vhd-file"
+ptach_flie: "some-patch-file"
+
