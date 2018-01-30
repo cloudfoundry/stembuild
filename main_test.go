@@ -469,7 +469,7 @@ stemcell_formats:
 
 func TestValidApplyPatchManifestFile(t *testing.T) {
 	testCommand := fmt.Sprintf(
-		"stembuild -apply-patch %s",
+		"stembuild apply-patch %s",
 		"testdata/valid-apply-patch.yml",
 	)
 	testArgs := strings.Split(testCommand, " ")
@@ -486,7 +486,7 @@ func TestValidApplyPatchManifestFile(t *testing.T) {
 
 func TestInvalidApplyPatchManifestFile(t *testing.T) {
 	testCommand := fmt.Sprintf(
-		"stembuild -apply-patch %s",
+		"stembuild apply-patch %s",
 		"testdata/invalid-apply-patch.yml",
 	)
 	testArgs := strings.Split(testCommand, " ")

@@ -27,8 +27,7 @@ import (
 const DefaultOSVersion = "2012R2"
 
 var (
-	applyPatch        patch.ApplyPatch
-	patchManifestFile string
+	applyPatch patch.ApplyPatch
 
 	EnableDebug bool
 	DebugColor  bool
@@ -114,9 +113,6 @@ func Init() {
 		"Output directory, default is the current working directory.")
 	flag.StringVar(&applyPatch.OutputDir, "o", "", "Output directory (shorthand)")
 
-	flag.StringVar(&patchManifestFile, "apply-patch", "",
-		"Manifest file containing patch information to create stemcell")
-
 	flag.BoolVar(&EnableDebug, "debug", false, "Print lots of debugging information")
 	flag.BoolVar(&DebugColor, "color", false, "Colorize debug output")
 }
@@ -138,9 +134,25 @@ func validFile(name string) error {
 }
 
 func ValidateFlags() []error {
-	var errs []error
+	var (
+		errs              []error
+		patchManifestFile string
+	)
+
 	add := func(err error) {
 		errs = append(errs, err)
+	}
+
+	argCount := flag.NArg()
+	switch {
+	case argCount == 2:
+		command := flag.Arg(0)
+		if command != "apply-patch" {
+			add(fmt.Errorf("Unrecognized command '%s'", command))
+		}
+		patchManifestFile = flag.Arg(1)
+	case argCount != 0:
+		add(errors.New("Invalid number of arguments"))
 	}
 
 	if patchManifestFile != "" {
@@ -732,13 +744,14 @@ func realMain(c *Config, vmdk, vhd, patch string) error {
 	}
 
 	Debugf("created stemcell (%s) in: %s", stemcellPath, time.Since(start))
-	fmt.Println("created stemell:", stemcellPath)
+	fmt.Println("created stemcell:", stemcellPath)
 
 	return nil
 }
 
 func main() {
 	Init()
+
 	Debugf("parsing flags")
 	if err := ParseFlags(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

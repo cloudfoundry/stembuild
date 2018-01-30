@@ -1,4 +1,4 @@
 ---
 version: "2012R2"
-vhd_file: "some-vhd-file"
-patch_file: "some-patch-file"
+vhd_file: "testdata/original.vhd"
+patch_file: "testdata/diff.patch"
