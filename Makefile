@@ -22,7 +22,7 @@ test : units
 
 units : format build
 	@ginkgo version
-	ROOT_DIR=$(shell pwd) "PATH=./out:$(PATH)" ginkgo -r -p -randomizeAllSpecs -randomizeSuites -skipPackage integration
+	ginkgo -r -p -randomizeAllSpecs -randomizeSuites -skipPackage integration
 	@echo "\nSWEET SUITE SUCCESS"
 
 .PHONY : all build clean format

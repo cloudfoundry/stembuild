@@ -1,19 +1,16 @@
-package patch_test
+package utils_test
 
 import (
-	"math/rand"
 	"testing"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = BeforeSuite(func() {
-	rand.Seed(time.Now().UnixNano())
 })
 
-func TestPatch(t *testing.T) {
+func TestUtils(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Patch Suite")
+	RunSpecs(t, "Utils Suite")
 }

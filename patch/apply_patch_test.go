@@ -309,9 +309,9 @@ var _ = Describe("Apply Patch", func() {
 					It("copies into the arguments the values from the manifest", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 						expected := ApplyPatch{
-							PatchFile: "some-patch-file",
+							PatchFile: "testdata/diff.patch",
 							Version:   "2012R2",
-							VHDFile:   "some-vhd-file",
+							VHDFile:   "testdata/original.vhd",
 						}
 						Expect(args).To(Equal(expected))
 					})

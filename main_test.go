@@ -33,37 +33,6 @@ var (
 	InitRan = false
 )
 
-var versionTests = []struct {
-	s  string
-	ok bool
-}{
-	{"1.2", true},
-	{"-1.2", false},
-	{"1.-2", false},
-	{"001.002", true},
-	{"0a1.002", false},
-	{"1.a", false},
-	{"a1.2", false},
-	{"a.2", false},
-	{"1.2 a", false},
-	{"1200.0.3-build.2", true},
-	{"1200.0.3-build.a", false},
-	{"1.2-build.1", true},
-}
-
-func TestValidateVersion(t *testing.T) {
-	for _, x := range versionTests {
-		err := validateVersion(x.s)
-		if (err == nil) != x.ok {
-			if x.ok {
-				t.Errorf("failed to validate version: %s\n", x.s)
-			} else {
-				t.Errorf("expected error for version (%s) but got: %v\n", x.s, err)
-			}
-		}
-	}
-}
-
 func exists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
