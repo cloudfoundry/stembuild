@@ -33,70 +33,10 @@ var (
 	InitRan = false
 )
 
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
-}
-
 func runInit() {
 	if !InitRan {
 		Init()
 		InitRan = true
-	}
-}
-
-func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
-	// Setup output directory
-	testOutputDir, err := ioutil.TempDir("", "testOutputDir-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	os.RemoveAll(testOutputDir)
-	dirExists, _ := exists(testOutputDir)
-	if dirExists {
-		t.Errorf("%s already exists, not a valid test", testOutputDir)
-	}
-	// defer os.RemoveAll(testOutputDir)
-
-	// Setup input vhd and vmdk
-	testInputDir, err := ioutil.TempDir("", "testInputDir-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(testInputDir)
-	testEmptyFilePath := filepath.Join(testInputDir, "testEmptyFile.txt")
-	testEmptyFile, err := os.Create(testEmptyFilePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	testEmptyFile.Close()
-
-	testCommand := fmt.Sprintf(
-		"stembuild -vhd %s -patch %s -v 1200.666 -output %s",
-		testEmptyFilePath,
-		testEmptyFilePath,
-		testOutputDir,
-	)
-	testArgs := strings.Split(testCommand, " ")
-	os.Args = testArgs
-	runInit()
-	ParseFlags()
-
-	errs := ValidateFlags()
-
-	if len(errs) != 0 {
-		t.Errorf("expected no errors, but got errors: %s", errs)
-	}
-
-	dirExists, _ = exists(testOutputDir)
-	if !dirExists {
-		t.Errorf("%s was not created", testOutputDir)
 	}
 }
 

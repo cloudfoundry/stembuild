@@ -36,9 +36,9 @@ var (
 var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
-Usage %[1]s [OPTIONS...] apply-patch <patch manifest yml>
-      %[2]s [-vhd FILENAME] [-patch FILENAME] [-output DIRNAME]
+Usage %[1]s [-vhd FILENAME] [-patch FILENAME] [-output DIRNAME]
       %[2]s [-version STEMCELL_VERSION] [-os OS_VERSION]
+      %[2]s [OPTIONS...] apply-patch <patch manifest yml>
 
 Usage %[1]s [OPTIONS...] [-vmdk FILENAME]
       %[2]s [-output DIRNAME] [-version STEMCELL_VERSION]
@@ -60,7 +60,7 @@ Usage:
     not specified the stemcell will be created in the current working directory.
 
 Examples:
-  %[1]s patch-manifest.yml
+  %[1]s apply-patch patch-manifest.yml
   where patch-manifest.yml contains
   %[2]s ---
   %[2]s version: '1.2.3'
@@ -161,12 +161,22 @@ func ValidateFlags() []error {
 			add(fmt.Errorf("invalid patch manifest file: %q", err))
 			return errs
 		}
-		return nil
+	}
+
+	if applyPatch.OutputDir == "" || applyPatch.OutputDir == "." {
+		wd, err := os.Getwd()
+		if err != nil {
+			add(fmt.Errorf("getting working directory: %s", err))
+			return errs
+		}
+		Debugf("setting output dir (%s) to working directory: %s", applyPatch.OutputDir, wd)
+		applyPatch.OutputDir = wd
 	}
 
 	Debugf("validating [vmdk] (%s) [vhd] (%s) and [patch] (%s) flags",
 		applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.PatchFile)
 
+	fmt.Printf("%#v", applyPatch)
 	if applyPatch.VMDKFile != "" && applyPatch.VHDFile != "" {
 		add(errors.New("both VMDK and VHD flags are specified"))
 		return errs
@@ -176,9 +186,9 @@ func ValidateFlags() []error {
 		return errs
 	}
 
-	// check for extra flags
+	// check for extra flags in vmdk commmand
 	Debugf("validating that no extra flags or arguments were provided")
-	if n := len(flag.Args()); n != 0 {
+	if applyPatch.VMDKFile != "" && len(flag.Args()) > 0 {
 		add(fmt.Errorf("extra arguments: %s\n", strings.Join(flag.Args(), ", ")))
 	}
 
@@ -243,7 +253,7 @@ func StemcellFilename(version, os string) string {
 		version, os)
 }
 
-var ErrInterupt = errors.New("interupt")
+var ErrInterupt = errors.New("interrupt")
 
 type CancelReadSeeker struct {
 	rs   io.ReadSeeker
@@ -555,7 +565,7 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 	select {
 	case <-c.stop:
 		if cmd.Process != nil {
-			Debugf("recieved stop signall killing ovftool process")
+			Debugf("received stop signall killing ovftool process")
 			cmd.Process.Kill()
 		}
 		return ErrInterupt
@@ -598,15 +608,6 @@ func ParseFlags() error {
 			Debugf = log.New(os.Stderr, "debug: ", 0).Printf
 		}
 		Debugf("enabled")
-	}
-
-	if applyPatch.OutputDir == "" || applyPatch.OutputDir == "." {
-		wd, err := os.Getwd()
-		if err != nil {
-			return fmt.Errorf("getting working directory: %s", err)
-		}
-		Debugf("setting output dir (%s) to working directory: %s", applyPatch.OutputDir, wd)
-		applyPatch.OutputDir = wd
 	}
 
 	applyPatch.OSVersion = strings.ToUpper(applyPatch.OSVersion)
@@ -746,10 +747,13 @@ func main() {
 
 	if errs := ValidateFlags(); errs != nil {
 		fmt.Fprintln(os.Stderr, "Error: invalid arguments")
+
 		for _, e := range errs {
 			fmt.Fprintf(os.Stderr, "  %s\n", e)
 		}
-		Usage()
+
+		fmt.Fprintln(os.Stderr, "\nfor usage: stembuild -h")
+		os.Exit(1)
 	}
 
 	c := Config{stop: make(chan struct{})}
@@ -760,13 +764,13 @@ func main() {
 		signal.Notify(ch, os.Interrupt)
 		stopping := false
 		for sig := range ch {
-			Debugf("recieved signal: %s", sig)
+			Debugf("received signal: %s", sig)
 			if stopping {
-				fmt.Fprintf(os.Stderr, "recieved second (%s) signale - exiting now\n", sig)
+				fmt.Fprintf(os.Stderr, "received second (%s) signale - exiting now\n", sig)
 				os.Exit(1)
 			}
 			stopping = true
-			fmt.Fprintf(os.Stderr, "recieved (%s) signal cleaning up\n", sig)
+			fmt.Fprintf(os.Stderr, "received (%s) signal cleaning up\n", sig)
 			c.Stop()
 		}
 	}()

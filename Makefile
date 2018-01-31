@@ -13,7 +13,7 @@ format :
 	go fmt ./...
 
 integration : build
-	ginkgo -r -randomizeAllSpecs -p integration
+	PATH="$(PWD)/out:$(PATH)" ginkgo -r -randomizeAllSpecs integration
 
 out/stembuild : $(GOSRC)
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
@@ -22,7 +22,7 @@ test : units
 
 units : format build
 	@ginkgo version
-	ginkgo -r -p -randomizeAllSpecs -randomizeSuites -skipPackage integration
+	ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration
 	@echo "\nSWEET SUITE SUCCESS"
 
 .PHONY : all build clean format

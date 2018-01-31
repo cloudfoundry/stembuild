@@ -17,7 +17,7 @@ type ApplyPatch struct {
 }
 
 // Copy into `d` the values in `s` which are empty in `d`.
-func (d *ApplyPatch) CopyInto(s ApplyPatch) {
+func (d *ApplyPatch) CopyFrom(s ApplyPatch) {
 	if d.PatchFile == "" {
 		d.PatchFile = s.PatchFile
 	}
@@ -60,7 +60,7 @@ func LoadPatchManifest(fileName string, patchArgs *ApplyPatch) error {
 		return err
 	}
 
-	patchArgs.CopyInto(patchManifest)
+	patchArgs.CopyFrom(patchManifest)
 
 	return nil
 }

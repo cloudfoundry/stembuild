@@ -13,7 +13,7 @@ import (
 )
 
 var _ = Describe("Apply Patch", func() {
-	Context("CopyInto", func() {
+	Context("CopyFrom", func() {
 		var (
 			dest ApplyPatch
 			src  ApplyPatch
@@ -25,7 +25,7 @@ var _ = Describe("Apply Patch", func() {
 		})
 
 		JustBeforeEach(func() {
-			dest.CopyInto(src)
+			dest.CopyFrom(src)
 		})
 
 		Context("PatchFile", func() {
