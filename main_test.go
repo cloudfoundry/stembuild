@@ -1,188 +1,17 @@
 package main
 
 import (
-	"bytes"
 	"crypto/sha1"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"reflect"
-	"sort"
 	"strings"
 	"testing"
 
 	"github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/ovftool"
 )
-
-// Run this test first - no point continuing with ovftool!
-func TestOVFTool(t *testing.T) {
-	const format = "locating ovftool executable: %s\n\n" +
-		"The OVF Tool is required to run these tests.\n" +
-		"It may be download from VMware for free from:\n" +
-		"  https://www.vmware.com/support/developer/ovf/\n\n"
-	if _, err := ovftool.Ovftool(); err != nil {
-		t.Logf(format, err)
-		panic("stopping tests now - missing ovftool!")
-	}
-}
-
-var (
-	InitRan = false
-)
-
-func runInit() {
-	if !InitRan {
-		Init()
-		InitRan = true
-	}
-}
-
-func readdirnames(dirname string) ([]string, error) {
-	f, err := os.Open(dirname)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	names, err := f.Readdirnames(-1)
-	if err != nil {
-		return nil, err
-	}
-	sort.Strings(names)
-	return names, nil
-}
-
-func TestExtractOVA_Valid(t *testing.T) {
-	const Count = 9
-	const NameFmt = "file-%d"
-
-	tmpdir, err := ioutil.TempDir("", "test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tmpdir)
-
-	if err := ExtractOVA("testdata/tar/valid.tar", tmpdir); err != nil {
-		t.Fatal(err)
-	}
-
-	var expFileNames []string
-	for i := 0; i <= Count; i++ {
-		expFileNames = append(expFileNames, fmt.Sprintf("file-%d", i))
-	}
-	sort.Strings(expFileNames)
-
-	names, err := readdirnames(tmpdir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(expFileNames, names) {
-		t.Errorf("ExtractOVA: filenames want: %v got: %v", expFileNames, names)
-	}
-
-	// the content of each file is it's index
-	// and a newline so 'file-2' contains "2\n"
-	validFile := func(name string) error {
-		path := filepath.Join(tmpdir, name)
-		b, err := ioutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		var i int
-		if _, err := fmt.Sscanf(name, NameFmt, &i); err != nil {
-			return err
-		}
-		exp := fmt.Sprintf("%d\n", i)
-		if s := string(b); s != exp {
-			t.Errorf("ExtractOVA: file (%s) want: %s got: %s", name, exp, s)
-		}
-		return nil
-	}
-
-	for _, name := range names {
-		if err := validFile(name); err != nil {
-			t.Error(err)
-		}
-	}
-}
-
-func TestExtractOVA_Invalid(t *testing.T) {
-	var tests = []struct {
-		archive string
-		reason  string
-	}{
-		{
-			"has-sub-dir.tar",
-			"subdirectories are not supported",
-		},
-		{
-			"too-many-files.tar",
-			"too many files read from archive (this is capped at 100)",
-		},
-		{
-			"symlinks.tar",
-			"symlinks are not supported",
-		},
-	}
-
-	for _, x := range tests {
-		tmpdir, err := ioutil.TempDir("", "test-")
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer os.RemoveAll(tmpdir)
-
-		filename := filepath.Join("testdata", "tar", x.archive)
-		if err := ExtractOVA(filename, tmpdir); err == nil {
-			t.Errorf("ExtractOVA (%s): expected error because:", x.archive, x.reason)
-		}
-	}
-}
-
-func TestApplyPatch(t *testing.T) {
-	const archive = "testdata/patch-test.tar.gz"
-
-	dirname := helpers.ExtractGzipArchive(t, archive)
-	defer os.RemoveAll(dirname)
-
-	vhd := filepath.Join(dirname, "original.vhd")
-	patch := filepath.Join(dirname, "delta.patch")
-	expVMDK := filepath.Join(dirname, "expected.vmdk")
-
-	// output file
-	newVMDK := filepath.Join(dirname, "image.vmdk")
-
-	conf := Config{stop: make(chan struct{})}
-
-	// Normal operation
-	{
-		if err := conf.ApplyPatch(vhd, patch, newVMDK); err != nil {
-			t.Fatal(err)
-		}
-		expSrc, err := ioutil.ReadFile(expVMDK)
-		if err != nil {
-			t.Fatalf("ApplyPatch: reading expected vmdk file (%s): %s", expVMDK, err)
-		}
-		vmdkSrc, err := ioutil.ReadFile(newVMDK)
-		if err != nil {
-			t.Fatalf("ApplyPatch: reading vmdk file (%s): %s", newVMDK, err)
-		}
-		if !bytes.Equal(expSrc, vmdkSrc) {
-			t.Fatalf("ApplyPatch: patched vmdk (%s) does not match expected vmdk (%s)",
-				newVMDK, expVMDK)
-		}
-	}
-
-	// Error when VMDK file already exists
-	{
-		if err := conf.ApplyPatch(vhd, patch, newVMDK); err == nil {
-			t.Error("ApplyPatch: expected an error when the VMDK already exists got")
-		}
-	}
-}
 
 func TestCreateImage(t *testing.T) {
 	const archive = "testdata/patch-test.tar.gz"
@@ -351,9 +180,4 @@ func TestInvalidApplyPatchManifestFile(t *testing.T) {
 	if len(errs) != 1 {
 		t.Error("expected single error; but got no, or more than one, error(s)")
 	}
-}
-
-func readFile(name string) (string, error) {
-	b, err := ioutil.ReadFile(name)
-	return string(b), err
 }

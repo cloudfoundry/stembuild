@@ -1,4 +1,4 @@
-package main
+package vmxtemplate_test
 
 import (
 	"bytes"

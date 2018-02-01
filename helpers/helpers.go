@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
@@ -150,4 +151,18 @@ func ExtractGzipArchive(name string) (string, error) {
 func ReadFile(name string) (string, error) {
 	b, err := ioutil.ReadFile(name)
 	return string(b), err
+}
+
+func Readdirnames(dirname string) ([]string, error) {
+	f, err := os.Open(dirname)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	names, err := f.Readdirnames(-1)
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(names)
+	return names, nil
 }
