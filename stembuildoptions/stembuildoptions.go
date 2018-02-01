@@ -26,9 +26,7 @@ func (d *StembuildOptions) CopyFrom(s StembuildOptions) {
 		d.OSVersion = s.OSVersion
 	}
 
-	if d.OutputDir == "" {
-		d.OutputDir = s.OutputDir
-	}
+	// ignore OutputDir from config file
 
 	if d.Version == "" {
 		d.Version = s.Version

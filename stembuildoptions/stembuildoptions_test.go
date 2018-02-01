@@ -98,8 +98,8 @@ var _ = Describe("StembuildOptions", func() {
 					src.OutputDir = fmt.Sprintf("foo%d/%d", rand.Intn(2000), rand.Intn(2000))
 				})
 
-				It("copies src.OutputDir into dest.OutputDir", func() {
-					Expect(dest.OutputDir).To(Equal(src.OutputDir))
+				It("does nothing", func() {
+					Expect(dest.OutputDir).To(Equal(""))
 				})
 			})
 

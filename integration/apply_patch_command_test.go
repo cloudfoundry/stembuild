@@ -114,30 +114,6 @@ var _ = Describe("Apply Patch", func() {
 					})
 				})
 			})
-
-			Context("when output directory specified only in manifest", func() {
-				BeforeEach(func() {
-					tmpDir, err := ioutil.TempDir("", "")
-					Expect(err).NotTo(HaveOccurred())
-
-					manifestStruct.OutputDir = tmpDir
-				})
-
-				AfterEach(func() {
-					Expect(os.RemoveAll(manifestStruct.OutputDir)).To(Succeed())
-				})
-
-				It("creates stemcell in directory from manifest", func() {
-					session := helpers.Stembuild("apply-patch", manifestFilename)
-					Eventually(session, 5).Should(Exit(0))
-					Eventually(session).Should(Say(`created stemcell: .*%s.*\.tgz`, manifestStruct.OutputDir))
-				})
-			})
-
-			Context("when manifest does specify output directory", func() {
-				It("creates stemcell in dir specified by -o flag", func() {
-				})
-			})
 		})
 	})
 })
