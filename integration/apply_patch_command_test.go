@@ -77,6 +77,14 @@ var _ = Describe("Apply Patch", func() {
 
 				expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", osVersion)
 				Expect(manifest).To(ContainSubstring(expectedName))
+
+				imageFilepath := filepath.Join(stemcellDir, "image")
+				imageDir, err := helpers.ExtractGzipArchive(imageFilepath)
+				Expect(err).NotTo(HaveOccurred())
+
+				actualVmdkFilepath := filepath.Join(imageDir, "image-disk1.vmdk")
+				_, err = ioutil.ReadFile(actualVmdkFilepath)
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 
