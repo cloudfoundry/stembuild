@@ -2,13 +2,17 @@ package helpers
 
 import (
 	"bytes"
+	"compress/gzip"
+	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	"github.com/pivotal-cf-experimental/stembuild/utils"
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {
@@ -112,3 +116,38 @@ patch_file: "{{.PatchFile}}"
 os_version: "{{.OSVersion}}"
 output_dir: "{{.OutputDir}}"
 `
+
+// ExtractGzipArchive, extracts the tgz archive name to a temp directory
+// returning the filepath of the temp directory.
+func ExtractGzipArchive(name string) (string, error) {
+	fmt.Fprintf(os.Stderr, "extractGzipArchive: extracting tgz: %s", name)
+
+	tmpdir, err := ioutil.TempDir("", "test-")
+	if err != nil {
+		return "", err
+	}
+	fmt.Fprintf(os.Stderr, "extractGzipArchive: using temp directory: %s", tmpdir)
+
+	f, err := os.Open(name)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	w, err := gzip.NewReader(f)
+	if err != nil {
+		return "", err
+	}
+	if err := utils.ExtractArchive(w, tmpdir); err != nil {
+		return "", err
+	}
+	if err := w.Close(); err != nil {
+		return "", err
+	}
+	return tmpdir, nil
+}
+
+func ReadFile(name string) (string, error) {
+	b, err := ioutil.ReadFile(name)
+	return string(b), err
+}

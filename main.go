@@ -492,51 +492,7 @@ func ExtractOVA(ova, dirname string) error {
 		return err
 	}
 	defer tf.Close()
-	return ExtractArchive(tf, dirname)
-}
-
-func ExtractArchive(archive io.Reader, dirname string) error {
-	Debugf("extracting archive to directory: %s", dirname)
-
-	tr := tar.NewReader(archive)
-
-	limit := 100
-	for ; limit >= 0; limit-- {
-		h, err := tr.Next()
-		if err != nil {
-			if err != io.EOF {
-				return fmt.Errorf("tar: reading from archive: %s", err)
-			}
-			break
-		}
-
-		// expect a flat archive
-		name := h.Name
-		if filepath.Base(name) != name {
-			return fmt.Errorf("tar: archive contains subdirectory: %s", name)
-		}
-
-		// only allow regular files
-		mode := h.FileInfo().Mode()
-		if !mode.IsRegular() {
-			return fmt.Errorf("tar: unexpected file mode (%s): %s", name, mode)
-		}
-
-		path := filepath.Join(dirname, name)
-		f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, mode)
-		if err != nil {
-			return fmt.Errorf("tar: opening file (%s): %s", path, err)
-		}
-		defer f.Close()
-
-		if _, err := io.Copy(f, tr); err != nil {
-			return fmt.Errorf("tar: writing file (%s): %s", path, err)
-		}
-	}
-	if limit <= 0 {
-		return errors.New("tar: too many files in archive")
-	}
-	return nil
+	return utils.ExtractArchive(tf, dirname)
 }
 
 func (c *Config) ConvertVMX2OVA(vmx, ova string) error {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -43,6 +44,40 @@ var _ = Describe("Apply Patch", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			manifestFilename = manifestFile.Name()
+		})
+
+		Context("stembuild when executed", func() {
+			var osVersion string
+			BeforeEach(func() {
+				osVersion = "2012R2"
+				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", manifestStruct.Version, osVersion)
+				manifestStruct.VHDFile = "testdata/original.vhd"
+				manifestStruct.PatchFile = "testdata/diff.patch"
+			})
+
+			AfterEach(func() {
+				Expect(os.Remove(stemcellFilename)).To(Succeed())
+			})
+
+			It("creates a valid stemcell", func() {
+				session := helpers.Stembuild("apply-patch", manifestFilename)
+				Eventually(session, 5).Should(Exit(0))
+				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
+				Expect(stemcellFilename).To(BeAnExistingFile())
+
+				stemcellDir, err := helpers.ExtractGzipArchive(stemcellFilename)
+				Expect(err).NotTo(HaveOccurred())
+
+				manifestFilepath := filepath.Join(stemcellDir, "stemcell.MF")
+				manifest, err := helpers.ReadFile(manifestFilepath)
+				Expect(err).NotTo(HaveOccurred())
+
+				expectedOs := fmt.Sprintf("operating_system: windows%s", osVersion)
+				Expect(manifest).To(ContainSubstring(expectedOs))
+
+				expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", osVersion)
+				Expect(manifest).To(ContainSubstring(expectedName))
+			})
 		})
 
 		Context("when no output directory is specified on the command line", func() {
@@ -94,72 +129,27 @@ var _ = Describe("Apply Patch", func() {
 				Expect(os.RemoveAll(tmpDir)).To(Succeed())
 			})
 
-			Context("when manifest does not specify output directory", func() {
-				Context("directory already exists", func() {
-					It("creates stemcell in output directory", func() {
-						session := helpers.Stembuild("-o", tmpDir, "apply-patch", manifestFilename)
-						Eventually(session, 5).Should(Exit(0))
-						Eventually(session).Should(Say(`created stemcell: .*%s.*\.tgz`, tmpDir))
-					})
+			Context("directory already exists", func() {
+				// TODO: what if the directory already has a stemcell in it?
+				It("creates stemcell in output directory", func() {
+					session := helpers.Stembuild("-o", tmpDir, "apply-patch", manifestFilename)
+					Eventually(session, 5).Should(Exit(0))
+					Eventually(session).Should(Say(`created stemcell: .*%s.*\.tgz`, tmpDir))
 				})
+			})
 
-				Context("directory does not exist", func() {
-					AfterEach(func() {
-						Expect(os.RemoveAll("idontexist")).To(Succeed())
-					})
-					It("creates directory and puts stemcell in it", func() {
-						session := helpers.Stembuild("-o", "idontexist", "apply-patch", manifestFilename)
-						Eventually(session, 5).Should(Exit(0))
-						Eventually(session).Should(Say(`created stemcell: .*idontexist.*\.tgz`))
-					})
+			Context("directory does not exist", func() {
+				AfterEach(func() {
+					Expect(os.RemoveAll("idontexist")).To(Succeed())
+				})
+				It("creates directory and puts stemcell in it", func() {
+					session := helpers.Stembuild("-o", "idontexist", "apply-patch", manifestFilename)
+					Eventually(session, 5).Should(Exit(0))
+					Eventually(session).Should(Say(`created stemcell: .*idontexist.*\.tgz`))
+					Expect(helpers.Exists("idontexist")).To(BeTrue())
 				})
 			})
 		})
+
 	})
 })
-
-// func TestMissingOutputDirectoryCreatesDirectory(t *testing.T) {
-// 	// Setup output directory
-// 	testOutputDir, err := ioutil.TempDir("", "testOutputDir-")
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	os.RemoveAll(testOutputDir)
-// 	if helpers.Exists(testOutputDir) {
-// 		t.Errorf("%s already exists, not a valid test", testOutputDir)
-// 	}
-
-// 	// Setup input vhd and vmdk
-// 	testInputDir, err := ioutil.TempDir("", "testInputDir-")
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	defer os.RemoveAll(testInputDir)
-// 	testEmptyFilePath := filepath.Join(testInputDir, "testEmptyFile.txt")
-// 	testEmptyFile, err := os.Create(testEmptyFilePath)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	testEmptyFile.Close()
-
-// 	testCommand := fmt.Sprintf(
-// 		"stembuild -vhd %s -patch %s -v 1200.666 -output %s",
-// 		testEmptyFilePath,
-// 		testEmptyFilePath,
-// 		testOutputDir,
-// 	)
-// 	testArgs := strings.Split(testCommand, " ")
-// 	os.Args = testArgs
-// 	runInit()
-// 	ParseFlags()
-
-// 	errs := ValidateFlags()
-
-// 	if len(errs) != 0 {
-// 		t.Errorf("expected no errors, but got errors: %s", errs)
-// 	}
-
-// 	if !helpers.Exists(testOutputDir) {
-// 		t.Errorf("%s was not created", testOutputDir)
-// 	}
-// }

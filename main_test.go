@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"compress/gzip"
 	"crypto/sha1"
 	"fmt"
 	"io"
@@ -14,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pivotal-cf-experimental/stembuild/helpers"
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
 )
 
@@ -52,63 +52,6 @@ func readdirnames(dirname string) ([]string, error) {
 	}
 	sort.Strings(names)
 	return names, nil
-}
-
-func TestOsVersion(t *testing.T) {
-	const archive = "testdata/patch-test.tar.gz"
-
-	// Reset Version and OSVersion on exit
-	oldVersion := applyPatch.Version
-	oldOSVersion := applyPatch.OSVersion
-	defer func() {
-		applyPatch.Version = oldVersion
-		applyPatch.OSVersion = oldOSVersion
-	}()
-	applyPatch.Version = "9000"
-	applyPatch.OSVersion = "2016"
-
-	var err error
-	outputDir, err := ioutil.TempDir("", "test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	applyPatch.OutputDir = outputDir
-	defer os.RemoveAll(applyPatch.OutputDir)
-
-	dirname := extractGzipArchive(t, archive)
-	defer os.RemoveAll(dirname)
-	vmdkPath := filepath.Join(dirname, "expected.vmdk")
-
-	conf := Config{stop: make(chan struct{})}
-
-	realMain(&conf, vmdkPath, "", "")
-
-	// assertions
-	stemcellFilename := filepath.Base(conf.Stemcell)
-	stemcellDirname := extractGzipArchive(t, filepath.Join(applyPatch.OutputDir, stemcellFilename))
-	manifestFilepath := filepath.Join(stemcellDirname, "stemcell.MF")
-
-	manifest, err := readFile(manifestFilepath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	expectedOs := fmt.Sprintf("operating_system: windows%s", applyPatch.OSVersion)
-	if !strings.Contains(manifest, expectedOs) {
-		t.Errorf("TestOSVerson: stemcell.MF expected os: %s\n%s\n",
-			expectedOs, manifest)
-	}
-
-	expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", applyPatch.OSVersion)
-	if !strings.Contains(manifest, expectedName) {
-		t.Errorf("TestOSVerson: stemcell.MF expected stemcell filename: %s\n%s\n",
-			expectedName, manifest)
-	}
-
-	if !strings.Contains(stemcellFilename, applyPatch.OSVersion) {
-		t.Errorf("TestOSVerson: expected filename: %s got: %s",
-			applyPatch.OSVersion, stemcellFilename)
-	}
 }
 
 func TestExtractOVA_Valid(t *testing.T) {
@@ -202,7 +145,7 @@ func TestExtractOVA_Invalid(t *testing.T) {
 func TestApplyPatch(t *testing.T) {
 	const archive = "testdata/patch-test.tar.gz"
 
-	dirname := extractGzipArchive(t, archive)
+	dirname := helpers.ExtractGzipArchive(t, archive)
 	defer os.RemoveAll(dirname)
 
 	vhd := filepath.Join(dirname, "original.vhd")
@@ -244,7 +187,7 @@ func TestApplyPatch(t *testing.T) {
 func TestCreateImage(t *testing.T) {
 	const archive = "testdata/patch-test.tar.gz"
 
-	dirname := extractGzipArchive(t, archive)
+	dirname := helpers.ExtractGzipArchive(t, archive)
 	defer os.RemoveAll(dirname)
 
 	vmdkPath := filepath.Join(dirname, "expected.vmdk")
@@ -291,7 +234,7 @@ func TestCreateImage(t *testing.T) {
 			"image-disk1.vmdk",
 		}
 
-		imageDir := extractGzipArchive(t, conf.Image)
+		imageDir := helpers.ExtractGzipArchive(t, conf.Image)
 		list, err := ioutil.ReadDir(imageDir)
 		if err != nil {
 			t.Fatal(err)
@@ -332,7 +275,7 @@ func TestCreateImage(t *testing.T) {
 func TestCreateImagePathResolution(t *testing.T) {
 	const archive = "testdata/patch-test.tar.gz"
 
-	dirname := extractGzipArchive(t, archive)
+	dirname := helpers.ExtractGzipArchive(t, archive)
 	defer os.RemoveAll(dirname)
 
 	// get current working dir
@@ -413,34 +356,4 @@ func TestInvalidApplyPatchManifestFile(t *testing.T) {
 func readFile(name string) (string, error) {
 	b, err := ioutil.ReadFile(name)
 	return string(b), err
-}
-
-// extractGzipArchive, extracts the tgz archive name to a temp directory
-// returning the filepath of the temp directory.
-func extractGzipArchive(t *testing.T, name string) string {
-	t.Logf("extractGzipArchive: extracting tgz: %s", name)
-
-	tmpdir, err := ioutil.TempDir("", "test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("extractGzipArchive: using temp directory: %s", tmpdir)
-
-	f, err := os.Open(name)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
-
-	w, err := gzip.NewReader(f)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := ExtractArchive(w, tmpdir); err != nil {
-		t.Fatal(err)
-	}
-	if err := w.Close(); err != nil {
-		t.Fatal(err)
-	}
-	return tmpdir
 }

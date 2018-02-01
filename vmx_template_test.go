@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pivotal-cf-experimental/stembuild/helpers"
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
 )
 
@@ -126,7 +127,7 @@ VMX File (%[2]s):
 	}
 	t.Logf("TestVMXTemplateToOVF: ovftool location: %s", toolpath)
 
-	dirname := extractGzipArchive(t, "testdata/patch-test.tar.gz")
+	dirname := helpers.ExtractGzipArchive(t, "testdata/patch-test.tar.gz")
 	defer os.RemoveAll(dirname)
 
 	vmdk := filepath.Join(dirname, "expected.vmdk")
