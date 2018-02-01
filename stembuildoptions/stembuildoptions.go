@@ -1,4 +1,4 @@
-package patch
+package stembuildoptions
 
 import (
 	"io/ioutil"
@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type ApplyPatch struct {
+type StembuildOptions struct {
 	PatchFile string `yaml:"patch_file"`
 	OSVersion string `yaml:"os_version"`
 	OutputDir string `yaml:"output_dir"`
@@ -17,7 +17,7 @@ type ApplyPatch struct {
 }
 
 // Copy into `d` the values in `s` which are empty in `d`.
-func (d *ApplyPatch) CopyFrom(s ApplyPatch) {
+func (d *StembuildOptions) CopyFrom(s StembuildOptions) {
 	if d.PatchFile == "" {
 		d.PatchFile = s.PatchFile
 	}
@@ -43,13 +43,13 @@ func (d *ApplyPatch) CopyFrom(s ApplyPatch) {
 	}
 }
 
-func LoadPatchManifest(fileName string, patchArgs *ApplyPatch) error {
+func LoadOptionsFromManifest(fileName string, patchArgs *StembuildOptions) error {
 	_, err := os.Stat(fileName)
 	if err != nil {
 		return err
 	}
 
-	var patchManifest ApplyPatch
+	var patchManifest StembuildOptions
 	manifestFile, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return err

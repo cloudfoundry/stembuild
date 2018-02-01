@@ -11,13 +11,13 @@ import (
 	. "github.com/onsi/gomega/gexec"
 
 	"github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/patch"
+	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 )
 
 var _ = Describe("Apply Patch", func() {
-	var manifestStruct patch.ApplyPatch
+	var manifestStruct stembuildoptions.StembuildOptions
 	BeforeEach(func() {
-		manifestStruct = patch.ApplyPatch{}
+		manifestStruct = stembuildoptions.StembuildOptions{}
 	})
 
 	Context("when valid manifest file", func() {

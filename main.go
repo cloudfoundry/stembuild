@@ -19,15 +19,15 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
-	"github.com/pivotal-cf-experimental/stembuild/patch"
 	"github.com/pivotal-cf-experimental/stembuild/rdiff"
+	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 	"github.com/pivotal-cf-experimental/stembuild/utils"
 )
 
 const DefaultOSVersion = "2012R2"
 
 var (
-	applyPatch patch.ApplyPatch
+	applyPatch stembuildoptions.StembuildOptions
 
 	EnableDebug bool
 	DebugColor  bool
@@ -157,7 +157,7 @@ func ValidateFlags() []error {
 
 	if patchManifestFile != "" {
 		Debugf("loading 'apply patch' manifest file: %q", patchManifestFile)
-		if err := patch.LoadPatchManifest(patchManifestFile, &applyPatch); err != nil {
+		if err := stembuildoptions.LoadOptionsFromManifest(patchManifestFile, &applyPatch); err != nil {
 			add(fmt.Errorf("invalid patch manifest file: %q", err))
 			return errs
 		}

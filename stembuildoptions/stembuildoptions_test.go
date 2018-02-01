@@ -1,4 +1,4 @@
-package patch_test
+package stembuildoptions_test
 
 import (
 	"fmt"
@@ -9,19 +9,19 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf-experimental/stembuild/patch"
+	. "github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 )
 
-var _ = Describe("Apply Patch", func() {
+var _ = Describe("StembuildOptions", func() {
 	Context("CopyFrom", func() {
 		var (
-			dest ApplyPatch
-			src  ApplyPatch
+			dest StembuildOptions
+			src  StembuildOptions
 		)
 
 		BeforeEach(func() {
-			src = ApplyPatch{}
-			dest = ApplyPatch{}
+			src = StembuildOptions{}
+			dest = StembuildOptions{}
 		})
 
 		JustBeforeEach(func() {
@@ -234,7 +234,7 @@ var _ = Describe("Apply Patch", func() {
 				})
 
 				It("copies into dest only those fields which are empty in dest", func() {
-					expected := ApplyPatch{
+					expected := StembuildOptions{
 						PatchFile: "matter",
 						OSVersion: "the",
 						OutputDir: "needful",
@@ -248,19 +248,19 @@ var _ = Describe("Apply Patch", func() {
 		})
 	})
 
-	Context("LoadPatchManifest", func() {
+	Context("LoadOptionsFromManifest", func() {
 		var (
 			testFileName string
-			args         ApplyPatch
+			args         StembuildOptions
 			executeErr   error
 		)
 
 		JustBeforeEach(func() {
-			executeErr = LoadPatchManifest(testFileName, &args)
+			executeErr = LoadOptionsFromManifest(testFileName, &args)
 		})
 
 		BeforeEach(func() {
-			args = ApplyPatch{}
+			args = StembuildOptions{}
 		})
 
 		Context("when the file does not exist", func() {
@@ -308,9 +308,9 @@ var _ = Describe("Apply Patch", func() {
 
 					It("copies into the arguments the values from the manifest", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						expected := ApplyPatch{
+						expected := StembuildOptions{
 							PatchFile: "testdata/diff.patch",
-							Version:   "2012R2",
+							Version:   "1200.0",
 							VHDFile:   "testdata/original.vhd",
 						}
 						Expect(args).To(Equal(expected))

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pivotal-cf-experimental/stembuild/patch"
+	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {
@@ -93,7 +93,7 @@ func Exists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
-func StringFromManifest(fileTemplate string, manifestStruct patch.ApplyPatch) (string, error) {
+func StringFromManifest(fileTemplate string, manifestStruct stembuildoptions.StembuildOptions) (string, error) {
 	t, err := template.New("manifest template").Parse(fileTemplate)
 	if err != nil {
 		return "", err

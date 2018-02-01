@@ -4,13 +4,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/patch"
+	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 )
 
 var _ = Describe("Helpers", func() {
 	Describe("ManifestString", func() {
 		It("Should make an empty manifest properly", func() {
-			output, executeErr := StringFromManifest(ManifestTemplate, patch.ApplyPatch{})
+			output, executeErr := StringFromManifest(ManifestTemplate, stembuildoptions.StembuildOptions{})
 			Expect(executeErr).NotTo(HaveOccurred())
 			Expect(output).To(Equal(`---
 version: ""
@@ -22,7 +22,7 @@ output_dir: ""
 		})
 
 		It("Should make an empty manifest properly", func() {
-			output, executeErr := StringFromManifest(ManifestTemplate, patch.ApplyPatch{
+			output, executeErr := StringFromManifest(ManifestTemplate, stembuildoptions.StembuildOptions{
 				Version:   "1",
 				VHDFile:   "2",
 				PatchFile: "3",
