@@ -17,33 +17,35 @@ import (
 
 var _ = Describe("Apply Patch", func() {
 	var manifestStruct stembuildoptions.StembuildOptions
+	var manifestText string
+	var manifestFilename string
 	BeforeEach(func() {
 		manifestStruct = stembuildoptions.StembuildOptions{}
+	})
+	JustBeforeEach(func() {
+		manifestFile, err := ioutil.TempFile("", "")
+		Expect(err).NotTo(HaveOccurred())
+		defer func() {
+			Expect(manifestFile.Close()).To(Succeed())
+		}()
+
+		contents, err := helpers.StringFromManifest(manifestText, manifestStruct)
+		Expect(err).NotTo(HaveOccurred())
+		_, err = manifestFile.Write([]byte(contents))
+		Expect(err).NotTo(HaveOccurred())
+
+		manifestFilename = manifestFile.Name()
 	})
 
 	Context("when valid manifest file", func() {
 		var stemcellFilename string
-		var manifestFilename string
+		const validManifestTemplate = helpers.ManifestTemplate
 
 		BeforeEach(func() {
 			manifestStruct.Version = "1200.0"
 			manifestStruct.VHDFile = "testdata/original.vhd"
 			manifestStruct.PatchFile = "testdata/diff.patch"
-		})
-
-		JustBeforeEach(func() {
-			manifestFile, err := ioutil.TempFile("", "")
-			Expect(err).NotTo(HaveOccurred())
-			defer func() {
-				Expect(manifestFile.Close()).To(Succeed())
-			}()
-
-			contents, err := helpers.StringFromManifest(helpers.ManifestTemplate, manifestStruct)
-			Expect(err).NotTo(HaveOccurred())
-			_, err = manifestFile.Write([]byte(contents))
-			Expect(err).NotTo(HaveOccurred())
-
-			manifestFilename = manifestFile.Name()
+			manifestText = validManifestTemplate
 		})
 
 		Context("stembuild when executed", func() {
@@ -158,6 +160,23 @@ var _ = Describe("Apply Patch", func() {
 				})
 			})
 		})
+	})
 
+	Context("Invalid apply-patch manifest file", func() {
+		invalidManifestTemplate := `---
+		version: "2012R2"
+		dhv_flie_nmae "some-vhd-file"
+		ptach_flie: "some-patch-file"
+		`
+		BeforeEach(func() {
+			manifestStruct.Version = "1200.0"
+			manifestStruct.VHDFile = "testdata/original.vhd"
+			manifestStruct.PatchFile = "testdata/diff.patch"
+			manifestText = invalidManifestTemplate
+		})
+		It("Returns an error", func() {
+			session := helpers.Stembuild("apply-patch", manifestFilename)
+			Eventually(session).Should(Exit(1))
+		})
 	})
 })
