@@ -165,7 +165,7 @@ func (c *Config) TempDir() (string, error) {
 		}
 		return c.tmpdir, nil
 	}
-	name, err := ioutil.TempDir("", "stemcell-")
+	name, err := ioutil.TempDir(c.BuildOptions.OutputDir, "stemcell-")
 	if err != nil {
 		return "", fmt.Errorf("creating temp directory: %s", err)
 	}
