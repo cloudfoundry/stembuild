@@ -6,14 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/ovftool"
+	"github.com/pivotal-cf-experimental/stembuild/utils"
+	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
 )
 
 func parseVMX(vmx string) (map[string]string, error) {
@@ -60,17 +59,26 @@ func checkVMXTemplate(t *testing.T, hwVersion int, vmdkPath, vmxContent string) 
 	}
 }
 
+func ExtractOVA(ova, dirname string) error {
+	tf, err := os.Open(ova)
+	if err != nil {
+		return err
+	}
+	defer tf.Close()
+	return utils.ExtractArchive(tf, dirname)
+}
+
 const vmdkPath = "FooBarBaz.vmdk"
 const virtualHWVersion = 60
 
 func TestVMXTemplate(t *testing.T) {
 	var buf bytes.Buffer
-	if err := VMXTemplate(vmdkPath, virtualHWVersion, &buf); err != nil {
+	if err := vmxtemplate.VMXTemplate(vmdkPath, virtualHWVersion, &buf); err != nil {
 		t.Fatal(err)
 	}
 	checkVMXTemplate(t, virtualHWVersion, vmdkPath, buf.String())
 
-	if err := VMXTemplate("", 0, &buf); err == nil {
+	if err := vmxtemplate.VMXTemplate("", 0, &buf); err == nil {
 		t.Error("VMXTemplate: expected error for empty vmx filename")
 	}
 }
@@ -82,7 +90,7 @@ func TestWriteVMXTemplate(t *testing.T) {
 	}
 	vmxPath := filepath.Join(tmpdir, "FooBarBaz.vmx")
 
-	if err := WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
+	if err := vmxtemplate.WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
 		t.Fatal(err)
 	}
 	b, err := ioutil.ReadFile(vmxPath)
@@ -96,91 +104,10 @@ func TestWriteVMXTemplate(t *testing.T) {
 	}
 
 	// vmx file is deleted if there is an error
-	if err := WriteVMXTemplate("", 0, vmxPath); err == nil {
+	if err := vmxtemplate.WriteVMXTemplate("", 0, vmxPath); err == nil {
 		t.Error("WriteVMXTemplate: expected error for empty vmx filename")
 	}
 	if _, err := os.Stat(vmxPath); err == nil {
 		t.Error("WriteVMXTemplate: failed to delete vmx file on error: %s", vmxPath)
-	}
-}
-
-func TestVMXTemplateToOVF(t *testing.T) {
-	const errorMsgFormat = `
-TestVMXTemplateToOVF: [ovf] file (%[1]s) contains an ethernet configuration.
-Using the generated [vmx] file (%[2]s), ovftool should not include any ethernet
-configuration - as this leads to errors with the BOSH vSphere CPI.
-
-Below are the generated [vmx] and [ova] files:
-
-OVF File (%[1]s):
-
-%[3]s
-
-VMX File (%[2]s):
-
-%[4]s
-`
-
-	toolpath, err := ovftool.Ovftool()
-	if err != nil {
-		t.Fatalf("ovftool is required to run tests: %s", err)
-	}
-	t.Logf("TestVMXTemplateToOVF: ovftool location: %s", toolpath)
-
-	dirname := helpers.ExtractGzipArchive(t, "testdata/patch-test.tar.gz")
-	defer os.RemoveAll(dirname)
-
-	vmdk := filepath.Join(dirname, "expected.vmdk")
-	t.Logf("TestVMXTemplateToOVF [vmdk]: %s", vmdk)
-
-	// make sure the vmdk exists
-	if _, err := os.Stat(vmdk); err != nil {
-		t.Fatal(err)
-	}
-
-	ova := filepath.Join(dirname, "test.ova")
-	vmx := filepath.Join(dirname, "test.vmx")
-
-	t.Logf("TestVMXTemplateToOVF [ova]: %s", ova)
-	t.Logf("TestVMXTemplateToOVF [vmx]: %s", vmx)
-
-	var vmxBuf bytes.Buffer
-	if err := VMXTemplate("expected.vmdk", virtualHWVersion, &vmxBuf); err != nil {
-		t.Fatal(err)
-	}
-	if err := ioutil.WriteFile(vmx, vmxBuf.Bytes(), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	cmd := exec.Command(toolpath, vmx, ova)
-	t.Logf("TestVMXTemplateToOVF: running command: %s [%s]", cmd.Path, cmd.Args)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		t.Fatalf("error: ovftool (%s) [%s]: %s\nOutput:\n%s\n",
-			toolpath, cmd.Args, err, string(out))
-	}
-	t.Logf("TestVMXTemplateToOVF: ovftool output:\n%s\n", string(out))
-
-	tmpdir, err := ioutil.TempDir("", "test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tmpdir)
-	t.Logf("TestVMXTemplateToOVF: using temp directory: %s", tmpdir)
-
-	t.Logf("TestVMXTemplateToOVF: extracting ova (%s) to dir (%s)", ova, tmpdir)
-	if err := ExtractOVA(ova, tmpdir); err != nil {
-		t.Fatal(err)
-	}
-
-	ovf := filepath.Join(tmpdir, "test.ovf")
-	t.Logf("TestVMXTemplateToOVF [ovf]: %s", ovf)
-	b, err := ioutil.ReadFile(ovf)
-	if err != nil {
-		t.Fatal(err)
-	}
-	ovfSrc := string(b)
-	if strings.Contains(ovfSrc, "ethernet") {
-		t.Fatalf(errorMsgFormat, ovf, vmx, ovfSrc, vmxBuf.String())
 	}
 }
