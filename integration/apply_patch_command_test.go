@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -144,7 +145,8 @@ var _ = Describe("Apply Patch", func() {
 				It("creates stemcell in output directory", func() {
 					session := helpers.Stembuild("-o", tmpDir, "apply-patch", manifestFilename)
 					Eventually(session, 5).Should(Exit(0))
-					Eventually(session).Should(Say(`created stemcell: .*%s.*\.tgz`, tmpDir))
+					safeDir := strings.Replace(tmpDir, `\`, `\\`, -1)
+					Eventually(session).Should(Say(`created stemcell: .*%s.*\.tgz`, safeDir))
 				})
 			})
 
