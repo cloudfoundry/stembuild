@@ -6,6 +6,7 @@
   packages = [
     ".",
     "config",
+    "extensions/table",
     "internal/codelocation",
     "internal/containernode",
     "internal/failer",
@@ -31,6 +32,8 @@
   packages = [
     ".",
     "format",
+    "gbytes",
+    "gexec",
     "internal/assertion",
     "internal/asyncassertion",
     "internal/oraclematcher",
@@ -98,6 +101,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fbd197586ca300ddab7a4c904bc4099d386fcdbcfe17bd231af72cead8b73277"
+  inputs-digest = "c6835154637e2851410d4b3a9eb27a431b49e8b41d829293451037ce0a3d3462"
   solver-name = "gps-cdcl"
   solver-version = 1
