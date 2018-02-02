@@ -241,16 +241,6 @@ func ValidateFlags() []error {
 	return errs
 }
 
-func ExtractOVA(ova, dirname string) error {
-	Debugf("extracting ova file (%s) to directory: %s", ova, dirname)
-	tf, err := os.Open(ova)
-	if err != nil {
-		return err
-	}
-	defer tf.Close()
-	return utils.ExtractArchive(tf, dirname)
-}
-
 func ParseFlags() error {
 	flag.Parse()
 
