@@ -29,9 +29,7 @@ var (
 var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
-Usage %[1]s [-vhd FILENAME] [-patch FILENAME] [-output DIRNAME]
-      %[2]s [-version STEMCELL_VERSION] [-os OS_VERSION]
-      %[2]s [OPTIONS...] apply-patch <patch manifest yml>
+Usage %[1]s [-output DIRNAME] apply-patch <patch manifest yml>
 
 Usage %[1]s [OPTIONS...] [-vmdk FILENAME]
       %[2]s [-output DIRNAME] [-version STEMCELL_VERSION]
@@ -44,7 +42,7 @@ Usage:
   must be installed (both include the 'ovftool').
 
   Patch VHD:
-    The [vhd], [patch], and [version] flags must be specified either on the
+		The [vhd], [patch], and [version] flags must be specified either on the
     command line or in the manifest file.  If the [output] flag is not
     specified the stemcell will be created in the current working directory.
 
@@ -54,23 +52,17 @@ Usage:
 
 Examples:
   %[1]s apply-patch patch-manifest.yml
-  where patch-manifest.yml contains
-  %[2]s ---
-  %[2]s version: '1.2.3'
-  %[2]s vhd_file: disk.vhd
-  %[2]s patch_file: patch.file
 
-  and
+  where patch-manifest.yml contains:
+  ---
+  version: '1.2.3'
+  vhd_file: disk.vhd
+  patch_file: patch.file
 
-  %[1]s -vhd disk.vhd -patch patch.file -v 1.2.3
+    Will create a stemcell using the package patch-manifest.yml (requires a VHD and
+    VMDK to exist on paths in your system).
 
-    Will create a stemcell using [vhd] 'disk.vhd' and a patch file with
-    version 1.2.3 in the current working directory.
-
-  %[1]s -vhd disk.vhd -patch patch.file -gzip -v 1.2 -output foo
-
-    Will create a stemcell with version 1.2 in the 'foo' directory using gzip
-    compressed patch file 'patch.file'.
+    and
 
   %[1]s -vmdk disk.vmdk -v 1.2
 
@@ -169,7 +161,6 @@ func ValidateFlags() []error {
 	Debugf("validating [vmdk] (%s) [vhd] (%s) and [patch] (%s) flags",
 		applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.PatchFile)
 
-	fmt.Printf("%#v", applyPatch)
 	if applyPatch.VMDKFile != "" && applyPatch.VHDFile != "" {
 		add(errors.New("both VMDK and VHD flags are specified"))
 		return errs
