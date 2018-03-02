@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -118,6 +119,26 @@ func validFile(name string) error {
 	return nil
 }
 
+func validPatchPath(name string) error {
+	var fileError error
+	var urlError error
+	if fileError = validFile(name); fileError == nil {
+		return nil
+	}
+	if urlError = validUrl(name); urlError == nil {
+		return nil
+	}
+	return fmt.Errorf("The patchfile path is neither a valid file nor a valid url")
+}
+
+func validUrl(urlPath string) error {
+	if strings.HasPrefix(urlPath, "http://") || strings.HasPrefix(urlPath, "https://") {
+		_, err := url.Parse(urlPath)
+		return err
+	}
+	return fmt.Errorf("%s is not a URL", urlPath)
+}
+
 func ValidateFlags() []error {
 	var (
 		errs              []error
@@ -190,7 +211,7 @@ func ValidateFlags() []error {
 		if applyPatch.PatchFile == "" {
 			add(errors.New("missing required argument 'patch'"))
 		}
-		if err := validFile(applyPatch.PatchFile); err != nil {
+		if err := validPatchPath(applyPatch.PatchFile); err != nil {
 			add(fmt.Errorf("invalid [patch]: %s", err))
 		}
 	}
@@ -313,7 +334,7 @@ func main() {
 		BuildOptions: applyPatch,
 	}
 
-	// cleanup if interupted
+	// cleanup if interrupted
 	go func() {
 		ch := make(chan os.Signal, 64)
 		signal.Notify(ch, os.Interrupt)
@@ -321,7 +342,8 @@ func main() {
 		for sig := range ch {
 			Debugf("received signal: %s", sig)
 			if stopping {
-				fmt.Fprintf(os.Stderr, "received second (%s) signale - exiting now\n", sig)
+				fmt.Fprintf(os.Stderr, "received second (%s) signal - exiting now\n", sig)
+				c.Cleanup() // remove temp dir
 				os.Exit(1)
 			}
 			stopping = true
@@ -332,6 +354,8 @@ func main() {
 
 	if err := realMain(&c, applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.PatchFile); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		c.Cleanup() // remove temp dir
+		os.Exit(1)
 	}
 	c.Cleanup() // remove temp dir
 }

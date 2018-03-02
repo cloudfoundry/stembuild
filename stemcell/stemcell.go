@@ -9,14 +9,17 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
 	"github.com/pivotal-cf-experimental/stembuild/rdiff"
 	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	"github.com/pivotal-cf-experimental/stembuild/utils"
 	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
 )
 
@@ -308,9 +311,25 @@ func (c *Config) ApplyPatch(vhd, patch, vmdk string) error {
 	}
 
 	start := time.Now() // this is sometimes interesting
+	var patchfilePath string
+	switch {
+	case strings.HasPrefix(patch, "http://") || strings.HasPrefix(patch, "https://"):
+		if _, err := url.Parse(patch); err == nil {
+			downloadDir, err := ioutil.TempDir("", "")
+			patchfilePath, err = utils.DownloadFileFromURL(downloadDir, patch, c.Debugf)
+			defer os.RemoveAll(downloadDir)
+			if err != nil {
+				return err
+			}
+		} else {
+			patchfilePath = patch
+		}
+	default:
+		patchfilePath = patch
+	}
 
 	c.Debugf("applying patch with rdiff")
-	if err := rdiff.Patch(vhd, patch, vmdk); err != nil {
+	if err := rdiff.Patch(vhd, patchfilePath, vmdk); err != nil {
 		return err
 	}
 

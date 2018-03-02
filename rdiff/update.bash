@@ -45,5 +45,6 @@ rm -vf *.[ch]
 # any spaces!!
 cp $LIBRSYNC_BUILD_DIR/src/*.[ch] .
 cp $LIBRSYNC_DIR/src/*.[ch] .
+cp $LIBRSYNC_DIR/src/*/*.[ch] .
 
 rm -v rdiff.c

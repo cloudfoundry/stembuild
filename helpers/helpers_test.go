@@ -1,10 +1,11 @@
 package helpers_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	. "github.com/pivotal-cf-experimental/stembuild/helpers"
 	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Helpers", func() {

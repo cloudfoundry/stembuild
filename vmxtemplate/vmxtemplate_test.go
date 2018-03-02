@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pivotal-cf-experimental/stembuild/utils"
+	"github.com/pivotal-cf-experimental/stembuild/helpers"
 	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
 )
 
@@ -65,7 +65,7 @@ func ExtractOVA(ova, dirname string) error {
 		return err
 	}
 	defer tf.Close()
-	return utils.ExtractArchive(tf, dirname)
+	return helpers.ExtractArchive(tf, dirname)
 }
 
 const vmdkPath = "FooBarBaz.vmdk"
