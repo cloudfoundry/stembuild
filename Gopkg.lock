@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -34,6 +40,7 @@
     "format",
     "gbytes",
     "gexec",
+    "ghttp",
     "internal/assertion",
     "internal/asyncassertion",
     "internal/oraclematcher",
@@ -101,6 +108,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c6835154637e2851410d4b3a9eb27a431b49e8b41d829293451037ce0a3d3462"
+  inputs-digest = "e1ceacf56e1ac80e442bc9c39b82550cb6550955a933df61aed9d18336148ad8"
   solver-name = "gps-cdcl"
   solver-version = 1
