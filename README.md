@@ -11,11 +11,9 @@ The VMware 'ovftool' binary must be on your path or Fusion/Workstation must be i
 
 ## Create a stemcell from a vmdk
 
-Usage `stembuild-linux [OPTIONS...] [-vmdk FILENAME]
-                                  [-output DIRNAME] [-version STEMCELL_VERSION]
-                                  [-os OS_VERSION]`
+Usage `stembuild-linux [OPTIONS...] [-vmdk FILENAME] [-output DIRNAME] [-version STEMCELL_VERSION] [-os OS_VERSION]`
 
-Process takes between 10 and 20 minutes. See Progress with `-debug` flag.
+Process can take between 10 and 20 minutes. See Progress with `-debug` flag.
 
 ## Create a stemcell from a vhd
 
@@ -23,7 +21,7 @@ Usage `stembuild-linux [-output DIRNAME] apply-patch <patch manifest yml>`
 
 will generate a stemcell in the current working directory
 
-Other options available with `stembuild -h`.
+Process can take between 30 and 60 minutes. See Progress with `-debug` flag.
 
 ## Compilation
 
