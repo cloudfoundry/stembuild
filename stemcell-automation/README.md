@@ -1,0 +1,1 @@
+# BOSH Windows Stemcell Automation [![slack.cloudfoundry.org](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
