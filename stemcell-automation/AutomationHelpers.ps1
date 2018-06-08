@@ -52,3 +52,15 @@ function InstallOpenSSH {
         throw $_.Exception
     }
 }
+
+function CleanUpVM {
+    try {
+        Optimize-Disk
+        Compress-Disk
+        Write-Log "Successfully cleaned up the VM's disk"
+    } catch [ Exception ] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to clean up the VM's disk. See 'c:\provisions\log.log' for mor info."
+        throw $_.Exception
+    }
+}
