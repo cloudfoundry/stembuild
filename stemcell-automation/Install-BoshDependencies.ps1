@@ -1,8 +1,10 @@
 #. ./AutomationHelpers.ps1
 
 #Install Bosh Agent
+InstallBoshAgent
+
 #Install SSH Deamon
-#Install LGPO
+InstallOpenSSH
 
 #Install Bosh Powershell Modules
 CopyPSModules

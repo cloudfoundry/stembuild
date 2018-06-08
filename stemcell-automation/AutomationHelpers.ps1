@@ -21,13 +21,34 @@ function InstallCFFeatures {
 }
 
 function InstallCFCell {
-    try
-    {
+    try {
         Protect-CFCell
         Write-Log "Succesfully ran Protect-CFCell"
     } catch [ Exception ] {
         Write-Log $_.Exception.Message
         Write-Log "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provisions\log.log' for mor info."
+        throw $_.Exception
+    }
+}
+
+function InstallBoshAgent {
+    try {
+        Install-Agent -Iaas "vsphere" -agentZipPath ".\agent.zip"
+        Write-Log "Bosh agent successfully installed"
+    } catch [ Exception ] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to execute Install-Agent powershell cmdlet. See 'c:\provisions\log.log' for mor info."
+        throw $_.Exception
+    }
+}
+
+function InstallOpenSSH {
+    try {
+        Install-SSHD -SSHZipFile ".\OpenSSH-Win64.zip"
+        Write-Log "OpenSSH successfully installed"
+    } catch [ Exception ] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to execute Install-SSHD powershell cmdlet. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
