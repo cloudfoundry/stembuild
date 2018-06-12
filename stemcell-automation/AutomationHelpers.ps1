@@ -64,3 +64,71 @@ function CleanUpVM {
         throw $_.Exception
     }
 }
+
+function Is-Special() {
+    param([parameter(Mandatory=$true)] [string]$c)
+
+    return $c -cmatch '[!-/:-@[-`{-~]'
+}
+
+function Valid-Password() {
+    param([parameter(Mandatory=$true)] [string]$Password)
+
+    $digits = 0
+    $special = 0
+    $alphaLow = 0
+    $alphaHigh = 0
+
+    if ($Password.Length -lt 8) {
+        return $false
+    }
+
+    $tmp = $Password.ToCharArray()
+
+    foreach ($c in $Password.ToCharArray()) {
+        if ($c -cmatch '\d') {
+            $digits = 1
+        } elseif ($c -cmatch '[a-z]') {
+            $alphaLow = 1
+        } elseif ($c -cmatch '[A-Z]') {
+            $alphaHigh = 1
+        } elseif (Is-Special $c) {
+            $special = 1
+        } else {
+            #Invalid char
+            return $false
+        }
+    }
+    return ($digits + $special + $alphaLow + $alphaHigh) -ge 3
+}
+
+function GenerateRandomPassword {
+    $CharList = "!`"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_``abcdefghijklmnopqrstuvwxyz{|}~".ToCharArray()
+    $limit = 200
+    $count = 0
+
+    while ($limit-- -gt 0) {
+        $passwd = (Get-Random -InputObject $CharList -Count 24) -join ''
+        if (Valid-Password -Password $passwd) {
+            Write-Log "Successfully generated password"
+            return $passwd
+        }
+    }
+    Write-Log "Failed to generate password after 200 attempts"
+    throw "Unable to generate a valid password after 200 attempts"
+}
+
+function SysprepVM {
+    try {
+        Expand-Archive -LiteralPath ".\LGPO.zip" -DestinationPath "C:\Windows\"
+        Write-Log "Successfully migrated LGPO to destination dir"
+
+        $randomPassword = GenerateRandomPassword
+
+        Invoke-Sysprep -IaaS "vsphere" -NewPassword $randomPassword
+    } catch [ Exception ] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info."
+        throw $_.Exception
+    }
+}
