@@ -1,12 +1,14 @@
-#. ./AutomationHelpers.ps1
+Push-Location $PSScriptRoot
 
-#Install Bosh Agent
-InstallBoshAgent
-
-#Install SSH Deamon
-InstallOpenSSH
+. ./AutomationHelpers.ps1
 
 #Install Bosh Powershell Modules
-CopyPSModules
-InstallCFCell
-InstallCFFeatures
+#Install Bosh Agent
+#Install SSH Deamon
+#Install Cloud Foundry Diego Cell requirements
+
+
+
+Pop-Location
+
+#shutdown /r /t 0

@@ -132,3 +132,47 @@ function SysprepVM {
         throw $_.Exception
     }
 }
+
+function Check-Dependencies{
+    try
+    {
+        $depsObj = ( Get-Content -Path "$PSScriptRoot/deps.json") -join '`n' | ConvertFrom-Json
+        if ($depsObj.psobject.properties.Count -eq 0 -or $depsObj.psobject.properties.Count -eq $null)  {
+            throw "Dependency file is empty"
+        }
+
+        $hashtable = @{ }
+        $depsObj.psobject.properties | Foreach { $hashtable[$_.Name] = $_.Value }
+
+        $corruptedOrMissingFile = $false
+        foreach ($item in $hashtable.GetEnumerator())
+        {
+            $fileName = $item.Key
+            $expectedFileHash = $item.Value
+            if (Test-Path -Path "$PSScriptRoot/$fileName")
+            {
+                $fileHash = Get-FileHash -Path "$PSScriptRoot/$fileName"
+                if ($fileHash.Hash -notmatch $expectedFileHash)
+                {
+                    Write-Log "$PSScriptRoot/$fileName does not have the correct hash"
+                    $corruptedOrMissingFile = $true
+                }
+            }
+            else {
+                Write-Log "$PSScriptRoot/$fileName is required but was not found"
+                $corruptedOrMissingFile = $true
+            }
+        }
+
+        if ($corruptedOrMissingFile) {
+            throw "One or more files are corrupted or missing."
+        }
+
+    } catch [Exception] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info."
+        throw $_.Exception
+    }
+
+    Write-Log "Found all dependencies"
+}

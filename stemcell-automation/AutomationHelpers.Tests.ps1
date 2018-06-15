@@ -315,3 +315,170 @@ Describe "Is-Special" {
         Is-Special " " | Should -Be $False
     }
 }
+
+Describe "Check-Dependencies" {
+    BeforeEach {
+        Mock Write-Log {}
+
+        $file1Hash = @{
+            Algorithm = "SHA256"
+            Hash = "hashOne"
+            Path = "$PSScriptRoot/file1.zip"
+        }
+        $file2Hash = @{
+            Algorithm = "SHA256"
+            Hash = "hashTwo"
+            Path = "$PSScriptRoot/file2.zip"
+        }
+        $file3Hash = @{
+            Algorithm = "SHA256"
+            Hash = "hashThree"
+            Path = "$PSScriptRoot/file3.exe"
+        }
+
+        Mock Get-FileHash {New-Object PSObject -Property $file1Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+        Mock Get-FileHash {New-Object PSObject -Property $file2Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+        Mock Get-FileHash {New-Object PSObject -Property $file3Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+        Mock Test-Path { $true } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+        Mock Test-Path { $true } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+        Mock Test-Path { $true } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+        #We specify when to throw the exception to prevent other test from being polluted when calling Convert-FromJson
+        Mock ConvertFrom-Json {throw "Invalid JSON primitive: bad-json-format"} -ParameterFilter { $InputObject -match "bad-json-format" }
+    }
+
+
+    It "successfully checks all required files are available and have the correct SHAs" {
+        Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""hashTwo"",""file3.exe"":""hashThree""}"}
+        Mock Get-FileHash {New-Object PSObject -Property $file1Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+        Mock Get-FileHash {New-Object PSObject -Property $file2Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+        Mock Get-FileHash {New-Object PSObject -Property $file3Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+        { Check-Dependencies } | Should -Not -Throw
+
+        Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+
+        Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+        Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+        Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+        Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+        Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+        Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Found all dependencies" }
+    }
+
+    Context "fails gracefully if the dependency file" {
+        It "is not present" {
+            Mock Get-Content { throw "File not found" }
+
+            { Check-Dependencies } | Should -Throw "File not found"
+
+            Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "File not found" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+
+        }
+
+        It "is empty" {
+            Mock Get-Content { "" }
+
+            { Check-Dependencies } | Should -Throw "Dependency file is empty"
+
+            Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Dependency file is empty" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+        }
+
+        It "contains an empty json object" {
+            Mock Get-Content { "{}" }
+
+            { Check-Dependencies } | Should -Throw "Dependency file is empty"
+
+            Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Dependency file is empty" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+        }
+
+        It "content is badly formatted" {
+            Mock Get-Content {"bad-json-format"}
+
+            { Check-Dependencies } | Should -Throw "Invalid JSON primitive: bad-json-format"
+
+            Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Invalid JSON primitive: bad-json-format" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+
+        }
+    }
+
+    Context "fails gracefully when checking file dependencies" {
+        It "when one or more are not found" {
+            Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""hashTwo"",""file3.exe"":""hashThree""}"}
+            Mock Test-Path { $false } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+            Mock Test-Path { $false } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+            { Check-Dependencies } | Should -Throw "One or more files are corrupted or missing."
+
+            Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+
+            Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+            Assert-MockCalled Get-FileHash -Times 0 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+            Assert-MockCalled Get-FileHash -Times 0 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+            Assert-MockCalled Write-Log -Times 0 -Scope It -ParameterFilter { $Message -like "$PSScriptRoot/file1.zip *" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file2.zip is required but was not found" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file3.exe is required but was not found" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+        }
+
+        It "when one or more file hashes do not match" {
+            Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""badhash2"",""file3.exe"":""badhash3""}"}
+
+            { Check-Dependencies } | Should -Throw "One or more files are corrupted or missing."
+
+            Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+
+            Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+            Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+            Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+            Assert-MockCalled Write-Log -Times 0 -Scope It -ParameterFilter { $Message -like "$PSScriptRoot/file1.zip *" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file2.zip does not have the correct hash" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file3.exe does not have the correct hash" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+        }
+
+        It "when one file hash does not match and another file is missing " {
+            Mock Test-Path { $False } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+            Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""badhash2"",""file3.exe"":""hashThree""}"}
+
+            { Check-Dependencies } | Should -Throw "One or more files are corrupted or missing."
+
+            Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
+
+            Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+            Assert-MockCalled Get-FileHash -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+            Assert-MockCalled Get-FileHash -Times 0 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+            Assert-MockCalled Test-Path -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+
+            Assert-MockCalled Write-Log -Times 0 -Scope It -ParameterFilter { $Message -like "$PSScriptRoot/file1.zip *" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file2.zip does not have the correct hash" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file3.exe is required but was not found" }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+        }
+    }
+}
