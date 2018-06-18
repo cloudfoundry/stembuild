@@ -170,6 +170,40 @@ Describe "SysprepVM" {
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Successfully migrated LGPO to destination dir" }
     }
 
+    It "executes the Invoke-Sysprep powershell cmdlet with owner parameter set when an owner string is provided" {
+        Mock Expand-Archive {}
+        Mock Invoke-Sysprep {}
+        Mock GenerateRandomPassword { "SomeRandomPassword" }
+        Mock Write-Log {}
+
+        { SysprepVM -Owner "some owner" } | Should -Not -Throw
+
+        Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" -and $Owner -eq "some owner" -and $Organization -eq "" }
+    }
+
+    It "executes the Invoke-Sysprep powershell cmdlet with organization parameter set when an organization string is provided" {
+        Mock Expand-Archive {}
+        Mock Invoke-Sysprep {}
+        Mock GenerateRandomPassword { "SomeRandomPassword" }
+        Mock Write-Log {}
+
+        { SysprepVM -Organization "some org" } | Should -Not -Throw
+
+        Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" -and $Organization -eq "some org" -and $Owner -eq "" }
+    }
+
+    It "executes the Invoke-Sysprep powershell cmdlet with owner & organization parameter set when an owner & organization string is provided" {
+        Mock Expand-Archive {}
+        Mock Invoke-Sysprep {}
+        Mock GenerateRandomPassword { "SomeRandomPassword" }
+        Mock Write-Log {}
+
+        { SysprepVM -Owner "some owner" -Organization "some org" } | Should -Not -Throw
+
+        Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" -and $Owner -eq "some owner" -and $Organization -eq "some org" }
+    }
+
+
     It "fails gracefully when Expand-Archive powershell cmdlet fails" {
         Mock Expand-Archive { throw "Expand-Archive failed because something went wrong" }
         Mock Invoke-Sysprep {}

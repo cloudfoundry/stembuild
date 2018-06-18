@@ -119,13 +119,18 @@ function GenerateRandomPassword {
 }
 
 function SysprepVM {
+    Param (
+        [string]$Organization="",
+        [string]$Owner=""
+    )
+
     try {
         Expand-Archive -LiteralPath ".\LGPO.zip" -DestinationPath "C:\Windows\"
         Write-Log "Successfully migrated LGPO to destination dir"
 
         $randomPassword = GenerateRandomPassword
 
-        Invoke-Sysprep -IaaS "vsphere" -NewPassword $randomPassword
+        Invoke-Sysprep -IaaS "vsphere" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
     } catch [ Exception ] {
         Write-Log $_.Exception.Message
         Write-Log "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info."
