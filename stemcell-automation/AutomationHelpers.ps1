@@ -141,14 +141,10 @@ function Check-Dependencies{
             throw "Dependency file is empty"
         }
 
-        $hashtable = @{ }
-        $depsObj.psobject.properties | Foreach { $hashtable[$_.Name] = $_.Value }
-
         $corruptedOrMissingFile = $false
-        foreach ($item in $hashtable.GetEnumerator())
-        {
-            $fileName = $item.Key
-            $expectedFileHash = $item.Value
+        $depsObj.psobject.properties | ForEach {
+            $fileName = $_.Name
+            $expectedFileHash = $_.Value.sha
             if (Test-Path -Path "$PSScriptRoot/$fileName")
             {
                 $fileHash = Get-FileHash -Path "$PSScriptRoot/$fileName"

@@ -316,6 +316,15 @@ Describe "Is-Special" {
     }
 }
 
+function GenerateDepJson {
+    param(  [parameter(Mandatory=$true)] [string]$file1Sha,
+            [parameter(Mandatory=$true)] [string]$file2Sha,
+            [parameter(Mandatory=$true)] [string]$file3Sha
+    )
+
+    return "{""file1.zip"":{""sha"":""$file1Sha"",""version"":""1.0""},""file2.zip"":{""sha"":""$file2Sha"",""version"":""1.0-alpha""},""file3.exe"":{""sha"":""$file3Sha"",""version"":""3.0""}}"
+}
+
 Describe "Check-Dependencies" {
     BeforeEach {
         Mock Write-Log {}
@@ -350,10 +359,7 @@ Describe "Check-Dependencies" {
 
 
     It "successfully checks all required files are available and have the correct SHAs" {
-        Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""hashTwo"",""file3.exe"":""hashThree""}"}
-        Mock Get-FileHash {New-Object PSObject -Property $file1Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
-        Mock Get-FileHash {New-Object PSObject -Property $file2Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
-        Mock Get-FileHash {New-Object PSObject -Property $file3Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+        Mock Get-Content { GenerateDepJson "hashOne" "hashTwo" "hashThree" }
 
         { Check-Dependencies } | Should -Not -Throw
 
@@ -416,7 +422,7 @@ Describe "Check-Dependencies" {
 
     Context "fails gracefully when checking file dependencies" {
         It "when one or more are not found" {
-            Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""hashTwo"",""file3.exe"":""hashThree""}"}
+            Mock Get-Content { GenerateDepJson "hashOne" "hashTwo" "hashThree" }
             Mock Test-Path { $false } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
             Mock Test-Path { $false } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
 
@@ -439,7 +445,7 @@ Describe "Check-Dependencies" {
         }
 
         It "when one or more file hashes do not match" {
-            Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""badhash2"",""file3.exe"":""badhash3""}"}
+            Mock Get-Content { GenerateDepJson "hashOne" "badhash2" "badhash3" }
 
             { Check-Dependencies } | Should -Throw "One or more files are corrupted or missing."
 
@@ -461,7 +467,7 @@ Describe "Check-Dependencies" {
 
         It "when one file hash does not match and another file is missing " {
             Mock Test-Path { $False } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
-            Mock Get-Content {"{""file1.zip"":""hashOne"",""file2.zip"":""badhash2"",""file3.exe"":""hashThree""}"}
+            Mock Get-Content { GenerateDepJson "hashOne" "badhash2" "hashThree" }
 
             { Check-Dependencies } | Should -Throw "One or more files are corrupted or missing."
 
