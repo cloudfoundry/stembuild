@@ -2,8 +2,8 @@
 
 Describe "CopyPSModules" {
     It "can copy PS Modules to target directory" {
-        Mock Write-Log {}
-        Mock Expand-Archive {}
+        Mock Write-Log { }
+        Mock Expand-Archive { }
 
         { CopyPSModules } | Should -Not -Throw
 
@@ -13,7 +13,7 @@ Describe "CopyPSModules" {
 
     It "fails gracefully when expanding archive fails" {
         Mock Expand-Archive { throw "Expand-Archive failed because something went wrong" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { CopyPSModules } | Should -Throw "Expand-Archive failed because something went wrong"
 
@@ -24,8 +24,8 @@ Describe "CopyPSModules" {
 
 Describe "InstallCFFeatures" {
     It "executes the Install-CFFeatures powershell cmdlet" {
-        Mock Install-CFFeatures {}
-        Mock Write-Log {}
+        Mock Install-CFFeatures { }
+        Mock Write-Log { }
 
         { InstallCFFeatures } | Should -Not -Throw
 
@@ -35,19 +35,19 @@ Describe "InstallCFFeatures" {
 
     It "fails gracefully when installing CF Features" {
         Mock Install-CFFeatures { throw "Something terrible happened while attempting to install a CF feature" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { InstallCFFeatures } | Should -Throw "Something terrible happened while attempting to install a CF feature"
 
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to install a CF feature"}
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to install the CF features. See 'c:\provisions\log.log' for mor info."}
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to install a CF feature" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to install the CF features. See 'c:\provisions\log.log' for mor info." }
     }
 }
 
 Describe "InstallCFCell" {
     It "executes the Protect-CFCell powershell cmdlet" {
-        Mock Protect-CFCell {}
-        Mock Write-Log {}
+        Mock Protect-CFCell { }
+        Mock Write-Log { }
 
         { InstallCFCell } | Should -Not -Throw
 
@@ -57,20 +57,20 @@ Describe "InstallCFCell" {
 
     It "fails gracefully when Protect-CFCell powershell cmdlet fails" {
         Mock Protect-CFCell { throw "Something terrible happened while attempting to execute Protect-CFCell" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { InstallCFCell } | Should -Throw "Something terrible happened while attempting to execute Protect-CFCell"
 
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Protect-CFCell"}
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provisions\log.log' for mor info."}
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Protect-CFCell" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provisions\log.log' for mor info." }
     }
 
 }
 
 Describe "InstallBoshAgent" {
     It "executes the Install-Agent powershell cmdlet" {
-        Mock Install-Agent {}
-        Mock Write-Log {}
+        Mock Install-Agent { }
+        Mock Write-Log { }
 
         { InstallBoshAgent } | Should -Not -Throw
 
@@ -81,7 +81,7 @@ Describe "InstallBoshAgent" {
 
     It "fails gracefully when Install-Agent powershell cmdlet fails" {
         Mock Install-Agent { throw "Something terrible happened while attempting to execute Install-Agent" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { InstallBoshAgent } | Should -Throw "Something terrible happened while attempting to execute Install-Agent"
 
@@ -92,8 +92,8 @@ Describe "InstallBoshAgent" {
 
 Describe "InstallOpenSSH" {
     It "executes the Install-SSHD powershell cmdlet" {
-        Mock Install-SSHD {}
-        Mock Write-Log {}
+        Mock Install-SSHD { }
+        Mock Write-Log { }
 
         { InstallOpenSSH } | Should -Not -Throw
 
@@ -104,7 +104,7 @@ Describe "InstallOpenSSH" {
 
     It "fails gracefully when Install-SSHD powershell cmdlet fails" {
         Mock Install-SSHD { throw "Something terrible happened while attempting to execute Install-SSHD" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { InstallOpenSSH } | Should -Throw "Something terrible happened while attempting to execute Install-SSHD"
 
@@ -115,9 +115,9 @@ Describe "InstallOpenSSH" {
 
 Describe "CleanUpVM" {
     It "executes the Optimize-Disk and Compress-Disk powershell cmdlet" {
-        Mock Optimize-Disk {}
-        Mock Compress-Disk {}
-        Mock Write-Log {}
+        Mock Optimize-Disk { }
+        Mock Compress-Disk { }
+        Mock Write-Log { }
 
         { CleanUpVM } | Should -Not -Throw
 
@@ -128,8 +128,8 @@ Describe "CleanUpVM" {
 
     It "fails gracefully when Optimize-Disk powershell cmdlet fails" {
         Mock Optimize-Disk { throw "Something terrible happened while attempting to execute Optimize-Disk" }
-        Mock Compress-Disk {}
-        Mock Write-Log {}
+        Mock Compress-Disk { }
+        Mock Write-Log { }
 
         { CleanUpVM } | Should -Throw "Something terrible happened while attempting to execute Optimize-Disk"
 
@@ -141,9 +141,9 @@ Describe "CleanUpVM" {
     }
 
     It "fails gracefully when Compress-Disk powershell cmdlet fails" {
-        Mock Optimize-Disk {}
+        Mock Optimize-Disk { }
         Mock Compress-Disk { throw "Something terrible happened while attempting to execute Compress-Disk" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { CleanUpVM } | Should -Throw "Something terrible happened while attempting to execute Compress-Disk"
 
@@ -157,10 +157,10 @@ Describe "CleanUpVM" {
 
 Describe "SysprepVM" {
     It "copies LGPO to the correct destination and executes the Invoke-Sysprep powershell cmdlet" {
-        Mock Expand-Archive {}
-        Mock Invoke-Sysprep {}
+        Mock Expand-Archive { }
+        Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { SysprepVM } | Should -Not -Throw
 
@@ -171,10 +171,10 @@ Describe "SysprepVM" {
     }
 
     It "executes the Invoke-Sysprep powershell cmdlet with owner parameter set when an owner string is provided" {
-        Mock Expand-Archive {}
-        Mock Invoke-Sysprep {}
+        Mock Expand-Archive { }
+        Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { SysprepVM -Owner "some owner" } | Should -Not -Throw
 
@@ -182,10 +182,10 @@ Describe "SysprepVM" {
     }
 
     It "executes the Invoke-Sysprep powershell cmdlet with organization parameter set when an organization string is provided" {
-        Mock Expand-Archive {}
-        Mock Invoke-Sysprep {}
+        Mock Expand-Archive { }
+        Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { SysprepVM -Organization "some org" } | Should -Not -Throw
 
@@ -193,10 +193,10 @@ Describe "SysprepVM" {
     }
 
     It "executes the Invoke-Sysprep powershell cmdlet with owner & organization parameter set when an owner & organization string is provided" {
-        Mock Expand-Archive {}
-        Mock Invoke-Sysprep {}
+        Mock Expand-Archive { }
+        Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { SysprepVM -Owner "some owner" -Organization "some org" } | Should -Not -Throw
 
@@ -206,9 +206,9 @@ Describe "SysprepVM" {
 
     It "fails gracefully when Expand-Archive powershell cmdlet fails" {
         Mock Expand-Archive { throw "Expand-Archive failed because something went wrong" }
-        Mock Invoke-Sysprep {}
+        Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { SysprepVM } | Should -Throw "Expand-Archive failed because something went wrong"
 
@@ -221,10 +221,10 @@ Describe "SysprepVM" {
     }
 
     It "fails gracefully when Invoke-Sysprep powershell cmdlet fails" {
-        Mock Expand-Archive {}
+        Mock Expand-Archive { }
         Mock Invoke-Sysprep { throw "Invoke-Sysprep failed because something went wrong" }
         Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { SysprepVM } | Should -Throw "Invoke-Sysprep failed because something went wrong"
 
@@ -237,10 +237,10 @@ Describe "SysprepVM" {
     }
 
     It "fails gracefully when GenerateRandomPassword function fails" {
-        Mock Expand-Archive {}
-        Mock Invoke-Sysprep {}
+        Mock Expand-Archive { }
+        Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { throw "GenerateRandomPassword failed because something went wrong" }
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         { SysprepVM } | Should -Throw "GenerateRandomPassword failed because something went wrong"
 
@@ -258,7 +258,7 @@ Describe "GenerateRandomPassword" {
     It "generates a valid password" {
         Mock Get-Random { "changeMe123!".ToCharArray() }
         Mock Valid-Password { $True }
-        Mock Write-Log{}
+        Mock Write-Log{ }
         $result = ""
         { GenerateRandomPassword | Set-Variable -Name "result" -Scope 1 } | Should -Not -Throw
         $result | Should -BeExactly "changeMe123!"
@@ -271,7 +271,7 @@ Describe "GenerateRandomPassword" {
     It "fails to generate a valid password after 200 tries" {
         Mock Get-Random { "changeMe123!".ToCharArray() }
         Mock Valid-Password { $False }
-        Mock Write-Log{}
+        Mock Write-Log{ }
 
         { GenerateRandomPassword } | Should -Throw "Unable to generate a valid password after 200 attempts"
 
@@ -328,13 +328,15 @@ Describe "Valid-Password" {
 
         It "that contains a whitespace character" {
             Valid-Password "JoyeuxNoel 123!" | Should -Be $false
-        }}
+        }
+    }
 }
 
 Describe "Is-Special" {
     It "returns true when given a valid special character" {
         $CharList = "!`"#$%&'()*+,-./:;<=>?@[\]^_``{|}~".ToCharArray()
-        foreach ($c in $CharList) {
+        foreach ($c in $CharList)
+        {
             Is-Special $c | Should -Be $true
         }
     }
@@ -350,10 +352,11 @@ Describe "Is-Special" {
     }
 }
 
-function GenerateDepJson {
-    param(  [parameter(Mandatory=$true)] [string]$file1Sha,
-            [parameter(Mandatory=$true)] [string]$file2Sha,
-            [parameter(Mandatory=$true)] [string]$file3Sha
+function GenerateDepJson
+{
+    param ([parameter(Mandatory = $true)] [string]$file1Sha,
+        [parameter(Mandatory = $true)] [string]$file2Sha,
+        [parameter(Mandatory = $true)] [string]$file3Sha
     )
 
     return "{""file1.zip"":{""sha"":""$file1Sha"",""version"":""1.0""},""file2.zip"":{""sha"":""$file2Sha"",""version"":""1.0-alpha""},""file3.exe"":{""sha"":""$file3Sha"",""version"":""3.0""}}"
@@ -361,7 +364,7 @@ function GenerateDepJson {
 
 Describe "Check-Dependencies" {
     BeforeEach {
-        Mock Write-Log {}
+        Mock Write-Log { }
 
         $file1Hash = @{
             Algorithm = "SHA256"
@@ -379,16 +382,16 @@ Describe "Check-Dependencies" {
             Path = "$PSScriptRoot/file3.exe"
         }
 
-        Mock Get-FileHash {New-Object PSObject -Property $file1Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
-        Mock Get-FileHash {New-Object PSObject -Property $file2Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
-        Mock Get-FileHash {New-Object PSObject -Property $file3Hash} -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
+        Mock Get-FileHash { New-Object PSObject -Property $file1Hash } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
+        Mock Get-FileHash { New-Object PSObject -Property $file2Hash } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
+        Mock Get-FileHash { New-Object PSObject -Property $file3Hash } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
 
         Mock Test-Path { $true } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file1.zip" }
         Mock Test-Path { $true } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file2.zip" }
         Mock Test-Path { $true } -ParameterFilter { $Path -cmatch "$PSScriptRoot/file3.exe" }
 
         #We specify when to throw the exception to prevent other test from being polluted when calling Convert-FromJson
-        Mock ConvertFrom-Json {throw "Invalid JSON primitive: bad-json-format"} -ParameterFilter { $InputObject -match "bad-json-format" }
+        Mock ConvertFrom-Json { throw "Invalid JSON primitive: bad-json-format" } -ParameterFilter { $InputObject -match "bad-json-format" }
     }
 
 
@@ -443,7 +446,7 @@ Describe "Check-Dependencies" {
         }
 
         It "content is badly formatted" {
-            Mock Get-Content {"bad-json-format"}
+            Mock Get-Content { "bad-json-format" }
 
             { Check-Dependencies } | Should -Throw "Invalid JSON primitive: bad-json-format"
 
@@ -525,7 +528,7 @@ Describe "Check-Dependencies" {
 
 Describe "Validate-OSVersion" {
     BeforeEach {
-        Mock Write-Log {}
+        Mock Write-Log { }
     }
 
     It "should return false when the OS major version doesn't match" {
@@ -539,6 +542,7 @@ Describe "Validate-OSVersion" {
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
 
     }
+
     It "should return false when the OS minor version doesn't match" {
         Mock Get-OSVersionString { "10.5.16299.0" }
         Validate-OSVersion | Should -Be $false
@@ -549,6 +553,7 @@ Describe "Validate-OSVersion" {
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
 
     }
+
     It "should return false when the OS build version doesn't match" {
         Mock Get-OSVersionString { "10.0.12345.0" }
 
@@ -558,6 +563,7 @@ Describe "Validate-OSVersion" {
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
     }
+
     It "should return true when the OS is Windows Server 1709" {
         Mock Get-OSVersionString { "10.0.16299.0" }
 

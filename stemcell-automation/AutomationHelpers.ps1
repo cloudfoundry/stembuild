@@ -1,100 +1,137 @@
-function CopyPSModules {
-    try {
+function CopyPSModules
+{
+    try
+    {
         Expand-Archive -LiteralPath ".\bosh-psmodules.zip" -DestinationPath "C:\Program Files\WindowsPowerShell\Modules\" -Force
         Write-Log "Succesfully migrated Bosh Powershell modules to destination dir"
-    } catch [ Exception ] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to copy Bosh Powershell Modules into destination dir. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
 
-function InstallCFFeatures {
-    try {
+function InstallCFFeatures
+{
+    try
+    {
         Install-CFFeatures
         Write-Log "Successfully installed CF features"
-    } catch [ Exception ] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to install the CF features. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
 
-function InstallCFCell {
-    try {
+function InstallCFCell
+{
+    try
+    {
         Protect-CFCell
         Write-Log "Succesfully ran Protect-CFCell"
-    } catch [ Exception ] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
 
-function InstallBoshAgent {
-    try {
+function InstallBoshAgent
+{
+    try
+    {
         Install-Agent -Iaas "vsphere" -agentZipPath ".\agent.zip"
         Write-Log "Bosh agent successfully installed"
-    } catch [ Exception ] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to execute Install-Agent powershell cmdlet. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
 
-function InstallOpenSSH {
-    try {
+function InstallOpenSSH
+{
+    try
+    {
         Install-SSHD -SSHZipFile ".\OpenSSH-Win64.zip"
         Write-Log "OpenSSH successfully installed"
-    } catch [ Exception ] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to execute Install-SSHD powershell cmdlet. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
 
-function CleanUpVM {
-    try {
+function CleanUpVM
+{
+    try
+    {
         Optimize-Disk
         Compress-Disk
         Write-Log "Successfully cleaned up the VM's disk"
-    } catch [ Exception ] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to clean up the VM's disk. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
 
-function Is-Special() {
-    param([parameter(Mandatory=$true)] [string]$c)
+function Is-Special()
+{
+    param ([parameter(Mandatory = $true)] [string]$c)
 
     return $c -cmatch '[!-/:-@[-`{-~]'
 }
 
-function Valid-Password() {
-    param([parameter(Mandatory=$true)] [string]$Password)
+function Valid-Password()
+{
+    param ([parameter(Mandatory = $true)] [string]$Password)
 
     $digits = 0
     $special = 0
     $alphaLow = 0
     $alphaHigh = 0
 
-    if ($Password.Length -lt 8) {
+    if ($Password.Length -lt 8)
+    {
         return $false
     }
 
     $tmp = $Password.ToCharArray()
 
-    foreach ($c in $Password.ToCharArray()) {
-        if ($c -cmatch '\d') {
+    foreach ($c in $Password.ToCharArray())
+    {
+        if ($c -cmatch '\d')
+        {
             $digits = 1
-        } elseif ($c -cmatch '[a-z]') {
+        }
+        elseif ($c -cmatch '[a-z]')
+        {
             $alphaLow = 1
-        } elseif ($c -cmatch '[A-Z]') {
+        }
+        elseif ($c -cmatch '[A-Z]')
+        {
             $alphaHigh = 1
-        } elseif (Is-Special $c) {
+        }
+        elseif (Is-Special $c)
+        {
             $special = 1
-        } else {
+        }
+        else
+        {
             #Invalid char
             return $false
         }
@@ -102,14 +139,17 @@ function Valid-Password() {
     return ($digits + $special + $alphaLow + $alphaHigh) -ge 3
 }
 
-function GenerateRandomPassword {
+function GenerateRandomPassword
+{
     $CharList = "!`"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_``abcdefghijklmnopqrstuvwxyz{|}~".ToCharArray()
     $limit = 200
     $count = 0
 
-    while ($limit-- -gt 0) {
+    while ($limit-- -gt 0)
+    {
         $passwd = (Get-Random -InputObject $CharList -Count 24) -join ''
-        if (Valid-Password -Password $passwd) {
+        if (Valid-Password -Password $passwd)
+        {
             Write-Log "Successfully generated password"
             return $passwd
         }
@@ -118,31 +158,37 @@ function GenerateRandomPassword {
     throw "Unable to generate a valid password after 200 attempts"
 }
 
-function SysprepVM {
+function SysprepVM
+{
     Param (
-        [string]$Organization="",
-        [string]$Owner=""
+        [string]$Organization = "",
+        [string]$Owner = ""
     )
 
-    try {
+    try
+    {
         Expand-Archive -LiteralPath ".\LGPO.zip" -DestinationPath "C:\Windows\"
         Write-Log "Successfully migrated LGPO to destination dir"
 
         $randomPassword = GenerateRandomPassword
 
         Invoke-Sysprep -IaaS "vsphere" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
-    } catch [ Exception ] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
 
-function Check-Dependencies{
+function Check-Dependencies
+{
     try
     {
         $depsObj = (Get-Content -Path "$PSScriptRoot/deps.json") -join '`n' | ConvertFrom-Json
-        if ($depsObj.psobject.properties.Count -eq 0 -or $depsObj.psobject.properties.Count -eq $null)  {
+        if ($depsObj.psobject.properties.Count -eq 0 -or $depsObj.psobject.properties.Count -eq $null)
+        {
             throw "Dependency file is empty"
         }
 
@@ -159,17 +205,21 @@ function Check-Dependencies{
                     $corruptedOrMissingFile = $true
                 }
             }
-            else {
+            else
+            {
                 Write-Log "$PSScriptRoot/$fileName is required but was not found"
                 $corruptedOrMissingFile = $true
             }
         }
 
-        if ($corruptedOrMissingFile) {
+        if ($corruptedOrMissingFile)
+        {
             throw "One or more files are corrupted or missing."
         }
 
-    } catch [Exception] {
+    }
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info."
         throw $_.Exception
@@ -178,23 +228,27 @@ function Check-Dependencies{
     Write-Log "Found all dependencies"
 }
 
-function Get-OSVersionString {
+function Get-OSVersionString
+{
     return [System.Environment]::OSVersion.Version.ToString()
 }
 
-function Validate-OSVersion {
+function Validate-OSVersion
+{
     $osMatch = $false
     try
     {
         $osVersion = Get-OSVersionString
         $osMatch = $osVersion -match "10\.0\.16299\..+"
 
-        if ($osMatch -ne $true) {
+        if ($osMatch -ne $true)
+        {
             throw "OS Version Mismatch: Please use Windows Server 2016, Version 1709"
         }
         Write-Log "Found correct OS version: Windows Server 2016, Version 1709"
     }
-    catch [Exception] {
+    catch [Exception]
+    {
         Write-Log $_.Exception.Message
         Write-Log "Failed to validate the OS version. See 'c:\provisions\log.log' for more info."
     }
