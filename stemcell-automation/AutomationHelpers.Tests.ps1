@@ -522,3 +522,60 @@ Describe "Check-Dependencies" {
         }
     }
 }
+
+Describe "Validate-OSVersion" {
+    BeforeEach {
+        Mock Write-Log {}
+    }
+
+    It "should return false when the OS major version doesn't match" {
+        Mock Get-OSVersionString { "14.0.16299.0" }
+
+        Validate-OSVersion | Should -Be $false
+
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2016, Version 1709" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
+
+    }
+    It "should return false when the OS minor version doesn't match" {
+        Mock Get-OSVersionString { "10.5.16299.0" }
+        Validate-OSVersion | Should -Be $false
+
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2016, Version 1709" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
+
+    }
+    It "should return false when the OS build version doesn't match" {
+        Mock Get-OSVersionString { "10.0.12345.0" }
+
+        Validate-OSVersion | Should -Be $false
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2016, Version 1709" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
+    }
+    It "should return true when the OS is Windows Server 1709" {
+        Mock Get-OSVersionString { "10.0.16299.0" }
+
+        Validate-OSVersion | Should -Be $true
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Found correct OS version: Windows Server 2016, Version 1709" }
+        Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
+    }
+
+    It "should return false when an exception is received when getting OS version" {
+        Mock Get-OSVersionString { throw "Could not fetch OS version" }
+        Mock Write-Log
+
+        Validate-OSVersion | Should -Be $false
+
+        Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Could not fetch OS version" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+    }
+}

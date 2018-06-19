@@ -141,7 +141,7 @@ function SysprepVM {
 function Check-Dependencies{
     try
     {
-        $depsObj = ( Get-Content -Path "$PSScriptRoot/deps.json") -join '`n' | ConvertFrom-Json
+        $depsObj = (Get-Content -Path "$PSScriptRoot/deps.json") -join '`n' | ConvertFrom-Json
         if ($depsObj.psobject.properties.Count -eq 0 -or $depsObj.psobject.properties.Count -eq $null)  {
             throw "Dependency file is empty"
         }
@@ -176,4 +176,28 @@ function Check-Dependencies{
     }
 
     Write-Log "Found all dependencies"
+}
+
+function Get-OSVersionString {
+    return [System.Environment]::OSVersion.Version.ToString()
+}
+
+function Validate-OSVersion {
+    $osMatch = $false
+    try
+    {
+        $osVersion = Get-OSVersionString
+        $osMatch = $osVersion -match "10\.0\.16299\..+"
+
+        if ($osMatch -ne $true) {
+            throw "OS Version Mismatch: Please use Windows Server 2016, Version 1709"
+        }
+        Write-Log "Found correct OS version: Windows Server 2016, Version 1709"
+    }
+    catch [Exception] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to validate the OS version. See 'c:\provisions\log.log' for more info."
+    }
+
+    return $osMatch
 }
