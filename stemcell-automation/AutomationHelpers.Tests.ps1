@@ -531,22 +531,20 @@ Describe "Validate-OSVersion" {
         Mock Write-Log { }
     }
 
-    It "should return false when the OS major version doesn't match" {
+    It "fails gracefully when the OS major version doesn't match" {
         Mock Get-OSVersionString { "14.0.16299.0" }
 
-        Validate-OSVersion | Should -Be $false
-
+        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2016, Version 1709"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2016, Version 1709" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
-
     }
 
-    It "should return false when the OS minor version doesn't match" {
+    It "fails gracefully when the OS minor version doesn't match" {
         Mock Get-OSVersionString { "10.5.16299.0" }
-        Validate-OSVersion | Should -Be $false
 
+        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2016, Version 1709"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2016, Version 1709" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
@@ -554,34 +552,86 @@ Describe "Validate-OSVersion" {
 
     }
 
-    It "should return false when the OS build version doesn't match" {
+    It "fails gracefully when the OS build version doesn't match" {
         Mock Get-OSVersionString { "10.0.12345.0" }
 
-        Validate-OSVersion | Should -Be $false
+        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2016, Version 1709"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2016, Version 1709" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
     }
 
-    It "should return true when the OS is Windows Server 1709" {
+    It "successfully validates the OS when it is Windows Server 1709" {
         Mock Get-OSVersionString { "10.0.16299.0" }
 
-        Validate-OSVersion | Should -Be $true
+        { Validate-OSVersion } | Should -Not -Throw
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Found correct OS version: Windows Server 2016, Version 1709" }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
     }
 
-    It "should return false when an exception is received when getting OS version" {
+    It "fails gracefully when an exception is received when getting OS version" {
         Mock Get-OSVersionString { throw "Could not fetch OS version" }
         Mock Write-Log
 
-        Validate-OSVersion | Should -Be $false
+        { Validate-OSVersion } | Should -Throw "Could not fetch OS version"
 
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Could not fetch OS version" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+    }
+}
+
+
+Describe "DeleteScheduledTask" {
+    BeforeEach {
+        $scheduledTask1 = New-Object PSObject -Property @{
+            TaskName = "Task01"
+        }
+        $boshScheduledTask = New-Object PSObject -Property @{
+            TaskName = "BoshCompleteVMPrep"
+        }
+        $scheduledtask2 = New-Object PSObject -Property @{
+            TaskName = "Unknown task"
+        }
+        $scheduledtask3 = New-Object PSObject -Property @{
+            TaskName = "Another task"
+        }
+        Mock Write-Log { }
+        Mock Unregister-ScheduledTask { }
+        Mock Get-ScheduledTask { @($scheduledTask1,$boshScheduledTask,$scheduledTask2,$scheduledTask3) }
+
+    }
+    It "successfully delete the Bosh scheduled task, when the task has been registered" {
+        { DeleteScheduledTask } | Should -Not -Throw
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Successfully deleted the 'BoshCompleteVMPrep' scheduled task" }
+
+        Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
+        Assert-MockCalled Unregister-ScheduledTask -Times 1 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
+    }
+
+    It "does nothing if the Bosh scheduled task has not been registered" {
+        Mock Get-ScheduledTask { @($scheduledTask1,$scheduledTask2,$scheduledTask3) }
+        { DeleteScheduledTask } | Should -Not -Throw
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "BoshCompleteVMPrep schedule task was not registered" }
+
+        Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
+        Assert-MockCalled Unregister-ScheduledTask -Times 0 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
+    }
+
+    It "fails gracefully if the registered Bosh scheduled task was not unregistered" {
+        Mock Unregister-ScheduledTask { throw "Could not unregister task" }
+
+        { DeleteScheduledTask } | Should -Throw "Could not unregister task"
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Could not unregister task" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provisions\log.log' for more info." }
+
+        Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
+        Assert-MockCalled Unregister-ScheduledTask -Times 1 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
     }
 }

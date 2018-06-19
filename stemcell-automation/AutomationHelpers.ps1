@@ -23,6 +23,7 @@ function InstallCFFeatures
     catch [Exception]
     {
         Write-Log $_.Exception.Message
+        #TODO: Fix spelling!
         Write-Log "Failed to install the CF features. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
@@ -186,7 +187,7 @@ function Check-Dependencies
 {
     try
     {
-        $depsObj = (Get-Content -Path "$PSScriptRoot/deps.json") -join '`n' | ConvertFrom-Json
+        $depsObj = (Get-Content -Path "$PSScriptRoot/deps.json") -join '' | ConvertFrom-Json
         if ($depsObj.psobject.properties.Count -eq 0 -or $depsObj.psobject.properties.Count -eq $null)
         {
             throw "Dependency file is empty"
@@ -235,23 +236,37 @@ function Get-OSVersionString
 
 function Validate-OSVersion
 {
-    $osMatch = $false
     try
     {
         $osVersion = Get-OSVersionString
-        $osMatch = $osVersion -match "10\.0\.16299\..+"
-
-        if ($osMatch -ne $true)
+        if ($osVersion -match "10\.0\.16299\..+")
         {
+            Write-Log "Found correct OS version: Windows Server 2016, Version 1709"
+        } else {
             throw "OS Version Mismatch: Please use Windows Server 2016, Version 1709"
         }
-        Write-Log "Found correct OS version: Windows Server 2016, Version 1709"
     }
     catch [Exception]
     {
         Write-Log $_.Exception.Message
         Write-Log "Failed to validate the OS version. See 'c:\provisions\log.log' for more info."
+        throw $_.Exception
     }
+}
 
-    return $osMatch
+function DeleteScheduledTask {
+    try {
+        if ((Get-ScheduledTask | ForEach { $_.TaskName }) -ccontains "BoshCompleteVMPrep") {
+            Unregister-ScheduledTask -TaskName BoshCompleteVMPrep -Confirm:$false
+            Write-Log "Successfully deleted the 'BoshCompleteVMPrep' scheduled task"
+        }
+        else {
+            Write-Log "BoshCompleteVMPrep schedule task was not registered"
+        }
+    }
+    catch [Exception] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provisions\log.log' for more info."
+        throw $_.Exception
+    }
 }
