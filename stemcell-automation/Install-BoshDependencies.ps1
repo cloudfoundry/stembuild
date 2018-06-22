@@ -30,7 +30,7 @@ try {
     Check-Dependencies
 
     # create the scheduled task to run second script here!
-    $Sta = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit -File  ""$PSScriptRoot\Complete-VMPrep.ps1 -Organization $Organization -Owner $Owner"""
+    $Sta = Create-VMPrepTaskAction -Organization $Organization -Owner $Owner
     $STPrin = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
     $Stt = New-ScheduledTaskTrigger -AtStartup
     Register-ScheduledTask BoshCompleteVMPrep -Action $Sta -Trigger $Stt -Principal $STPrin -Description "Bosh Stemcell Automation task to complete the vm preparation"

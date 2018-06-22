@@ -192,6 +192,17 @@ Describe "SysprepVM" {
         Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" -and $Organization -eq "some org" -and $Owner -eq "" }
     }
 
+    It "executes the Invoke-Sysprep powershell cmdlet with owner parameter set when an organization string has line breaks" {
+        Mock Expand-Archive { }
+        Mock Invoke-Sysprep { }
+        Mock GenerateRandomPassword { "SomeRandomPassword" }
+        Mock Write-Log { }
+
+        { SysprepVM -Owner "some `r`n org" } | Should -Not -Throw
+
+        Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" -and $Owner -eq "some `r`n org" -and $Organization -eq "" }
+    }
+
     It "executes the Invoke-Sysprep powershell cmdlet with owner & organization parameter set when an owner & organization string is provided" {
         Mock Expand-Archive { }
         Mock Invoke-Sysprep { }
@@ -633,5 +644,16 @@ Describe "DeleteScheduledTask" {
 
         Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
         Assert-MockCalled Unregister-ScheduledTask -Times 1 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
+    }
+}
+
+Describe "Create-VMPrepTaskAction" {
+    It "Sucessfully creates a TaskAction with owner and organization arguments" {
+        $taskAction = $null
+        $goldenArguments = "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"" -Organization ""Pivotal Cloud Foundry"" -Owner ""Pivotal User"""
+
+        { Create-VMPrepTaskAction -Owner "Pivotal User" -Organization "Pivotal Cloud Foundry" | Set-Variable -Name "taskAction" -Scope 1 } | Should -Not -Throw
+
+        $taskAction.Arguments | Should -eq $goldenArguments
     }
 }

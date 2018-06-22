@@ -270,3 +270,12 @@ function DeleteScheduledTask {
         throw $_.Exception
     }
 }
+
+function Create-VMPrepTaskAction {
+    param(
+        [string]$Organization="",
+        [string]$Owner=""
+    )
+
+    New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"" -Organization ""$Organization"" -Owner ""$Owner"""
+}
