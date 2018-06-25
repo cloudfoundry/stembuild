@@ -10,6 +10,7 @@ Push-Location $PSScriptRoot
 try {
     DeleteScheduledTask
 
+    InstallCFCell
     CleanUpVM
     SysprepVM -Organization $Organization -Owner $Owner
 } catch [Exception] {

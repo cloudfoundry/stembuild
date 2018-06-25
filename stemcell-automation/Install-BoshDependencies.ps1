@@ -39,7 +39,6 @@ try {
     CopyPSModules
     InstallBoshAgent
     InstallOpenSSH
-    InstallCFCell
     InstallCFFeatures
 } catch [Exception] {
     Write-Log "Failed to install Bosh dependendies. See 'c:\provisions\log.log' for more info."
