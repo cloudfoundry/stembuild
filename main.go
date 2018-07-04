@@ -18,8 +18,6 @@ import (
 	"github.com/pivotal-cf-experimental/stembuild/utils"
 )
 
-const DefaultOSVersion = "2012R2"
-
 var (
 	applyPatch stembuildoptions.StembuildOptions
 
@@ -88,7 +86,7 @@ func Init() {
 		"Patch file that will be applied to the VHD")
 	flag.StringVar(&applyPatch.PatchFile, "d", "", "Patch file (shorthand)")
 
-	flag.StringVar(&applyPatch.OSVersion, "os", DefaultOSVersion,
+	flag.StringVar(&applyPatch.OSVersion, "os", "",
 		"OS version must be either 2012R2 or 2016")
 
 	flag.StringVar(&applyPatch.Version, "version", "",

@@ -85,7 +85,7 @@ var _ = Describe("StembuildOptions", func() {
 				})
 			})
 
-			Context("when src specifies an OSVersion and dest specifies an OSVersion", func() {
+			Context("when src does not specify an OSVersion and dest does not specify an OSVersion", func() {
 				It("should do nothing", func() {
 					Expect(dest.OSVersion).To(BeEmpty())
 				})

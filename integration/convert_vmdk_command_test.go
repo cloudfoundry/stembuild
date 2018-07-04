@@ -34,7 +34,7 @@ var _ = Describe("Convert VMDK", func() {
 			})
 
 			It("creates a valid stemcell", func() {
-				session := helpers.Stembuild("-vmdk", inputVmdk, "-v", version)
+				session := helpers.Stembuild("-vmdk", inputVmdk, "-v", version, "-os", osVersion)
 				Eventually(session, 5).Should(Exit(0))
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())

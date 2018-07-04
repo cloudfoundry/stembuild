@@ -60,11 +60,18 @@ var _ = Describe("Apply Patch", func() {
 			manifestStruct.VHDFile = "testdata/original.vhd"
 			manifestStruct.PatchFile = "testdata/diff.patch"
 			manifestText = validManifestTemplate
+			manifestStruct.OSVersion = "2012R2"
 			osVersion = "2012R2"
 			stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", manifestStruct.Version, osVersion)
 		})
 
 		Context("stembuild when executed with a patchfile on disk", func() {
+			BeforeEach(func() {
+				manifestStruct.OSVersion = "2016"
+				osVersion = "2016"
+				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", manifestStruct.Version, osVersion)
+			})
+
 			AfterEach(func() {
 				Expect(os.Remove(stemcellFilename)).To(Succeed())
 			})
@@ -95,6 +102,18 @@ var _ = Describe("Apply Patch", func() {
 				actualVmdkFilepath := filepath.Join(imageDir, "image-disk1.vmdk")
 				_, err = ioutil.ReadFile(actualVmdkFilepath)
 				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when OS version is invalid", func() {
+			BeforeEach(func() {
+				manifestStruct.OSVersion = ""
+			})
+
+			It("displays an error", func(){
+				session := helpers.Stembuild("apply-patch", manifestFilename)
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("OS version must be either 2012R2 or 2016"))
 			})
 		})
 
