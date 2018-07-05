@@ -10,4 +10,4 @@ DEPS=(
 
 # check that we have all these files on disk?
 
-ruby mk-deps.rb "${DEPS[@]}" | jq . > deps2.json
+ruby mk-deps.rb "${DEPS[@]}" | jq . > deps.json
