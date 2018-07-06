@@ -173,7 +173,7 @@ function SysprepVM
 
         $randomPassword = GenerateRandomPassword
 
-        Invoke-Sysprep -IaaS "vsphere" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
+        Invoke-Sysprep -IaaS "vsphere" -OsVersion "windows2016" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
     }
     catch [Exception]
     {
