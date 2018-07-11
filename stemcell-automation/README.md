@@ -26,7 +26,7 @@ The following steps are used to prepare the base VM image that will be used to c
 
 ### 2. Running the BOSH Windows stemcell automation tool
 The following steps installs the binaries, as well as modify Windows settings and registries, to make it work in a BOSH environment.
-1. Copy the `LGPO.exe` and `StemcellAutomation.zip` onto the VM created in the previous step.
+1. Copy the `LGPO.zip` and `StemcellAutomation.zip` onto the VM created in the previous step.
 1. Start Powershell
 1. Extract the content of the `StemcellAutomation.zip` by executing the following command: `Expand-Archive .\StemcellAutomation.zip .`
 1. Begin the automation process by executing the following command: `.\Setup.ps1`
