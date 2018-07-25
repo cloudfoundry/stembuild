@@ -15,14 +15,6 @@ Usage `stembuild-linux [OPTIONS...] [-vmdk FILENAME] [-output DIRNAME] [-version
 
 Process can take between 10 and 20 minutes. See Progress with `-debug` flag.
 
-## Create a stemcell from a vhd
-
-Usage `stembuild-linux [-output DIRNAME] apply-patch <patch manifest yml>`
-
-will generate a stemcell in the current working directory
-
-Process can take between 30 and 60 minutes. See Progress with `-debug` flag.
-
 ## Compilation
 
 See the [wiki](https://github.com/pivotal-cf-experimental/stembuild/wiki/build-stembuild)
