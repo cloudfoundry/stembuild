@@ -47,5 +47,3 @@ try {
 }
 
 Pop-Location
-
-# shutdown /r /t 0
