@@ -8,7 +8,7 @@ depObj = {}
 @dependencies.each do |dep|
   digest = Digest::SHA256.file(dep["file_source"]).hexdigest
   version = File.read(dep["version_source"]).chomp
-  depObj[dep] = {"sha"=> digest, "version" =>  version}
+  depObj[File.basename(dep["file_source"])] = {"sha"=> digest, "version" =>  version}
 end
 
 puts depObj.to_json
