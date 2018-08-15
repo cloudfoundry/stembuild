@@ -87,7 +87,7 @@ func Init() {
 	flag.StringVar(&applyPatch.PatchFile, "d", "", "Patch file (shorthand)")
 
 	flag.StringVar(&applyPatch.OSVersion, "os", "",
-		"OS version must be either 2012R2 or 2016")
+		"OS version must be either 2012R2, 2016 or 1803")
 
 	flag.StringVar(&applyPatch.Version, "version", "",
 		"Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)")
@@ -236,10 +236,10 @@ func ValidateFlags() []error {
 
 	Debugf("validating OS version: %s", applyPatch.OSVersion)
 	switch applyPatch.OSVersion {
-	case "2012R2", "2016":
+	case "2012R2", "2016", "1803":
 		// Ok
 	default:
-		add(fmt.Errorf("OS version must be either 2012R2 or 2016 have: %s", applyPatch.OSVersion))
+		add(fmt.Errorf("OS version must be either 2012R2, 2016 or 1803 have: %s", applyPatch.OSVersion))
 	}
 
 	name := filepath.Join(applyPatch.OutputDir, stemcell.StemcellFilename(applyPatch.Version, applyPatch.OSVersion))

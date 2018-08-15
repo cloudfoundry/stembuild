@@ -351,7 +351,7 @@ func (c *Config) CreateImage(vmdk string) error {
 	switch c.BuildOptions.OSVersion {
 	case "2012R2":
 		hwVersion = 9
-	case "2016":
+	case "2016", "1803":
 		hwVersion = 10
 	}
 

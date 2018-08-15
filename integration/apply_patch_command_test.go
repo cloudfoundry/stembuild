@@ -110,10 +110,36 @@ var _ = Describe("Apply Patch", func() {
 				manifestStruct.OSVersion = ""
 			})
 
-			It("displays an error", func(){
+			It("displays an error", func() {
 				session := helpers.Stembuild("apply-patch", manifestFilename)
 				Eventually(session).Should(Exit(1))
-				Eventually(session.Err).Should(Say("OS version must be either 2012R2 or 2016"))
+				Eventually(session.Err).Should(Say("OS version must be either 2012R2, 2016 or 1803"))
+			})
+		})
+
+		Context("when OS version is 1803", func() {
+			BeforeEach(func() {
+				manifestStruct.OSVersion = "1803"
+				osVersion = "1803"
+				manifestStruct.Version = "1803.0"
+				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", manifestStruct.Version, osVersion)
+			})
+
+			AfterEach(func() {
+				Expect(os.Remove(stemcellFilename)).To(Succeed())
+			})
+
+			It("creates a valid stemcell", func() {
+				session := helpers.Stembuild("apply-patch", manifestFilename)
+				Eventually(session, 5).Should(Exit(0))
+
+				stemcellDir, err := helpers.ExtractGzipArchive(stemcellFilename)
+				Expect(err).NotTo(HaveOccurred())
+				manifestFilepath := filepath.Join(stemcellDir, "stemcell.MF")
+				manifest, err := helpers.ReadFile(manifestFilepath)
+				Expect(err).NotTo(HaveOccurred())
+				expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", osVersion)
+				Expect(manifest).To(ContainSubstring(expectedName))
 			})
 		})
 
