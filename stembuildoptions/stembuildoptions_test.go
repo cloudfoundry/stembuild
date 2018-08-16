@@ -53,9 +53,21 @@ var _ = Describe("StembuildOptions", func() {
 				})
 			})
 
-			Context("when src specifies a PatchFile and dest specifies a PatchFile", func() {
+			Context("when src does not specify a PatchFile and dest does not specify a PatchFile", func() {
 				It("should do nothing", func() {
 					Expect(dest.PatchFile).To(BeEmpty())
+				})
+			})
+
+			Context("when dest does specify a PatchFile and src does not specify a PatchFile", func() {
+				var expectedDestPatchfile string
+
+				BeforeEach(func() {
+					dest.PatchFile = fmt.Sprintf("blackberry%d", rand.Intn(2000))
+					expectedDestPatchfile = dest.PatchFile
+				})
+				It("should do nothing", func() {
+					Expect(dest.PatchFile).To(Equal(expectedDestPatchfile))
 				})
 			})
 		})
@@ -90,6 +102,18 @@ var _ = Describe("StembuildOptions", func() {
 					Expect(dest.OSVersion).To(BeEmpty())
 				})
 			})
+
+			Context("when dest does specify a OSVersion and src does not specify a OSVersion", func() {
+				var expectedDestOSVersion string
+
+				BeforeEach(func() {
+					dest.OSVersion = fmt.Sprintf("banana%d.%d", rand.Intn(2000), rand.Intn(2000))
+					expectedDestOSVersion = dest.OSVersion
+				})
+				It("should do nothing", func() {
+					Expect(dest.OSVersion).To(Equal(expectedDestOSVersion))
+				})
+			})
 		})
 
 		Context("OutputDir", func() {
@@ -117,9 +141,21 @@ var _ = Describe("StembuildOptions", func() {
 				})
 			})
 
-			Context("when src specifies an OutputDir and dest specifies an OutputDir", func() {
+			Context("when src does not specify an OutputDir and dest does not specify an OutputDir", func() {
 				It("should do nothing", func() {
 					Expect(dest.OutputDir).To(BeEmpty())
+				})
+			})
+
+			Context("when dest does specify a OutputDir and src does not specify a OutputDir", func() {
+				var expectedDestOutputDir string
+
+				BeforeEach(func() {
+					dest.OutputDir = fmt.Sprintf("foo%d/%d", rand.Intn(2000), rand.Intn(2000))
+					expectedDestOutputDir = dest.OutputDir
+				})
+				It("should do nothing", func() {
+					Expect(dest.OutputDir).To(Equal(expectedDestOutputDir))
 				})
 			})
 		})
@@ -149,9 +185,21 @@ var _ = Describe("StembuildOptions", func() {
 				})
 			})
 
-			Context("when src specifies a version and dest specifies a version", func() {
+			Context("when src does not specify a version and dest does not specify a version", func() {
 				It("should do nothing", func() {
 					Expect(dest.Version).To(BeEmpty())
+				})
+			})
+
+			Context("when dest does specify a Version and src does not specify a Version", func() {
+				var expectedDestVersion string
+
+				BeforeEach(func() {
+					dest.Version = fmt.Sprintf("%d.%d", rand.Intn(2000), rand.Intn(2000))
+					expectedDestVersion = dest.Version
+				})
+				It("should do nothing", func() {
+					Expect(dest.Version).To(Equal(expectedDestVersion))
 				})
 			})
 		})
@@ -181,9 +229,21 @@ var _ = Describe("StembuildOptions", func() {
 				})
 			})
 
-			Context("when src specifies a VHDFile and dest specifies a VHDFile", func() {
+			Context("when src does not specify a VHDFile and dest does not specify a VHDFile", func() {
 				It("should do nothing", func() {
 					Expect(dest.VHDFile).To(BeEmpty())
+				})
+			})
+
+			Context("when dest does specify a VHDFile and src does not specify a VHDFile", func() {
+				var expectedDestVHDFile string
+
+				BeforeEach(func() {
+					dest.VHDFile = fmt.Sprintf("bar%d.vhd", rand.Intn(2000))
+					expectedDestVHDFile = dest.VHDFile
+				})
+				It("should do nothing", func() {
+					Expect(dest.VHDFile).To(Equal(expectedDestVHDFile))
 				})
 			})
 		})
@@ -213,9 +273,21 @@ var _ = Describe("StembuildOptions", func() {
 				})
 			})
 
-			Context("when src specifies a VMDKFile and dest specifies a VMDKFile", func() {
+			Context("when src does not specify a VMDKFile and dest does not specify a VMDKFile", func() {
 				It("should do nothing", func() {
 					Expect(dest.VMDKFile).To(BeEmpty())
+				})
+			})
+
+			Context("when dest does specify a VMDKFile and src does not specify a VMDKFile", func() {
+				var expectedDestVMDKFile string
+
+				BeforeEach(func() {
+					dest.VHDFile = fmt.Sprintf("orange%d.vmdk", rand.Intn(2000))
+					expectedDestVMDKFile = dest.VMDKFile
+				})
+				It("should do nothing", func() {
+					Expect(dest.VMDKFile).To(Equal(expectedDestVMDKFile))
 				})
 			})
 		})
