@@ -2,3 +2,5 @@
 version: "1200.0"
 vhd_file: "testdata/original.vhd"
 patch_file: "testdata/diff.patch"
+vhd_file_checksum: 246616016f66ad2275364be1a2f625758a963a497ea4d1a1103a1a840c3ef274
+patch_file_checksum: d802a5077d747a4ce36e7318b262714dd01be78b645acab30fc01a2131184b09

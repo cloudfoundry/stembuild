@@ -154,6 +154,8 @@ vhd_file: "{{.VHDFile}}"
 patch_file: "{{.PatchFile}}"
 os_version: "{{.OSVersion}}"
 output_dir: "{{.OutputDir}}"
+vhd_file_checksum: "{{.VHDFileChecksum}}"
+patch_file_checksum: "{{.PatchFileChecksum}}"
 `
 
 func ExtractArchive(archive io.Reader, dirname string) error {

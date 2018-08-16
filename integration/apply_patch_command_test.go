@@ -59,6 +59,8 @@ var _ = Describe("Apply Patch", func() {
 			manifestStruct.Version = "1200.0"
 			manifestStruct.VHDFile = "testdata/original.vhd"
 			manifestStruct.PatchFile = "testdata/diff.patch"
+			manifestStruct.VHDFileChecksum = "246616016f66ad2275364be1a2f625758a963a497ea4d1a1103a1a840c3ef274"
+			manifestStruct.PatchFileChecksum = "d802a5077d747a4ce36e7318b262714dd01be78b645acab30fc01a2131184b09"
 			manifestText = validManifestTemplate
 			manifestStruct.OSVersion = "2012R2"
 			osVersion = "2012R2"
@@ -102,6 +104,28 @@ var _ = Describe("Apply Patch", func() {
 				actualVmdkFilepath := filepath.Join(imageDir, "image-disk1.vmdk")
 				_, err = ioutil.ReadFile(actualVmdkFilepath)
 				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when vhd file checksum does not match the checksum in the manifest file", func() {
+			BeforeEach(func() {
+				manifestStruct.VHDFileChecksum = "incorrect checksum value"
+			})
+			It("fails with the expected error message", func() {
+				session := helpers.Stembuild("apply-patch", manifestFilename)
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("the specified base VHD is different from the VHD expected by the diff bundle"))
+			})
+		})
+
+		Context("when patch file checksum does not match the checksum in the manifest file", func() {
+			BeforeEach(func() {
+				manifestStruct.PatchFileChecksum = "incorrect checksum value"
+			})
+			It("fails with the expected error message", func() {
+				session := helpers.Stembuild("apply-patch", manifestFilename)
+				Eventually(session).Should(Exit(1))
+				Eventually(session.Err).Should(Say("the specified patch file is different from the patch file expected by the diff bundle"))
 			})
 		})
 

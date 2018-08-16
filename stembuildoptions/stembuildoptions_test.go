@@ -292,6 +292,94 @@ var _ = Describe("StembuildOptions", func() {
 			})
 		})
 
+		Context("PatchFileChecksum", func() {
+			Context("when src specifies an PatchFileChecksum and dest does not", func() {
+				BeforeEach(func() {
+					src.PatchFileChecksum = fmt.Sprintf("%d%d%d", rand.Intn(2000), rand.Intn(2000), rand.Intn(2000))
+				})
+
+				It("copies src.PatchFileChecksum into dest.PatchFileChecksum", func() {
+					Expect(dest.PatchFileChecksum).To(Equal(src.PatchFileChecksum))
+				})
+			})
+
+			Context("when src specifies a PatchFileChecksum and dest specifies a PatchFileChecksum", func() {
+				var expectedDestPatchFileChecksum string
+
+				BeforeEach(func() {
+					src.PatchFileChecksum = fmt.Sprintf("%d%d%d", rand.Intn(2000), rand.Intn(2000), rand.Intn(2000))
+					dest.PatchFileChecksum = fmt.Sprintf("%d%d%d", rand.Intn(2000), rand.Intn(2000), rand.Intn(2000))
+					expectedDestPatchFileChecksum = dest.PatchFileChecksum
+				})
+
+				It("retains dest.PatchFileChecksum's original value", func() {
+					Expect(dest.PatchFileChecksum).To(Equal(expectedDestPatchFileChecksum))
+				})
+			})
+
+			Context("when src does not specify a PatchFileChecksum and dest does not specify a PatchFileChecksum", func() {
+				It("should do nothing", func() {
+					Expect(dest.PatchFileChecksum).To(BeEmpty())
+				})
+			})
+
+			Context("when dest does specify a PatchFileChecksum and src does not specify a PatchFileChecksum", func() {
+				var expectedDestPatchFileChecksum string
+
+				BeforeEach(func() {
+					dest.PatchFileChecksum = fmt.Sprintf("orange%d.vmdk", rand.Intn(2000))
+					expectedDestPatchFileChecksum = dest.PatchFileChecksum
+				})
+				It("should do nothing", func() {
+					Expect(dest.PatchFileChecksum).To(Equal(expectedDestPatchFileChecksum))
+				})
+			})
+		})
+
+		Context("VHDFileChecksum", func() {
+			Context("when src specifies an PatchFileChecksum and dest does not", func() {
+				BeforeEach(func() {
+					src.VHDFileChecksum = fmt.Sprintf("%d%d%d", rand.Intn(2000), rand.Intn(2000), rand.Intn(2000))
+				})
+
+				It("copies src.VHDFileChecksum into dest.VHDFileChecksum", func() {
+					Expect(dest.VHDFileChecksum).To(Equal(src.VHDFileChecksum))
+				})
+			})
+
+			Context("when src specifies a VHDFileChecksum and dest specifies a VHDFileChecksum", func() {
+				var expectedDestVHDFileChecksum string
+
+				BeforeEach(func() {
+					src.VHDFileChecksum = fmt.Sprintf("%d%d%d", rand.Intn(2000), rand.Intn(2000), rand.Intn(2000))
+					dest.VHDFileChecksum = fmt.Sprintf("%d%d%d", rand.Intn(2000), rand.Intn(2000), rand.Intn(2000))
+					expectedDestVHDFileChecksum = dest.VHDFileChecksum
+				})
+
+				It("retains dest.VHDFileChecksum's original value", func() {
+					Expect(dest.VHDFileChecksum).To(Equal(expectedDestVHDFileChecksum))
+				})
+			})
+
+			Context("when src does not specify a VHDFileChecksum and dest does not specify a VHDFileChecksum", func() {
+				It("should do nothing", func() {
+					Expect(dest.VHDFileChecksum).To(BeEmpty())
+				})
+			})
+
+			Context("when dest does specify a VHDFileChecksum and src does not specify a VHDFileChecksum", func() {
+				var expectedDestVHDFileChecksum string
+
+				BeforeEach(func() {
+					dest.VHDFileChecksum = fmt.Sprintf("orange%d.vmdk", rand.Intn(2000))
+					expectedDestVHDFileChecksum = dest.VHDFileChecksum
+				})
+				It("should do nothing", func() {
+					Expect(dest.VHDFileChecksum).To(Equal(expectedDestVHDFileChecksum))
+				})
+			})
+		})
+
 		Context("Multiple fields", func() {
 			Context("when some fields are set in src and another, somewhat overlapping, set of fields is set in dest", func() {
 				BeforeEach(func() {
@@ -303,16 +391,20 @@ var _ = Describe("StembuildOptions", func() {
 					src.OSVersion = "the"
 					src.OutputDir = "bear"
 					src.VHDFile = "does"
+					src.VHDFileChecksum = "123645125867"
+					src.PatchFileChecksum = "123645125867"
 				})
 
 				It("copies into dest only those fields which are empty in dest", func() {
 					expected := StembuildOptions{
-						PatchFile: "matter",
-						OSVersion: "the",
-						OutputDir: "needful",
-						Version:   "do",
-						VHDFile:   "qwerty",
-						VMDKFile:  "not",
+						PatchFile:         "matter",
+						OSVersion:         "the",
+						OutputDir:         "needful",
+						Version:           "do",
+						VHDFile:           "qwerty",
+						VMDKFile:          "not",
+						VHDFileChecksum:   "123645125867",
+						PatchFileChecksum: "123645125867",
 					}
 					Expect(dest).To(Equal(expected))
 				})
@@ -365,7 +457,7 @@ var _ = Describe("StembuildOptions", func() {
 			Context("when the file can be read", func() {
 				Context("when the file is not proper YAML", func() {
 					BeforeEach(func() {
-						testFileName = filepath.Join("testdata", "invalid-yml.yml")
+						testFileName = filepath.Join("..", "testdata", "invalid-yml.yml")
 					})
 
 					It("throws a parsing error", func() {
@@ -381,9 +473,11 @@ var _ = Describe("StembuildOptions", func() {
 					It("copies into the arguments the values from the manifest", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 						expected := StembuildOptions{
-							PatchFile: "testdata/diff.patch",
-							Version:   "1200.0",
-							VHDFile:   "testdata/original.vhd",
+							PatchFile:         "testdata/diff.patch",
+							Version:           "1200.0",
+							VHDFile:           "testdata/original.vhd",
+							VHDFileChecksum:   "246616016f66ad2275364be1a2f625758a963a497ea4d1a1103a1a840c3ef274",
+							PatchFileChecksum: "d802a5077d747a4ce36e7318b262714dd01be78b645acab30fc01a2131184b09",
 						}
 						Expect(args).To(Equal(expected))
 					})
