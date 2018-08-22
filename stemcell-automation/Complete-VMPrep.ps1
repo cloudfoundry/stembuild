@@ -1,6 +1,7 @@
 param(
     [string]$Organization = "",
-    [string]$Owner = ""
+    [string]$Owner = "",
+    [switch]$SkipRandomPassword
 )
 
 Push-Location $PSScriptRoot
@@ -12,7 +13,7 @@ try {
 
     InstallCFCell
     CleanUpVM
-    SysprepVM -Organization $Organization -Owner $Owner
+    SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
 } catch [Exception] {
     Write-Log "Failed to prepare the VM. See 'c:\provisions\log.log' for more info."
     Exit 1

@@ -163,7 +163,8 @@ function SysprepVM
 {
     Param (
         [string]$Organization = "",
-        [string]$Owner = ""
+        [string]$Owner = "",
+        [bool]$SkipRandomPassword = $false
     )
 
     try
@@ -171,9 +172,12 @@ function SysprepVM
         Expand-Archive -LiteralPath ".\LGPO.zip" -DestinationPath "C:\Windows\"
         Write-Log "Successfully migrated LGPO to destination dir"
 
-        $randomPassword = GenerateRandomPassword
-
-        Invoke-Sysprep -IaaS "vsphere" -OsVersion "windows2016" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
+        if ($SkipRandomPassword) {
+            Invoke-Sysprep -IaaS "vsphere" -OsVersion "windows2016" -Organization $Organization -Owner $Owner
+        }else {
+            $randomPassword = GenerateRandomPassword
+            Invoke-Sysprep -IaaS "vsphere" -OsVersion "windows2016" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
+        }
     }
     catch [Exception]
     {
@@ -279,8 +283,22 @@ function DeleteScheduledTask {
 function Create-VMPrepTaskAction {
     param(
         [string]$Organization="",
-        [string]$Owner=""
+        [string]$Owner="",
+        [switch]$SkipRandomPassword
     )
 
-    New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"" -Organization ""$Organization"" -Owner ""$Owner"""
+    $arguments = "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"""
+    if ($Organization -ne "") {
+        $arguments += " -Organization ""$Organization"""
+    }
+
+    if ($Owner -ne "") {
+        $arguments += " -Owner ""$Owner"""
+    }
+
+    if ($SkipRandomPassword) {
+        $arguments += " -SkipRandomPassword"
+    }
+
+    New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arguments
 }

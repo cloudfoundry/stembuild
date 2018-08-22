@@ -1,6 +1,7 @@
 param(
     [string]$Organization = "",
-    [string]$Owner = ""
+    [string]$Owner = "",
+    [switch]$SkipRandomPassword
 )
 
 Push-Location $PSScriptRoot
@@ -31,6 +32,9 @@ try {
 
     # create the scheduled task to run second script here!
     $Sta = Create-VMPrepTaskAction -Organization $Organization -Owner $Owner
+    if($SkipRandomPassword) {
+        $Sta = Create-VMPrepTaskAction -Organization $Organization -Owner $Owner -SkipRandomPassword
+    }
     $STPrin = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
     $Stt = New-ScheduledTaskTrigger -AtStartup
     Register-ScheduledTask BoshCompleteVMPrep -Action $Sta -Trigger $Stt -Principal $STPrin -Description "Bosh Stemcell Automation task to complete the vm preparation"

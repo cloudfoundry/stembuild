@@ -262,6 +262,16 @@ Describe "SysprepVM" {
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "GenerateRandomPassword failed because something went wrong" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info." }
     }
+
+    It "doesn't generate a new password when -SkipRandomPassword set to true" {
+        Mock Expand-Archive { }
+        Mock Write-Log { }
+        Mock Invoke-Sysprep { }
+
+        { SysprepVM -SkipRandomPassword $True} | Should -Not -Throw
+
+        Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $OsVersion -eq "windows2016" -and $NewPassword -eq $null }
+    }
 }
 
 Describe "GenerateRandomPassword" {
@@ -662,6 +672,15 @@ Describe "Create-VMPrepTaskAction" {
         $goldenArguments = "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"" -Organization ""Pivotal Cloud Foundry"" -Owner ""Pivotal User"""
 
         { Create-VMPrepTaskAction -Owner "Pivotal User" -Organization "Pivotal Cloud Foundry" | Set-Variable -Name "taskAction" -Scope 1 } | Should -Not -Throw
+
+        $taskAction.Arguments | Should -eq $goldenArguments
+    }
+
+    It "Sucessfully creates a TaskAction with SkipRandomPassword" {
+        $taskAction = $null
+        $goldenArguments = "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"" -SkipRandomPassword"
+
+        { Create-VMPrepTaskAction -SkipRandomPassword | Set-Variable -Name "taskAction" -Scope 1 } | Should -Not -Throw
 
         $taskAction.Arguments | Should -eq $goldenArguments
     }
