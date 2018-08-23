@@ -30,6 +30,7 @@ The following steps installs the binaries, as well as modify Windows settings an
 1. Start Powershell
 1. Extract the content of the `StemcellAutomation.zip` by executing the following command: `Expand-Archive .\StemcellAutomation.zip .`
 1. Begin the automation process by executing the following command: `.\Setup.ps1`
+    * (Optional) By default the setup script will randomize the Administrator's password. To avoid this, and maintain access to the VM after preparation, use the `-SkipRandomPassword` flag. For example: `.\Setup.ps1 -SkipRandomPassword`
     * During this step, the VM will reboot once and the second half of the automation will continue. At this stage, there is no visual feedback for the process; eventually, the VM will shutdown.
     * (Optional) To keep an eye on the progress after the reboot, follow these steps:
         * Log into the VM
