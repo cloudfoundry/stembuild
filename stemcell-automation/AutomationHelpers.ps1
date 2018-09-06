@@ -173,10 +173,10 @@ function SysprepVM
         Write-Log "Successfully migrated LGPO to destination dir"
 
         if ($SkipRandomPassword) {
-            Invoke-Sysprep -IaaS "vsphere" -OsVersion "windows2016" -Organization $Organization -Owner $Owner
+            Invoke-Sysprep -IaaS "vsphere" -Organization $Organization -Owner $Owner
         }else {
             $randomPassword = GenerateRandomPassword
-            Invoke-Sysprep -IaaS "vsphere" -OsVersion "windows2016" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
+            Invoke-Sysprep -IaaS "vsphere" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
         }
     }
     catch [Exception]

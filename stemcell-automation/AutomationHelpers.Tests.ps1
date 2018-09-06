@@ -270,7 +270,7 @@ Describe "SysprepVM" {
 
         { SysprepVM -SkipRandomPassword $True} | Should -Not -Throw
 
-        Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $OsVersion -eq "windows2016" -and $NewPassword -eq $null }
+        Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq $null }
     }
 }
 
