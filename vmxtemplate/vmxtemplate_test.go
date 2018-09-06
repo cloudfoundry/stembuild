@@ -108,6 +108,6 @@ func TestWriteVMXTemplate(t *testing.T) {
 		t.Error("WriteVMXTemplate: expected error for empty vmx filename")
 	}
 	if _, err := os.Stat(vmxPath); err == nil {
-		t.Error("WriteVMXTemplate: failed to delete vmx file on error: %s", vmxPath)
+		t.Errorf("WriteVMXTemplate: failed to delete vmx file on error: %s", vmxPath)
 	}
 }
