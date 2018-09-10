@@ -48,6 +48,8 @@ Examples:
 
     Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
                 working directory.
+
+Flags:
 `
 
 func Init() {
