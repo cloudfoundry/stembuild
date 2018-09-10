@@ -31,47 +31,43 @@ var (
 var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
-Usage %[1]s [-output DIRNAME] apply-patch <patch manifest yml>
-
-Usage %[1]s [OPTIONS...] [-vmdk FILENAME]
-      %[2]s [-output DIRNAME] [-version STEMCELL_VERSION]
-      %[2]s [-os OS_VERSION]
-
-Creates a BOSH stemcell from a VHD and PATCH (patch) file.
+Usage stembuild-windows.exe [OPTIONS...] [-vmdk FILENAME]
+                            [-output DIRNAME] [-version STEMCELL_VERSION]
+                            [-os OS_VERSION]
 
 Usage:
   The VMware 'ovftool' binary must be on your path or Fusion/Workstation
   must be installed (both include the 'ovftool').
-
-  Patch VHD:
-		The [vhd], [patch], and [version] flags must be specified either on the
-    command line or in the manifest file.  If the [output] flag is not
-    specified the stemcell will be created in the current working directory.
 
   Convert VMDK [-vmdk]:
     The [vmdk] and [version] flags must be specified.  If the [output] flag is
     not specified the stemcell will be created in the current working directory.
 
 Examples:
-  %[1]s apply-patch patch-manifest.yml
-
-  where patch-manifest.yml contains:
-  ---
-  version: '1.2.3'
-  vhd_file: disk.vhd
-  patch_file: patch.file
-
-    Will create a stemcell using the package patch-manifest.yml (requires a VHD and
-    VMDK to exist on paths in your system).
-
-    and
-
-  %[1]s -vmdk disk.vmdk -v 1.2
+  stembuild-windows.exe -vmdk disk.vmdk -v 1.2
 
     Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
-		working directory.
+                working directory.
 
 Flags:
+  -color
+        Colorize debug output
+  -d string
+        Patch file (shorthand)
+  -debug
+        Print lots of debugging information
+  -o string
+        Output directory (shorthand)
+  -os string
+        OS version must be either 2012R2 or 2016 (default "2012R2")
+  -output string
+        Output directory, default is the current working directory.
+  -v string
+        Stemcell version (shorthand)
+  -version string
+        Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)
+  -vmdk string
+        VMDK file to create stemcell from
 `
 
 func Init() {
