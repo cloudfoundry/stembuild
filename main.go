@@ -48,33 +48,11 @@ Examples:
 
     Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
                 working directory.
-
-Flags:
-  -color
-        Colorize debug output
-  -d string
-        Patch file (shorthand)
-  -debug
-        Print lots of debugging information
-  -o string
-        Output directory (shorthand)
-  -os string
-        OS version must be either 2012R2 or 2016 (default "2012R2")
-  -output string
-        Output directory, default is the current working directory.
-  -v string
-        Stemcell version (shorthand)
-  -version string
-        Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)
-  -vmdk string
-        VMDK file to create stemcell from
 `
 
 func Init() {
 	flag.Usage = func() {
-		exe := filepath.Base(os.Args[0])
-		pad := strings.Repeat(" ", len(exe))
-		fmt.Fprintf(os.Stderr, UsageMessage, exe, pad)
+		fmt.Fprintf(os.Stderr, UsageMessage)
 		flag.PrintDefaults()
 	}
 
