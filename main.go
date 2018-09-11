@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"flag"
 	"fmt"
@@ -10,9 +8,7 @@ import (
 	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 	"github.com/pivotal-cf-experimental/stembuild/stemcell"
 	"github.com/pivotal-cf-experimental/stembuild/utils"
-	"io"
 	"log"
-	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -21,7 +17,7 @@ import (
 )
 
 var (
-	applyPatch stembuildoptions.StembuildOptions
+	stembuildOptions stembuildoptions.StembuildOptions
 
 	errs        []error
 	EnableDebug bool
@@ -31,9 +27,11 @@ var (
 var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
-Usage stembuild-windows.exe [OPTIONS...] [-vmdk FILENAME]
-                            [-output DIRNAME] [-version STEMCELL_VERSION]
-                            [-os OS_VERSION]
+Usage %[1]s [OPTIONS...] -vmdk FILENAME
+                                  [-output DIRNAME] [-version STEMCELL_VERSION]
+                                  [-os OS_VERSION]
+
+Create a BOSH Stemcell from a VMDK file
 
 Usage:
   The VMware 'ovftool' binary must be on your path or Fusion/Workstation
@@ -44,40 +42,39 @@ Usage:
     not specified the stemcell will be created in the current working directory.
 
 Examples:
-  stembuild-windows.exe -vmdk disk.vmdk -v 1.2
+
+  %[1]s -vmdk disk.vmdk -v 1.2
 
     Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
-                working directory.
+        working directory.
 
 Flags:
 `
 
 func Init() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, UsageMessage)
+		fmt.Fprintf(os.Stderr, UsageMessage, filepath.Base(os.Args[0]))
 		flag.PrintDefaults()
 	}
-
-	flag.StringVar(&applyPatch.VHDFile, "vhd", "", "VHD file to patch")
-	flag.StringVar(&applyPatch.VMDKFile, "vmdk", "", "VMDK file to create stemcell from")
-
-	flag.StringVar(&applyPatch.PatchFile, "patch", "",
-		"Patch file that will be applied to the VHD")
-	flag.StringVar(&applyPatch.PatchFile, "d", "", "Patch file (shorthand)")
-
-	flag.StringVar(&applyPatch.OSVersion, "os", "",
-		"OS version must be either 2012R2, 2016 or 1803")
-
-	flag.StringVar(&applyPatch.Version, "version", "",
-		"Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)")
-	flag.StringVar(&applyPatch.Version, "v", "", "Stemcell version (shorthand)")
-
-	flag.StringVar(&applyPatch.OutputDir, "output", "",
-		"Output directory, default is the current working directory.")
-	flag.StringVar(&applyPatch.OutputDir, "o", "", "Output directory (shorthand)")
+	flag.BoolVar(&DebugColor, "color", false, "Colorize debug output")
 
 	flag.BoolVar(&EnableDebug, "debug", false, "Print lots of debugging information")
-	flag.BoolVar(&DebugColor, "color", false, "Colorize debug output")
+
+	flag.StringVar(&stembuildOptions.OutputDir, "output", "",
+		"Output directory, default is the current working directory.")
+	flag.StringVar(&stembuildOptions.OutputDir, "o", "", "Output directory (shorthand)")
+
+	flag.StringVar(&stembuildOptions.OSVersion, "os", "",
+		"OS version must be either 2012R2, 2016 or 1803")
+
+	flag.StringVar(&stembuildOptions.Version, "version", "",
+		"Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)")
+	flag.StringVar(&stembuildOptions.Version, "v", "", "Stemcell version (shorthand)")
+
+	flag.StringVar(&stembuildOptions.VHDFile, "vhd", "", "VHD file to patch")
+	flag.StringVar(&stembuildOptions.VMDKFile, "vmdk", "", "VMDK file to create stemcell from")
+
+
 }
 
 func Usage() {
@@ -96,64 +93,15 @@ func validFile(name string) error {
 	return nil
 }
 
-func validPatchPath(name string) error {
-	var fileError error
-	var urlError error
-	if fileError = validFile(name); fileError == nil {
-		return nil
-	}
-	if urlError = validUrl(name); urlError == nil {
-		return nil
-	}
-	return fmt.Errorf("The patchfile path is neither a valid file nor a valid url")
-}
-
-func validUrl(urlPath string) error {
-	if strings.HasPrefix(urlPath, "http://") || strings.HasPrefix(urlPath, "https://") {
-		_, err := url.Parse(urlPath)
-		return err
-	}
-	return fmt.Errorf("%s is not a URL", urlPath)
-}
-
 func add(err error) {
 	errs = append(errs, err)
 }
 
 func ValidateFlags() []error {
-	var patchManifestFile string
+	Debugf("validating [vmdk] (%s) flags", stembuildOptions.VMDKFile)
 
-	argCount := flag.NArg()
-	switch {
-	case argCount == 2:
-		command := flag.Arg(0)
-		if command != "apply-patch" {
-			add(fmt.Errorf("Unrecognized command '%s'", command))
-			return errs
-		}
-		patchManifestFile = flag.Arg(1)
-	case argCount != 0:
-		add(errors.New("Invalid number of arguments"))
-		return errs
-	}
-
-	if patchManifestFile != "" {
-		Debugf("loading 'apply patch' manifest file: %q", patchManifestFile)
-		if err := stembuildoptions.LoadOptionsFromManifest(patchManifestFile, &applyPatch); err != nil {
-			add(fmt.Errorf("invalid patch manifest file: %q", err))
-			return errs
-		}
-	}
-
-	Debugf("validating [vmdk] (%s) [vhd] (%s) and [patch] (%s) flags",
-		applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.PatchFile)
-
-	if applyPatch.VMDKFile != "" && applyPatch.VHDFile != "" {
-		add(errors.New("both VMDK and VHD flags are specified"))
-		return errs
-	}
-	if applyPatch.VMDKFile == "" && applyPatch.VHDFile == "" {
-		add(errors.New("missing VMDK and VHD flags, one must be specified"))
+	if stembuildOptions.VMDKFile == "" {
+		add(errors.New("missing VMDK flag"))
 		return errs
 	}
 
@@ -161,28 +109,25 @@ func ValidateFlags() []error {
 	Debugf("validating that no extra flags or arguments were provided")
 	validateInputs()
 
-	Debugf("validating output directory: %s", applyPatch.OutputDir)
+	Debugf("validating output directory: %s", stembuildOptions.OutputDir)
 	validateOutputDir()
 
-	Debugf("validating integrity of provided inputs")
-	validateChecksums()
-
-	Debugf("validating stemcell version string: %s", applyPatch.Version)
-	if err := utils.ValidateVersion(applyPatch.Version); err != nil {
+	Debugf("validating stemcell version string: %s", stembuildOptions.Version)
+	if err := utils.ValidateVersion(stembuildOptions.Version); err != nil {
 		add(err)
 		return errs
 	}
 
-	Debugf("validating OS version: %s", applyPatch.OSVersion)
-	switch applyPatch.OSVersion {
+	Debugf("validating OS version: %s", stembuildOptions.OSVersion)
+	switch stembuildOptions.OSVersion {
 	case "2012R2", "2016", "1803":
 		// Ok
 	default:
-		add(fmt.Errorf("OS version must be either 2012R2, 2016 or 1803 have: %s", applyPatch.OSVersion))
+		add(fmt.Errorf("OS version must be either 2012R2, 2016 or 1803 have: %s", stembuildOptions.OSVersion))
 		return errs
 	}
 
-	name := filepath.Join(applyPatch.OutputDir, stemcell.StemcellFilename(applyPatch.Version, applyPatch.OSVersion))
+	name := filepath.Join(stembuildOptions.OutputDir, stemcell.StemcellFilename(stembuildOptions.Version, stembuildOptions.OSVersion))
 	Debugf("validating that stemcell filename (%s) does not exist", name)
 	if _, err := os.Stat(name); !os.IsNotExist(err) {
 		add(fmt.Errorf("error with output file (%s): %v (file may already exist)", name, err))
@@ -193,82 +138,32 @@ func ValidateFlags() []error {
 }
 
 func validateInputs() {
-	if applyPatch.VMDKFile != "" {
-		Debugf("validating VMDK file [vmdk]: %q", applyPatch.VMDKFile)
-		if err := validFile(applyPatch.VMDKFile); err != nil {
-			add(fmt.Errorf("invalid [vmdk]: %s", err))
-		}
-	} else {
-		Debugf("validating VHD file [vhd]: %q", applyPatch.VHDFile)
-		if err := validFile(applyPatch.VHDFile); err != nil {
-			add(fmt.Errorf("invalid [vhd]: %s", err))
-		}
-		Debugf("validating patch file [patch]: %q", applyPatch.PatchFile)
-		if applyPatch.PatchFile == "" {
-			add(errors.New("missing required argument 'patch'"))
-		}
-		if err := validPatchPath(applyPatch.PatchFile); err != nil {
-			add(fmt.Errorf("invalid [patch]: %s", err))
-		}
+	Debugf("validating VMDK file [vmdk]: %q", stembuildOptions.VMDKFile)
+	if err := validFile(stembuildOptions.VMDKFile); err != nil {
+		add(fmt.Errorf("invalid [vmdk]: %s", err))
 	}
 }
 
 func validateOutputDir() {
-	if applyPatch.OutputDir == "" || applyPatch.OutputDir == "." {
+	if stembuildOptions.OutputDir == "" || stembuildOptions.OutputDir == "." {
 		wd, err := os.Getwd()
 		if err != nil {
 			add(fmt.Errorf("getting working directory: %s", err))
 		}
-		Debugf("setting output dir (%s) to working directory: %s", applyPatch.OutputDir, wd)
-		applyPatch.OutputDir = wd
+		Debugf("setting output dir (%s) to working directory: %s", stembuildOptions.OutputDir, wd)
+		stembuildOptions.OutputDir = wd
 	}
 
-	fi, err := os.Stat(applyPatch.OutputDir)
+	fi, err := os.Stat(stembuildOptions.OutputDir)
 	if err != nil && os.IsNotExist(err) {
-		if err = os.Mkdir(applyPatch.OutputDir, 0700); err != nil {
+		if err = os.Mkdir(stembuildOptions.OutputDir, 0700); err != nil {
 			add(err)
 		}
 	} else if err != nil || fi == nil {
-		add(fmt.Errorf("error opening output directory (%s): %s\n", applyPatch.OutputDir, err))
+		add(fmt.Errorf("error opening output directory (%s): %s\n", stembuildOptions.OutputDir, err))
 	} else if !fi.IsDir() {
-		add(fmt.Errorf("output argument (%s): is not a directory\n", applyPatch.OutputDir))
+		add(fmt.Errorf("output argument (%s): is not a directory\n", stembuildOptions.OutputDir))
 	}
-}
-
-func validateChecksums() {
-
-	if applyPatch.VHDFileChecksum != "" {
-		if validateChecksum(applyPatch.VHDFile, applyPatch.VHDFileChecksum) != nil {
-			add(errors.New("the specified base VHD is different from the VHD expected by the diff bundle"))
-		}
-	}
-	if applyPatch.PatchFileChecksum != "" && validFile(applyPatch.PatchFile) == nil {
-		if validateChecksum(applyPatch.PatchFile, applyPatch.PatchFileChecksum) != nil {
-			add(errors.New("the specified patch file is different from the patch file expected by the diff bundle"))
-		}
-	}
-}
-
-func validateChecksum(filename, expectedChecksum string) error {
-	hasher := sha256.New()
-
-	fileContents, err := os.Open(filename)
-	if err != nil {
-		return errors.New("the specified file cannot be opened")
-	}
-
-	defer fileContents.Close()
-	if _, err := io.Copy(hasher, fileContents); err != nil {
-		return errors.New("the specified file cannot be loaded")
-	}
-
-	actualChecksum := hex.EncodeToString(hasher.Sum(nil))
-
-	if expectedChecksum != actualChecksum {
-		return errors.New("the actual checksum does not match the expected checksum")
-	}
-
-	return nil
 }
 
 func ParseFlags() error {
@@ -283,32 +178,15 @@ func ParseFlags() error {
 		Debugf("enabled")
 	}
 
-	applyPatch.OSVersion = strings.ToUpper(applyPatch.OSVersion)
+	stembuildOptions.OSVersion = strings.ToUpper(stembuildOptions.OSVersion)
 
 	return nil
 }
 
-func realMain(c *stemcell.Config, vmdk, vhd, patch string) error {
+func realMain(c *stemcell.Config, vmdk string) error {
 	start := time.Now()
 
-	// PATCH HERE
-	tmpdir, err := c.TempDir()
-	if err != nil {
-		return err
-	}
-
-	// This is ugly and I'm sorry
-	if vmdk == "" {
-		Debugf("main: creating vmdk from [vhd] (%s) and [patch] (%s)", vhd, patch)
-		vmdk = filepath.Join(tmpdir, "image.vmdk")
-		if err := c.ApplyPatch(vhd, patch, vmdk); err != nil {
-			return err
-		}
-	} else {
-		Debugf("main: using vmdk (%s)", vmdk)
-	}
-
-	stemcellPath, err := c.ConvertVMDK(vmdk, applyPatch.OutputDir)
+	stemcellPath, err := c.ConvertVMDK(vmdk, stembuildOptions.OutputDir)
 	if err != nil {
 		return err
 	}
@@ -342,14 +220,14 @@ func main() {
 			fmt.Fprintf(os.Stderr, "  %s\n", e)
 		}
 
-		fmt.Fprintln(os.Stderr, "\nfor usage: stembuild -h")
+		fmt.Fprintf(os.Stderr, "\nfor usage: %s -h \n", filepath.Base(os.Args[0]))
 		os.Exit(1)
 	}
 
 	c := stemcell.Config{
 		Stop:         make(chan struct{}),
 		Debugf:       Debugf,
-		BuildOptions: applyPatch,
+		BuildOptions: stembuildOptions,
 	}
 
 	// cleanup if interrupted
@@ -370,7 +248,7 @@ func main() {
 		}
 	}()
 
-	if err := realMain(&c, applyPatch.VMDKFile, applyPatch.VHDFile, applyPatch.PatchFile); err != nil {
+	if err := realMain(&c, stembuildOptions.VMDKFile); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 		c.Cleanup() // remove temp dir
 		os.Exit(1)
