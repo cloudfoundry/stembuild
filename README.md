@@ -11,7 +11,7 @@ The VMware 'ovftool' binary must be on your path or Fusion/Workstation must be i
 
 ## Create a stemcell from a vmdk
 
-Usage `stembuild-linux [OPTIONS...] [-vmdk FILENAME] [-output DIRNAME] [-version STEMCELL_VERSION] [-os OS_VERSION]`
+Usage `stembuild [OPTIONS...] -vmdk FILENAME [-output DIRNAME] [-version STEMCELL_VERSION] [-os OS_VERSION]`
 
 Process can take between 10 and 20 minutes. See Progress with `-debug` flag.
 

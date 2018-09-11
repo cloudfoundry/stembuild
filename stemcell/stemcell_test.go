@@ -1,7 +1,6 @@
 package stemcell_test
 
 import (
-	"bytes"
 	"crypto/sha1"
 	"fmt"
 	"io"
@@ -11,12 +10,10 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	// . "github.com/onsi/gomega/gbytes"
-	// . "github.com/onsi/gomega/gexec"
 
 	"github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 	"github.com/pivotal-cf-experimental/stembuild/stemcell"
+	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
 )
 
 var _ = Describe("Stemcell", func() {
@@ -30,10 +27,8 @@ var _ = Describe("Stemcell", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		stembuildConfig = stembuildoptions.StembuildOptions{
-			PatchFile: filepath.Join("..", "testdata", "diff.patch"),
 			OSVersion: "2012R2",
 			Version:   "1200.1",
-			VHDFile:   filepath.Join("..", "testdata", "original.vhd"),
 		}
 
 		c = stemcell.Config{
@@ -45,24 +40,6 @@ var _ = Describe("Stemcell", func() {
 
 	AfterEach(func() {
 		Expect(os.RemoveAll(tmpDir)).To(Succeed())
-	})
-
-	Describe("ApplyPatch", func() {
-		It("successfully applies a patch", func() {
-			actualVmdkFilepath := filepath.Join(tmpDir, "image-disk1.vmdk")
-			err := c.ApplyPatch(c.BuildOptions.VHDFile, c.BuildOptions.PatchFile, actualVmdkFilepath)
-			Expect(err).NotTo(HaveOccurred())
-
-			actualVmdk, err := ioutil.ReadFile(actualVmdkFilepath)
-			fmt.Fprintf(GinkgoWriter, "image disk1: %s", actualVmdkFilepath)
-			Expect(err).NotTo(HaveOccurred())
-
-			expectedVmdkFilepath := filepath.Join("..", "testdata", "expected.vmdk")
-			expectedVmdk, err := ioutil.ReadFile(expectedVmdkFilepath)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(bytes.Equal(actualVmdk, expectedVmdk)).To(BeTrue())
-		})
 	})
 
 	Describe("CreateImage", func() {

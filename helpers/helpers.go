@@ -6,20 +6,12 @@ import (
 	"compress/gzip"
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
-	"math/rand"
-	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
-	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
-
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/ghttp"
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {
@@ -131,33 +123,6 @@ func CompareFiles(file1 string, file2 string) bool {
 	}
 }
 
-func Exists(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
-}
-
-func StringFromManifest(fileTemplate string, manifestStruct stembuildoptions.StembuildOptions) (string, error) {
-	t, err := template.New("manifest template").Parse(fileTemplate)
-	if err != nil {
-		return "", err
-	}
-	var buf bytes.Buffer
-	if err := t.Execute(&buf, manifestStruct); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
-}
-
-const ManifestTemplate = `---
-version: "{{.Version}}"
-vhd_file: "{{.VHDFile}}"
-patch_file: "{{.PatchFile}}"
-os_version: "{{.OSVersion}}"
-output_dir: "{{.OutputDir}}"
-vhd_file_checksum: "{{.VHDFileChecksum}}"
-patch_file_checksum: "{{.PatchFileChecksum}}"
-`
-
 func ExtractArchive(archive io.Reader, dirname string) error {
 	tr := tar.NewReader(archive)
 
@@ -230,42 +195,4 @@ func ExtractGzipArchive(name string) (string, error) {
 func ReadFile(name string) (string, error) {
 	b, err := ioutil.ReadFile(name)
 	return string(b), err
-}
-
-func Readdirnames(dirname string) ([]string, error) {
-	f, err := os.Open(dirname)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	names, err := f.Readdirnames(-1)
-	if err != nil {
-		return nil, err
-	}
-	sort.Strings(names)
-	return names, nil
-}
-
-func StartFileServer(myFilepath string) (*Server, string) {
-	servedFilePath := fmt.Sprintf("/file-path.%d", rand.Intn(2000))
-	server := NewServer()
-	patchData, err := ioutil.ReadFile(myFilepath)
-	Expect(err).ToNot(HaveOccurred())
-
-	server.AppendHandlers(
-		RespondWith(http.StatusOK, patchData),
-	)
-
-	return server, fmt.Sprintf("%s%s", server.URL(), servedFilePath)
-}
-
-func StartInvalidFileServer(returnCode int) (*Server, string) {
-	servedFilePath := fmt.Sprintf("/file-path.%d", rand.Intn(2000))
-	server := NewServer()
-
-	server.AppendHandlers(
-		RespondWith(returnCode, nil),
-	)
-
-	return server, fmt.Sprintf("%s%s", server.URL(), servedFilePath)
 }

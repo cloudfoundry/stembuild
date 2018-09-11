@@ -9,17 +9,13 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
-	"github.com/pivotal-cf-experimental/stembuild/rdiff"
 	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
-	"github.com/pivotal-cf-experimental/stembuild/utils"
 	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
 )
 
@@ -298,42 +294,6 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 		}
 	}
 
-	return nil
-}
-
-// ApplyPatch, applies patch file patch to base file vhd, to create file vmdk.
-// It is an error if the vmdk file already exists.
-func (c *Config) ApplyPatch(vhd, patch, vmdk string) error {
-	c.Debugf("preparing to apply patch: vhd: %s patch: %s vmdk: %s", vhd, patch, vmdk)
-
-	if _, err := os.Stat(vmdk); err == nil {
-		return fmt.Errorf("creating [vmdk] file: file exists: %s", vmdk)
-	}
-
-	start := time.Now() // this is sometimes interesting
-	var patchfilePath string
-	switch {
-	case strings.HasPrefix(patch, "http://") || strings.HasPrefix(patch, "https://"):
-		if _, err := url.Parse(patch); err == nil {
-			downloadDir, err := ioutil.TempDir("", "")
-			patchfilePath, err = utils.DownloadFileFromURL(downloadDir, patch, c.Debugf)
-			defer os.RemoveAll(downloadDir)
-			if err != nil {
-				return err
-			}
-		} else {
-			patchfilePath = patch
-		}
-	default:
-		patchfilePath = patch
-	}
-
-	c.Debugf("applying patch with rdiff")
-	if err := rdiff.Patch(vhd, patchfilePath, vmdk); err != nil {
-		return err
-	}
-
-	c.Debugf("applied patch in: %s", time.Since(start))
 	return nil
 }
 

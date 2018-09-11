@@ -71,7 +71,6 @@ func Init() {
 		"Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)")
 	flag.StringVar(&stembuildOptions.Version, "v", "", "Stemcell version (shorthand)")
 
-	flag.StringVar(&stembuildOptions.VHDFile, "vhd", "", "VHD file to patch")
 	flag.StringVar(&stembuildOptions.VMDKFile, "vmdk", "", "VMDK file to create stemcell from")
 
 
