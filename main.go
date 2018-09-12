@@ -28,9 +28,9 @@ var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
 Usage %[1]s [OPTIONS...] -vmdk FILENAME
-                                  -version STEMCELL_VERSION
-                                  -os OS_VERSION
-                                  [-output DIRNAME] 
+                             -version STEMCELL_VERSION
+                             -os OS_VERSION
+                             [-output DIRNAME] 
 
 Create a BOSH Stemcell from a VMDK file
 
