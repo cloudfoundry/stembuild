@@ -28,8 +28,9 @@ var Debugf = func(format string, a ...interface{}) {}
 
 const UsageMessage = `
 Usage %[1]s [OPTIONS...] -vmdk FILENAME
-                                  [-output DIRNAME] [-version STEMCELL_VERSION]
-                                  [-os OS_VERSION]
+                                  -version STEMCELL_VERSION
+                                  -os OS_VERSION
+                                  [-output DIRNAME] 
 
 Create a BOSH Stemcell from a VMDK file
 
@@ -38,7 +39,7 @@ Usage:
   must be installed (both include the 'ovftool').
 
   Convert VMDK [-vmdk]:
-    The [vmdk] and [version] flags must be specified.  If the [output] flag is
+    The [vmdk], [version], and [os] flags must be specified.  If the [output] flag is
     not specified the stemcell will be created in the current working directory.
 
 Examples:
