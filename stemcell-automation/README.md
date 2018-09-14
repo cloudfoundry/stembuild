@@ -6,6 +6,13 @@ BOSH Windows stemcell automation is an automation tool used to create local BOSH
 The BOSH Windows stemcell automation tool will create stemcells for the following IaaS:
 * VMware vSphere
 
+## Compatibility Matrix
+
+| OS Line | stemcell automation version | Stemcell Version
+| :--- | --- | --- 
+| 1709 | 0.2 | 1709.11 
+| 1803 | 0.2 | 1803.1 
+
 ## Supported Windows Server versions
 The BOSH Windows stemcell automation tool is compatible with the following Windows versions:
 * Windows Server 1709
