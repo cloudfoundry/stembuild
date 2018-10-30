@@ -76,13 +76,19 @@ function InstallOpenSSH
 
 function Set-MeltdownRegKeys
 {
+    $PathExists = Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat'
     try
     {
-    Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat' -Value 0 -Name 'cadca5fe-87d3-4b96-b7fb-a231484277cc'
-    Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization' -Value 1.0 -Name 'MinVmVersionForCpuBasedMitigations'
-    Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 3 -Name 'FeatureSettingsOverrideMask'
-    Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 0 -Name 'FeatureSettingsOverride'
-    Write-Log "Meltdown registry keys successfully added"
+        if ($PathExists -eq $False)
+        {
+            New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat'
+        }
+
+        New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat' -Value 0 -Name 'cadca5fe-87d3-4b96-b7fb-a231484277cc' -force
+        New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization' -Value 1.0 -Name 'MinVmVersionForCpuBasedMitigations' -force
+        New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 3 -Name 'FeatureSettingsOverrideMask' -force
+        New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 0 -Name 'FeatureSettingsOverride' -force
+        Write-Log "Meltdown registry keys successfully added"
     }
     catch [Exception]
     {
@@ -90,7 +96,6 @@ function Set-MeltdownRegKeys
         Write-Log "Failed to set meltdown registry keys. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
-
 }
 
 
