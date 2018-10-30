@@ -76,7 +76,7 @@ function InstallOpenSSH
 
 function Set-MeltdownRegKeys
 {
-    Set-ItemProperty -Path 'HKLM:\HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat' -Value 0 -Name 'cadca5fe-87d3-4b96-b7fb-a231484277cc'
+    Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat' -Value 0 -Name 'cadca5fe-87d3-4b96-b7fb-a231484277cc'
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization' -Value 1.0 -Name 'MinVmVersionForCpuBasedMitigations'
     Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 3 -Name 'FeatureSettingsOverrideMask'
     Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 0 -Name 'FeatureSettingsOverride'
