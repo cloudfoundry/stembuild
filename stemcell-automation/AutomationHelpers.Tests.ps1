@@ -691,7 +691,7 @@ Describe "Set-MeltdownRegistryKeys" {
     It "Successfully sets the meltdown registry keys " {
         Mock Set-ItemProperty { }
         { Set-MeltdownRegKeys } | Should -Not -Throw
-        Assert-MockCalled Set-ItemProperty -ParameterFilter{ $Path -eq 'HKLM:\HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat' -and $Value -eq 0 -and $Name -eq 'cadca5fe-87d3-4b96-b7fb-a231484277cc' }
+        Assert-MockCalled Set-ItemProperty -ParameterFilter{ $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat' -and $Value -eq 0 -and $Name -eq 'cadca5fe-87d3-4b96-b7fb-a231484277cc' }
         Assert-MockCalled Set-ItemProperty -ParameterFilter{ $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization' -and $Value -eq 1.0 -and $Name -eq 'MinVmVersionForCpuBasedMitigations' }
         Assert-MockCalled Set-ItemProperty -ParameterFilter{ $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -and $Value -eq 3 -and $Name -eq 'FeatureSettingsOverrideMask' }
         Assert-MockCalled Set-ItemProperty -ParameterFilter{ $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -and $Value -eq 0 -and $Name -eq 'FeatureSettingsOverride' }
