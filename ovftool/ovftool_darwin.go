@@ -16,7 +16,7 @@ func homeDirectory() string {
 		return s
 	}
 
-	out, err := exec.Command("sh", "-c", "cd && pwd").Output()
+	out, err := exec.Command("sh", "-c", "cd ~ && pwd").Output()
 	if err != nil {
 		return ""
 	}
@@ -35,25 +35,13 @@ func Ovftool() (string, error) {
 	}
 
 	// search paths
-	var defaultPaths = []string{
-		"/Applications/VMware Fusion.app/Contents/Library/VMware OVF Tool/ovftool",
-	}
 	var vmwareDirs = []string{
 		"/Applications/VMware Fusion.app",
 	}
 	if home := homeDirectory(); home != "" {
-		defaultPaths = append(defaultPaths, filepath.Join(home, defaultPaths[0]))
 		vmwareDirs = append(vmwareDirs, filepath.Join(home, vmwareDirs[0]))
 	}
 
-	for _, file := range defaultPaths {
-		if fi, err := os.Stat(file); err != nil || fi.IsDir() {
-			continue
-		}
-		if path, err := exec.LookPath(file); err == nil {
-			return path, nil
-		}
-	}
 	for _, root := range vmwareDirs {
 		if fi, err := os.Stat(root); err != nil || !fi.IsDir() {
 			continue
