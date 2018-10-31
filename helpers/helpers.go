@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {

@@ -2,10 +2,10 @@ package stembuildoptions_test
 
 import (
 	"fmt"
-	"math/rand"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	"math/rand"
 )
 
 var _ = Describe("StembuildOptions", func() {
@@ -199,8 +199,6 @@ var _ = Describe("StembuildOptions", func() {
 			})
 		})
 
-
-
 		Context("Multiple fields", func() {
 			Context("when some fields are set in src and another, somewhat overlapping, set of fields is set in dest", func() {
 				BeforeEach(func() {
@@ -213,10 +211,10 @@ var _ = Describe("StembuildOptions", func() {
 
 				It("copies into dest only those fields which are empty in dest", func() {
 					expected := StembuildOptions{
-						OSVersion:         "the",
-						OutputDir:         "needful",
-						Version:           "do",
-						VMDKFile:          "not",
+						OSVersion: "the",
+						OutputDir: "needful",
+						Version:   "do",
+						VMDKFile:  "not",
 					}
 					Expect(dest).To(Equal(expected))
 				})

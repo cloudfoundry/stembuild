@@ -74,7 +74,6 @@ func Init() {
 
 	flag.StringVar(&stembuildOptions.VMDKFile, "vmdk", "", "VMDK file to create stemcell from")
 
-
 }
 
 func Usage() {

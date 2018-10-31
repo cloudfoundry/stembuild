@@ -1,10 +1,10 @@
 package stembuildoptions
 
 type StembuildOptions struct {
-	OSVersion         string `yaml:"os_version"`
-	OutputDir         string `yaml:"output_dir"`
-	Version           string `yaml:"version"`
-	VMDKFile          string `yaml:"vmdk_file"`
+	OSVersion string `yaml:"os_version"`
+	OutputDir string `yaml:"output_dir"`
+	Version   string `yaml:"version"`
+	VMDKFile  string `yaml:"vmdk_file"`
 }
 
 // Copy into `d` the values in `s` which are empty in `d`.

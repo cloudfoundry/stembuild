@@ -51,9 +51,13 @@ func vmwareInstallPaths() ([]string, error) {
 	return paths, nil
 }
 
+func lookPath(name) (string, err) {
+	return exec.LookPath(name)
+}
+
 func Ovftool() (string, error) {
 	const name = "ovftool.exe"
-	if path, err := exec.LookPath(name); err == nil {
+	if path, err := lookPath(name); err == nil {
 		return path, nil
 	}
 
@@ -72,7 +76,7 @@ func Ovftool() (string, error) {
 	for _, dir := range installPaths {
 		for _, name := range search {
 			file := filepath.Join(dir, name)
-			if path, err := exec.LookPath(file); err == nil {
+			if path, err := lookPath(file); err == nil {
 				return path, nil
 			}
 		}

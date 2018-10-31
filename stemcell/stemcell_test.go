@@ -12,8 +12,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/stemcell"
 	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	"github.com/pivotal-cf-experimental/stembuild/stemcell"
 )
 
 var _ = Describe("Stemcell", func() {
