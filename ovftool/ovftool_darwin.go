@@ -28,12 +28,7 @@ func homeDirectory() string {
 	return s
 }
 
-func Ovftool() (string, error) {
-	const name = "ovftool"
-	if path, err := exec.LookPath(name); err == nil {
-		return path, nil
-	}
-
+func SearchPaths() ([]string, error) {
 	// search paths
 	var vmwareDirs = []string{
 		"/Applications/VMware Fusion.app",
@@ -41,8 +36,16 @@ func Ovftool() (string, error) {
 	if home := homeDirectory(); home != "" {
 		vmwareDirs = append(vmwareDirs, filepath.Join(home, vmwareDirs[0]))
 	}
+	return vmwareDirs, nil
+}
 
-	for _, root := range vmwareDirs {
+func Ovftool(searchPaths []string) (string, error) {
+	const name = "ovftool"
+	if path, err := exec.LookPath(name); err == nil {
+		return path, nil
+	}
+
+	for _, root := range searchPaths {
 		if fi, err := os.Stat(root); err != nil || !fi.IsDir() {
 			continue
 		}

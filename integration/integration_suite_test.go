@@ -33,7 +33,11 @@ var _ = SynchronizedAfterSuite(func() {
 })
 
 func CheckOVFToolOnPath() error {
-	if _, err := ovftool.Ovftool(); err != nil {
+	searchPaths, err := ovftool.SearchPaths()
+	if err != nil {
+		return err
+	}
+	if _, err := ovftool.Ovftool(searchPaths); err != nil {
 		return err
 	}
 	return nil

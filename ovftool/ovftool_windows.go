@@ -2,24 +2,22 @@ package ovftool
 
 import (
 	"fmt"
-	"os/exec"
-	"path/filepath"
-
 	"golang.org/x/sys/windows/registry"
+	"os/exec"
 )
+
+var keypaths = []string{
+	`SOFTWARE\Wow6432Node\VMware, Inc.\VMware Workstation`,
+	`SOFTWARE\Wow6432Node\VMware, Inc.\VMware OVF Tool`,
+	`SOFTWARE\VMware, Inc.\VMware Workstation`,
+	`SOFTWARE\VMware, Inc.\VMware OVF Tool`,
+}
 
 // vmwareInstallPaths, returns the install paths of VMware Workstation and
 // OVF Tool, which can be installed separately.
-func vmwareInstallPaths() ([]string, error) {
+func vmwareInstallPaths(keypaths []string) ([]string, error) {
 	const regKey = registry.LOCAL_MACHINE
 	const access = registry.QUERY_VALUE
-
-	keypaths := []string{
-		`SOFTWARE\Wow6432Node\VMware, Inc.\VMware Workstation`,
-		`SOFTWARE\Wow6432Node\VMware, Inc.\VMware OVF Tool`,
-		`SOFTWARE\VMware, Inc.\VMware Workstation`,
-		`SOFTWARE\VMware, Inc.\VMware OVF Tool`,
-	}
 
 	var key registry.Key
 	var err error
@@ -34,52 +32,32 @@ func vmwareInstallPaths() ([]string, error) {
 	}
 	defer key.Close()
 
-	var first error
 	var paths []string
 	for _, k := range []string{"InstallPath64", "InstallPath"} {
-		s, _, err := key.GetStringValue(k)
-		if err != nil && first == nil {
-			first = err
-		} else {
+		var s string
+		s, _, err = key.GetStringValue(k)
+		if err == nil {
 			paths = append(paths, s)
 		}
 	}
 
 	if len(paths) == 0 {
-		return nil, fmt.Errorf("could not find VMware Workstation install path in registry:", first)
+		return nil, fmt.Errorf("could not find VMware Workstation install path in registry: %s", err)
 	}
 	return paths, nil
 }
 
-func lookPath(name) (string, err) {
-	return exec.LookPath(name)
+func SearchPaths() ([]string, error) {
+	return vmwareInstallPaths(keypaths)
 }
 
-func Ovftool() (string, error) {
+func Ovftool(installPaths []string) (string, error) {
 	const name = "ovftool.exe"
-	if path, err := lookPath(name); err == nil {
+	if path, err := exec.LookPath(name); err == nil {
 		return path, nil
 	}
 
-	installPaths, err := vmwareInstallPaths()
-	if err != nil {
-		return "", err
-	}
-
-	// Locations of ovftool.exe in the OVF Tool and Workstation directories
-	search := []string{
-		// Location if OVF Tool is installed
-		name,
-		// Location if Workstation is installed
-		filepath.Join("ovftool", name),
-	}
 	for _, dir := range installPaths {
-		for _, name := range search {
-			file := filepath.Join(dir, name)
-			if path, err := lookPath(file); err == nil {
-				return path, nil
-			}
-		}
 		if path, err := findExecutable(dir, name); err == nil {
 			return path, nil
 		}

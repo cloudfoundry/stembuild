@@ -205,7 +205,12 @@ func main() {
 		Usage()
 	}
 
-	path, err := ovftool.Ovftool()
+	searchPaths, err := ovftool.SearchPaths()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not get search paths for Ovftool: %s", err)
+		Usage()
+	}
+	path, err := ovftool.Ovftool(searchPaths)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not locate 'ovftool' on PATH: %s", err)
 		Usage()

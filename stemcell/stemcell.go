@@ -262,7 +262,11 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 	const errFmt = "converting vmx to ova: %s\n" +
 		"-- BEGIN STDERR OUTPUT -- :\n%s\n-- END STDERR OUTPUT --\n"
 
-	ovfpath, err := ovftool.Ovftool()
+	searchPaths, err := ovftool.SearchPaths()
+	if err != nil {
+		return err
+	}
+	ovfpath, err := ovftool.Ovftool(searchPaths)
 	if err != nil {
 		return err
 	}
@@ -275,7 +279,7 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("ovftool: %s", err)
 	}
-	c.Debugf("converting vmx to ova with cmd: %s %s", cmd.Path, cmd.Args)
+	c.Debugf("converting vmx to ova with cmd: %s %s", cmd.Path, cmd.Args[1:])
 
 	// Wait for process exit or interupt
 	errCh := make(chan error, 1)

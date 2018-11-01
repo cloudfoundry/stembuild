@@ -43,6 +43,7 @@ var _ = Describe("Stemcell", func() {
 	})
 
 	Describe("CreateImage", func() {
+
 		It("successfully creates an image tarball", func() {
 			inputVmdkFilepath := filepath.Join("..", "testdata", "expected.vmdk")
 			err := c.CreateImage(inputVmdkFilepath)
