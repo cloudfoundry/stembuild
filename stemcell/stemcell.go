@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"time"
 
@@ -382,4 +383,41 @@ func (c *Config) ConvertVMDK(vmdk string, outputDir string) (string, error) {
 		return "", err
 	}
 	return stemcellPath, nil
+}
+
+func (c *Config) catchInterruptSignal() {
+	ch := make(chan os.Signal, 64)
+	signal.Notify(ch, os.Interrupt)
+	stopping := false
+	for sig := range ch {
+		c.Debugf("received signal: %s", sig)
+		if stopping {
+			fmt.Fprintf(os.Stderr, "received second (%s) signal - exiting now\n", sig)
+			c.Cleanup() // remove temp dir
+			os.Exit(1)
+		}
+		stopping = true
+		fmt.Fprintf(os.Stderr, "received (%s) signal cleaning up\n", sig)
+		c.StopConfig()
+	}
+}
+
+func (c *Config) Package() error {
+
+	go c.catchInterruptSignal()
+
+	start := time.Now()
+
+	stemcellPath, err := c.ConvertVMDK(c.BuildOptions.VMDKFile, c.BuildOptions.OutputDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		c.Cleanup() // remove temp dir
+		return err
+	}
+
+	c.Debugf("created stemcell (%s) in: %s", stemcellPath, time.Since(start))
+	fmt.Printf("created stemcell: %s", stemcellPath)
+
+	c.Cleanup()
+	return nil
 }

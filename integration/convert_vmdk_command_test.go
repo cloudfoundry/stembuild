@@ -33,8 +33,8 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "testdata", "expected.vmdk")
 
-				session := helpers.Stembuild("-vmdk", inputVmdk, "-v", version, "-os", osVersion)
-				Eventually(session, 5).Should(Exit(0))
+				session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--version", version, "--os", osVersion)
+				Eventually(session, 20).Should(Exit(0))
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
@@ -66,8 +66,8 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "testdata", "expected.vmdk")
 
-				session := helpers.Stembuild("-vmdk", inputVmdk, "-v", version, "-os", osVersion)
-				Eventually(session, 5).Should(Exit(0))
+				session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--version", version, "--os", osVersion)
+				Eventually(session, 20).Should(Exit(0))
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
