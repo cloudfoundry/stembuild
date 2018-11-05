@@ -10,7 +10,7 @@ type GlobalFlags struct {
 	Color bool
 }
 
-func (g *GlobalFlags) GetDebug() func(format string, a ...interface{}) {
+func (g *GlobalFlags) GetDebugf() func(format string, a ...interface{}) {
 
 	debugFunc := func(format string, a ...interface{}) {}
 	prefix := "debug: "

@@ -304,8 +304,8 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 
 // CreateImage, converts a vmdk to a gzip compressed image file and records the
 // sha1 sum of the resulting image.
-func (c *Config) CreateImage(vmdk string) error {
-	c.Debugf("Creating [image] from [vmdk]: %s", vmdk)
+func (c *Config) CreateImage() error {
+	c.Debugf("Creating [image] from [vmdk]: %s", c.BuildOptions.VMDKFile)
 
 	tmpdir, err := c.TempDir()
 	if err != nil {
@@ -321,7 +321,7 @@ func (c *Config) CreateImage(vmdk string) error {
 	}
 
 	vmxPath := filepath.Join(tmpdir, "image.vmx")
-	vmdkPath, err := filepath.Abs(vmdk)
+	vmdkPath, err := filepath.Abs(c.BuildOptions.VMDKFile)
 	if err != nil {
 		return err
 	}
@@ -366,7 +366,7 @@ func (c *Config) CreateImage(vmdk string) error {
 }
 
 func (c *Config) ConvertVMDK() (string, error) {
-	if err := c.CreateImage(c.BuildOptions.VMDKFile); err != nil {
+	if err := c.CreateImage(); err != nil {
 		return "", err
 	}
 	if err := c.WriteManifest(CreateManifest(c.BuildOptions.OSVersion, c.BuildOptions.Version, c.Sha1sum)); err != nil {

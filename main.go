@@ -9,9 +9,8 @@ import (
 	"path"
 )
 
-var gf GlobalFlags
-
 func main() {
+	var gf GlobalFlags
 
 	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	fs.BoolVar(&gf.Debug, "debug", false, "Print lots of debugging informatio")

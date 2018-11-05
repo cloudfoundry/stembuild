@@ -46,8 +46,8 @@ var _ = Describe("Stemcell", func() {
 	Describe("CreateImage", func() {
 
 		It("successfully creates an image tarball", func() {
-			inputVmdkFilepath := filepath.Join("..", "..", "test", "data", "expected.vmdk")
-			err := c.CreateImage(inputVmdkFilepath)
+			c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+			err := c.CreateImage()
 			Expect(err).NotTo(HaveOccurred())
 
 			// the image will be saved to the Config's temp directory

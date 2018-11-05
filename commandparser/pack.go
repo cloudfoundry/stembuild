@@ -22,9 +22,27 @@ type PackageCmd struct {
 }
 
 func (*PackageCmd) Name() string     { return "package" }
-func (*PackageCmd) Synopsis() string { return "ADD A GOOD SYNOPSIS" }
+func (*PackageCmd) Synopsis() string { return "Create a BOSH Stemcell from a VMDK file" }
 func (*PackageCmd) Usage() string {
-	return "package --vmdk <path-to-vmdk> -os <os version> -version <stemcell version>\n"
+	return fmt.Sprintf(`%[1]s package -vmdk <path-to-vmdk> -version <stemcell version> -os <os version>
+
+Create a BOSH Stemcell from a VMDK file
+
+The [vmdk], [version], and [os] flags must be specified.  If the [output] flag is
+not specified the stemcell will be created in the current working directory.
+
+Requirements:
+	The VMware 'ovftool' binary must be on your path or Fusion/Workstation
+	must be installed (both include the 'ovftool').
+
+Examples:
+	%[1]s -vmdk disk.vmdk -version 1.2 -os 1803
+
+	Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk', and set the stemcell version to 1.2.
+	The final stemcell will be found in the current working directory.
+
+Flags:
+`, filepath.Base(os.Args[0]))
 }
 
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
@@ -67,7 +85,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	}
 
 	name := filepath.Join(p.outputDir, stemcell.StemcellFilename(p.version, p.os))
-	p.GlobalFlags.GetDebug()("validating that stemcell filename (%s) does not exist", name)
+	p.GlobalFlags.GetDebugf()("validating that stemcell filename (%s) does not exist", name)
 	if _, err := os.Stat(name); !os.IsNotExist(err) {
 		fmt.Fprintf(os.Stderr, "error with output file (%s): %v (file may already exist)", name, err)
 		return subcommands.ExitFailure
@@ -88,7 +106,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 
 	c := stemcell.Config{
 		Stop:         make(chan struct{}),
-		Debugf:       p.GlobalFlags.GetDebug(),
+		Debugf:       p.GlobalFlags.GetDebugf(),
 		BuildOptions: StembuildOptions{},
 	}
 

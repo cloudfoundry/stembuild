@@ -29,7 +29,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 var _ = SynchronizedAfterSuite(func() {
 }, func() {
-	Expect(os.RemoveAll("./test/data")).To(Succeed())
+	Expect(os.RemoveAll("./data")).To(Succeed())
 })
 
 func CheckOVFToolOnPath() error {
