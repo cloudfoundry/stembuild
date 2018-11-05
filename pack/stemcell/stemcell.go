@@ -17,7 +17,7 @@ import (
 
 	"github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
-	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
+	"github.com/pivotal-cf-experimental/stembuild/templates"
 )
 
 type Config struct {
@@ -325,7 +325,7 @@ func (c *Config) CreateImage(vmdk string) error {
 	if err != nil {
 		return err
 	}
-	if err := vmxtemplate.WriteVMXTemplate(vmdkPath, hwVersion, vmxPath); err != nil {
+	if err := templates.WriteVMXTemplate(vmdkPath, hwVersion, vmxPath); err != nil {
 		return err
 	}
 

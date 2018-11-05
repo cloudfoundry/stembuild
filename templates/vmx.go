@@ -1,4 +1,4 @@
-package vmxtemplate
+package templates
 
 import (
 	"errors"

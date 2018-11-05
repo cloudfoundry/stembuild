@@ -1,4 +1,4 @@
-package commandParser_test
+package commandparser_test
 
 import (
 	"math/rand"

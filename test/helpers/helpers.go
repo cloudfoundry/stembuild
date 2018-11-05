@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"archive/tar"
-	"bytes"
 	"compress/gzip"
 	"errors"
 	"fmt"
@@ -90,39 +89,7 @@ func CopyRecursive(destRoot, srcRoot string) error {
 	return nil
 }
 
-func CompareFiles(file1 string, file2 string) bool {
-	f1, err := os.Open(file1)
-	if err != nil {
-		return false
-	}
-	defer f1.Close()
-
-	f2, err := os.Open(file2)
-	if err != nil {
-		return false
-	}
-	defer f2.Close()
-
-	blockSize := 64000
-	block1 := make([]byte, blockSize)
-	block2 := make([]byte, blockSize)
-
-	for {
-		_, err1 := f1.Read(block1)
-		_, err2 := f2.Read(block2)
-
-		switch {
-		case err1 == io.EOF && err2 == io.EOF:
-			return true
-		case err1 != nil || err2 != nil:
-			return false
-		case !bytes.Equal(block1, block2):
-			return false
-		}
-	}
-}
-
-func ExtractArchive(archive io.Reader, dirname string) error {
+func extractArchive(archive io.Reader, dirname string) error {
 	tr := tar.NewReader(archive)
 
 	limit := 100
@@ -182,7 +149,7 @@ func ExtractGzipArchive(name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := ExtractArchive(w, tmpdir); err != nil {
+	if err := extractArchive(w, tmpdir); err != nil {
 		return "", err
 	}
 	if err := w.Close(); err != nil {

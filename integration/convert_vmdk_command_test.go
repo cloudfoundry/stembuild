@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 
-	"github.com/pivotal-cf-experimental/stembuild/helpers"
+	"github.com/pivotal-cf-experimental/stembuild/test/helpers"
 )
 
 var _ = Describe("Convert VMDK", func() {
@@ -31,7 +31,7 @@ var _ = Describe("Convert VMDK", func() {
 				osVersion = "2012R2"
 				version = "1200.0"
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
-				inputVmdk = filepath.Join("..", "testdata", "expected.vmdk")
+				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
 				session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--version", version, "--os", osVersion)
 				Eventually(session, 20).Should(Exit(0))
@@ -64,7 +64,7 @@ var _ = Describe("Convert VMDK", func() {
 				osVersion = "1803"
 				version = "1803.0"
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
-				inputVmdk = filepath.Join("..", "testdata", "expected.vmdk")
+				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
 				session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--version", version, "--os", osVersion)
 				Eventually(session, 20).Should(Exit(0))

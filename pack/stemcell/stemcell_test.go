@@ -12,9 +12,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/pivotal-cf-experimental/stembuild/helpers"
 	"github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"github.com/pivotal-cf-experimental/stembuild/pack/stemcell"
+	"github.com/pivotal-cf-experimental/stembuild/test/helpers"
 )
 
 var _ = Describe("Stemcell", func() {
@@ -46,7 +46,7 @@ var _ = Describe("Stemcell", func() {
 	Describe("CreateImage", func() {
 
 		It("successfully creates an image tarball", func() {
-			inputVmdkFilepath := filepath.Join("..", "..", "testdata", "expected.vmdk")
+			inputVmdkFilepath := filepath.Join("..", "..", "test", "data", "expected.vmdk")
 			err := c.CreateImage(inputVmdkFilepath)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -119,7 +119,7 @@ stemcell_formats:
 	Describe("catchInterruptSignal", func() {
 
 		It("cleans up on one interrupt", func() {
-			inputVmdk := filepath.Join("..", "..", "testdata", "expected.vmdk")
+			inputVmdk := filepath.Join("..", "..", "test", "data", "expected.vmdk")
 			session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--os", "2012R2", "--version", "1200.0")
 			time.Sleep(1 * time.Second)
 

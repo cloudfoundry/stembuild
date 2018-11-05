@@ -1,9 +1,9 @@
-package commandParser_test
+package commandparser_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf-experimental/stembuild/commandParser"
+	. "github.com/pivotal-cf-experimental/stembuild/commandparser"
 	"io/ioutil"
 	"os"
 	"path/filepath"

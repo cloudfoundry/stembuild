@@ -1,4 +1,4 @@
-package vmxtemplate_test
+package templates_test
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
+	"github.com/pivotal-cf-experimental/stembuild/templates"
 )
 
 func parseVMX(vmx string) (map[string]string, error) {
@@ -63,12 +63,12 @@ const virtualHWVersion = 60
 
 func TestVMXTemplate(t *testing.T) {
 	var buf bytes.Buffer
-	if err := vmxtemplate.VMXTemplate(vmdkPath, virtualHWVersion, &buf); err != nil {
+	if err := templates.VMXTemplate(vmdkPath, virtualHWVersion, &buf); err != nil {
 		t.Fatal(err)
 	}
 	checkVMXTemplate(t, virtualHWVersion, vmdkPath, buf.String())
 
-	if err := vmxtemplate.VMXTemplate("", 0, &buf); err == nil {
+	if err := templates.VMXTemplate("", 0, &buf); err == nil {
 		t.Error("VMXTemplate: expected error for empty vmx filename")
 	}
 }
@@ -80,7 +80,7 @@ func TestWriteVMXTemplate(t *testing.T) {
 	}
 	vmxPath := filepath.Join(tmpdir, "FooBarBaz.vmx")
 
-	if err := vmxtemplate.WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
+	if err := templates.WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
 		t.Fatal(err)
 	}
 	b, err := ioutil.ReadFile(vmxPath)
@@ -94,7 +94,7 @@ func TestWriteVMXTemplate(t *testing.T) {
 	}
 
 	// vmx file is deleted if there is an error
-	if err := vmxtemplate.WriteVMXTemplate("", 0, vmxPath); err == nil {
+	if err := templates.WriteVMXTemplate("", 0, vmxPath); err == nil {
 		t.Error("WriteVMXTemplate: expected error for empty vmx filename")
 	}
 	if _, err := os.Stat(vmxPath); err == nil {

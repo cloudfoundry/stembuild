@@ -7,8 +7,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf-experimental/stembuild/helpers"
 	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
+	"github.com/pivotal-cf-experimental/stembuild/test/helpers"
 
 	"testing"
 )
@@ -21,7 +21,7 @@ func TestIntegration(t *testing.T) {
 
 var _ = SynchronizedBeforeSuite(func() []byte {
 	rand.Seed(time.Now().UnixNano())
-	Expect(helpers.CopyRecursive(".", "../testdata")).To(Succeed())
+	Expect(helpers.CopyRecursive(".", "../test/data")).To(Succeed())
 	Expect(CheckOVFToolOnPath()).To(Succeed())
 	return nil
 }, func(_ []byte) {
@@ -29,7 +29,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 var _ = SynchronizedAfterSuite(func() {
 }, func() {
-	Expect(os.RemoveAll("./testdata")).To(Succeed())
+	Expect(os.RemoveAll("./test/data")).To(Succeed())
 })
 
 func CheckOVFToolOnPath() error {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"github.com/google/subcommands"
-	. "github.com/pivotal-cf-experimental/stembuild/commandParser"
+	. "github.com/pivotal-cf-experimental/stembuild/commandparser"
 	"os"
 	"path"
 )

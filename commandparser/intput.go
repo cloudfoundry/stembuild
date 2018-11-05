@@ -1,4 +1,4 @@
-package commandParser
+package commandparser
 
 import (
 	"fmt"
