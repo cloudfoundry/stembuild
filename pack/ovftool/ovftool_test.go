@@ -6,7 +6,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/pivotal-cf-experimental/stembuild/ovftool"
+	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
 	"path/filepath"
 )
 
@@ -22,7 +22,7 @@ var _ = Describe("ovftool", func() {
 			pwd, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 			// pwd is set to stembuild/ovftool, so we need to go up a directory
-			pwd = filepath.Join(pwd, "..")
+			pwd = filepath.Join(pwd, "..", "..")
 
 			executable, err := ovftool.FindExecutable(pwd, stemExe)
 
@@ -46,7 +46,7 @@ var _ = Describe("ovftool", func() {
 			pwd, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 			// pwd is set to stembuild/ovftool, so we need to go up a directory
-			pwd = filepath.Join(pwd, "..")
+			pwd = filepath.Join(pwd, "..", "..")
 			errorString := "executable file not found in: " + pwd
 
 			executable, err := ovftool.FindExecutable(pwd, "notRealExec")

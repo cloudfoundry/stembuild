@@ -15,8 +15,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/pivotal-cf-experimental/stembuild/ovftool"
 	"github.com/pivotal-cf-experimental/stembuild/pack/options"
+	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
 	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
 )
 
@@ -365,8 +365,8 @@ func (c *Config) CreateImage(vmdk string) error {
 	return nil
 }
 
-func (c *Config) ConvertVMDK(vmdk string, outputDir string) (string, error) {
-	if err := c.CreateImage(vmdk); err != nil {
+func (c *Config) ConvertVMDK() (string, error) {
+	if err := c.CreateImage(c.BuildOptions.VMDKFile); err != nil {
 		return "", err
 	}
 	if err := c.WriteManifest(CreateManifest(c.BuildOptions.OSVersion, c.BuildOptions.Version, c.Sha1sum)); err != nil {
@@ -376,7 +376,7 @@ func (c *Config) ConvertVMDK(vmdk string, outputDir string) (string, error) {
 		return "", err
 	}
 
-	stemcellPath := filepath.Join(outputDir, filepath.Base(c.Stemcell))
+	stemcellPath := filepath.Join(c.BuildOptions.OutputDir, filepath.Base(c.Stemcell))
 	c.Debugf("moving stemcell (%s) to: %s", c.Stemcell, stemcellPath)
 
 	if err := os.Rename(c.Stemcell, stemcellPath); err != nil {
@@ -408,7 +408,7 @@ func (c *Config) Package() error {
 
 	start := time.Now()
 
-	stemcellPath, err := c.ConvertVMDK(c.BuildOptions.VMDKFile, c.BuildOptions.OutputDir)
+	stemcellPath, err := c.ConvertVMDK()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 		c.Cleanup() // remove temp dir

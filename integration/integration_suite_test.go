@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/ovftool"
+	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
 
 	"testing"
 )
