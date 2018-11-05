@@ -13,13 +13,13 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/pivotal-cf-experimental/stembuild/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	"github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"github.com/pivotal-cf-experimental/stembuild/stemcell"
 )
 
 var _ = Describe("Stemcell", func() {
 	var tmpDir string
-	var stembuildConfig stembuildoptions.StembuildOptions
+	var stembuildConfig options.StembuildOptions
 	var c stemcell.Config
 
 	BeforeEach(func() {
@@ -27,7 +27,7 @@ var _ = Describe("Stemcell", func() {
 		tmpDir, err = ioutil.TempDir("", "")
 		Expect(err).NotTo(HaveOccurred())
 
-		stembuildConfig = stembuildoptions.StembuildOptions{
+		stembuildConfig = options.StembuildOptions{
 			OSVersion: "2012R2",
 			Version:   "1200.1",
 		}

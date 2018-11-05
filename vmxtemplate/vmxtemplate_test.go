@@ -11,7 +11,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pivotal-cf-experimental/stembuild/helpers"
 	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
 )
 
@@ -57,15 +56,6 @@ func checkVMXTemplate(t *testing.T, hwVersion int, vmdkPath, vmxContent string) 
 	if s := m[hwVersionKeyName]; s != expectedHWVersion {
 		t.Errorf("VMXTemplate: key: %q want: %q got: %q", hwVersionKeyName, expectedHWVersion, s)
 	}
-}
-
-func ExtractOVA(ova, dirname string) error {
-	tf, err := os.Open(ova)
-	if err != nil {
-		return err
-	}
-	defer tf.Close()
-	return helpers.ExtractArchive(tf, dirname)
 }
 
 const vmdkPath = "FooBarBaz.vmdk"

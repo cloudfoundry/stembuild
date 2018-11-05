@@ -1,10 +1,10 @@
-package stembuildoptions_test
+package options_test
 
 import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	. "github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"math/rand"
 )
 

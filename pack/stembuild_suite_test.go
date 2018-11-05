@@ -1,4 +1,4 @@
-package stembuildoptions_test
+package pack_test
 
 import (
 	"math/rand"
@@ -13,7 +13,7 @@ var _ = BeforeSuite(func() {
 	rand.Seed(time.Now().UnixNano())
 })
 
-func TestStembuildOptions(t *testing.T) {
+func TestStembuild(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "StembuildOptions Suite")
+	RunSpecs(t, "Stembuild Suite")
 }

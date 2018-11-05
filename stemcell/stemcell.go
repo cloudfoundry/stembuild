@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
-	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	"github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"github.com/pivotal-cf-experimental/stembuild/vmxtemplate"
 )
 
@@ -28,7 +28,7 @@ type Config struct {
 	tmpdir       string
 	Stop         chan struct{}
 	Debugf       func(format string, a ...interface{})
-	BuildOptions stembuildoptions.StembuildOptions
+	BuildOptions options.StembuildOptions
 }
 
 type CancelReadSeeker struct {

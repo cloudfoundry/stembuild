@@ -1,261 +1,146 @@
-package stembuild
+package main
 
 import (
-	"errors"
+	"context"
 	"flag"
 	"fmt"
+	"github.com/google/subcommands"
 	"github.com/pivotal-cf-experimental/stembuild/ovftool"
-	"github.com/pivotal-cf-experimental/stembuild/stembuildoptions"
+	"github.com/pivotal-cf-experimental/stembuild/pack"
+	. "github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"github.com/pivotal-cf-experimental/stembuild/stemcell"
-	"github.com/pivotal-cf-experimental/stembuild/utils"
+	"path/filepath"
+
 	"log"
 	"os"
-	"os/signal"
-	"path/filepath"
+	"path"
 	"strings"
-	"time"
 )
 
-var (
-	stembuildOptions stembuildoptions.StembuildOptions
-
-	errs        []error
-	EnableDebug bool
-	DebugColor  bool
-)
-
-var Debugf = func(format string, a ...interface{}) {}
-
-const UsageMessage = `
-Usage %[1]s [OPTIONS...] -vmdk FILENAME
-                             -version STEMCELL_VERSION
-                             -os OS_VERSION
-                             [-output DIRNAME] 
-
-Create a BOSH Stemcell from a VMDK file
-
-Usage:
-  The VMware 'ovftool' binary must be on your path or Fusion/Workstation
-  must be installed (both include the 'ovftool').
-
-  Convert VMDK [-vmdk]:
-    The [vmdk], [version], and [os] flags must be specified.  If the [output] flag is
-    not specified the stemcell will be created in the current working directory.
-
-Examples:
-
-  %[1]s -vmdk disk.vmdk -v 1.2
-
-    Will create a stemcell using [vmdk] 'disk.vmdk' with version 1.2 in the current
-        working directory.
-
-Flags:
-`
-
-func Init() {
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, UsageMessage, filepath.Base(os.Args[0]))
-		flag.PrintDefaults()
-	}
-	flag.BoolVar(&DebugColor, "color", false, "Colorize debug output")
-
-	flag.BoolVar(&EnableDebug, "debug", false, "Print lots of debugging information")
-
-	flag.StringVar(&stembuildOptions.OutputDir, "output", "",
-		"Output directory, default is the current working directory.")
-	flag.StringVar(&stembuildOptions.OutputDir, "o", "", "Output directory (shorthand)")
-
-	flag.StringVar(&stembuildOptions.OSVersion, "os", "",
-		"OS version must be either 2012R2, 2016 or 1803")
-
-	flag.StringVar(&stembuildOptions.Version, "version", "",
-		"Stemcell version in the form of [DIGITS].[DIGITS] (e.x. 123.01)")
-	flag.StringVar(&stembuildOptions.Version, "v", "", "Stemcell version (shorthand)")
-
-	flag.StringVar(&stembuildOptions.VMDKFile, "vmdk", "", "VMDK file to create stemcell from")
-
+type packageCmd struct {
+	vmdk      string
+	os        string
+	version   string
+	outputDir string
 }
 
-func Usage() {
-	flag.Usage()
-	os.Exit(1)
+type globalFlags struct {
+	debug bool
+	color bool
 }
 
-func validFile(name string) error {
-	fi, err := os.Stat(name)
-	if err != nil {
-		return err
-	}
-	if !fi.Mode().IsRegular() {
-		return fmt.Errorf("not a regular file: %s", name)
-	}
-	return nil
+var gf globalFlags
+
+func (*packageCmd) Name() string     { return "package" }
+func (*packageCmd) Synopsis() string { return "ADD A GOOD SYNOPSIS" }
+func (*packageCmd) Usage() string {
+	return "package --vmdk <path-to-vmdk> -os <os version> -version <stemcell version>\n"
 }
 
-func add(err error) {
-	errs = append(errs, err)
+func (p *packageCmd) SetFlags(f *flag.FlagSet) {
+	f.StringVar(&p.vmdk, "vmdk", "", "VMDK file to create stemcell from")
+	f.StringVar(&p.os, "os", "", "OS version must be either 2012R2, 2016 or 1803")
+	f.StringVar(&p.version, "version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
+	f.StringVar(&p.version, "v", "", "Stemcell version (shorthand)")
+	f.StringVar(&p.outputDir, "outputDir", "", "Output directory, default is the current working directory.")
+	f.StringVar(&p.outputDir, "o", "", "Output directory (shorthand)")
 }
+func (g *globalFlags) getDebug() func(format string, a ...interface{}) {
 
-func ValidateFlags() []error {
-	Debugf("validating [vmdk] (%s) flags", stembuildOptions.VMDKFile)
-
-	if stembuildOptions.VMDKFile == "" {
-		add(errors.New("missing VMDK flag"))
-		return errs
+	debugFunc := func(format string, a ...interface{}) {}
+	prefix := "debug: "
+	if g.color {
+		prefix = "\033[32m" + prefix + "\033[0m"
 	}
-
-	// check for extra flags in vmdk commmand
-	Debugf("validating that no extra flags or arguments were provided")
-	validateInputs()
-
-	Debugf("validating output directory: %s", stembuildOptions.OutputDir)
-	validateOutputDir()
-
-	Debugf("validating stemcell version string: %s", stembuildOptions.Version)
-	if err := utils.ValidateVersion(stembuildOptions.Version); err != nil {
-		add(err)
-		return errs
+	if g.debug {
+		debugFunc = log.New(os.Stderr, prefix, 0).Printf
 	}
-
-	Debugf("validating OS version: %s", stembuildOptions.OSVersion)
-	switch stembuildOptions.OSVersion {
-	case "2012R2", "2016", "1803":
-		// Ok
-	default:
-		add(fmt.Errorf("OS version must be either 2012R2, 2016 or 1803 have: %s", stembuildOptions.OSVersion))
-		return errs
-	}
-
-	name := filepath.Join(stembuildOptions.OutputDir, stemcell.StemcellFilename(stembuildOptions.Version, stembuildOptions.OSVersion))
-	Debugf("validating that stemcell filename (%s) does not exist", name)
-	if _, err := os.Stat(name); !os.IsNotExist(err) {
-		add(fmt.Errorf("error with output file (%s): %v (file may already exist)", name, err))
-		return errs
-	}
-
-	return errs
+	return debugFunc
 }
+func (p *packageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 
-func validateInputs() {
-	Debugf("validating VMDK file [vmdk]: %q", stembuildOptions.VMDKFile)
-	if err := validFile(stembuildOptions.VMDKFile); err != nil {
-		add(fmt.Errorf("invalid [vmdk]: %s", err))
+	if validVMDK, err := pack.IsValidVMDK(p.vmdk); err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		return subcommands.ExitFailure
+	} else if !validVMDK {
+		fmt.Fprintf(os.Stderr, "VMDK not specified or invalid\n")
+		return subcommands.ExitFailure
 	}
-}
+	if !pack.IsValidOS(p.os) {
+		fmt.Fprintf(os.Stderr, "OS version must be either 2012R2, 1709, or 1803 have: %s\n", p.os)
+		return subcommands.ExitFailure
+	}
+	if !pack.IsValidVersion(p.version) {
+		fmt.Fprintf(os.Stderr, "invalid version (%s) expected format [NUMBER].[NUMBER] or "+
+			"[NUMBER].[NUMBER].[NUMBER]\n", p.version)
 
-func validateOutputDir() {
-	if stembuildOptions.OutputDir == "" || stembuildOptions.OutputDir == "." {
-		wd, err := os.Getwd()
+		return subcommands.ExitFailure
+	}
+
+	if p.outputDir == "" || p.outputDir == "." {
+		cwd, err := os.Getwd()
 		if err != nil {
-			add(fmt.Errorf("getting working directory: %s", err))
+			fmt.Fprintf(os.Stderr, "error getting working directory %s", err)
+			return subcommands.ExitFailure
 		}
-		Debugf("setting output dir (%s) to working directory: %s", stembuildOptions.OutputDir, wd)
-		stembuildOptions.OutputDir = wd
+		p.outputDir = cwd
+	} else if err := pack.ValidateOrCreateOutputDir(p.outputDir); err != nil {
+		return subcommands.ExitFailure
 	}
 
-	fi, err := os.Stat(stembuildOptions.OutputDir)
-	if err != nil && os.IsNotExist(err) {
-		if err = os.Mkdir(stembuildOptions.OutputDir, 0700); err != nil {
-			add(err)
-		}
-	} else if err != nil || fi == nil {
-		add(fmt.Errorf("error opening output directory (%s): %s\n", stembuildOptions.OutputDir, err))
-	} else if !fi.IsDir() {
-		add(fmt.Errorf("output argument (%s): is not a directory\n", stembuildOptions.OutputDir))
-	}
-}
-
-func ParseFlags() error {
-	flag.Parse()
-
-	if EnableDebug {
-		if DebugColor {
-			Debugf = log.New(os.Stderr, "\033[32m"+"debug: "+"\033[0m", 0).Printf
-		} else {
-			Debugf = log.New(os.Stderr, "debug: ", 0).Printf
-		}
-		Debugf("enabled")
+	name := filepath.Join(p.outputDir, stemcell.StemcellFilename(p.version, p.os))
+	gf.getDebug()("validating that stemcell filename (%s) does not exist", name)
+	if _, err := os.Stat(name); !os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "error with output file (%s): %v (file may already exist)", name, err)
+		return subcommands.ExitFailure
 	}
 
-	stembuildOptions.OSVersion = strings.ToUpper(stembuildOptions.OSVersion)
-
-	return nil
-}
-
-func realMain(c *stemcell.Config, vmdk string) error {
-	start := time.Now()
-
-	stemcellPath, err := c.ConvertVMDK(vmdk, stembuildOptions.OutputDir)
-	if err != nil {
-		return err
-	}
-
-	Debugf("created stemcell (%s) in: %s", stemcellPath, time.Since(start))
-	fmt.Println("created stemcell:", stemcellPath)
-
-	return nil
-}
-
-func main() {
-	Init()
-
-	Debugf("parsing flags")
-	if err := ParseFlags(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		Usage()
-	}
-
+	fmt.Print("Finding 'ovftool'...")
 	searchPaths, err := ovftool.SearchPaths()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not get search paths for Ovftool: %s", err)
-		Usage()
+		return subcommands.ExitFailure
 	}
 	path, err := ovftool.Ovftool(searchPaths)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "could not locate 'ovftool' on PATH: %s", err)
-		Usage()
+		return subcommands.ExitFailure
 	}
-	Debugf("using 'ovftool' found at: %s", path)
-
-	if errs := ValidateFlags(); errs != nil {
-		fmt.Fprintln(os.Stderr, "Error: invalid arguments")
-
-		for _, e := range errs {
-			fmt.Fprintf(os.Stderr, "  %s\n", e)
-		}
-
-		fmt.Fprintf(os.Stderr, "\nfor usage: %s -h \n", filepath.Base(os.Args[0]))
-		os.Exit(1)
-	}
+	fmt.Printf("...'ovftool' found at: %s\n", path)
 
 	c := stemcell.Config{
 		Stop:         make(chan struct{}),
-		Debugf:       Debugf,
-		BuildOptions: stembuildOptions,
+		Debugf:       gf.getDebug(),
+		BuildOptions: StembuildOptions{},
 	}
 
-	// cleanup if interrupted
-	go func() {
-		ch := make(chan os.Signal, 64)
-		signal.Notify(ch, os.Interrupt)
-		stopping := false
-		for sig := range ch {
-			Debugf("received signal: %s", sig)
-			if stopping {
-				fmt.Fprintf(os.Stderr, "received second (%s) signal - exiting now\n", sig)
-				c.Cleanup() // remove temp dir
-				os.Exit(1)
-			}
-			stopping = true
-			fmt.Fprintf(os.Stderr, "received (%s) signal cleaning up\n", sig)
-			c.StopConfig()
-		}
-	}()
+	c.BuildOptions.VMDKFile = p.vmdk
+	c.BuildOptions.OSVersion = strings.ToUpper(p.os)
+	c.BuildOptions.Version = p.version
+	c.BuildOptions.OutputDir = p.outputDir
 
-	if err := realMain(&c, stembuildOptions.VMDKFile); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-		c.Cleanup() // remove temp dir
-		os.Exit(1)
+	if err := c.Package(); err != nil {
+		return subcommands.ExitFailure
 	}
-	c.Cleanup() // remove temp dir
+
+	return subcommands.ExitSuccess
+}
+
+func main() {
+
+	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	fs.BoolVar(&gf.debug, "debug", false, "Print lots of debugging informatio")
+	fs.BoolVar(&gf.color, "color", false, "Colorize debug output")
+
+	commander := subcommands.NewCommander(fs, path.Base(os.Args[0]))
+
+	commander.Register(commander.HelpCommand(), "")
+	commander.Register(commander.FlagsCommand(), "")
+	commander.Register(commander.CommandsCommand(), "")
+
+	commander.Register(&packageCmd{}, "")
+
+	fs.Parse(os.Args[1:])
+	ctx := context.Background()
+	os.Exit(int(commander.Execute(ctx)))
 }

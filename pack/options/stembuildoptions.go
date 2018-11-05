@@ -1,4 +1,4 @@
-package stembuildoptions
+package options
 
 type StembuildOptions struct {
 	OSVersion string `yaml:"os_version"`

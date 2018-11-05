@@ -1,4 +1,4 @@
-package stembuild
+package pack
 
 import (
 	"fmt"

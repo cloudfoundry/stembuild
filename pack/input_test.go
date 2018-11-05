@@ -1,9 +1,9 @@
-package stembuild_test
+package pack_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf-experimental/stembuild"
+	"github.com/pivotal-cf-experimental/stembuild/pack"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -14,7 +14,7 @@ var _ = Describe("inputs", func() {
 		Context("no vmdk specified", func() {
 			vmdk := ""
 			It("should be invalid", func() {
-				valid, err := stembuild.IsValidVMDK(vmdk)
+				valid, err := pack.IsValidVMDK(vmdk)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(valid).To(BeFalse())
 			})
@@ -26,14 +26,14 @@ var _ = Describe("inputs", func() {
 				Expect(err).ToNot(HaveOccurred())
 				defer os.Remove(vmdk.Name())
 
-				valid, err := stembuild.IsValidVMDK(vmdk.Name())
+				valid, err := pack.IsValidVMDK(vmdk.Name())
 				Expect(err).To(BeNil())
 				Expect(valid).To(BeTrue())
 			})
 		})
 		Context("invalid vmdk file specified", func() {
 			It("should be invalid", func() {
-				valid, err := stembuild.IsValidVMDK("/dev/null")
+				valid, err := pack.IsValidVMDK("/dev/null")
 				Expect(err).To(BeNil())
 				Expect(valid).To(BeFalse())
 			})
@@ -42,19 +42,19 @@ var _ = Describe("inputs", func() {
 	Describe("os", func() {
 		Context("no os specified", func() {
 			It("should be invalid", func() {
-				valid := stembuild.IsValidOS("")
+				valid := pack.IsValidOS("")
 				Expect(valid).To(BeFalse())
 			})
 		})
 		Context("a supported os is specified", func() {
 			It("should be valid", func() {
-				valid := stembuild.IsValidOS("1709")
+				valid := pack.IsValidOS("1709")
 				Expect(valid).To(BeTrue())
 			})
 		})
 		Context("something other than a supported os is specified", func() {
 			It("should be invalid", func() {
-				valid := stembuild.IsValidOS("bad-thing")
+				valid := pack.IsValidOS("bad-thing")
 				Expect(valid).To(BeFalse())
 			})
 		})
@@ -63,7 +63,7 @@ var _ = Describe("inputs", func() {
 	Describe("version", func() {
 		Context("no version specified", func() {
 			It("should be invalid", func() {
-				valid := stembuild.IsValidVersion("")
+				valid := pack.IsValidVersion("")
 				Expect(valid).To(BeFalse())
 			})
 		})
@@ -71,14 +71,14 @@ var _ = Describe("inputs", func() {
 			It("should be valid", func() {
 				valids := []string{"4.4", "4.4-build.1", "4.4.4", "4.4.4-build.4"}
 				for _, version := range valids {
-					valid := stembuild.IsValidVersion(version)
+					valid := pack.IsValidVersion(version)
 					Expect(valid).To(BeTrue())
 				}
 			})
 		})
 		Context("version specified is invalid pattern", func() {
 			It("should be invalid", func() {
-				valid := stembuild.IsValidVersion("4.4.4.4")
+				valid := pack.IsValidVersion("4.4.4.4")
 				Expect(valid).To(BeFalse())
 			})
 		})
@@ -87,7 +87,7 @@ var _ = Describe("inputs", func() {
 
 		Context("no dir given", func() {
 			It("should be an error", func() {
-				err := stembuild.ValidateOrCreateOutputDir("")
+				err := pack.ValidateOrCreateOutputDir("")
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -96,7 +96,7 @@ var _ = Describe("inputs", func() {
 			It("should create the directory and not fail", func() {
 				err := os.RemoveAll(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
-				err = stembuild.ValidateOrCreateOutputDir(filepath.Join(".", "tmp"))
+				err = pack.ValidateOrCreateOutputDir(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
 				_, err = os.Stat(filepath.Join(filepath.Join(".", "tmp")))
 				Expect(err).ToNot(HaveOccurred())
@@ -111,7 +111,7 @@ var _ = Describe("inputs", func() {
 			It("should not fail", func() {
 				err := os.Mkdir(filepath.Join(".", "tmp"), 0700)
 				Expect(err).ToNot(HaveOccurred())
-				err = stembuild.ValidateOrCreateOutputDir(filepath.Join(".", "tmp"))
+				err = pack.ValidateOrCreateOutputDir(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
 			})
 			AfterEach(func() {
@@ -124,7 +124,7 @@ var _ = Describe("inputs", func() {
 			It("should not fail", func() {
 				cwd, err := os.Getwd()
 				Expect(err).ToNot(HaveOccurred())
-				err = stembuild.ValidateOrCreateOutputDir(cwd)
+				err = pack.ValidateOrCreateOutputDir(cwd)
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -133,7 +133,7 @@ var _ = Describe("inputs", func() {
 			It("should be an error", func() {
 				err := os.RemoveAll(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
-				err = stembuild.ValidateOrCreateOutputDir(filepath.Join(".", "tmp", "subtmp"))
+				err = pack.ValidateOrCreateOutputDir(filepath.Join(".", "tmp", "subtmp"))
 				Expect(err).To(HaveOccurred())
 			})
 		})
