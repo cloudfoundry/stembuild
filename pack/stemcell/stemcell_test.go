@@ -3,14 +3,14 @@ package stemcell_test
 import (
 	"crypto/sha1"
 	"fmt"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 
 	"github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"github.com/pivotal-cf-experimental/stembuild/pack/stemcell"
@@ -119,8 +119,12 @@ stemcell_formats:
 	Describe("catchInterruptSignal", func() {
 
 		It("cleans up on one interrupt", func() {
+			if runtime.GOOS == "windows" {
+				Skip("Skipping, test not supported on Windows.")
+			}
+
 			inputVmdk := filepath.Join("..", "..", "test", "data", "expected.vmdk")
-			session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--os", "2012R2", "--version", "1200.0")
+			session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--os", "2012R2", "--version", "1200.0", "--outputDir", tmpDir)
 			time.Sleep(1 * time.Second)
 
 			err := session.Command.Process.Signal(os.Interrupt)

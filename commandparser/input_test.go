@@ -33,8 +33,8 @@ var _ = Describe("inputs", func() {
 		})
 		Context("invalid vmdk file specified", func() {
 			It("should be invalid", func() {
-				valid, err := IsValidVMDK("/dev/null")
-				Expect(err).To(BeNil())
+				valid, err := IsValidVMDK(filepath.Join("..", "out", "invalid"))
+				Expect(err).To(HaveOccurred())
 				Expect(valid).To(BeFalse())
 			})
 		})
