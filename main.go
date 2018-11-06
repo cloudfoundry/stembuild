@@ -13,7 +13,7 @@ func main() {
 	var gf GlobalFlags
 
 	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	fs.BoolVar(&gf.Debug, "debug", false, "Print lots of debugging informatio")
+	fs.BoolVar(&gf.Debug, "debug", false, "Print lots of debugging information")
 	fs.BoolVar(&gf.Color, "color", false, "Colorize debug output")
 
 	commander := subcommands.NewCommander(fs, path.Base(os.Args[0]))

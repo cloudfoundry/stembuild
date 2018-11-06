@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/google/subcommands"
+	"github.com/pivotal-cf-experimental/stembuild/colorlogger"
 	. "github.com/pivotal-cf-experimental/stembuild/pack/options"
 	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
 	"github.com/pivotal-cf-experimental/stembuild/pack/stemcell"
@@ -54,6 +55,11 @@ func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.outputDir, "o", "", "Output directory (shorthand)")
 }
 func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+	logLevel := colorlogger.NONE
+	if p.GlobalFlags.Debug {
+		logLevel = colorlogger.DEBUG
+	}
+	logger := colorlogger.ConstructLogger(logLevel, p.GlobalFlags.Color, os.Stderr)
 
 	if validVMDK, err := IsValidVMDK(p.vmdk); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -85,7 +91,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	}
 
 	name := filepath.Join(p.outputDir, stemcell.StemcellFilename(p.version, p.os))
-	p.GlobalFlags.GetDebugf()("validating that stemcell filename (%s) does not exist", name)
+	logger.Debugf("validating that stemcell filename (%s) does not exist", name)
 	if _, err := os.Stat(name); !os.IsNotExist(err) {
 		fmt.Fprintf(os.Stderr, "error with output file (%s): %v (file may already exist)", name, err)
 		return subcommands.ExitFailure
@@ -106,7 +112,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 
 	c := stemcell.Config{
 		Stop:         make(chan struct{}),
-		Debugf:       p.GlobalFlags.GetDebugf(),
+		Debugf:       logger.Debugf,
 		BuildOptions: StembuildOptions{},
 	}
 
