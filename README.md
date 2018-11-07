@@ -23,7 +23,41 @@ See the [wiki](https://github.com/pivotal-cf-experimental/stembuild/wiki/build-s
 
 Older tests were written using the default testing framework.  However, more recent code
 has been test-driven with Ginkgo.  We recommend that any new code be test-driven using Ginkgo.
+Below are steps to run the tests:
+
+Make puts some files in `out` dir. To clean state of this dir:
+```
+make clean
+```
+To run only unit tests:
+```
+make units
+```
+To run integration tests:
+```
+make integration
+```
+
 
 ## Vendoring
 
-Vendoring for this project is done using `dep`.
+Vendoring for this project is done using `dep`. 
+To sync all the dependecies run
+```
+dep ensure
+```
+
+To add a new dependency run 
+```
+dep ensure -add <git package url>
+```
+like 
+```
+dep ensure -add github.com/google/subcommands
+```
+
+To check if dependencies are in sync or not run
+```
+dep sync
+```
+The output should be nothing if there no out-of-sync dependencies.
