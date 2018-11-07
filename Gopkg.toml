@@ -44,3 +44,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/google/subcommands"
+
+[[override]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.1"
