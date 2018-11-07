@@ -22,7 +22,7 @@ test : units
 
 units : format build
 	@ginkgo version
-	ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration
+	PATH="$(PWD)/out:$(PATH)" ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration
 	@echo "\nSWEET SUITE SUCCESS"
 
 .PHONY : all build clean format
