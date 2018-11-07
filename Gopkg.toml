@@ -37,10 +37,10 @@
   branch = "master"
   name = "golang.org/x/sys"
 
-[[constraint]]
-  branch = "v2"
-  name = "gopkg.in/yaml.v2"
-
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/google/subcommands"
