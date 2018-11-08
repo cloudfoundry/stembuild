@@ -3,10 +3,8 @@ package ovftool_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
-	"runtime"
-
 	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
+	"os"
 	"path/filepath"
 )
 
@@ -14,9 +12,6 @@ var _ = Describe("ovftool", func() {
 
 	Context("findExecutable", func() {
 		var stemExe = "stembuild"
-		if runtime.GOOS == "windows" {
-			stemExe += ".exe"
-		}
 
 		It("given root that has executable and valid executable name, should return location of the executable", func() {
 			pwd, err := os.Getwd()
