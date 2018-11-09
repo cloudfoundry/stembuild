@@ -110,6 +110,14 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	}
 	fmt.Printf("...'ovftool' found at: %s\n", ovfPath)
 
+	if p.os == "2016" {
+		fmt.Fprintf(os.Stdout, "Warning: '2016' OS version is deprecated. Use '1709' instead.")
+	}
+
+	if p.os == "1709" {
+		fmt.Fprintf(os.Stdout, "Warning: Though 1709 is entered as OS in command line, the final stemcell is still worded a 2016 OS. However, the OS is still 1709.")
+		p.os = "2016"
+	}
 	c := stemcell.Config{
 		Stop:         make(chan struct{}),
 		Debugf:       logger.Debugf,

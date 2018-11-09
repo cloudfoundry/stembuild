@@ -125,6 +125,42 @@ var _ = Describe("Convert VMDK", func() {
 				_, err = ioutil.ReadFile(actualVmdkFilepath)
 				Expect(err).NotTo(HaveOccurred())
 			})
+
+
+			It("creates a valid 1709 stemcell, with 2016 in its name and manifest", func() {
+				osVersion = "1709"
+				version = "1709.0"
+				expectedOSVersionInNameANdManifest := "2016"
+
+				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, expectedOSVersionInNameANdManifest)
+				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
+
+				session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--version", version, "--os", osVersion)
+				Eventually(session, 20).Should(Exit(0))
+				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
+				Expect(stemcellFilename).To(BeAnExistingFile())
+
+				stemcellDir, err := helpers.ExtractGzipArchive(stemcellFilename)
+				Expect(err).NotTo(HaveOccurred())
+
+				manifestFilepath := filepath.Join(stemcellDir, "stemcell.MF")
+				manifest, err := helpers.ReadFile(manifestFilepath)
+				Expect(err).NotTo(HaveOccurred())
+
+				expectedOs := fmt.Sprintf("operating_system: windows%s", expectedOSVersionInNameANdManifest)
+				Expect(manifest).To(ContainSubstring(expectedOs))
+
+				expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", expectedOSVersionInNameANdManifest)
+				Expect(manifest).To(ContainSubstring(expectedName))
+
+				imageFilepath := filepath.Join(stemcellDir, "image")
+				imageDir, err := helpers.ExtractGzipArchive(imageFilepath)
+				Expect(err).NotTo(HaveOccurred())
+
+				actualVmdkFilepath := filepath.Join(imageDir, "image-disk1.vmdk")
+				_, err = ioutil.ReadFile(actualVmdkFilepath)
+				Expect(err).NotTo(HaveOccurred())
+			})
 		})
 	})
 })
