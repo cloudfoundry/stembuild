@@ -48,7 +48,7 @@ Flags:
 
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.vmdk, "vmdk", "", "VMDK file to create stemcell from")
-	f.StringVar(&p.os, "os", "", "OS version must be either 2012R2, 2016 or 1803")
+	f.StringVar(&p.os, "os", "", "OS version must be either 2012R2, 2016, 1709 or 1803")
 	f.StringVar(&p.version, "version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
 	f.StringVar(&p.version, "v", "", "Stemcell version (shorthand)")
 	f.StringVar(&p.outputDir, "outputDir", "", "Output directory, default is the current working directory.")
@@ -69,7 +69,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 	if !IsValidOS(p.os) {
-		fmt.Fprintf(os.Stderr, "OS version must be either 2012R2, 1709, or 1803 have: %s\n", p.os)
+		fmt.Fprintf(os.Stderr, "OS version must be either 2012R2, 2016, 1709, or 1803 have: %s\n", p.os)
 		return subcommands.ExitFailure
 	}
 	if !IsValidVersion(p.version) {

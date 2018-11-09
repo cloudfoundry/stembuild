@@ -126,7 +126,6 @@ var _ = Describe("Convert VMDK", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-
 			It("creates a valid 1709 stemcell, with 2016 in its name and manifest", func() {
 				osVersion = "1709"
 				version = "1709.0"
