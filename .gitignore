@@ -6,3 +6,4 @@ gordiff.exe
 temp
 rdiff/*.c
 rdiff/*.h
+test/data/expected.vmdk.lck/*
