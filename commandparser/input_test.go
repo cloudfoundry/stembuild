@@ -51,6 +51,10 @@ var _ = Describe("inputs", func() {
 				valid := IsValidOS("1709")
 				Expect(valid).To(BeTrue())
 			})
+			It("should be valid", func() {
+				valid := IsValidOS("2016")
+				Expect(valid).To(BeTrue())
+			})
 		})
 		Context("something other than a supported os is specified", func() {
 			It("should be invalid", func() {

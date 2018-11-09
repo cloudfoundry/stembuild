@@ -24,7 +24,7 @@ func IsValidVMDK(vmdk string) (bool, error) {
 
 func IsValidOS(os string) bool {
 	switch os {
-	case "2012R2", "1709", "1803":
+	case "2012R2", "1709", "1803", "2016":
 		return true
 	default:
 		return false
