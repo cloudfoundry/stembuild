@@ -48,7 +48,7 @@ Flags:
 
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.vmdk, "vmdk", "", "VMDK file to create stemcell from")
-	f.StringVar(&p.os, "os", "", "OS version must be either 2012R2, 2016, 1709 or 1803")
+	f.StringVar(&p.os, "os", "", "OS version must be either 2012R2, 2016, or 1803")
 	f.StringVar(&p.version, "version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
 	f.StringVar(&p.version, "v", "", "Stemcell version (shorthand)")
 	f.StringVar(&p.outputDir, "outputDir", "", "Output directory, default is the current working directory.")
@@ -69,7 +69,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 	if !IsValidOS(p.os) {
-		fmt.Fprintf(os.Stderr, "OS version must be either 2012R2, 2016, 1709, or 1803 have: %s\n", p.os)
+		fmt.Fprintf(os.Stderr, "OS version must be either 2012R2, 2016, or 1803 have: %s\n", p.os)
 		return subcommands.ExitFailure
 	}
 	if !IsValidVersion(p.version) {
@@ -110,14 +110,6 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	}
 	fmt.Printf("...'ovftool' found at: %s\n", ovfPath)
 
-	if p.os == "2016" {
-		fmt.Fprintf(os.Stdout, "Warning: '2016' OS version is deprecated. Use '1709' instead.")
-	}
-
-	if p.os == "1709" {
-		fmt.Fprintf(os.Stdout, "Warning: Though 1709 is entered as OS in command line, the final stemcell is still worded a 2016 OS. However, the OS is still 1709.")
-		p.os = "2016"
-	}
 	c := stemcell.Config{
 		Stop:         make(chan struct{}),
 		Debugf:       logger.Debugf,

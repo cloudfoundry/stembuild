@@ -47,18 +47,26 @@ var _ = Describe("inputs", func() {
 			})
 		})
 		Context("a supported os is specified", func() {
-			It("should be valid", func() {
-				valid := IsValidOS("1709")
+			It("2016 should be valid", func() {
+				valid := IsValidOS("2016")
 				Expect(valid).To(BeTrue())
 			})
-			It("should be valid", func() {
-				valid := IsValidOS("2016")
+			It("2012R2 should be valid", func() {
+				valid := IsValidOS("2012R2")
+				Expect(valid).To(BeTrue())
+			})
+			It("1803 should be valid", func() {
+				valid := IsValidOS("1803")
 				Expect(valid).To(BeTrue())
 			})
 		})
 		Context("something other than a supported os is specified", func() {
 			It("should be invalid", func() {
 				valid := IsValidOS("bad-thing")
+				Expect(valid).To(BeFalse())
+			})
+			It("1709 should be invalid", func() {
+				valid := IsValidOS("1709")
 				Expect(valid).To(BeFalse())
 			})
 		})
