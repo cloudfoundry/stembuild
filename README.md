@@ -1,6 +1,6 @@
 # Stembuild
 
-The stembuild binary is used to build BOSH stemcells for **Windows 2012R2** and **2016 v1709** on **vSphere**. See [here](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-builder/wiki/Creating-a-vSphere-Stemcell-by-Hand) for instructions to build Windows stemcells for vSphere.
+The stembuild binary is used to build BOSH stemcells for **Windows 2012R2**,**Windows Server, version v1709** and **Windows Server, version 1803** on **vSphere**. See [here](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-builder/wiki/Creating-a-vSphere-Stemcell-by-Hand) for instructions to build Windows stemcells for vSphere.
 
 It can convert a prepared .vmdk into a stemcell with the appropriate metadata.
 
