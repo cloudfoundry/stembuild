@@ -47,7 +47,7 @@ func ValidateOrCreateOutputDir(outputDir string) error {
 	return nil
 }
 
-func IsValidVersion(version string) bool {
+func IsValidStemcellVersion(version string) bool {
 
 	if version == "" {
 		return false

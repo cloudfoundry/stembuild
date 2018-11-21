@@ -124,7 +124,7 @@ stemcell_formats:
 			}
 
 			inputVmdk := filepath.Join("..", "..", "test", "data", "expected.vmdk")
-			session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--os", "2012R2", "--version", "1200.0", "--outputDir", tmpDir)
+			session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--os", "2012R2", "--stemcell-version", "1200.0", "--outputDir", tmpDir)
 			time.Sleep(1 * time.Second)
 
 			err := session.Command.Process.Signal(os.Interrupt)

@@ -72,25 +72,25 @@ var _ = Describe("inputs", func() {
 		})
 
 	})
-	Describe("version", func() {
-		Context("no version specified", func() {
+	Describe("stemcell version", func() {
+		Context("no stemcell version specified", func() {
 			It("should be invalid", func() {
-				valid := IsValidVersion("")
+				valid := IsValidStemcellVersion("")
 				Expect(valid).To(BeFalse())
 			})
 		})
-		Context("version specified is valid pattern", func() {
+		Context("stemcell version specified is valid pattern", func() {
 			It("should be valid", func() {
 				valids := []string{"4.4", "4.4-build.1", "4.4.4", "4.4.4-build.4"}
 				for _, version := range valids {
-					valid := IsValidVersion(version)
+					valid := IsValidStemcellVersion(version)
 					Expect(valid).To(BeTrue())
 				}
 			})
 		})
-		Context("version specified is invalid pattern", func() {
+		Context("stemcell version specified is invalid pattern", func() {
 			It("should be invalid", func() {
-				valid := IsValidVersion("4.4.4.4")
+				valid := IsValidStemcellVersion("4.4.4.4")
 				Expect(valid).To(BeFalse())
 			})
 		})
