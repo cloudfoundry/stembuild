@@ -75,6 +75,10 @@ func (h *stembuildHelp) Explain(w io.Writer) {
 
 	_, _ = fmt.Fprint(w, "\nGlobal Options:\n")
 	h.topLevelFlags.VisitAll(func(f *flag.Flag) {
-		_, _ = fmt.Fprintf(w, "  -%s\t%s\n", f.Name, f.Usage)
+		if len(f.Name) > 1 {
+			_, _ = fmt.Fprintf(w, "  -%s\t%s\n", f.Name, f.Usage)
+		} else {
+			_, _ = fmt.Fprintf(w, "  -%s\t\t%s\n", f.Name, f.Usage)
+		}
 	})
 }

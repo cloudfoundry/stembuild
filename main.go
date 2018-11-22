@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	. "github.com/google/subcommands"
 	. "github.com/pivotal-cf-experimental/stembuild/commandparser"
+	"github.com/pivotal-cf-experimental/stembuild/version"
 	"os"
 	"path"
 )
@@ -21,6 +23,8 @@ func main() {
 	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	fs.BoolVar(&gf.Debug, "debug", false, "Print lots of debugging information")
 	fs.BoolVar(&gf.Color, "color", false, "Colorize debug output")
+	fs.BoolVar(&gf.ShowVersion, "version", false, "Show Stembuild version")
+	fs.BoolVar(&gf.ShowVersion, "v", false, "Stembuild version (shorthand)")
 
 	commander := NewCommander(fs, path.Base(os.Args[0]))
 
@@ -35,6 +39,11 @@ func main() {
 	fs.Usage = func() { sh.Explain(commander.Error) }
 
 	_ = fs.Parse(os.Args[1:])
+	if gf.ShowVersion {
+		_, _ = fmt.Fprintf(os.Stdout, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version)
+		os.Exit(0)
+	}
+
 	ctx := context.Background()
 	os.Exit(int(commander.Execute(ctx)))
 }
