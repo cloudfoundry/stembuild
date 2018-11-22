@@ -7,6 +7,7 @@ all : test build
 build : out/stembuild
 
 clean :
+	rm -r version/version.go
 	rm -r $(wildcard out/*)
 
 format :
@@ -16,6 +17,7 @@ integration : build
 	PATH="$(PWD)/out:$(PATH)" ginkgo -r -v -randomizeAllSpecs integration
 
 out/stembuild : $(GOSRC)
+	go generate
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
 
 test : units

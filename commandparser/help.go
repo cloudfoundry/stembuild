@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	. "github.com/google/subcommands"
+	"github.com/pivotal-cf-experimental/stembuild/version"
+	"io"
 	"os"
 	"path"
 )
@@ -49,7 +51,7 @@ func (h *stembuildHelp) Usage() string {
 func (h *stembuildHelp) Execute(c context.Context, f *flag.FlagSet, args ...interface{}) ExitStatus {
 	switch f.NArg() {
 	case 0:
-		h.Explain()
+		h.Explain(h.commander.Output)
 		return ExitSuccess
 
 	default:
@@ -57,10 +59,9 @@ func (h *stembuildHelp) Execute(c context.Context, f *flag.FlagSet, args ...inte
 	}
 }
 
-func (h *stembuildHelp) Explain() {
-	var w = h.commander.Error
+func (h *stembuildHelp) Explain(w io.Writer) {
 
-	_, _ = fmt.Fprintf(w, "%s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]))
+	_, _ = fmt.Fprintf(w, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version)
 	_, _ = fmt.Fprintf(w, "Usage: %s <global options> <command> <command args>\n\n", path.Base(os.Args[0]))
 
 	_, _ = fmt.Fprint(w, "Commands:\n")

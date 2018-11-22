@@ -9,6 +9,8 @@ import (
 	"path"
 )
 
+//go:generate go run gen.go
+
 func main() {
 	var gf GlobalFlags
 	packageCmd := PackageCmd{}
@@ -30,7 +32,7 @@ func main() {
 	commands = append(commands, &packageCmd)
 
 	// Override the default usage text of Google's Subcommand with our own
-	fs.Usage = func() { sh.Explain() }
+	fs.Usage = func() { sh.Explain(commander.Error) }
 
 	_ = fs.Parse(os.Args[1:])
 	ctx := context.Background()
