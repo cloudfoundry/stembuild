@@ -2,9 +2,9 @@ package options_test
 
 import (
 	"fmt"
+	. "github.com/cloudfoundry-incubator/stembuild/pack/options"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/cloudfoundry-incubator/stembuild/pack/options"
 	"math/rand"
 )
 

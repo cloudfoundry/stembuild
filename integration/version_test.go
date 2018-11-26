@@ -2,12 +2,12 @@ package integration
 
 import (
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	"github.com/cloudfoundry-incubator/stembuild/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
-	"github.com/cloudfoundry-incubator/stembuild/version"
 )
 
 var _ = Describe("Version flag", func() {

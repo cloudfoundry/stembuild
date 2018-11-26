@@ -37,7 +37,7 @@ Requirements:
 	must be installed (both include the 'ovftool').
 
 Examples:
-	%[1]s -vmdk disk.vmdk -stemcellVersion 1.2 -os 1803
+	%[1]s package -vmdk disk.vmdk -stemcell-version 1.2 -os 1803
 
 	Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk', and set the stemcell version to 1.2.
 	The final stemcell will be found in the current working directory.

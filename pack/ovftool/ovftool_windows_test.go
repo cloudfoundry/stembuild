@@ -1,9 +1,9 @@
 package ovftool_test
 
 import (
+	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
 	"os"

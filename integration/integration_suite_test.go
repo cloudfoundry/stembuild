@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 
 	"testing"
 )

@@ -4,9 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	. "github.com/google/subcommands"
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/version"
+	. "github.com/google/subcommands"
 	"os"
 	"path"
 )
