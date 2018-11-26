@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
+	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 	"io/ioutil"
 	"os"
 	"path/filepath"

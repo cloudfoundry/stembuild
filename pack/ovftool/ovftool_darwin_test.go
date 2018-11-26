@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
+	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 )
 
 var _ = Describe("ovftool darwin", func() {

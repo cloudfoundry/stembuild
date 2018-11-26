@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
+	"github.com/cloudfoundry-incubator/stembuild/version"
 	"github.com/google/subcommands"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf-experimental/stembuild/commandparser"
-	"github.com/pivotal-cf-experimental/stembuild/version"
 	"os"
 	"path"
 )

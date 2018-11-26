@@ -6,7 +6,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
+	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 	"path/filepath"
 )
 

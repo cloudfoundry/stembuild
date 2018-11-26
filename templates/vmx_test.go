@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pivotal-cf-experimental/stembuild/templates"
+	"github.com/cloudfoundry-incubator/stembuild/templates"
 )
 
 func parseVMX(vmx string) (map[string]string, error) {

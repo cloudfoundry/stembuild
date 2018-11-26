@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 
-	"github.com/pivotal-cf-experimental/stembuild/test/helpers"
+	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 )
 
 var _ = Describe("Convert VMDK", func() {

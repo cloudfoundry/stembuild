@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-	"github.com/pivotal-cf-experimental/stembuild/test/helpers"
-	"github.com/pivotal-cf-experimental/stembuild/version"
+	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	"github.com/cloudfoundry-incubator/stembuild/version"
 )
 
 var _ = Describe("Version flag", func() {

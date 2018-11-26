@@ -1,9 +1,9 @@
 package commandparser_test
 
 import (
+	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf-experimental/stembuild/commandparser"
 	"io/ioutil"
 	"os"
 	"path/filepath"

@@ -12,9 +12,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/pivotal-cf-experimental/stembuild/pack/options"
-	"github.com/pivotal-cf-experimental/stembuild/pack/stemcell"
-	"github.com/pivotal-cf-experimental/stembuild/test/helpers"
+	"github.com/cloudfoundry-incubator/stembuild/pack/options"
+	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
+	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 )
 
 var _ = Describe("Stemcell", func() {

@@ -15,9 +15,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/pivotal-cf-experimental/stembuild/pack/options"
-	"github.com/pivotal-cf-experimental/stembuild/pack/ovftool"
-	"github.com/pivotal-cf-experimental/stembuild/templates"
+	"github.com/cloudfoundry-incubator/stembuild/pack/options"
+	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
+	"github.com/cloudfoundry-incubator/stembuild/templates"
 )
 
 type Config struct {

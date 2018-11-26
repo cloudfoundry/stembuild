@@ -4,7 +4,7 @@ The stembuild binary is used to build BOSH stemcells for **Windows 2012R2**,**Wi
 
 It can convert a prepared .vmdk into a stemcell with the appropriate metadata.
 
-Download the latest stembuild from the [Releases page](https://github.com/pivotal-cf-experimental/stembuild/releases).
+Download the latest stembuild from the [Releases page](https://github.com/cloudfoundry-incubator/stembuild/releases).
 
 ## Dependencies
 The VMware 'ovftool' binary must be on your path or Fusion/Workstation must be installed (both include the 'ovftool').
@@ -17,7 +17,7 @@ Process can take between 10 and 20 minutes. See Progress with `-debug` flag.
 
 ## Compilation
 
-See the [wiki](https://github.com/pivotal-cf-experimental/stembuild/wiki/build-stembuild)
+See the [wiki](https://github.com/cloudfoundry-incubator/stembuild/wiki/build-stembuild)
 
 ## Testing
 

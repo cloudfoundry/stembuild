@@ -4,7 +4,7 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf-experimental/stembuild/pack/options"
+	. "github.com/cloudfoundry-incubator/stembuild/pack/options"
 	"math/rand"
 )
 

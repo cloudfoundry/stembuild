@@ -5,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	. "github.com/google/subcommands"
-	. "github.com/pivotal-cf-experimental/stembuild/commandparser"
-	"github.com/pivotal-cf-experimental/stembuild/version"
+	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
+	"github.com/cloudfoundry-incubator/stembuild/version"
 	"os"
 	"path"
 )

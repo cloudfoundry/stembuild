@@ -2,9 +2,9 @@ package colorlogger_test
 
 import (
 	"bytes"
+	. "github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/pivotal-cf-experimental/stembuild/colorlogger"
 )
 
 var _ = Describe("Stdout", func() {
