@@ -2,14 +2,19 @@ package helpers
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
 	"errors"
 	"fmt"
+	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {
@@ -161,4 +166,35 @@ func ExtractGzipArchive(name string) (string, error) {
 func ReadFile(name string) (string, error) {
 	b, err := ioutil.ReadFile(name)
 	return string(b), err
+}
+
+func BuildStembuild() (string, error) {
+	stembuildExecutable, err := ioutil.TempFile(os.TempDir(), "stembuild")
+	if err != nil {
+		return "", err
+	}
+
+	stdout := bytes.NewBuffer([]byte{})
+	stderr := bytes.NewBuffer([]byte{})
+
+	buildCommand := fmt.Sprintf("go build -o %s %s", stembuildExecutable.Name(), "github.com/cloudfoundry-incubator/stembuild")
+	buildCommandSlice := strings.Split(buildCommand, " ")
+
+	cmd := exec.Command(buildCommandSlice[0], buildCommandSlice[1:]...)
+	session, err := gexec.Start(cmd, stdout, stderr)
+	if err != nil {
+		return "", err
+	}
+	gomega.EventuallyWithOffset(1, session, 30*time.Second).Should(
+		gexec.Exit(0),
+		fmt.Sprintf(
+			"Build command %s exited with exit code: %d, stdout: %s, stderr: %s",
+			buildCommand,
+			session.ExitCode(),
+			string(stdout.Bytes()),
+			string(stderr.Bytes()),
+		),
+	)
+
+	return stembuildExecutable.Name(), err
 }

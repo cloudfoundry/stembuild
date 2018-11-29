@@ -10,23 +10,22 @@ import (
 )
 
 const (
-	Cmd                = "stembuild"
 	DebugCommandPrefix = "\nCMD>"
 	DebugOutPrefix     = "OUT: "
 	DebugErrPrefix     = "ERR: "
 )
 
-func Stembuild(args ...string) *Session {
-	WriteCommand(args)
+func Stembuild(command string, args ...string) *Session {
+	WriteCommand(command, args)
 	session, err := Start(
-		exec.Command(Cmd, args...),
+		exec.Command(command, args...),
 		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
 		NewPrefixedWriter(DebugErrPrefix, GinkgoWriter))
 	Expect(err).NotTo(HaveOccurred())
 	return session
 }
 
-func WriteCommand(args []string) {
-	display := append([]string{DebugCommandPrefix, Cmd}, args...)
+func WriteCommand(command string, args []string) {
+	display := append([]string{DebugCommandPrefix, command}, args...)
 	GinkgoWriter.Write([]byte(strings.Join(append(display, "\n"), " ")))
 }

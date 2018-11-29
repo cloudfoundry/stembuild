@@ -3,18 +3,16 @@ package stemcell_test
 import (
 	"crypto/sha1"
 	"fmt"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
-	"time"
 
 	"github.com/cloudfoundry-incubator/stembuild/pack/options"
 	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Stemcell", func() {
@@ -114,28 +112,5 @@ stemcell_formats:
 			result := stemcell.CreateManifest("1", "version", "sha1sum")
 			Expect(result).To(Equal(expectedManifest))
 		})
-	})
-
-	Describe("catchInterruptSignal", func() {
-
-		It("cleans up on one interrupt", func() {
-			if runtime.GOOS == "windows" {
-				Skip("Skipping, test not supported on Windows.")
-			}
-
-			inputVmdk := filepath.Join("..", "..", "test", "data", "expected.vmdk")
-			session := helpers.Stembuild("package", "--vmdk", inputVmdk, "--os", "2012R2", "--stemcell-version", "1200.0", "--outputDir", tmpDir)
-			time.Sleep(1 * time.Second)
-
-			err := session.Command.Process.Signal(os.Interrupt)
-			Expect(err).ToNot(HaveOccurred())
-			time.Sleep(1 * time.Second)
-
-			stdErr := session.Err.Contents()
-			Expect(string(stdErr)).To(ContainSubstring("received ("))
-		})
-
-		// Tried to create test to handle 2 interrupts in a row, but timing of processes makes it difficult
-		// to test
 	})
 })

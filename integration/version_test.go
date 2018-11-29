@@ -1,4 +1,4 @@
-package integration
+package integration_test
 
 import (
 	"fmt"
@@ -12,17 +12,17 @@ import (
 
 var _ = Describe("Version flag", func() {
 	Context("when version provided", func() {
-		expectedVersion := fmt.Sprintf("stembuild version %s, Windows Stemcell Building Tool", version.Version)
+		expectedVersion := fmt.Sprintf(`stembuild\d+ version %s, Windows Stemcell Building Tool`, version.Version)
 
 		It("prints version information", func() {
-			session := helpers.Stembuild("--version")
+			session := helpers.Stembuild(stembuildExecutable, "--version")
 
 			Eventually(session, 20).Should(Exit(0))
 			Eventually(session).Should(Say(expectedVersion))
 		})
 
 		It("with command, prints version information and does not run command", func() {
-			session := helpers.Stembuild("--version", "package")
+			session := helpers.Stembuild(stembuildExecutable, "--version", "package")
 
 			Eventually(session, 20).Should(Exit(0))
 			Eventually(session).Should(Say(expectedVersion))
