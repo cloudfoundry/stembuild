@@ -19,6 +19,7 @@ function InstallCFFeatures
     {
         Install-CFFeatures
         Write-Log "Successfully installed CF features"
+        Restart-Computer
     }
     catch [Exception]
     {
