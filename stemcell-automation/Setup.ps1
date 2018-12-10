@@ -46,7 +46,7 @@ try {
     InstallOpenSSH
     InstallCFFeatures
 } catch [Exception] {
-    Write-Log "Failed to install Bosh dependendies. See 'c:\provisions\log.log' for more info."
+    Write-Log "Failed to install Bosh dependencies. See 'c:\provisions\log.log' for more info."
     DeleteScheduledTask
     Exit 1
 }
