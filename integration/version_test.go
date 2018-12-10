@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Version flag", func() {
 	Context("when version provided", func() {
-		expectedVersion := fmt.Sprintf(`stembuild\d+ version %s, Windows Stemcell Building Tool`, version.Version)
+		expectedVersion := fmt.Sprintf(`stembuild(\.exe)? version %s, Windows Stemcell Building Tool`, version.Version)
 
 		It("prints version information", func() {
 			session := helpers.Stembuild(stembuildExecutable, "--version")

@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -169,15 +170,25 @@ func ReadFile(name string) (string, error) {
 }
 
 func BuildStembuild() (string, error) {
-	stembuildExecutable, err := ioutil.TempFile(os.TempDir(), "stembuild")
+	var stembuildExe = "stembuild"
+	if runtime.GOOS == "windows" {
+		stembuildExe += ".exe"
+	}
+
+	tempDir, err := ioutil.TempDir("", "stembuild")
 	if err != nil {
 		return "", err
 	}
 
+	stembuildExecutable := fmt.Sprintf("%s%c%s", tempDir, os.PathSeparator, stembuildExe)
+
 	stdout := bytes.NewBuffer([]byte{})
 	stderr := bytes.NewBuffer([]byte{})
 
-	buildCommand := fmt.Sprintf("go build -o %s %s", stembuildExecutable.Name(), "github.com/cloudfoundry-incubator/stembuild")
+	buildPackage := "github.com/cloudfoundry-incubator/stembuild"
+	buildPackage = filepath.FromSlash(buildPackage)
+
+	buildCommand := fmt.Sprintf("go build -o %s %s", stembuildExecutable, buildPackage)
 	buildCommandSlice := strings.Split(buildCommand, " ")
 
 	cmd := exec.Command(buildCommandSlice[0], buildCommandSlice[1:]...)
@@ -196,5 +207,5 @@ func BuildStembuild() (string, error) {
 		),
 	)
 
-	return stembuildExecutable.Name(), err
+	return stembuildExecutable, err
 }
