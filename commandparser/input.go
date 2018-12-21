@@ -2,6 +2,7 @@ package commandparser
 
 import (
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 	"os"
 	"regexp"
 )
@@ -67,4 +68,12 @@ func IsValidStemcellVersion(version string) bool {
 	}
 
 	return false
+}
+
+func HasAtLeastFreeDiskSpace(minFreeSpace uint64, fs filesystem.FileSystem, path string) (bool, error) {
+	freeSpace, err := fs.GetAvailableDiskSpace(path)
+	if err != nil {
+		return false, err
+	}
+	return freeSpace >= minFreeSpace, nil
 }

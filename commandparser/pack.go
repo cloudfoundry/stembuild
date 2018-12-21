@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 	. "github.com/cloudfoundry-incubator/stembuild/pack/options"
 	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
@@ -21,6 +22,8 @@ type PackageCmd struct {
 	outputDir       string
 	GlobalFlags     *GlobalFlags
 }
+
+const gigabyte = 1024 * 1024 * 1024
 
 func (*PackageCmd) Name() string     { return "package" }
 func (*PackageCmd) Synopsis() string { return "Create a BOSH Stemcell from a VMDK file" }
@@ -44,6 +47,24 @@ Examples:
 
 Flags:
 `, filepath.Base(os.Args[0]))
+}
+
+func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool, error) {
+
+	fi, err := os.Stat(p.vmdk)
+	if err != nil {
+		return false, fmt.Errorf("could not get vmdk info: %s", err)
+	}
+	vmdkSize := fi.Size()
+
+	// make sure there is enough space for ova + stemcell and some leftover
+	//	ova and stemcell will be the size of the vmdk in the worst case scenario
+	minSpace := uint64(vmdkSize)*2 + (gigabyte / 2)
+	hasSpace, err := HasAtLeastFreeDiskSpace(minSpace, fs, p.vmdk)
+	if err != nil {
+		return false, fmt.Errorf("could not check free space on disk: %s", err)
+	}
+	return hasSpace, nil
 }
 
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
@@ -109,6 +130,17 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 	fmt.Printf("...'ovftool' found at: %s\n", ovfPath)
+
+	fs := filesystem.OSFileSystem{}
+	enoughSpace, err := p.validateFreeSpaceForPackage(&fs)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "problem checking disk space: %s", err)
+		return subcommands.ExitFailure
+	}
+	if !enoughSpace {
+		_, _ = fmt.Fprintf(os.Stderr, "Not enough space to create stemcell. Free up space and try again")
+		return subcommands.ExitFailure
+	}
 
 	c := stemcell.Config{
 		Stop:         make(chan struct{}),

@@ -1,10 +1,14 @@
 package commandparser_test
 
 import (
+	"errors"
 	"flag"
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
+	. "github.com/cloudfoundry-incubator/stembuild/filesystem/mock"
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"path/filepath"
 )
 
 var _ = Describe("pack", func() {
@@ -79,5 +83,71 @@ var _ = Describe("pack", func() {
 
 		})
 
+	})
+
+	Describe("validateFreeSpaceForPackage", func() {
+		var (
+			mockCtrl       *gomock.Controller
+			mockFileSystem *MockFileSystem
+		)
+		const gigFreeSpace = uint64(1024 * 1024 * 1024)
+		const lowFreeSpace = uint64(20)
+
+		BeforeEach(func() {
+			mockCtrl = gomock.NewController(GinkgoT())
+			mockFileSystem = NewMockFileSystem(mockCtrl)
+		})
+
+		Context("There is enough space on disk", func() {
+			It("returns true", func() {
+				mockFileSystem.EXPECT().GetAvailableDiskSpace(gomock.Any()).Return(gigFreeSpace, nil).AnyTimes()
+
+				pkgCmd := PackageCmd{}
+				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "expected.vmdk"))
+
+				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(validSpace).To(BeTrue())
+			})
+		})
+
+		Context("There is not enough space on disk", func() {
+			It("returns false", func() {
+				mockFileSystem.EXPECT().GetAvailableDiskSpace(gomock.Any()).Return(lowFreeSpace, nil).AnyTimes()
+
+				pkgCmd := PackageCmd{}
+				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "expected.vmdk"))
+
+				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(validSpace).To(BeFalse())
+			})
+		})
+
+		Context("Returns an error", func() {
+			It("when the vmdk doesn't exist", func() {
+				mockFileSystem.EXPECT().GetAvailableDiskSpace(gomock.Any()).Return(gigFreeSpace, nil).AnyTimes()
+
+				pkgCmd := PackageCmd{}
+				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "nonexistent.vmdk"))
+
+				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(HavePrefix("could not get vmdk info: "))
+				Expect(validSpace).To(BeFalse())
+			})
+
+			It("when it fails to check the available disk space", func() {
+				mockFileSystem.EXPECT().GetAvailableDiskSpace(gomock.Any()).Return(gigFreeSpace, errors.New("some check error")).AnyTimes()
+
+				pkgCmd := PackageCmd{}
+				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "expected.vmdk"))
+
+				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("could not check free space on disk: some check error"))
+				Expect(validSpace).To(BeFalse())
+			})
+		})
 	})
 })
