@@ -9,9 +9,63 @@ Download the latest stembuild from the [Releases page](https://github.com/cloudf
 ## Dependencies
 The VMware 'ovftool' binary must be on your path or Fusion/Workstation must be installed (both include the 'ovftool').
 
-## Create a stemcell from a vmdk
+## Installation
 
-Usage `stembuild [OPTIONS...] -vmdk FILENAME [-output DIRNAME] [-version STEMCELL_VERSION] [-os OS_VERSION]`
+To install `stembuild` go to [Releases](https://github.com/cloudfoundry-incubator/stembuild/releases)
+
+## Current Commands
+```
+stembuild version 0.21.45, Windows Stemcell Building Tool
+
+Usage: stembuild <global options> <command> <command args>
+
+Commands:
+  help		Describe commands and their syntax
+  package	Create a BOSH Stemcell from a VMDK file
+
+Global Options:
+  -color	Colorize debug output
+  -debug	Print lots of debugging information
+  -v		Stembuild version (shorthand)
+  -version	Show Stembuild version
+
+```
+## Create a Windows Stemcell from a VMDK
+
+This command converts a VMDK into a bosh-deployable Windows Stemcell 
+```
+stembuild package -vmdk <path-to-vmdk> -stemcellVersion <stemcell stemcellVersion> -os <os stemcellVersion>
+
+Create a BOSH Stemcell from a VMDK file
+
+The [vmdk], [stemcellVersion], and [os] flags must be specified.  If the [output] flag is
+not specified the stemcell will be created in the current working directory.
+
+Requirements:
+	The VMware 'ovftool' binary must be on your path or Fusion/Workstation
+	must be installed (both include the 'ovftool').
+
+Examples:
+	stembuild package -vmdk disk.vmdk -stemcell-version 1.2 -os 1803
+
+	Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk', and set the stemcell version to 1.2.
+	The final stemcell will be found in the current working directory.
+
+Flags:
+  -o string
+    	Output directory (shorthand)
+  -os string
+    	OS version must be either 2012R2, 2016, or 1803
+  -outputDir string
+    	Output directory, default is the current working directory.
+  -s string
+    	Stemcell version (shorthand)
+  -stemcell-version string
+    	Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)
+  -vmdk string
+    	VMDK file to create stemcell from
+      
+```
 
 Process can take between 10 and 20 minutes. See Progress with `-debug` flag.
 
