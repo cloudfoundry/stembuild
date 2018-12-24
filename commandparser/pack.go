@@ -60,7 +60,7 @@ func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool
 	// make sure there is enough space for ova + stemcell and some leftover
 	//	ova and stemcell will be the size of the vmdk in the worst case scenario
 	minSpace := uint64(vmdkSize)*2 + (gigabyte / 2)
-	hasSpace, err := HasAtLeastFreeDiskSpace(minSpace, fs, p.vmdk)
+	hasSpace, err := HasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.vmdk))
 	if err != nil {
 		return false, fmt.Errorf("could not check free space on disk: %s", err)
 	}
