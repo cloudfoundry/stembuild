@@ -166,7 +166,7 @@ var _ = Describe("inputs", func() {
 
 			mockFileSystem.EXPECT().GetAvailableDiskSpace("/").Return(uint64(8), nil).AnyTimes()
 
-			hasSpace, err := HasAtLeastFreeDiskSpace(4, mockFileSystem, "/")
+			hasSpace, _, err := HasAtLeastFreeDiskSpace(4, mockFileSystem, "/")
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(hasSpace).To(BeTrue())
 
@@ -178,9 +178,10 @@ var _ = Describe("inputs", func() {
 
 			mockFileSystem.EXPECT().GetAvailableDiskSpace("/").Return(uint64(4), nil).AnyTimes()
 
-			hasSpace, err := HasAtLeastFreeDiskSpace(8, mockFileSystem, "/")
+			hasSpace, requiredSpace, err := HasAtLeastFreeDiskSpace(8, mockFileSystem, "/")
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(hasSpace).To(BeFalse())
+			Expect(requiredSpace).To(Equal(uint64(4)))
 		})
 
 		It("fails on error", func() {
@@ -189,7 +190,7 @@ var _ = Describe("inputs", func() {
 
 			mockFileSystem.EXPECT().GetAvailableDiskSpace("/").Return(uint64(4), errors.New("some error")).AnyTimes()
 
-			hasSpace, err := HasAtLeastFreeDiskSpace(8, mockFileSystem, "/")
+			hasSpace, _, err := HasAtLeastFreeDiskSpace(8, mockFileSystem, "/")
 			Expect(err).To(HaveOccurred())
 			Expect(hasSpace).To(BeFalse())
 		})

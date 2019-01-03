@@ -49,22 +49,22 @@ Flags:
 `, filepath.Base(os.Args[0]))
 }
 
-func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool, error) {
+func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool, uint64, error) {
 
 	fi, err := os.Stat(p.vmdk)
 	if err != nil {
-		return false, fmt.Errorf("could not get vmdk info: %s", err)
+		return false, uint64(0), fmt.Errorf("could not get vmdk info: %s", err)
 	}
 	vmdkSize := fi.Size()
 
 	// make sure there is enough space for ova + stemcell and some leftover
 	//	ova and stemcell will be the size of the vmdk in the worst case scenario
 	minSpace := uint64(vmdkSize)*2 + (gigabyte / 2)
-	hasSpace, err := HasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.vmdk))
+	hasSpace, spaceNeeded, err := HasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.vmdk))
 	if err != nil {
-		return false, fmt.Errorf("could not check free space on disk: %s", err)
+		return false, uint64(0), fmt.Errorf("could not check free space on disk: %s", err)
 	}
-	return hasSpace, nil
+	return hasSpace, spaceNeeded, nil
 }
 
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
@@ -132,13 +132,13 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	fmt.Printf("...'ovftool' found at: %s\n", ovfPath)
 
 	fs := filesystem.OSFileSystem{}
-	enoughSpace, err := p.validateFreeSpaceForPackage(&fs)
+	enoughSpace, requiredSpace, err := p.validateFreeSpaceForPackage(&fs)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "problem checking disk space: %s", err)
 		return subcommands.ExitFailure
 	}
 	if !enoughSpace {
-		_, _ = fmt.Fprintf(os.Stderr, "Not enough space to create stemcell. Free up space and try again")
+		_, _ = fmt.Fprintf(os.Stderr, "Not enough space to create stemcell. Free up %d bytes of space and try again", requiredSpace)
 		return subcommands.ExitFailure
 	}
 

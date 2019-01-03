@@ -70,10 +70,10 @@ func IsValidStemcellVersion(version string) bool {
 	return false
 }
 
-func HasAtLeastFreeDiskSpace(minFreeSpace uint64, fs filesystem.FileSystem, path string) (bool, error) {
+func HasAtLeastFreeDiskSpace(minFreeSpace uint64, fs filesystem.FileSystem, path string) (bool, uint64, error) {
 	freeSpace, err := fs.GetAvailableDiskSpace(path)
 	if err != nil {
-		return false, err
+		return false, 0, err
 	}
-	return freeSpace >= minFreeSpace, nil
+	return freeSpace >= minFreeSpace, minFreeSpace - freeSpace, nil
 }

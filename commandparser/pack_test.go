@@ -105,7 +105,7 @@ var _ = Describe("pack", func() {
 				pkgCmd := PackageCmd{}
 				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "expected.vmdk"))
 
-				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				validSpace, _, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(validSpace).To(BeTrue())
 			})
@@ -118,9 +118,10 @@ var _ = Describe("pack", func() {
 				pkgCmd := PackageCmd{}
 				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "expected.vmdk"))
 
-				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				validSpace, spaceNeeded, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(validSpace).To(BeFalse())
+				Expect(spaceNeeded).To(Equal(uint64(563085292)))
 			})
 		})
 
@@ -131,7 +132,7 @@ var _ = Describe("pack", func() {
 				pkgCmd := PackageCmd{}
 				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "nonexistent.vmdk"))
 
-				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				validSpace, _, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(HavePrefix("could not get vmdk info: "))
 				Expect(validSpace).To(BeFalse())
@@ -143,7 +144,7 @@ var _ = Describe("pack", func() {
 				pkgCmd := PackageCmd{}
 				pkgCmd.SetVMDK(filepath.Join("..", "test", "data", "expected.vmdk"))
 
-				validSpace, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
+				validSpace, _, err := pkgCmd.ValidateFreeSpaceForPackage(mockFileSystem)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("could not check free space on disk: some check error"))
 				Expect(validSpace).To(BeFalse())

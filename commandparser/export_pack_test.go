@@ -18,7 +18,7 @@ func (p *PackageCmd) GetOutputDir() string {
 	return p.outputDir
 }
 
-func (p *PackageCmd) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) (bool, error) {
+func (p *PackageCmd) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) (bool, uint64, error) {
 	return p.validateFreeSpaceForPackage(fs)
 }
 func (p *PackageCmd) SetVMDK(vmdk string) {
