@@ -4,15 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 	. "github.com/cloudfoundry-incubator/stembuild/pack/options"
 	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
 	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
 	"github.com/google/subcommands"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type PackageCmd struct {
@@ -138,7 +139,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 	if !enoughSpace {
-		_, _ = fmt.Fprintf(os.Stderr, "Not enough space to create stemcell. Free up %d bytes of space and try again", requiredSpace)
+		_, _ = fmt.Fprintf(os.Stderr, "Not enough space to create stemcell. Free up %d MB and try again", requiredSpace/(1024*1024))
 		return subcommands.ExitFailure
 	}
 
