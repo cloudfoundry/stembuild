@@ -2,26 +2,11 @@ package commandparser
 
 import (
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 	"os"
 	"regexp"
+
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 )
-
-func IsValidVMDK(vmdk string) (bool, error) {
-
-	if vmdk == "" {
-		return false, nil
-	}
-	fi, err := os.Stat(vmdk)
-	if err != nil {
-		return false, err
-	}
-	if !fi.Mode().IsRegular() {
-		return false, nil
-	}
-
-	return true, nil
-}
 
 func IsValidOS(os string) bool {
 	switch os {

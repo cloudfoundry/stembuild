@@ -8,20 +8,21 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/stembuild/pack/factory"
+
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
-	. "github.com/cloudfoundry-incubator/stembuild/pack/options"
-	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
+	"github.com/cloudfoundry-incubator/stembuild/pack/config"
 	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
 	"github.com/google/subcommands"
 )
 
 type PackageCmd struct {
-	vmdk            string
 	os              string
 	stemcellVersion string
 	outputDir       string
 	GlobalFlags     *GlobalFlags
+	sourceConfig    config.SourceConfig
 }
 
 const gigabyte = 1024 * 1024 * 1024
@@ -52,7 +53,7 @@ Flags:
 
 func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool, uint64, error) {
 
-	fi, err := os.Stat(p.vmdk)
+	fi, err := os.Stat(p.sourceConfig.Vmdk)
 	if err != nil {
 		return false, uint64(0), fmt.Errorf("could not get vmdk info: %s", err)
 	}
@@ -61,7 +62,7 @@ func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool
 	// make sure there is enough space for ova + stemcell and some leftover
 	//	ova and stemcell will be the size of the vmdk in the worst case scenario
 	minSpace := uint64(vmdkSize)*2 + (gigabyte / 2)
-	hasSpace, spaceNeeded, err := HasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.vmdk))
+	hasSpace, spaceNeeded, err := HasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.sourceConfig.Vmdk))
 	if err != nil {
 		return false, uint64(0), fmt.Errorf("could not check free space on disk: %s", err)
 	}
@@ -69,7 +70,11 @@ func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool
 }
 
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&p.vmdk, "vmdk", "", "VMDK file to create stemcell from")
+	f.StringVar(&p.sourceConfig.Vmdk, "vmdk", "", "VMDK file to create stemcell from")
+	f.StringVar(&p.sourceConfig.VmName, "vm-name", "", "Name of VM in vCenter")
+	f.StringVar(&p.sourceConfig.Username, "username", "", "vCenter username")
+	f.StringVar(&p.sourceConfig.Password, "password", "", "vCenter password")
+	f.StringVar(&p.sourceConfig.URL, "url", "", "vCenter url")
 	f.StringVar(&p.os, "os", "", "OS version must be either 2012R2, 2016, or 1803")
 	f.StringVar(&p.stemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
 	f.StringVar(&p.stemcellVersion, "s", "", "Stemcell version (shorthand)")
@@ -77,19 +82,13 @@ func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.outputDir, "o", "", "Output directory (shorthand)")
 }
 func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+
 	logLevel := colorlogger.NONE
 	if p.GlobalFlags.Debug {
 		logLevel = colorlogger.DEBUG
 	}
 	logger := colorlogger.ConstructLogger(logLevel, p.GlobalFlags.Color, os.Stderr)
 
-	if validVMDK, err := IsValidVMDK(p.vmdk); err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err.Error())
-		return subcommands.ExitFailure
-	} else if !validVMDK {
-		_, _ = fmt.Fprintf(os.Stderr, "VMDK not specified or invalid\n")
-		return subcommands.ExitFailure
-	}
 	if !IsValidOS(p.os) {
 		_, _ = fmt.Fprintf(os.Stderr, "OS version must be either 2012R2, 2016, or 1803 have: %s\n", p.os)
 		return subcommands.ExitFailure
@@ -119,19 +118,6 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 
-	fmt.Print("Finding 'ovftool'...")
-	searchPaths, err := ovftool.SearchPaths()
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "could not get search paths for Ovftool: %s", err)
-		return subcommands.ExitFailure
-	}
-	ovfPath, err := ovftool.Ovftool(searchPaths)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "could not locate 'ovftool' on PATH: %s", err)
-		return subcommands.ExitFailure
-	}
-	fmt.Printf("...'ovftool' found at: %s\n", ovfPath)
-
 	fs := filesystem.OSFileSystem{}
 	enoughSpace, requiredSpace, err := p.validateFreeSpaceForPackage(&fs)
 	if err != nil {
@@ -143,18 +129,19 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 
-	c := stemcell.Config{
-		Stop:         make(chan struct{}),
-		Debugf:       logger.Debugf,
-		BuildOptions: StembuildOptions{},
+	packager, err := factory.GetPackager(p.sourceConfig, strings.ToUpper(p.os), p.stemcellVersion, p.outputDir, logLevel, p.GlobalFlags.Color)
+	if err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err.Error())
+		return subcommands.ExitFailure
 	}
 
-	c.BuildOptions.VMDKFile = p.vmdk
-	c.BuildOptions.OSVersion = strings.ToUpper(p.os)
-	c.BuildOptions.Version = p.stemcellVersion
-	c.BuildOptions.OutputDir = p.outputDir
+	err = packager.ValidateSourceParameters()
+	if err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err.Error())
+		return subcommands.ExitFailure
+	}
 
-	if err := c.Package(); err != nil {
+	if err := packager.Package(); err != nil {
 		return subcommands.ExitFailure
 	}
 

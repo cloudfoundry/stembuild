@@ -6,8 +6,6 @@ import (
 	"compress/gzip"
 	"errors"
 	"fmt"
-	"github.com/onsi/gomega"
-	"github.com/onsi/gomega/gexec"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,6 +14,11 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/onsi/ginkgo"
+
+	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {
@@ -208,4 +211,13 @@ func BuildStembuild() (string, error) {
 	)
 
 	return stembuildExecutable, err
+}
+
+func EnvMustExist(variableName string) string {
+	result := os.Getenv(variableName)
+	if result == "" {
+		ginkgo.Fail(fmt.Sprintf("%s must be set", variableName))
+	}
+
+	return result
 }

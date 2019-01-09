@@ -402,7 +402,7 @@ func (c *Config) catchInterruptSignal() {
 	}
 }
 
-func (c *Config) Package() error {
+func (c Config) Package() error {
 
 	go c.catchInterruptSignal()
 
@@ -420,4 +420,33 @@ func (c *Config) Package() error {
 
 	c.Cleanup()
 	return nil
+}
+
+func (c Config) ValidateSourceParameters() error {
+	if validVMDK, err := IsValidVMDK(c.BuildOptions.VMDKFile); err != nil {
+		return err
+	} else if !validVMDK {
+		return errors.New("invalid VMDK file")
+	}
+
+	searchPaths, err := ovftool.SearchPaths()
+	if err != nil {
+		return fmt.Errorf("could not get search paths for Ovftool: %s", err)
+	}
+	_, err = ovftool.Ovftool(searchPaths)
+	if err != nil {
+		return fmt.Errorf("could not locate Ovftool on PATH: %s", err)
+	}
+	return nil
+}
+
+func IsValidVMDK(vmdk string) (bool, error) {
+	fi, err := os.Stat(vmdk)
+	if err != nil {
+		return false, err
+	}
+	if !fi.Mode().IsRegular() {
+		return false, nil
+	}
+	return true, nil
 }
