@@ -1,23 +1,24 @@
-package options_test
+package package_parameters_test
 
 import (
 	"fmt"
-	. "github.com/cloudfoundry-incubator/stembuild/pack/options"
+	"math/rand"
+
+	. "github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"math/rand"
 )
 
-var _ = Describe("StembuildOptions", func() {
+var _ = Describe("VmdkPackageParameters", func() {
 	Context("CopyFrom", func() {
 		var (
-			dest StembuildOptions
-			src  StembuildOptions
+			dest VmdkPackageParameters
+			src  VmdkPackageParameters
 		)
 
 		BeforeEach(func() {
-			src = StembuildOptions{}
-			dest = StembuildOptions{}
+			src = VmdkPackageParameters{}
+			dest = VmdkPackageParameters{}
 		})
 
 		JustBeforeEach(func() {
@@ -210,7 +211,7 @@ var _ = Describe("StembuildOptions", func() {
 				})
 
 				It("copies into dest only those fields which are empty in dest", func() {
-					expected := StembuildOptions{
+					expected := VmdkPackageParameters{
 						OSVersion: "the",
 						OutputDir: "needful",
 						Version:   "do",

@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
-	"github.com/cloudfoundry-incubator/stembuild/pack/config"
-	"github.com/cloudfoundry-incubator/stembuild/pack/options"
-	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
 )
 
 type Packager interface {
@@ -23,12 +23,12 @@ func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputCon
 	}
 	switch source {
 	case config.VCENTER:
-		v := VCenterPackager{SourceConfig: sourceConfig}
+		v := packagers.VCenterPackager{SourceConfig: sourceConfig}
 		return v, nil
 	case config.VMDK:
-		options := options.StembuildOptions{}
+		options := package_parameters.VmdkPackageParameters{}
 		logger := colorlogger.ConstructLogger(logLevel, color, os.Stderr)
-		vmdkPackager := stemcell.Config{
+		vmdkPackager := packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
 			Debugf:       logger.Debugf,
 			BuildOptions: options,

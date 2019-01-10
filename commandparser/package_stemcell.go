@@ -9,10 +9,10 @@ import (
 
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 
-	"github.com/cloudfoundry-incubator/stembuild/pack/factory"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/factory"
 
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
-	"github.com/cloudfoundry-incubator/stembuild/pack/config"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	"github.com/google/subcommands"
 )
 

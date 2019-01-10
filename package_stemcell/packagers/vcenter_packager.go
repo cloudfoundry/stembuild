@@ -1,7 +1,7 @@
-package factory
+package packagers
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/pack/config"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 )
 
 type VCenterPackager struct {

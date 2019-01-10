@@ -1,4 +1,4 @@
-package stemcell_test
+package packagers_test
 
 import (
 	. "github.com/onsi/ginkgo"

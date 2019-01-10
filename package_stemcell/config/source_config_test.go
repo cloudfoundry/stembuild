@@ -1,7 +1,7 @@
 package config_test
 
 import (
-	. "github.com/cloudfoundry-incubator/stembuild/pack/config"
+	. "github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

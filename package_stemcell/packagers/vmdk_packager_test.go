@@ -1,4 +1,4 @@
-package stemcell_test
+package packagers_test
 
 import (
 	"crypto/sha1"
@@ -8,9 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
-
-	"github.com/cloudfoundry-incubator/stembuild/pack/options"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,20 +17,20 @@ import (
 
 var _ = Describe("Stemcell", func() {
 	var tmpDir string
-	var stembuildConfig options.StembuildOptions
-	var c stemcell.Config
+	var stembuildConfig package_parameters.VmdkPackageParameters
+	var c packagers.VmdkPackager
 
 	BeforeEach(func() {
 		var err error
 		tmpDir, err = ioutil.TempDir("", "")
 		Expect(err).NotTo(HaveOccurred())
 
-		stembuildConfig = options.StembuildOptions{
+		stembuildConfig = package_parameters.VmdkPackageParameters{
 			OSVersion: "2012R2",
 			Version:   "1200.1",
 		}
 
-		c = stemcell.Config{
+		c = packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
 			Debugf:       func(format string, a ...interface{}) {},
 			BuildOptions: stembuildConfig,
@@ -50,14 +49,14 @@ var _ = Describe("Stemcell", func() {
 				Expect(err).ToNot(HaveOccurred())
 				defer os.Remove(vmdk.Name())
 
-				valid, err := stemcell.IsValidVMDK(vmdk.Name())
+				valid, err := packagers.IsValidVMDK(vmdk.Name())
 				Expect(err).To(BeNil())
 				Expect(valid).To(BeTrue())
 			})
 		})
 		Context("invalid vmdk file specified", func() {
 			It("should be invalid", func() {
-				valid, err := stemcell.IsValidVMDK(filepath.Join("..", "out", "invalid"))
+				valid, err := packagers.IsValidVMDK(filepath.Join("..", "out", "invalid"))
 				Expect(err).To(HaveOccurred())
 				Expect(valid).To(BeFalse())
 			})
@@ -71,7 +70,7 @@ var _ = Describe("Stemcell", func() {
 			err := c.CreateImage()
 			Expect(err).NotTo(HaveOccurred())
 
-			// the image will be saved to the Config's temp directory
+			// the image will be saved to the VmdkPackager's temp directory
 			tmpdir, err := c.TempDir()
 			Expect(err).NotTo(HaveOccurred())
 
@@ -132,7 +131,7 @@ stemcell_formats:
 - vsphere-ovf
 - vsphere-ova
 `
-			result := stemcell.CreateManifest("1", "version", "sha1sum")
+			result := packagers.CreateManifest("1", "version", "sha1sum")
 			Expect(result).To(Equal(expectedManifest))
 		})
 	})

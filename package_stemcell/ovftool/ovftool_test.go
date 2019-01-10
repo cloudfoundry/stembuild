@@ -1,14 +1,16 @@
 package ovftool_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"runtime"
 
-	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
 	"path/filepath"
+
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/ovftool"
 )
 
 var _ = Describe("ovftool", func() {

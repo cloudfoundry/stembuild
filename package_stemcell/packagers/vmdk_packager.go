@@ -1,4 +1,4 @@
-package stemcell
+package packagers
 
 import (
 	"archive/tar"
@@ -15,12 +15,12 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/pack/options"
-	"github.com/cloudfoundry-incubator/stembuild/pack/ovftool"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/ovftool"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry-incubator/stembuild/templates"
 )
 
-type Config struct {
+type VmdkPackager struct {
 	Image        string
 	Stemcell     string
 	Manifest     string
@@ -28,7 +28,7 @@ type Config struct {
 	tmpdir       string
 	Stop         chan struct{}
 	Debugf       func(format string, a ...interface{})
-	BuildOptions options.StembuildOptions
+	BuildOptions package_parameters.VmdkPackageParameters
 }
 
 type CancelReadSeeker struct {
@@ -84,23 +84,23 @@ func (r *CancelReader) Read(p []byte) (int, error) {
 	}
 }
 
-// returns a io.Writer that returns an error when Config c is stopped
-func (c *Config) Writer(w io.Writer) *CancelWriter {
+// returns a io.Writer that returns an error when VmdkPackager c is stopped
+func (c *VmdkPackager) Writer(w io.Writer) *CancelWriter {
 	return &CancelWriter{w: w, stop: c.Stop}
 }
 
-// returns a io.Reader that returns an error when Config c is stopped
-func (c *Config) Reader(r io.Reader) *CancelReader {
+// returns a io.Reader that returns an error when VmdkPackager c is stopped
+func (c *VmdkPackager) Reader(r io.Reader) *CancelReader {
 	return &CancelReader{r: r, stop: c.Stop}
 }
 
-func (c *Config) StopConfig() {
+func (c *VmdkPackager) StopConfig() {
 	c.Debugf("stopping config")
 	defer c.Cleanup() // make sure this runs!
 	close(c.Stop)
 }
 
-func (c *Config) Cleanup() {
+func (c *VmdkPackager) Cleanup() {
 	if c.tmpdir == "" {
 		return
 	}
@@ -111,7 +111,7 @@ func (c *Config) Cleanup() {
 	}
 }
 
-func (c *Config) AddTarFile(tr *tar.Writer, name string) error {
+func (c *VmdkPackager) AddTarFile(tr *tar.Writer, name string) error {
 	c.Debugf("adding file (%s) to tar archive", name)
 	f, err := os.Open(name)
 	if err != nil {
@@ -157,7 +157,7 @@ stemcell_formats:
 
 }
 
-func (c *Config) TempDir() (string, error) {
+func (c *VmdkPackager) TempDir() (string, error) {
 	if c.tmpdir != "" {
 		if _, err := os.Stat(c.tmpdir); err != nil {
 			c.Debugf("unable to stat temp dir (%s) was it deleted?", c.tmpdir)
@@ -174,7 +174,7 @@ func (c *Config) TempDir() (string, error) {
 	return c.tmpdir, nil
 }
 
-func (c *Config) CreateStemcell() error {
+func (c *VmdkPackager) CreateStemcell() error {
 	c.Debugf("creating stemcell")
 
 	// programming errors - panic!
@@ -231,7 +231,7 @@ func (c *Config) CreateStemcell() error {
 	return nil
 }
 
-func (c *Config) WriteManifest(manifest string) error {
+func (c *VmdkPackager) WriteManifest(manifest string) error {
 	// programming error - this should never happen...
 	if c.Manifest != "" {
 		panic("already created manifest: " + c.Manifest)
@@ -259,7 +259,7 @@ func (c *Config) WriteManifest(manifest string) error {
 	return nil
 }
 
-func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
+func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 	const errFmt = "converting vmx to ova: %s\n" +
 		"-- BEGIN STDERR OUTPUT -- :\n%s\n-- END STDERR OUTPUT --\n"
 
@@ -304,7 +304,7 @@ func (c *Config) ConvertVMX2OVA(vmx, ova string) error {
 
 // CreateImage, converts a vmdk to a gzip compressed image file and records the
 // sha1 sum of the resulting image.
-func (c *Config) CreateImage() error {
+func (c *VmdkPackager) CreateImage() error {
 	c.Debugf("Creating [image] from [vmdk]: %s", c.BuildOptions.VMDKFile)
 
 	tmpdir, err := c.TempDir()
@@ -365,7 +365,7 @@ func (c *Config) CreateImage() error {
 	return nil
 }
 
-func (c *Config) ConvertVMDK() (string, error) {
+func (c *VmdkPackager) ConvertVMDK() (string, error) {
 	if err := c.CreateImage(); err != nil {
 		return "", err
 	}
@@ -385,7 +385,7 @@ func (c *Config) ConvertVMDK() (string, error) {
 	return stemcellPath, nil
 }
 
-func (c *Config) catchInterruptSignal() {
+func (c *VmdkPackager) catchInterruptSignal() {
 	ch := make(chan os.Signal, 64)
 	signal.Notify(ch, os.Interrupt)
 	stopping := false
@@ -402,7 +402,7 @@ func (c *Config) catchInterruptSignal() {
 	}
 }
 
-func (c Config) Package() error {
+func (c VmdkPackager) Package() error {
 
 	go c.catchInterruptSignal()
 
@@ -422,7 +422,7 @@ func (c Config) Package() error {
 	return nil
 }
 
-func (c Config) ValidateSourceParameters() error {
+func (c VmdkPackager) ValidateSourceParameters() error {
 	if validVMDK, err := IsValidVMDK(c.BuildOptions.VMDKFile); err != nil {
 		return err
 	} else if !validVMDK {

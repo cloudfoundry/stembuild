@@ -1,9 +1,9 @@
 package factory_test
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/pack/config"
-	"github.com/cloudfoundry-incubator/stembuild/pack/factory"
-	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/factory"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -26,8 +26,8 @@ var _ = Describe("Factory", func() {
 				actualPackager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
 				Expect(err).To(BeNil())
 
-				Expect(actualPackager).To(BeAssignableToTypeOf(stemcell.Config{}))
-				Expect(actualPackager).NotTo(BeAssignableToTypeOf(factory.VCenterPackager{}))
+				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VmdkPackager{}))
+				Expect(actualPackager).NotTo(BeAssignableToTypeOf(packagers.VCenterPackager{}))
 			})
 		})
 
@@ -43,8 +43,8 @@ var _ = Describe("Factory", func() {
 				actualPackager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
 				Expect(err).To(BeNil())
 
-				Expect(actualPackager).To(BeAssignableToTypeOf(factory.VCenterPackager{}))
-				Expect(actualPackager).NotTo(BeAssignableToTypeOf(stemcell.Config{}))
+				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VCenterPackager{}))
+				Expect(actualPackager).NotTo(BeAssignableToTypeOf(packagers.VmdkPackager{}))
 			})
 		})
 

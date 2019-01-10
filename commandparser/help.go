@@ -4,11 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/version"
-	. "github.com/google/subcommands"
 	"io"
 	"os"
 	"path"
+
+	"github.com/cloudfoundry-incubator/stembuild/version"
+	. "github.com/google/subcommands"
 )
 
 /*
@@ -62,7 +63,7 @@ func (h *stembuildHelp) Execute(c context.Context, f *flag.FlagSet, args ...inte
 func (h *stembuildHelp) Explain(w io.Writer) {
 
 	_, _ = fmt.Fprintf(w, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version)
-	_, _ = fmt.Fprintf(w, "Usage: %s <global options> <command> <command args>\n\n", path.Base(os.Args[0]))
+	_, _ = fmt.Fprintf(w, "Usage: %s <global package_parameters> <command> <command args>\n\n", path.Base(os.Args[0]))
 
 	_, _ = fmt.Fprint(w, "Commands:\n")
 	for _, command := range *h.commands {

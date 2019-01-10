@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("pack", func() {
+var _ = Describe("package_stemcell", func() {
 	// Focus of this test is not to test the Flags.Parse functionality as much
 	// as to test that the command line flags values are stored in the expected
 	// struct variables. This adds a bit of protection when renaming flag parameters.

@@ -18,7 +18,7 @@ const (
 	NIL
 )
 
-//Three options:
+//Three package_parameters:
 //1. If VMDK provided and VMName not provided, ignore other VM credentials (simplifies a lot)
 //2. Use VCenterCredentials struct
 //3. use below implementation:

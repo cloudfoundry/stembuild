@@ -1,6 +1,6 @@
-package options
+package package_parameters
 
-type StembuildOptions struct {
+type VmdkPackageParameters struct {
 	OSVersion string `yaml:"os_version"`
 	OutputDir string `yaml:"output_dir"`
 	Version   string `yaml:"version"`
@@ -8,7 +8,7 @@ type StembuildOptions struct {
 }
 
 // Copy into `d` the values in `s` which are empty in `d`.
-func (d *StembuildOptions) CopyFrom(s StembuildOptions) {
+func (d *VmdkPackageParameters) CopyFrom(s VmdkPackageParameters) {
 	if d.OSVersion == "" {
 		d.OSVersion = s.OSVersion
 	}

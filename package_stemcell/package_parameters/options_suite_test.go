@@ -1,4 +1,4 @@
-package options_test
+package package_parameters_test
 
 import (
 	"math/rand"
@@ -15,5 +15,5 @@ var _ = BeforeSuite(func() {
 
 func TestStembuildOptions(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "StembuildOptions Suite")
+	RunSpecs(t, "VmdkPackageParameters Suite")
 }
