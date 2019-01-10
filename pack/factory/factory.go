@@ -38,8 +38,7 @@ func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputCon
 		vmdkPackager.BuildOptions.OSVersion = strings.ToUpper(outputConfig.Os)
 		vmdkPackager.BuildOptions.Version = outputConfig.StemcellVersion
 		vmdkPackager.BuildOptions.OutputDir = outputConfig.OutputDir
-		v := vmdkPackager
-		return v, nil
+		return vmdkPackager, nil
 	}
 	return nil, errors.New("Unable to determine packager")
 }
