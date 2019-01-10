@@ -3,57 +3,10 @@ package commandparser
 import (
 	"fmt"
 	"os"
-	"regexp"
+	"path/filepath"
 
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 )
-
-func IsValidOS(os string) bool {
-	switch os {
-	case "2012R2", "1803", "2016":
-		return true
-	default:
-		return false
-	}
-}
-
-func ValidateOrCreateOutputDir(outputDir string) error {
-
-	fi, err := os.Stat(outputDir)
-	if err != nil && os.IsNotExist(err) {
-		if err = os.Mkdir(outputDir, 0700); err != nil {
-			return err
-		}
-	} else if err != nil || fi == nil {
-		return fmt.Errorf("error opening output directory (%s): %s\n", outputDir, err)
-	} else if !fi.IsDir() {
-		return fmt.Errorf("output argument (%s): is not a directory\n", outputDir)
-	}
-
-	return nil
-}
-
-func IsValidStemcellVersion(version string) bool {
-
-	if version == "" {
-		return false
-	}
-
-	patterns := []string{
-		`^\d{1,}\.\d{1,}$`,
-		`^\d{1,}\.\d{1,}-build\.\d{1,}$`,
-		`^\d{1,}\.\d{1,}\.\d{1,}$`,
-		`^\d{1,}\.\d{1,}\.\d{1,}-build\.\d{1,}$`,
-	}
-
-	for _, pattern := range patterns {
-		if regexp.MustCompile(pattern).MatchString(version) {
-			return true
-		}
-	}
-
-	return false
-}
 
 func HasAtLeastFreeDiskSpace(minFreeSpace uint64, fs filesystem.FileSystem, path string) (bool, uint64, error) {
 	freeSpace, err := fs.GetAvailableDiskSpace(path)
@@ -61,4 +14,21 @@ func HasAtLeastFreeDiskSpace(minFreeSpace uint64, fs filesystem.FileSystem, path
 		return false, 0, err
 	}
 	return freeSpace >= minFreeSpace, minFreeSpace - freeSpace, nil
+}
+
+func ValidateFreeSpaceForPackage(vmdkPath string, fs filesystem.FileSystem) (bool, uint64, error) {
+	fi, err := os.Stat(vmdkPath)
+	if err != nil {
+		return false, uint64(0), fmt.Errorf("could not get vmdk info: %s", err)
+	}
+	vmdkSize := fi.Size()
+
+	// make sure there is enough space for ova + stemcell and some leftover
+	//	ova and stemcell will be the size of the vmdk in the worst case scenario
+	minSpace := uint64(vmdkSize)*2 + (gigabyte / 2)
+	hasSpace, spaceNeeded, err := HasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(vmdkPath))
+	if err != nil {
+		return false, uint64(0), fmt.Errorf("could not check free space on disk: %s", err)
+	}
+	return hasSpace, spaceNeeded, nil
 }

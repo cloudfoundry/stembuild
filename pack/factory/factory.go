@@ -3,6 +3,7 @@ package factory
 import (
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	"github.com/cloudfoundry-incubator/stembuild/pack/config"
@@ -15,7 +16,7 @@ type Packager interface {
 	ValidateSourceParameters() error
 }
 
-func GetPackager(sourceConfig config.SourceConfig, osVersion string, stemcellVersion string, outputDir string, logLevel int, color bool) (Packager, error) {
+func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logLevel int, color bool) (Packager, error) {
 	source, err := sourceConfig.GetSource()
 	if err != nil {
 		return nil, err
@@ -34,9 +35,9 @@ func GetPackager(sourceConfig config.SourceConfig, osVersion string, stemcellVer
 		}
 
 		vmdkPackager.BuildOptions.VMDKFile = sourceConfig.Vmdk
-		vmdkPackager.BuildOptions.OSVersion = osVersion
-		vmdkPackager.BuildOptions.Version = stemcellVersion
-		vmdkPackager.BuildOptions.OutputDir = outputDir
+		vmdkPackager.BuildOptions.OSVersion = strings.ToUpper(outputConfig.Os)
+		vmdkPackager.BuildOptions.Version = outputConfig.StemcellVersion
+		vmdkPackager.BuildOptions.OutputDir = outputConfig.OutputDir
 		v := vmdkPackager
 		return v, nil
 	}

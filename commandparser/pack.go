@@ -6,23 +6,20 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
+
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 
 	"github.com/cloudfoundry-incubator/stembuild/pack/factory"
 
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 	"github.com/cloudfoundry-incubator/stembuild/pack/config"
-	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
 	"github.com/google/subcommands"
 )
 
 type PackageCmd struct {
-	os              string
-	stemcellVersion string
-	outputDir       string
-	GlobalFlags     *GlobalFlags
-	sourceConfig    config.SourceConfig
+	GlobalFlags  *GlobalFlags
+	sourceConfig config.SourceConfig
+	outputConfig config.OutputConfig
 }
 
 const gigabyte = 1024 * 1024 * 1024
@@ -51,75 +48,34 @@ Flags:
 `, filepath.Base(os.Args[0]))
 }
 
-func (p *PackageCmd) validateFreeSpaceForPackage(fs filesystem.FileSystem) (bool, uint64, error) {
-
-	fi, err := os.Stat(p.sourceConfig.Vmdk)
-	if err != nil {
-		return false, uint64(0), fmt.Errorf("could not get vmdk info: %s", err)
-	}
-	vmdkSize := fi.Size()
-
-	// make sure there is enough space for ova + stemcell and some leftover
-	//	ova and stemcell will be the size of the vmdk in the worst case scenario
-	minSpace := uint64(vmdkSize)*2 + (gigabyte / 2)
-	hasSpace, spaceNeeded, err := HasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.sourceConfig.Vmdk))
-	if err != nil {
-		return false, uint64(0), fmt.Errorf("could not check free space on disk: %s", err)
-	}
-	return hasSpace, spaceNeeded, nil
-}
-
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.Vmdk, "vmdk", "", "VMDK file to create stemcell from")
 	f.StringVar(&p.sourceConfig.VmName, "vm-name", "", "Name of VM in vCenter")
 	f.StringVar(&p.sourceConfig.Username, "username", "", "vCenter username")
 	f.StringVar(&p.sourceConfig.Password, "password", "", "vCenter password")
 	f.StringVar(&p.sourceConfig.URL, "url", "", "vCenter url")
-	f.StringVar(&p.os, "os", "", "OS version must be either 2012R2, 2016, or 1803")
-	f.StringVar(&p.stemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
-	f.StringVar(&p.stemcellVersion, "s", "", "Stemcell version (shorthand)")
-	f.StringVar(&p.outputDir, "outputDir", "", "Output directory, default is the current working directory.")
-	f.StringVar(&p.outputDir, "o", "", "Output directory (shorthand)")
+	f.StringVar(&p.outputConfig.Os, "os", "", "OS version must be either 2012R2, 2016, or 1803")
+	f.StringVar(&p.outputConfig.StemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
+	f.StringVar(&p.outputConfig.StemcellVersion, "s", "", "Stemcell version (shorthand)")
+	f.StringVar(&p.outputConfig.OutputDir, "outputDir", "", "Output directory, default is the current working directory.")
+	f.StringVar(&p.outputConfig.OutputDir, "o", "", "Output directory (shorthand)")
 }
+
 func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 
 	logLevel := colorlogger.NONE
 	if p.GlobalFlags.Debug {
 		logLevel = colorlogger.DEBUG
 	}
-	logger := colorlogger.ConstructLogger(logLevel, p.GlobalFlags.Color, os.Stderr)
 
-	if !IsValidOS(p.os) {
-		_, _ = fmt.Fprintf(os.Stderr, "OS version must be either 2012R2, 2016, or 1803 have: %s\n", p.os)
-		return subcommands.ExitFailure
-	}
-	if !IsValidStemcellVersion(p.stemcellVersion) {
-		_, _ = fmt.Fprintf(os.Stderr, "invalid stemcell version (%s) expected format [NUMBER].[NUMBER] or "+
-			"[NUMBER].[NUMBER].[NUMBER]\n", p.stemcellVersion)
+	err := p.outputConfig.ValidateConfig()
 
+	if err != nil {
+		_, _ = fmt.Fprint(os.Stderr, err)
 		return subcommands.ExitFailure
 	}
 
-	if p.outputDir == "" || p.outputDir == "." {
-		cwd, err := os.Getwd()
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "error getting working directory %s", err)
-			return subcommands.ExitFailure
-		}
-		p.outputDir = cwd
-	} else if err := ValidateOrCreateOutputDir(p.outputDir); err != nil {
-		return subcommands.ExitFailure
-	}
-
-	name := filepath.Join(p.outputDir, stemcell.StemcellFilename(p.stemcellVersion, p.os))
-	logger.Debugf("validating that stemcell filename (%s) does not exist", name)
-	if _, err := os.Stat(name); !os.IsNotExist(err) {
-		_, _ = fmt.Fprintf(os.Stderr, "error with output file (%s): %v (file may already exist)", name, err)
-		return subcommands.ExitFailure
-	}
-
-	fs := filesystem.OSFileSystem{}
-	enoughSpace, requiredSpace, err := p.validateFreeSpaceForPackage(&fs)
+	enoughSpace, requiredSpace, err := ValidateFreeSpaceForPackage(p.sourceConfig.Vmdk, &filesystem.OSFileSystem{})
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "problem checking disk space: %s", err)
 		return subcommands.ExitFailure
@@ -129,7 +85,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 
-	packager, err := factory.GetPackager(p.sourceConfig, strings.ToUpper(p.os), p.stemcellVersion, p.outputDir, logLevel, p.GlobalFlags.Color)
+	packager, err := factory.GetPackager(p.sourceConfig, p.outputConfig, logLevel, p.GlobalFlags.Color)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err.Error())
 		return subcommands.ExitFailure

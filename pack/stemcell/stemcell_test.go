@@ -8,8 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/stembuild/pack/options"
 	"github.com/cloudfoundry-incubator/stembuild/pack/stemcell"
+
+	"github.com/cloudfoundry-incubator/stembuild/pack/options"
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -39,6 +40,28 @@ var _ = Describe("Stemcell", func() {
 
 	AfterEach(func() {
 		Expect(os.RemoveAll(tmpDir)).To(Succeed())
+	})
+
+	Describe("vmdk", func() {
+		Context("valid vmdk file specified", func() {
+			It("should be valid", func() {
+
+				vmdk, err := ioutil.TempFile("", "temp.vmdk")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.Remove(vmdk.Name())
+
+				valid, err := stemcell.IsValidVMDK(vmdk.Name())
+				Expect(err).To(BeNil())
+				Expect(valid).To(BeTrue())
+			})
+		})
+		Context("invalid vmdk file specified", func() {
+			It("should be invalid", func() {
+				valid, err := stemcell.IsValidVMDK(filepath.Join("..", "out", "invalid"))
+				Expect(err).To(HaveOccurred())
+				Expect(valid).To(BeFalse())
+			})
+		})
 	})
 
 	Describe("CreateImage", func() {

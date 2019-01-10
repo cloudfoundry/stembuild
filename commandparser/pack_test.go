@@ -3,12 +3,13 @@ package commandparser_test
 import (
 	"errors"
 	"flag"
+	"path/filepath"
+
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	. "github.com/cloudfoundry-incubator/stembuild/filesystem/mock"
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"path/filepath"
 )
 
 var _ = Describe("pack", func() {
@@ -85,7 +86,7 @@ var _ = Describe("pack", func() {
 
 	})
 
-	Describe("validateFreeSpaceForPackage", func() {
+	Describe("ValidateFreeSpaceForPackage", func() {
 		var (
 			mockCtrl       *gomock.Controller
 			mockFileSystem *MockFileSystem
