@@ -34,7 +34,7 @@ Global Options:
 
 This command converts a VMDK into a bosh-deployable Windows Stemcell 
 ```
-stembuild package -vmdk <path-to-vmdk> -stemcellVersion <stemcell stemcellVersion> -os <os stemcellVersion>
+stembuild package -vmdk <path-to-vmdk> -stemcell-version <stemcell stemcellVersion> -os <os stemcellVersion>
 
 Create a BOSH Stemcell from a VMDK file
 
