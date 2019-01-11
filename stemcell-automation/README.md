@@ -10,6 +10,8 @@ The BOSH Windows stemcell automation tool will create stemcells for the followin
 
 | OS Line | stemcell automation version | Stemcell Version
 | :--- | --- | --- 
+| 1803 | 0.6 | 1803.5
+| 1709 | 0.6 | 1709.16
 | 1803 | 0.5 | 1803.4
 | 1709 | 0.5 | 1709.15
 | 1803 | 0.4 | 1803.3
