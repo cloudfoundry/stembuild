@@ -4,11 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"path"
+
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/version"
 	. "github.com/google/subcommands"
-	"os"
-	"path"
 )
 
 //go:generate go run gen.go
@@ -17,6 +18,8 @@ func main() {
 	var gf GlobalFlags
 	packageCmd := PackageCmd{}
 	packageCmd.GlobalFlags = &gf
+	constructCmd := ConstructCmd{}
+	constructCmd.GlobalFlags = &gf
 
 	var commands = make([]Command, 0)
 
@@ -33,7 +36,10 @@ func main() {
 	commands = append(commands, sh)
 
 	commander.Register(&packageCmd, "")
+	commander.Register(&constructCmd, "")
+
 	commands = append(commands, &packageCmd)
+	commands = append(commands, &constructCmd)
 
 	// Override the default usage text of Google's Subcommand with our own
 	fs.Usage = func() { sh.Explain(commander.Error) }

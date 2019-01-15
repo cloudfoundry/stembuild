@@ -98,6 +98,10 @@ var _ = Describe("pack", func() {
 			mockFileSystem = NewMockFileSystem(mockCtrl)
 		})
 
+		AfterEach(func() {
+			mockCtrl.Finish()
+		})
+
 		Context("There is enough space on disk", func() {
 			It("returns true", func() {
 				mockFileSystem.EXPECT().GetAvailableDiskSpace(gomock.Any()).Return(gigFreeSpace, nil).AnyTimes()

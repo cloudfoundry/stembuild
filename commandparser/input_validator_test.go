@@ -162,6 +162,7 @@ var _ = Describe("inputs", func() {
 
 		It("Has enough free space", func() {
 			mockCtrl = gomock.NewController(GinkgoT())
+			defer mockCtrl.Finish()
 			mockFileSystem = NewMockFileSystem(mockCtrl)
 
 			mockFileSystem.EXPECT().GetAvailableDiskSpace("/").Return(uint64(8), nil).AnyTimes()
@@ -169,11 +170,11 @@ var _ = Describe("inputs", func() {
 			hasSpace, _, err := HasAtLeastFreeDiskSpace(4, mockFileSystem, "/")
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(hasSpace).To(BeTrue())
-
 		})
 
 		It("Not enough free space", func() {
 			mockCtrl = gomock.NewController(GinkgoT())
+			defer mockCtrl.Finish()
 			mockFileSystem = NewMockFileSystem(mockCtrl)
 
 			mockFileSystem.EXPECT().GetAvailableDiskSpace("/").Return(uint64(4), nil).AnyTimes()
