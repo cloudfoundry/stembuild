@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
@@ -13,6 +15,7 @@ import (
 
 type Packager interface {
 	Package() error
+	ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error
 	ValidateSourceParameters() error
 }
 
@@ -23,7 +26,8 @@ func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputCon
 	}
 	switch source {
 	case config.VCENTER:
-		v := packagers.VCenterPackager{SourceConfig: sourceConfig}
+		client := packagers.RealVcenterClient{Username: sourceConfig.Username, Password: sourceConfig.Password, Url: sourceConfig.URL}
+		v := packagers.VCenterPackager{SourceConfig: sourceConfig, Client: client}
 		return v, nil
 	case config.VMDK:
 		options := package_parameters.VmdkPackageParameters{}

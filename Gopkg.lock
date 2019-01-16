@@ -231,13 +231,16 @@
 
 [[projects]]
   digest = "1:e7abe7b2bb8968a120d09c0d4a336edb62b21eaf40e52e1bb7d0dc206cf8abee"
+  digest = "1:42a4848e296354f9fc35f0b3e6e70ffd56f01931cd693276a619f8c9a11e7d9b"
   name = "github.com/vmware/govmomi"
   packages = [
     "find",
+    "govc/about",
     "govc/cli",
     "govc/flags",
     "govc/host/esxcli",
     "govc/importx",
+    "govc/object",
     "govc/vm",
     "internal",
     "list",
@@ -511,7 +514,9 @@
     "github.com/vmware/govmomi/govc/importx",
     "github.com/vmware/govmomi/govc/vm",
     "github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp",
+    "github.com/vmware/govmomi/govc/about",
     "github.com/vmware/govmomi/govc/cli",
+    "github.com/vmware/govmomi/govc/object",
     "github.com/vmware/govmomi/govc/vm",
     "golang.org/x/sys/windows/registry",
   ]

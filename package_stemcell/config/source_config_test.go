@@ -26,10 +26,10 @@ var _ = Describe("SourceConfig", func() {
 
 		It("return no error when vCenter configured correctly", func() {
 			config := SourceConfig{
-				VmName:   "test-vm",
-				Username: "user",
-				Password: "pass",
-				URL:      "https://vcenter.test",
+				VmInventoryPath: "/my-datacenter/vm/my-folder/my-vm",
+				Username:        "user",
+				Password:        "pass",
+				URL:             "https://vcenter.test",
 			}
 			source, err := config.GetSource()
 			Expect(err).NotTo(HaveOccurred())
@@ -39,11 +39,11 @@ var _ = Describe("SourceConfig", func() {
 
 		It("returns an error when both VMDK and Vcenter configured", func() {
 			config := SourceConfig{
-				Vmdk:     "/some/path/to/a/file",
-				VmName:   "test-vm",
-				Username: "user",
-				Password: "pass",
-				URL:      "https://vcenter.test",
+				Vmdk:            "/some/path/to/a/file",
+				VmInventoryPath: "/my-datacenter/vm/my-folder/my-vm",
+				Username:        "user",
+				Password:        "pass",
+				URL:             "https://vcenter.test",
 			}
 			source, err := config.GetSource()
 			Expect(err).To(MatchError("configuration provided for VMDK & vCenter sources"))
@@ -53,9 +53,9 @@ var _ = Describe("SourceConfig", func() {
 
 		It("returns an error when Vcenter configurations only partially specified", func() {
 			config := SourceConfig{
-				VmName:   "test-vm",
-				Username: "user",
-				URL:      "https://vcenter.test",
+				VmInventoryPath: "/my-datacenter/vm/my-folder/my-vm",
+				Username:        "user",
+				URL:             "https://vcenter.test",
 			}
 			source, err := config.GetSource()
 			Expect(err).To(MatchError("missing vCenter configurations"))

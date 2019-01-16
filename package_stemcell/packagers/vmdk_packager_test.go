@@ -2,12 +2,16 @@ package packagers_test
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"github.com/golang/mock/gomock"
+
+	. "github.com/cloudfoundry-incubator/stembuild/filesystem/mock"
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
@@ -15,7 +19,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Stemcell", func() {
+var _ = Describe("VmdkPackager", func() {
 	var tmpDir string
 	var stembuildConfig package_parameters.VmdkPackageParameters
 	var c packagers.VmdkPackager
@@ -133,6 +137,91 @@ stemcell_formats:
 `
 			result := packagers.CreateManifest("1", "version", "sha1sum")
 			Expect(result).To(Equal(expectedManifest))
+		})
+	})
+
+	Describe("ValidateFreeSpaceForPackage", func() {
+		var (
+			mockCtrl       *gomock.Controller
+			mockFileSystem *MockFileSystem
+		)
+
+		Context("When VMDK file is invalid", func() {
+			FIt("returns an error", func() {
+				c.BuildOptions.VMDKFile = ""
+
+				mockCtrl = gomock.NewController(GinkgoT())
+				mockFileSystem = NewMockFileSystem(mockCtrl)
+
+				err := c.ValidateFreeSpaceForPackage(mockFileSystem)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("could not get vmdk info"))
+
+			})
+		})
+
+		Context("When filesystem has enough free space for stemcell (twice the size of the expected free space)", func() {
+			It("does not return an error", func() {
+				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+
+				mockCtrl = gomock.NewController(GinkgoT())
+				mockFileSystem = NewMockFileSystem(mockCtrl)
+
+				vmdkFile, err := os.Stat(c.BuildOptions.VMDKFile)
+				Expect(err).ToNot(HaveOccurred())
+
+				testVmdkSize := vmdkFile.Size()
+				expectFreeSpace := uint64(testVmdkSize)*2 + (packagers.Gigabyte / 2)
+
+				directoryPath := filepath.Dir(c.BuildOptions.VMDKFile)
+				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(expectFreeSpace*2), nil).AnyTimes()
+
+				err = c.ValidateFreeSpaceForPackage(mockFileSystem)
+				Expect(err).To(Not(HaveOccurred()))
+
+			})
+		})
+		Context("When filesystem does not have enough free space for stemcell (half the size of the expected free space", func() {
+			It("returns error", func() {
+				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+
+				mockCtrl = gomock.NewController(GinkgoT())
+				mockFileSystem = NewMockFileSystem(mockCtrl)
+
+				vmdkFile, err := os.Stat(c.BuildOptions.VMDKFile)
+				Expect(err).ToNot(HaveOccurred())
+
+				testVmdkSize := vmdkFile.Size()
+				expectFreeSpace := uint64(testVmdkSize)*2 + (packagers.Gigabyte / 2)
+
+				directoryPath := filepath.Dir(c.BuildOptions.VMDKFile)
+				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(expectFreeSpace/2), nil).AnyTimes()
+
+				err = c.ValidateFreeSpaceForPackage(mockFileSystem)
+
+				Expect(err).To(HaveOccurred())
+
+				expectedErrorMsg := fmt.Sprintf("Not enough space to create stemcell. Free up ")
+				Expect(err.Error()).To(ContainSubstring(expectedErrorMsg))
+			})
+		})
+
+		Context("When filesystem fails to provide free space", func() {
+			It("returns error specifying that given disk could not provide free space", func() {
+				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+
+				mockCtrl = gomock.NewController(GinkgoT())
+				mockFileSystem = NewMockFileSystem(mockCtrl)
+
+				directoryPath := filepath.Dir(c.BuildOptions.VMDKFile)
+				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(4), errors.New("some error")).AnyTimes()
+
+				err := c.ValidateFreeSpaceForPackage(mockFileSystem)
+
+				Expect(err).To(HaveOccurred())
+				expectedErrorMsg := fmt.Sprintf("could not check free space on disk: ")
+				Expect(err.Error()).To(ContainSubstring(expectedErrorMsg))
+			})
 		})
 	})
 })

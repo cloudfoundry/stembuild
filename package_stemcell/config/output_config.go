@@ -75,6 +75,7 @@ func IsValidStemcellVersion(version string) bool {
 		`^\d{1,}\.\d{1,}-build\.\d{1,}$`,
 		`^\d{1,}\.\d{1,}\.\d{1,}$`,
 		`^\d{1,}\.\d{1,}\.\d{1,}-build\.\d{1,}$`,
+		`^\d{1,}\.\d{1,}\.\d{1,}-manual\.\d{1,}$`,
 	}
 
 	for _, pattern := range patterns {

@@ -15,10 +15,14 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/ovftool"
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry-incubator/stembuild/templates"
 )
+
+const Gigabyte = 1024 * 1024 * 1024
 
 type VmdkPackager struct {
 	Image        string
@@ -449,4 +453,42 @@ func IsValidVMDK(vmdk string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func (p VmdkPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
+	fi, err := os.Stat(p.BuildOptions.VMDKFile)
+	if err != nil {
+		errorMsg := fmt.Sprintf("could not get vmdk info: %s", err)
+		return errors.New(errorMsg)
+	}
+	vmdkSize := fi.Size()
+
+	// make sure there is enough space for ova + stemcell and some leftover
+	//	ova and stemcell will be the size of the vmdk in the worst case scenario
+
+	minSpace := uint64(vmdkSize)*2 + (Gigabyte / 2)
+
+	enoughSpace, requiredSpace, err := hasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.BuildOptions.VMDKFile))
+	if err != nil {
+		errorMsg := fmt.Sprintf("could not check free space on disk: %s", err)
+		return errors.New(errorMsg)
+	}
+
+	if !enoughSpace {
+		errorMsg := fmt.Sprintf("Not enough space to create stemcell. Free up %d MB and try again", requiredSpace/(1024*1024))
+		return errors.New(errorMsg)
+
+	}
+	return nil
+
+}
+
+func hasAtLeastFreeDiskSpace(minFreeSpace uint64, fs filesystem.FileSystem, path string) (bool, uint64, error) {
+
+	freeSpace, err := fs.GetAvailableDiskSpace(path)
+
+	if err != nil {
+		return false, 0, err
+	}
+	return freeSpace >= minFreeSpace, minFreeSpace - freeSpace, nil
 }

@@ -3,11 +3,11 @@ package config
 import "errors"
 
 type SourceConfig struct {
-	Vmdk     string
-	VmName   string
-	Username string
-	Password string
-	URL      string
+	Vmdk            string
+	URL             string
+	Username        string
+	Password        string
+	VmInventoryPath string
 }
 
 type Source int
@@ -17,11 +17,6 @@ const (
 	VCENTER
 	NIL
 )
-
-//Three package_parameters:
-//1. If VMDK provided and VMName not provided, ignore other VM credentials (simplifies a lot)
-//2. Use VCenterCredentials struct
-//3. use below implementation:
 
 func (c SourceConfig) GetSource() (Source, error) {
 	if c.vmdkProvided() && c.partialvCenterProvided() {
@@ -48,7 +43,7 @@ func (c SourceConfig) vmdkProvided() bool {
 }
 
 func (c SourceConfig) vcenterProvided() bool {
-	if c.VmName != "" && c.Username != "" && c.Password != "" && c.URL != "" {
+	if c.VmInventoryPath != "" && c.Username != "" && c.Password != "" && c.URL != "" {
 		return true
 	}
 	return false
@@ -56,7 +51,7 @@ func (c SourceConfig) vcenterProvided() bool {
 
 //At least one vCenter configuration given
 func (c SourceConfig) partialvCenterProvided() bool {
-	if c.VmName != "" || c.Username != "" || c.Password != "" || c.URL != "" {
+	if c.VmInventoryPath != "" || c.Username != "" || c.Password != "" || c.URL != "" {
 		return true
 	}
 	return false

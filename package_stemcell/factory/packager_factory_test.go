@@ -24,38 +24,35 @@ var _ = Describe("Factory", func() {
 				}
 
 				actualPackager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VmdkPackager{}))
 				Expect(actualPackager).NotTo(BeAssignableToTypeOf(packagers.VCenterPackager{}))
 			})
 		})
 
-		Context("When vCenter credentials are given and no VMDK is specified", func() {
+		Context("When all vCenter credentials are given and no VMDK is specified", func() {
 			It("returns a vCenter packager with no error", func() {
 				sourceConfig := config.SourceConfig{
-					VmName:   "some-vm",
-					Username: "user",
-					Password: "pass",
-					URL:      "some-url",
+					Username:        "user",
+					Password:        "pass",
+					URL:             "some-url",
+					VmInventoryPath: "some-vm-inventory-path",
 				}
 
 				actualPackager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VCenterPackager{}))
 				Expect(actualPackager).NotTo(BeAssignableToTypeOf(packagers.VmdkPackager{}))
 			})
 		})
 
-		Context("When both vCenter credentials and VMDK are specified", func() {
+		Context("When at least one vCenter configuration and VMDK are both specified", func() {
 			It("returns an error", func() {
 				sourceConfig := config.SourceConfig{
-					Vmdk:     "path/to/a/vmdk",
-					VmName:   "some-vm",
-					Username: "user",
-					Password: "pass",
-					URL:      "some-url",
+					Vmdk:            "path/to/a/vmdk",
+					VmInventoryPath: "some-vm",
 				}
 
 				packager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
@@ -65,12 +62,12 @@ var _ = Describe("Factory", func() {
 			})
 		})
 
-		Context("When partial vCenter credentials are given", func() {
+		Context("When partial vCenter credentials are given and no VMDK is specified", func() {
 			It("returns an error", func() {
 				sourceConfig := config.SourceConfig{
-					VmName:   "some-vm",
-					Password: "pass",
-					URL:      "some-url",
+					VmInventoryPath: "some-vm",
+					Password:        "pass",
+					URL:             "some-url",
 				}
 
 				packager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
