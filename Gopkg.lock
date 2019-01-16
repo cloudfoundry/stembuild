@@ -57,61 +57,6 @@
   version = "v0.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:96d5c4e62a948c75882439e8ae1e2bf28db813849724c15b1e88104c80b24e57"
-  name = "github.com/Azure/go-ntlmssp"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "4a21cbd618b459155f8b8ee7f4491cd54f5efa77"
-
-[[projects]]
-  branch = "master"
-  digest = "1:02fd483ec38dfd1231ff5a3a5ff1389042a5bb825da2b1223af0446bb3c05416"
-  name = "github.com/ChrisTrenkamp/goxpath"
-  packages = [
-    ".",
-    "internal/execxp",
-    "internal/execxp/findutil",
-    "internal/execxp/intfns",
-    "internal/xsort",
-    "lexer",
-    "parser",
-    "parser/pathexpr",
-    "tree",
-    "tree/xmltree",
-    "tree/xmltree/xmlbuilder",
-    "tree/xmltree/xmlele",
-    "tree/xmltree/xmlnode",
-    "xconst",
-  ]
-  pruneopts = "UT"
-  revision = "c385f95c6022e7756e91beac5f5510872f7dcb7d"
-
-[[projects]]
-  branch = "master"
-  digest = "1:c13f2d1bcdefc6e7bcd5c2a3294642f81f395a03d25460a4c59d3aef561a53a2"
-  name = "github.com/cloudfoundry-incubator/winrmcp"
-  packages = ["winrmcp"]
-  pruneopts = "UT"
-  revision = "c76d91c1e7db27b0868c5d09e292bb540616c9a2"
-
-[[projects]]
-  digest = "1:91ecd75fdcbe6497b20c69dd95d4a245eeccd6da8be612cb2f533ffb53976ec0"
-  name = "github.com/concourse/pool-resource"
-  packages = ["out"]
-  pruneopts = "UT"
-  revision = "06598caac7211f84419805789f093a867a879084"
-  version = "v1.0.0"
-
-[[projects]]
-  digest = "1:12d4bc32014d9755850a247c43981d4b616f99c94f86247df2d6187511bfad8b"
-  name = "github.com/dylanmei/iso8601"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2075bf119b58e5576c6ed9f867b8f3d17f2e54d4"
-  version = "v0.1.0"
-
-[[projects]]
   digest = "1:b60efdeb75d3c0ceed88783ac2495256aba3491a537d0f31401202579fd62a94"
   name = "github.com/golang/mock"
   packages = ["gomock"]
@@ -230,8 +175,7 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:e7abe7b2bb8968a120d09c0d4a336edb62b21eaf40e52e1bb7d0dc206cf8abee"
-  digest = "1:42a4848e296354f9fc35f0b3e6e70ffd56f01931cd693276a619f8c9a11e7d9b"
+  digest = "1:9a27736f96c4870d428869a0adef4f9a0fe5b5993b8a31efebe9d55732d2e0c3"
   name = "github.com/vmware/govmomi"
   packages = [
     "find",
@@ -353,171 +297,12 @@
     "github.com/onsi/gomega",
     "github.com/onsi/gomega/gbytes",
     "github.com/onsi/gomega/gexec",
-    "github.com/vmware/govmomi/govc/cli",
-    "github.com/vmware/govmomi/govc/importx",
-    "github.com/vmware/govmomi/govc/vm",
-    "github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp",
-[[projects]]
-  branch = "govmomi"
-  digest = "1:bef68f026fa706063533a3763e96a5d01cf468c9636befb59e8cb5431641a97c"
-  name = "github.com/kr/pretty"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2ee9d7453c02ef7fa518a83ae23644eb8872186a"
-  source = "https://github.com/dougm/pretty"
-
-[[projects]]
-  digest = "1:15b5cc79aad436d47019f814fde81a10221c740dc8ddf769221a65097fb6c2e9"
-  name = "github.com/kr/text"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f"
-  version = "v0.1.0"
-
-[[projects]]
-  branch = "govmomi"
-  digest = "1:bef68f026fa706063533a3763e96a5d01cf468c9636befb59e8cb5431641a97c"
-  name = "github.com/kr/pretty"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2ee9d7453c02ef7fa518a83ae23644eb8872186a"
-  source = "https://github.com/dougm/pretty"
-
-[[projects]]
-  digest = "1:15b5cc79aad436d47019f814fde81a10221c740dc8ddf769221a65097fb6c2e9"
-  name = "github.com/kr/text"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f"
-  version = "v0.1.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:a7c1ab68a6cdeffcb148dc0d8b92c897f034aa38f58b69eab9bc6e77645b26fb"
-  name = "github.com/masterzen/simplexml"
-  packages = ["dom"]
-  pruneopts = "UT"
-  revision = "4572e39b1ab9fe03ee513ce6fc7e289e98482190"
-
-[[projects]]
-  branch = "master"
-  digest = "1:da344f3de94ad2424502dab3e8877ec79cc12b377e5b509aa74c94a751ace974"
-  name = "github.com/masterzen/winrm"
-  packages = [
-    ".",
-    "soap",
-  ]
-  pruneopts = "UT"
-  revision = "a196a4ff2a86e262d40284f34b6d5bf328d22d29"
-
-[[projects]]
-  digest = "1:53bc4cd4914cd7cd52139990d5170d6dc99067ae31c56530621b18b35fc30318"
-  name = "github.com/mitchellh/mapstructure"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
-  version = "v1.1.2"
-
-[[projects]]
-  branch = "master"
-  digest = "1:0e1e5f960c58fdc677212fcc70e55042a0084d367623e51afbdb568963832f5d"
-  name = "github.com/nu7hatch/gouuid"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
-
-[[projects]]
-  digest = "1:ac32a142b082b785f949770b4bc15c7460eda29a54ab885415138d7b73d237c3"
-  name = "github.com/vmware/govmomi"
-  packages = [
-    "find",
-    "govc/cli",
-    "govc/flags",
-    "govc/host/esxcli",
-    "govc/vm",
-    "internal",
-    "list",
-    "nfc",
-    "object",
-    "property",
-    "session",
-    "task",
-    "units",
-    "view",
-    "vim25",
-    "vim25/debug",
-    "vim25/methods",
-    "vim25/mo",
-    "vim25/progress",
-    "vim25/soap",
-    "vim25/types",
-    "vim25/xml",
-  ]
-  pruneopts = "UT"
-  revision = "3617f28d167d448f93f282a867870f109516d2a5"
-  version = "v0.19.0"
-
-[[projects]]
-  digest = "1:e7abe7b2bb8968a120d09c0d4a336edb62b21eaf40e52e1bb7d0dc206cf8abee"
-  name = "github.com/vmware/govmomi"
-  packages = [
-    "find",
-    "govc/cli",
-    "govc/flags",
-    "govc/host/esxcli",
-    "govc/importx",
-    "govc/vm",
-    "internal",
-    "list",
-    "nfc",
-    "object",
-    "ovf",
-    "property",
-    "session",
-    "task",
-    "units",
-    "view",
-    "vim25",
-    "vim25/debug",
-    "vim25/methods",
-    "vim25/mo",
-    "vim25/progress",
-    "vim25/soap",
-    "vim25/types",
-    "vim25/xml",
-    "vmdk",
-  ]
-  pruneopts = "UT"
-  revision = "3617f28d167d448f93f282a867870f109516d2a5"
-  version = "v0.19.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:2cd33e6e2d2e64481bf3801fa7cb2db0a2021932d395e0fcd96c724b3b442fec"
-  name = "github.com/xtreme-gabelan-satchithanantham/winrmcp"
-  packages = ["winrmcp"]
-  pruneopts = "UT"
-  revision = "ed85582c6e81fdbeb14913f22999c82a0c4a6503"
-
-[[projects]]
-  branch = "master"
-  digest = "1:7d80d5561efbfcfdc3e4720bf5e331d574fd6f1e531b115ecf568aab3e2b656d"
-  name = "golang.org/x/crypto"
-  packages = ["md4"]
-  pruneopts = "UT"
-  revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
-
-    "github.com/cloudfoundry-incubator/winrmcp/winrmcp",
-    "github.com/concourse/pool-resource/out",
-    "github.com/masterzen/winrm",
-    "github.com/vmware/govmomi/govc/cli",
-    "github.com/vmware/govmomi/govc/importx",
-    "github.com/vmware/govmomi/govc/vm",
-    "github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp",
     "github.com/vmware/govmomi/govc/about",
     "github.com/vmware/govmomi/govc/cli",
+    "github.com/vmware/govmomi/govc/importx",
     "github.com/vmware/govmomi/govc/object",
     "github.com/vmware/govmomi/govc/vm",
+    "github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp",
     "golang.org/x/sys/windows/registry",
   ]
   solver-name = "gps-cdcl"
