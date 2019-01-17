@@ -147,7 +147,7 @@ stemcell_formats:
 		)
 
 		Context("When VMDK file is invalid", func() {
-			FIt("returns an error", func() {
+			It("returns an error", func() {
 				c.BuildOptions.VMDKFile = ""
 
 				mockCtrl = gomock.NewController(GinkgoT())

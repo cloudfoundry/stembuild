@@ -22,24 +22,31 @@ func (v VCenterPackager) Package() error {
 	return nil
 }
 
-func (v VCenterPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
+func (p VCenterPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
 	return nil
 }
 
 func (v VCenterPackager) ValidateSourceParameters() error {
-	err := v.Client.Login()
+	err := v.Client.ValidateUrl()
 	if err != nil {
-		return err
+		return errors.New("please provide a valid vCenter URL")
 	}
 
+	err = v.Client.Login()
+	if err != nil {
+		errMsg := fmt.Sprintf("please provide valid credentials for %s", v.SourceConfig.URL)
+		return errors.New(errMsg)
+	}
 	err = v.Client.FindVM(v.SourceConfig.VmInventoryPath)
 	if err != nil {
-		return err
+		errorMsg := "VM path is invalid\nPlease make sure to format your inventory path correctly using the 'vm' keyword. Example: /my-datacenter/vm/my-folder/my-vm-name"
+		return errors.New(errorMsg)
 	}
 	return nil
 }
 
 type VcenterClient interface {
+	ValidateUrl() error
 	Login() error
 	FindVM(vmInventoryPath string) error
 }
@@ -53,50 +60,61 @@ type FakeVcenterClient struct {
 	InvalidVmInventoryPath bool
 }
 
+func (c FakeVcenterClient) ValidateUrl() error {
+	if c.InvalidUrl {
+		return errors.New("invalid url")
+	}
+	return nil
+}
+
 func (c FakeVcenterClient) Login() error {
 	if c.InvalidCredentials {
-		errorMsg := fmt.Sprintf("please provide valid credentials for %s", c.Url)
-		return errors.New(errorMsg)
-	}
-	if c.InvalidUrl {
-		return errors.New("please provide a valid vCenter URL")
+		return errors.New("invalid credentials")
 	}
 	return nil
 }
 
 func (c FakeVcenterClient) FindVM(vmInventoryPath string) error {
 	if c.InvalidVmInventoryPath {
-		return errors.New("VM path is invalid\nPlease make sure to format your inventory path correctly using the 'vm' keyword. Example: /my-datacenter/vm/my-folder/my-vm-name")
+		return errors.New("invalid VM path")
 	}
 	return nil
 }
 
 type RealVcenterClient struct {
-	Username string
-	Password string
-	Url      string
+	Username      string
+	Password      string
+	Url           string
+	credentialUrl string
+}
+
+func NewRealVcenterClient(username string, password string, url string) *RealVcenterClient {
+	urlWithCredentials := fmt.Sprintf("%s:%s@%s", username, password, url)
+	return &RealVcenterClient{Username: username, Password: password, Url: url, credentialUrl: urlWithCredentials}
+}
+
+func (c RealVcenterClient) ValidateUrl() error {
+	errCode := cli.Run([]string{"about", "-u", c.Url})
+	if errCode != 0 {
+		return errors.New("invalid url")
+	}
+	return nil
+
 }
 
 func (c RealVcenterClient) Login() error {
-
-	errCode := cli.Run([]string{"about", "-u", c.Url})
+	errCode := cli.Run([]string{"about", "-u", c.credentialUrl})
 	if errCode != 0 {
-		return errors.New("please provide valid vCenter URL")
-	}
-
-	errCode = cli.Run([]string{"about", "-u", fmt.Sprintf("%s:%s@%s", c.Username, c.Password, c.Url)})
-	if errCode != 0 {
-		errorMsg := fmt.Sprintf("please provide valid credentials for %s", c.Url)
-		return errors.New(errorMsg)
+		return errors.New("invalid credentials")
 	}
 
 	return nil
 }
 
 func (c RealVcenterClient) FindVM(vmInventoryPath string) error {
-	errCode := cli.Run([]string{"find", "-maxdepth=0", "-u", fmt.Sprintf("%s:%s@%s", c.Username, c.Password, c.Url), vmInventoryPath})
+	errCode := cli.Run([]string{"find", "-maxdepth=0", "-u", c.credentialUrl, vmInventoryPath})
 	if errCode != 0 {
-		errorMsg := "VM path is invalid\nPlease make sure to format your inventory path correctly using the 'vm' keyword. Example: /my-datacenter/vm/my-folder/my-vm-name"
+		errorMsg := "invalid VM path"
 		return errors.New(errorMsg)
 	}
 

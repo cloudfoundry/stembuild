@@ -26,7 +26,7 @@ func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputCon
 	}
 	switch source {
 	case config.VCENTER:
-		client := packagers.RealVcenterClient{Username: sourceConfig.Username, Password: sourceConfig.Password, Url: sourceConfig.URL}
+		client := packagers.NewRealVcenterClient(sourceConfig.Username, sourceConfig.Password, sourceConfig.URL)
 		v := packagers.VCenterPackager{SourceConfig: sourceConfig, Client: client}
 		return v, nil
 	case config.VMDK:
