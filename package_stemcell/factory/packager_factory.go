@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/iaas_clients"
+
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
@@ -26,7 +28,7 @@ func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputCon
 	}
 	switch source {
 	case config.VCENTER:
-		client := packagers.NewRealVcenterClient(sourceConfig.Username, sourceConfig.Password, sourceConfig.URL)
+		client := iaas_clients.NewRealVcenterClient(sourceConfig.Username, sourceConfig.Password, sourceConfig.URL)
 		v := packagers.VCenterPackager{SourceConfig: sourceConfig, Client: client}
 		return v, nil
 	case config.VMDK:
