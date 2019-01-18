@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+export GOVC_INSECURE=
+export GOVC_URL=
+export GOVC_DATASTORE=
+export GOVC_NETWORK=
+export GOVC_RESOURCE_POOL=
+export NETWORK_GATEWAY=
+export SUBNET_MASK=
+export OVA_FILE=
+export VM_NAME_PREFIX=construct-integration-test
+export VM_USERNAME=
+export VM_PASSWORD=
+export LOCK_PRIVATE_KEY=
+export EXISTING_VM_IP=
+export USER_PROVIDED_IP=
