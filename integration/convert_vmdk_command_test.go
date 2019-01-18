@@ -11,6 +11,10 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
 
+	"strings"
+
+	"time"
+
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 )
 
@@ -55,8 +59,7 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
-				session := helpers.Stembuild(stembuildExecutable, "package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
-				Eventually(session, 20).Should(Exit(0))
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
@@ -88,8 +91,7 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
-				session := helpers.Stembuild(stembuildExecutable, "package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
-				Eventually(session, 20).Should(Exit(0))
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
@@ -121,8 +123,8 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
-				session := helpers.Stembuild(stembuildExecutable, "package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
-				Eventually(session, 20).Should(Exit(0))
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
+
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
@@ -150,3 +152,18 @@ var _ = Describe("Convert VMDK", func() {
 		})
 	})
 })
+
+func expectStembuildToSucceed(arguments ...string) *Session {
+	session := helpers.Stembuild(stembuildExecutable, arguments...)
+	Eventually(session, 20*time.Second).Should(Exit(0),
+		fmt.Sprintf(
+			"Expected %s %s to exit with code 0, exited with code %d\nout: %s\nerr: %s",
+			stembuildExecutable,
+			strings.Join(arguments, " "),
+			session.ExitCode(),
+			string(session.Out.Contents()),
+			string(session.Err.Contents()),
+		))
+
+	return session
+}
