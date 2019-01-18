@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
+
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/iaas_clients"
 
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
@@ -28,7 +30,9 @@ func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputCon
 	}
 	switch source {
 	case config.VCENTER:
-		client := iaas_clients.NewRealVcenterClient(sourceConfig.Username, sourceConfig.Password, sourceConfig.URL)
+		//TODO: move username password etc to runner
+		runner := iaas_cli.GovcRunner{}
+		client := iaas_clients.NewVcenterClient(sourceConfig.Username, sourceConfig.Password, sourceConfig.URL, runner)
 		v := packagers.VCenterPackager{SourceConfig: sourceConfig, Client: client}
 		return v, nil
 	case config.VMDK:

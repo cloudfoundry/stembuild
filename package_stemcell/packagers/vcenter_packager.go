@@ -12,7 +12,7 @@ import (
 
 type VCenterPackager struct {
 	SourceConfig config.SourceConfig
-	Client       iaas_clients.VcenterClient
+	Client       iaas_clients.IaasClient
 }
 
 func (p VCenterPackager) Package() error {
@@ -29,7 +29,7 @@ func (v VCenterPackager) ValidateSourceParameters() error {
 		return errors.New("please provide a valid vCenter URL")
 	}
 
-	err = v.Client.Login()
+	err = v.Client.ValidateCredentials()
 	if err != nil {
 		errMsg := fmt.Sprintf("please provide valid credentials for %s", v.SourceConfig.URL)
 		return errors.New(errMsg)

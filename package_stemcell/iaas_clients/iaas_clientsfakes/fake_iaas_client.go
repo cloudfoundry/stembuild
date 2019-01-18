@@ -7,7 +7,7 @@ import (
 	iaas_clients "github.com/cloudfoundry-incubator/stembuild/package_stemcell/iaas_clients"
 )
 
-type FakeVcenterClient struct {
+type FakeIaasClient struct {
 	FindVMStub        func(string) error
 	findVMMutex       sync.RWMutex
 	findVMArgsForCall []struct {
@@ -19,14 +19,14 @@ type FakeVcenterClient struct {
 	findVMReturnsOnCall map[int]struct {
 		result1 error
 	}
-	LoginStub        func() error
-	loginMutex       sync.RWMutex
-	loginArgsForCall []struct {
+	ValidateCredentialsStub        func() error
+	validateCredentialsMutex       sync.RWMutex
+	validateCredentialsArgsForCall []struct {
 	}
-	loginReturns struct {
+	validateCredentialsReturns struct {
 		result1 error
 	}
-	loginReturnsOnCall map[int]struct {
+	validateCredentialsReturnsOnCall map[int]struct {
 		result1 error
 	}
 	ValidateUrlStub        func() error
@@ -43,7 +43,7 @@ type FakeVcenterClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeVcenterClient) FindVM(arg1 string) error {
+func (fake *FakeIaasClient) FindVM(arg1 string) error {
 	fake.findVMMutex.Lock()
 	ret, specificReturn := fake.findVMReturnsOnCall[len(fake.findVMArgsForCall)]
 	fake.findVMArgsForCall = append(fake.findVMArgsForCall, struct {
@@ -61,26 +61,26 @@ func (fake *FakeVcenterClient) FindVM(arg1 string) error {
 	return fakeReturns.result1
 }
 
-func (fake *FakeVcenterClient) FindVMCallCount() int {
+func (fake *FakeIaasClient) FindVMCallCount() int {
 	fake.findVMMutex.RLock()
 	defer fake.findVMMutex.RUnlock()
 	return len(fake.findVMArgsForCall)
 }
 
-func (fake *FakeVcenterClient) FindVMCalls(stub func(string) error) {
+func (fake *FakeIaasClient) FindVMCalls(stub func(string) error) {
 	fake.findVMMutex.Lock()
 	defer fake.findVMMutex.Unlock()
 	fake.FindVMStub = stub
 }
 
-func (fake *FakeVcenterClient) FindVMArgsForCall(i int) string {
+func (fake *FakeIaasClient) FindVMArgsForCall(i int) string {
 	fake.findVMMutex.RLock()
 	defer fake.findVMMutex.RUnlock()
 	argsForCall := fake.findVMArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeVcenterClient) FindVMReturns(result1 error) {
+func (fake *FakeIaasClient) FindVMReturns(result1 error) {
 	fake.findVMMutex.Lock()
 	defer fake.findVMMutex.Unlock()
 	fake.FindVMStub = nil
@@ -89,7 +89,7 @@ func (fake *FakeVcenterClient) FindVMReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeVcenterClient) FindVMReturnsOnCall(i int, result1 error) {
+func (fake *FakeIaasClient) FindVMReturnsOnCall(i int, result1 error) {
 	fake.findVMMutex.Lock()
 	defer fake.findVMMutex.Unlock()
 	fake.FindVMStub = nil
@@ -103,59 +103,59 @@ func (fake *FakeVcenterClient) FindVMReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeVcenterClient) Login() error {
-	fake.loginMutex.Lock()
-	ret, specificReturn := fake.loginReturnsOnCall[len(fake.loginArgsForCall)]
-	fake.loginArgsForCall = append(fake.loginArgsForCall, struct {
+func (fake *FakeIaasClient) ValidateCredentials() error {
+	fake.validateCredentialsMutex.Lock()
+	ret, specificReturn := fake.validateCredentialsReturnsOnCall[len(fake.validateCredentialsArgsForCall)]
+	fake.validateCredentialsArgsForCall = append(fake.validateCredentialsArgsForCall, struct {
 	}{})
-	fake.recordInvocation("Login", []interface{}{})
-	fake.loginMutex.Unlock()
-	if fake.LoginStub != nil {
-		return fake.LoginStub()
+	fake.recordInvocation("ValidateCredentials", []interface{}{})
+	fake.validateCredentialsMutex.Unlock()
+	if fake.ValidateCredentialsStub != nil {
+		return fake.ValidateCredentialsStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.loginReturns
+	fakeReturns := fake.validateCredentialsReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeVcenterClient) LoginCallCount() int {
-	fake.loginMutex.RLock()
-	defer fake.loginMutex.RUnlock()
-	return len(fake.loginArgsForCall)
+func (fake *FakeIaasClient) ValidateCredentialsCallCount() int {
+	fake.validateCredentialsMutex.RLock()
+	defer fake.validateCredentialsMutex.RUnlock()
+	return len(fake.validateCredentialsArgsForCall)
 }
 
-func (fake *FakeVcenterClient) LoginCalls(stub func() error) {
-	fake.loginMutex.Lock()
-	defer fake.loginMutex.Unlock()
-	fake.LoginStub = stub
+func (fake *FakeIaasClient) ValidateCredentialsCalls(stub func() error) {
+	fake.validateCredentialsMutex.Lock()
+	defer fake.validateCredentialsMutex.Unlock()
+	fake.ValidateCredentialsStub = stub
 }
 
-func (fake *FakeVcenterClient) LoginReturns(result1 error) {
-	fake.loginMutex.Lock()
-	defer fake.loginMutex.Unlock()
-	fake.LoginStub = nil
-	fake.loginReturns = struct {
+func (fake *FakeIaasClient) ValidateCredentialsReturns(result1 error) {
+	fake.validateCredentialsMutex.Lock()
+	defer fake.validateCredentialsMutex.Unlock()
+	fake.ValidateCredentialsStub = nil
+	fake.validateCredentialsReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeVcenterClient) LoginReturnsOnCall(i int, result1 error) {
-	fake.loginMutex.Lock()
-	defer fake.loginMutex.Unlock()
-	fake.LoginStub = nil
-	if fake.loginReturnsOnCall == nil {
-		fake.loginReturnsOnCall = make(map[int]struct {
+func (fake *FakeIaasClient) ValidateCredentialsReturnsOnCall(i int, result1 error) {
+	fake.validateCredentialsMutex.Lock()
+	defer fake.validateCredentialsMutex.Unlock()
+	fake.ValidateCredentialsStub = nil
+	if fake.validateCredentialsReturnsOnCall == nil {
+		fake.validateCredentialsReturnsOnCall = make(map[int]struct {
 			result1 error
 		})
 	}
-	fake.loginReturnsOnCall[i] = struct {
+	fake.validateCredentialsReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeVcenterClient) ValidateUrl() error {
+func (fake *FakeIaasClient) ValidateUrl() error {
 	fake.validateUrlMutex.Lock()
 	ret, specificReturn := fake.validateUrlReturnsOnCall[len(fake.validateUrlArgsForCall)]
 	fake.validateUrlArgsForCall = append(fake.validateUrlArgsForCall, struct {
@@ -172,19 +172,19 @@ func (fake *FakeVcenterClient) ValidateUrl() error {
 	return fakeReturns.result1
 }
 
-func (fake *FakeVcenterClient) ValidateUrlCallCount() int {
+func (fake *FakeIaasClient) ValidateUrlCallCount() int {
 	fake.validateUrlMutex.RLock()
 	defer fake.validateUrlMutex.RUnlock()
 	return len(fake.validateUrlArgsForCall)
 }
 
-func (fake *FakeVcenterClient) ValidateUrlCalls(stub func() error) {
+func (fake *FakeIaasClient) ValidateUrlCalls(stub func() error) {
 	fake.validateUrlMutex.Lock()
 	defer fake.validateUrlMutex.Unlock()
 	fake.ValidateUrlStub = stub
 }
 
-func (fake *FakeVcenterClient) ValidateUrlReturns(result1 error) {
+func (fake *FakeIaasClient) ValidateUrlReturns(result1 error) {
 	fake.validateUrlMutex.Lock()
 	defer fake.validateUrlMutex.Unlock()
 	fake.ValidateUrlStub = nil
@@ -193,7 +193,7 @@ func (fake *FakeVcenterClient) ValidateUrlReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeVcenterClient) ValidateUrlReturnsOnCall(i int, result1 error) {
+func (fake *FakeIaasClient) ValidateUrlReturnsOnCall(i int, result1 error) {
 	fake.validateUrlMutex.Lock()
 	defer fake.validateUrlMutex.Unlock()
 	fake.ValidateUrlStub = nil
@@ -207,13 +207,13 @@ func (fake *FakeVcenterClient) ValidateUrlReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeVcenterClient) Invocations() map[string][][]interface{} {
+func (fake *FakeIaasClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.findVMMutex.RLock()
 	defer fake.findVMMutex.RUnlock()
-	fake.loginMutex.RLock()
-	defer fake.loginMutex.RUnlock()
+	fake.validateCredentialsMutex.RLock()
+	defer fake.validateCredentialsMutex.RUnlock()
 	fake.validateUrlMutex.RLock()
 	defer fake.validateUrlMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
@@ -223,7 +223,7 @@ func (fake *FakeVcenterClient) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeVcenterClient) recordInvocation(key string, args []interface{}) {
+func (fake *FakeIaasClient) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -235,4 +235,4 @@ func (fake *FakeVcenterClient) recordInvocation(key string, args []interface{}) 
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ iaas_clients.VcenterClient = new(FakeVcenterClient)
+var _ iaas_clients.IaasClient = new(FakeIaasClient)

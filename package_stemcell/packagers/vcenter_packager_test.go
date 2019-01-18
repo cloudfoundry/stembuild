@@ -13,11 +13,11 @@ import (
 var _ = Describe("VcenterPackager", func() {
 
 	var sourceConfig config.SourceConfig
-	var fakeVcenterClient *iaas_clientsfakes.FakeVcenterClient
+	var fakeVcenterClient *iaas_clientsfakes.FakeIaasClient
 
 	BeforeEach(func() {
 		sourceConfig = config.SourceConfig{Password: "password", URL: "url", Username: "username", VmInventoryPath: "path"}
-		fakeVcenterClient = &iaas_clientsfakes.FakeVcenterClient{}
+		fakeVcenterClient = &iaas_clientsfakes.FakeIaasClient{}
 	})
 	Context("ValidateSourceParameters", func() {
 		It("returns an error if the vCenter url is invalid", func() {
@@ -34,14 +34,14 @@ var _ = Describe("VcenterPackager", func() {
 		})
 		It("returns an error if the vCenter credentials are not valid", func() {
 
-			fakeVcenterClient.LoginReturns(errors.New("invalid credentials"))
+			fakeVcenterClient.ValidateCredentialsReturns(errors.New("invalid credentials"))
 
 			packager := VCenterPackager{SourceConfig: sourceConfig, Client: fakeVcenterClient}
 
 			err := packager.ValidateSourceParameters()
 
 			Expect(err).To(HaveOccurred())
-			Expect(fakeVcenterClient.LoginCallCount()).To(Equal(1))
+			Expect(fakeVcenterClient.ValidateCredentialsCallCount()).To(Equal(1))
 			Expect(err.Error()).To(ContainSubstring("please provide valid credentials for"))
 		})
 
