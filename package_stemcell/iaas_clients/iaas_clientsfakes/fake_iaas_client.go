@@ -19,6 +19,17 @@ type FakeIaasClient struct {
 	findVMReturnsOnCall map[int]struct {
 		result1 error
 	}
+	PrepareVMStub        func(string) error
+	prepareVMMutex       sync.RWMutex
+	prepareVMArgsForCall []struct {
+		arg1 string
+	}
+	prepareVMReturns struct {
+		result1 error
+	}
+	prepareVMReturnsOnCall map[int]struct {
+		result1 error
+	}
 	ValidateCredentialsStub        func() error
 	validateCredentialsMutex       sync.RWMutex
 	validateCredentialsArgsForCall []struct {
@@ -99,6 +110,66 @@ func (fake *FakeIaasClient) FindVMReturnsOnCall(i int, result1 error) {
 		})
 	}
 	fake.findVMReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIaasClient) PrepareVM(arg1 string) error {
+	fake.prepareVMMutex.Lock()
+	ret, specificReturn := fake.prepareVMReturnsOnCall[len(fake.prepareVMArgsForCall)]
+	fake.prepareVMArgsForCall = append(fake.prepareVMArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("PrepareVM", []interface{}{arg1})
+	fake.prepareVMMutex.Unlock()
+	if fake.PrepareVMStub != nil {
+		return fake.PrepareVMStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.prepareVMReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIaasClient) PrepareVMCallCount() int {
+	fake.prepareVMMutex.RLock()
+	defer fake.prepareVMMutex.RUnlock()
+	return len(fake.prepareVMArgsForCall)
+}
+
+func (fake *FakeIaasClient) PrepareVMCalls(stub func(string) error) {
+	fake.prepareVMMutex.Lock()
+	defer fake.prepareVMMutex.Unlock()
+	fake.PrepareVMStub = stub
+}
+
+func (fake *FakeIaasClient) PrepareVMArgsForCall(i int) string {
+	fake.prepareVMMutex.RLock()
+	defer fake.prepareVMMutex.RUnlock()
+	argsForCall := fake.prepareVMArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeIaasClient) PrepareVMReturns(result1 error) {
+	fake.prepareVMMutex.Lock()
+	defer fake.prepareVMMutex.Unlock()
+	fake.PrepareVMStub = nil
+	fake.prepareVMReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIaasClient) PrepareVMReturnsOnCall(i int, result1 error) {
+	fake.prepareVMMutex.Lock()
+	defer fake.prepareVMMutex.Unlock()
+	fake.PrepareVMStub = nil
+	if fake.prepareVMReturnsOnCall == nil {
+		fake.prepareVMReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.prepareVMReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
@@ -212,6 +283,8 @@ func (fake *FakeIaasClient) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.findVMMutex.RLock()
 	defer fake.findVMMutex.RUnlock()
+	fake.prepareVMMutex.RLock()
+	defer fake.prepareVMMutex.RUnlock()
 	fake.validateCredentialsMutex.RLock()
 	defer fake.validateCredentialsMutex.RUnlock()
 	fake.validateUrlMutex.RLock()

@@ -12,6 +12,7 @@ type IaasClient interface {
 	ValidateUrl() error
 	ValidateCredentials() error
 	FindVM(vmInventoryPath string) error
+	PrepareVM(vmInventoryPath string) error
 }
 
 type VcenterClient struct {
@@ -52,5 +53,31 @@ func (c VcenterClient) FindVM(vmInventoryPath string) error {
 		return errors.New(errorMsg)
 	}
 
+	return nil
+}
+
+func (c VcenterClient) PrepareVM(vmInventoryPath string) error {
+	ethernetDeviceName, floppyDeviceName := "ethernet-0", "floppy-8000"
+	var err error
+
+	err = c.removeDevice(vmInventoryPath, ethernetDeviceName)
+	if err != nil {
+		return err
+	}
+
+	err = c.removeDevice(vmInventoryPath, floppyDeviceName)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c VcenterClient) removeDevice(vmInventoryPath string, deviceName string) error {
+	errCode := c.Runner.Run([]string{"device.remove", "-vm", vmInventoryPath, deviceName, "-u", c.credentialUrl})
+	if errCode != 0 {
+		errorMsg := fmt.Sprintf(deviceName + " could not be removed/not found")
+		return errors.New(errorMsg)
+	}
 	return nil
 }

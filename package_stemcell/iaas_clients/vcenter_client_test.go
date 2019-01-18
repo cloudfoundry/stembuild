@@ -101,4 +101,61 @@ var _ = Describe("VcenterClient", func() {
 			Expect(err.Error()).To(Equal("invalid VM path"))
 		})
 	})
+
+	Context("PrepareVM", func() {
+		It("removes the ethernet device", func() {
+			expectedArgs := []string{"device.remove", "-vm", "validVMPath", "ethernet-0", "-u", credentialUrl}
+			runner.RunReturns(0)
+			err := vcenterClient.PrepareVM("validVMPath")
+
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(runner.RunCallCount()).To(Equal(2))
+
+			argsForRun := runner.RunArgsForCall(0)
+			Expect(argsForRun).To(Equal(expectedArgs))
+
+		})
+
+		It("returns an error if it was not able to remove ethernet-0 for some reason", func() {
+			expectedArgs := []string{"device.remove", "-vm", "validVMPath", "ethernet-0", "-u", credentialUrl}
+			runner.RunReturns(1)
+			err := vcenterClient.PrepareVM("validVMPath")
+
+			Expect(err).To(HaveOccurred())
+			Expect(runner.RunCallCount()).To(Equal(1))
+
+			argsForRun := runner.RunArgsForCall(0)
+			Expect(argsForRun).To(Equal(expectedArgs))
+			Expect(err.Error()).To(Equal("ethernet-0 could not be removed/not found"))
+		})
+
+		It("removes the virtual floppy device", func() {
+			expectedArgs := []string{"device.remove", "-vm", "validVMPath", "floppy-8000", "-u", credentialUrl}
+			runner.RunReturns(0)
+			runner.RunReturnsOnCall(0, 0)
+			runner.RunReturnsOnCall(1, 0)
+			err := vcenterClient.PrepareVM("validVMPath")
+
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(runner.RunCallCount()).To(Equal(2))
+
+			argsForRun := runner.RunArgsForCall(1)
+			Expect(argsForRun).To(Equal(expectedArgs))
+
+		})
+
+		It("returns an error if it was not able to remove ethernet-0 for some reason", func() {
+			expectedArgs := []string{"device.remove", "-vm", "validVMPath", "floppy-8000", "-u", credentialUrl}
+			runner.RunReturnsOnCall(0, 0)
+			runner.RunReturnsOnCall(1, 1)
+			err := vcenterClient.PrepareVM("validVMPath")
+
+			Expect(err).To(HaveOccurred())
+			Expect(runner.RunCallCount()).To(Equal(2))
+
+			argsForRun := runner.RunArgsForCall(1)
+			Expect(argsForRun).To(Equal(expectedArgs))
+			Expect(err.Error()).To(Equal("floppy-8000 could not be removed/not found"))
+		})
+	})
 })

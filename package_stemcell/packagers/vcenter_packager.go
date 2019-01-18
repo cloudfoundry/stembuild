@@ -3,6 +3,7 @@ package packagers
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 
@@ -15,11 +16,16 @@ type VCenterPackager struct {
 	Client       iaas_clients.IaasClient
 }
 
-func (p VCenterPackager) Package() error {
+func (v VCenterPackager) Package() error {
+	err := v.Client.PrepareVM(v.SourceConfig.VmInventoryPath)
+	if err != nil {
+		return errors.New("could not prepare the VM for export")
+	}
 	return nil
 }
 
-func (p VCenterPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
+func (v VCenterPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
+	println(os.Stdout, "WARNING: Please make sure you have enough free disk space for export")
 	return nil
 }
 
