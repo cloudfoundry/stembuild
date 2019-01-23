@@ -25,6 +25,13 @@ import (
 	"github.com/vmware/govmomi/govc/cli"
 	_ "github.com/vmware/govmomi/govc/importx"
 	_ "github.com/vmware/govmomi/govc/vm"
+
+	"syscall"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 func TestConstruct(t *testing.T) {
@@ -33,20 +40,30 @@ func TestConstruct(t *testing.T) {
 }
 
 const (
-	NetworkGatewayVariable = "NETWORK_GATEWAY"
-	SubnetMaskVariable     = "SUBNET_MASK"
-	OvaFileVariable        = "OVA_FILE"
-	VMNamePrefixVariable   = "VM_NAME_PREFIX"
-	VMUsernameVariable     = "VM_USERNAME"
-	VMPasswordVariable     = "VM_PASSWORD"
-	ExistingVmIPVariable   = "EXISTING_VM_IP"
-	UserProvidedIPVariable = "USER_PROVIDED_IP"
-	LockPrivateKeyVariable = "LOCK_PRIVATE_KEY"
+	NetworkGatewayVariable      = "NETWORK_GATEWAY"
+	SubnetMaskVariable          = "SUBNET_MASK"
+	OvaFileVariable             = "OVA_FILE"
+	VMNamePrefixVariable        = "VM_NAME_PREFIX"
+	VMFolderVariable            = "VM_FOLDER"
+	VMUsernameVariable          = "VM_USERNAME"
+	VMPasswordVariable          = "VM_PASSWORD"
+	ExistingVmIPVariable        = "EXISTING_VM_IP"
+	UserProvidedIPVariable      = "USER_PROVIDED_IP"
+	LockPrivateKeyVariable      = "LOCK_PRIVATE_KEY"
+	IPPoolGitURIVariable        = "IP_POOL_GIT_URI"
+	IPPoolNameVariable          = "IP_POOL_NAME"
+	OvaSourceS3RegionVariable   = "OVA_SOURCE_S3_REGION"
+	OvaSourceS3BucketVariable   = "OVA_SOURCE_S3_BUCKET"
+	OvaSourceS3FilenameVariable = "OVA_SOURCE_S3_FILENAME"
+	AwsAccessKeyVariable        = "AWS_ACCESS_KEY_ID"
+	AwsSecretKeyVariable        = "AWS_SECRET_ACCESS_KEY"
+	SkipCleanupVariable         = "SKIP_CLEANUP"
 )
 
 var (
 	conf                config
 	tmpDir              string
+	lockParentDir       string
 	lockPool            out.LockPool
 	lockDir             string
 	stembuildExecutable string
@@ -71,9 +88,23 @@ func envMustExist(variableName string) string {
 	return result
 }
 
+func envMustExistWithDescription(variableName, description string) string {
+	result := os.Getenv(variableName)
+	if result == "" {
+		Fail(fmt.Sprintf("%s %s must be set", description, variableName))
+	}
+
+	return result
+}
+
 func claimAvailableIP() string {
 	lockPrivateKey := envMustExist(LockPrivateKeyVariable)
-	keyFile, err := ioutil.TempFile(os.TempDir(), "keyfile")
+	ipPoolGitURI := envMustExist(IPPoolGitURIVariable)
+	ipPoolName := envMustExist(IPPoolNameVariable)
+
+	lockParentDir = os.TempDir()
+
+	keyFile, err := ioutil.TempFile(lockParentDir, "keyfile")
 	Expect(err).NotTo(HaveOccurred())
 	_, _ = keyFile.Write([]byte(lockPrivateKey))
 	_ = keyFile.Chmod(0600)
@@ -82,9 +113,9 @@ func claimAvailableIP() string {
 	Expect(err).NotTo(HaveOccurred())
 
 	poolSource := out.Source{
-		URI:        "git@github.com:pivotal-cf-experimental/Bosh-Windows-Locks.git",
+		URI:        ipPoolGitURI,
 		Branch:     "master",
-		Pool:       "vcenter-ips",
+		Pool:       ipPoolName,
 		RetryDelay: 5 * time.Second,
 	}
 
@@ -157,11 +188,17 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 })
 
 func createVMWithIP(targetIP string) {
-	ovaFile := envMustExist(OvaFileVariable)
+	failureDescription := fmt.Sprintf(
+		"when creating a VM, because %s isn't set and %s is not set",
+		ExistingVmIPVariable, UserProvidedIPVariable,
+	)
 
-	vmNamePrefix := envMustExist(VMNamePrefixVariable)
-	conf.NetworkGateway = envMustExist(NetworkGatewayVariable)
-	conf.SubnetMask = envMustExist(SubnetMaskVariable)
+	ovaFile := validatedOVALocation()
+
+	vmNamePrefix := envMustExistWithDescription(VMNamePrefixVariable, failureDescription)
+	vmFolder := envMustExistWithDescription(VMFolderVariable, failureDescription)
+	conf.NetworkGateway = envMustExistWithDescription(NetworkGatewayVariable, failureDescription)
+	conf.SubnetMask = envMustExistWithDescription(SubnetMaskVariable, failureDescription)
 
 	conf.TargetIP = targetIP
 	fmt.Printf("Target ip is %s\n", targetIP)
@@ -174,20 +211,20 @@ func createVMWithIP(targetIP string) {
 	Expect(err).NotTo(HaveOccurred())
 	tmpl, err := template.New("ova_options.json.template").ParseFiles(templateFile)
 
-	tmpDir, err = ioutil.TempDir("", "construct-test")
+	tmpDir, err := ioutil.TempDir("", "construct-test")
 	Expect(err).NotTo(HaveOccurred())
 
-	tmpFile, err := ioutil.TempFile(tmpDir, "ova_options*.json")
+	optionsFile, err := ioutil.TempFile(tmpDir, "ova_options*.json")
 	Expect(err).NotTo(HaveOccurred())
 
-	err = tmpl.Execute(tmpFile, conf)
+	err = tmpl.Execute(optionsFile, conf)
 	Expect(err).NotTo(HaveOccurred())
 
 	opts := []string{
 		"import.ova",
-		fmt.Sprintf("--options=%s", tmpFile.Name()),
+		fmt.Sprintf("--options=%s", optionsFile.Name()),
 		fmt.Sprintf("--name=%s", vmName),
-		"--folder=/canada-dc/vm/winnipeg",
+		fmt.Sprintf("--folder=%s", vmFolder),
 		ovaFile,
 	}
 
@@ -198,21 +235,97 @@ func createVMWithIP(targetIP string) {
 
 }
 
+func validatedOVALocation() string {
+	providedLocation := os.Getenv(OvaFileVariable)
+	if providedLocation != "" {
+		_, err := os.Stat(providedLocation)
+		Expect(err).NotTo(
+			HaveOccurred(),
+			fmt.Sprintf("OVA File doesn't exist at %s, as configured by %s", providedLocation, OvaFileVariable),
+		)
+
+		return providedLocation
+	}
+
+	failureDescription := fmt.Sprintf(
+		"when creating a VM because %s isn't set %s isn't set will attempt to download from an S3 source,",
+		ExistingVmIPVariable, OvaFileVariable,
+	)
+
+	s3Region := envMustExistWithDescription(OvaSourceS3RegionVariable, failureDescription)
+	s3Bucket := envMustExistWithDescription(OvaSourceS3BucketVariable, failureDescription)
+	s3Filename := envMustExistWithDescription(OvaSourceS3FilenameVariable, failureDescription)
+	envMustExistWithDescription(AwsAccessKeyVariable, failureDescription)
+	envMustExistWithDescription(AwsSecretKeyVariable, failureDescription)
+
+	fmt.Printf(
+		"%s not set, attempting to download from %s/%s in S3 region %s\n",
+		OvaFileVariable,
+		s3Bucket,
+		s3Filename,
+		s3Region,
+	)
+
+	ovaFile, err := ioutil.TempFile(os.TempDir(), "stembuild-construct-test.ova")
+	Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("%s unable to create temporary OVA file", failureDescription))
+
+	sess, _ := session.NewSession(
+		&aws.Config{
+			Region: aws.String(s3Region),
+		},
+	)
+
+	s3Downloader := s3manager.NewDownloader(sess)
+	_, err = s3Downloader.Download(
+		ovaFile,
+		&s3.GetObjectInput{
+			Bucket: aws.String(s3Bucket),
+			Key:    aws.String(s3Filename),
+		},
+	)
+
+	Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("%s failed to download test OVA", failureDescription))
+
+	return ovaFile.Name()
+}
+
+func runIgnoringOutput(args []string) int {
+	oldStderr := os.Stderr
+	oldStdout := os.Stdout
+
+	_, w, _ := os.Pipe()
+
+	defer w.Close()
+
+	os.Stderr = w
+	os.Stdout = w
+
+	os.Stderr = os.NewFile(uintptr(syscall.Stderr), "/dev/null")
+
+	exitCode := cli.Run(args)
+
+	os.Stderr = oldStderr
+	os.Stdout = oldStdout
+
+	return exitCode
+}
+
 var _ = SynchronizedAfterSuite(func() {
 	_ = os.RemoveAll(tmpDir)
 
-	if !existingVM {
+	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
+
+	if !existingVM && skipCleanup != "TRUE" {
 		deleteCommand := []string{"vm.destroy", fmt.Sprintf("-vm.ip=%s", conf.TargetIP)}
 		Eventually(func() int {
-			return cli.Run(deleteCommand)
+			return runIgnoringOutput(deleteCommand)
 		}, 3*time.Minute).Should(BeZero())
 		fmt.Println("VM destroyed")
 		if lockDir != "" {
 			_, _, err := lockPool.ReleaseLock(lockDir)
 			Expect(err).NotTo(HaveOccurred())
 
-			tmpDir := os.TempDir()
-			childItems, err := ioutil.ReadDir(tmpDir)
+			childItems, err := ioutil.ReadDir(lockParentDir)
 			Expect(err).NotTo(HaveOccurred())
 
 			for _, item := range childItems {
