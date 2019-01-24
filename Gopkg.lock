@@ -227,12 +227,15 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:9a27736f96c4870d428869a0adef4f9a0fe5b5993b8a31efebe9d55732d2e0c3"
+  digest = "1:d6c9b36ea4960b181ee88e895f425b15959ec03ea00868ed0e632a071d45d33e"
   name = "github.com/vmware/govmomi"
   packages = [
     "find",
     "govc/about",
     "govc/cli",
+    "govc/device",
+    "govc/device/cdrom",
+    "govc/export",
     "govc/flags",
     "govc/host/esxcli",
     "govc/importx",
@@ -355,6 +358,9 @@
     "github.com/onsi/gomega/gexec",
     "github.com/vmware/govmomi/govc/about",
     "github.com/vmware/govmomi/govc/cli",
+    "github.com/vmware/govmomi/govc/device",
+    "github.com/vmware/govmomi/govc/device/cdrom",
+    "github.com/vmware/govmomi/govc/export",
     "github.com/vmware/govmomi/govc/importx",
     "github.com/vmware/govmomi/govc/object",
     "github.com/vmware/govmomi/govc/vm",

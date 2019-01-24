@@ -19,6 +19,21 @@ type FakeCliRunner struct {
 	runReturnsOnCall map[int]struct {
 		result1 int
 	}
+	RunWithOutputStub        func([]string) (string, int, error)
+	runWithOutputMutex       sync.RWMutex
+	runWithOutputArgsForCall []struct {
+		arg1 []string
+	}
+	runWithOutputReturns struct {
+		result1 string
+		result2 int
+		result3 error
+	}
+	runWithOutputReturnsOnCall map[int]struct {
+		result1 string
+		result2 int
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -88,11 +103,84 @@ func (fake *FakeCliRunner) RunReturnsOnCall(i int, result1 int) {
 	}{result1}
 }
 
+func (fake *FakeCliRunner) RunWithOutput(arg1 []string) (string, int, error) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.runWithOutputMutex.Lock()
+	ret, specificReturn := fake.runWithOutputReturnsOnCall[len(fake.runWithOutputArgsForCall)]
+	fake.runWithOutputArgsForCall = append(fake.runWithOutputArgsForCall, struct {
+		arg1 []string
+	}{arg1Copy})
+	fake.recordInvocation("RunWithOutput", []interface{}{arg1Copy})
+	fake.runWithOutputMutex.Unlock()
+	if fake.RunWithOutputStub != nil {
+		return fake.RunWithOutputStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.runWithOutputReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeCliRunner) RunWithOutputCallCount() int {
+	fake.runWithOutputMutex.RLock()
+	defer fake.runWithOutputMutex.RUnlock()
+	return len(fake.runWithOutputArgsForCall)
+}
+
+func (fake *FakeCliRunner) RunWithOutputCalls(stub func([]string) (string, int, error)) {
+	fake.runWithOutputMutex.Lock()
+	defer fake.runWithOutputMutex.Unlock()
+	fake.RunWithOutputStub = stub
+}
+
+func (fake *FakeCliRunner) RunWithOutputArgsForCall(i int) []string {
+	fake.runWithOutputMutex.RLock()
+	defer fake.runWithOutputMutex.RUnlock()
+	argsForCall := fake.runWithOutputArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeCliRunner) RunWithOutputReturns(result1 string, result2 int, result3 error) {
+	fake.runWithOutputMutex.Lock()
+	defer fake.runWithOutputMutex.Unlock()
+	fake.RunWithOutputStub = nil
+	fake.runWithOutputReturns = struct {
+		result1 string
+		result2 int
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCliRunner) RunWithOutputReturnsOnCall(i int, result1 string, result2 int, result3 error) {
+	fake.runWithOutputMutex.Lock()
+	defer fake.runWithOutputMutex.Unlock()
+	fake.RunWithOutputStub = nil
+	if fake.runWithOutputReturnsOnCall == nil {
+		fake.runWithOutputReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 int
+			result3 error
+		})
+	}
+	fake.runWithOutputReturnsOnCall[i] = struct {
+		result1 string
+		result2 int
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCliRunner) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.runMutex.RLock()
 	defer fake.runMutex.RUnlock()
+	fake.runWithOutputMutex.RLock()
+	defer fake.runWithOutputMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -30,10 +30,9 @@ func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputCon
 	}
 	switch source {
 	case config.VCENTER:
-		//TODO: move username password etc to runner
-		runner := iaas_cli.GovcRunner{}
+		runner := &iaas_cli.GovcRunner{}
 		client := iaas_clients.NewVcenterClient(sourceConfig.Username, sourceConfig.Password, sourceConfig.URL, runner)
-		v := packagers.VCenterPackager{SourceConfig: sourceConfig, Client: client}
+		v := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: client}
 		return v, nil
 	case config.VMDK:
 		options := package_parameters.VmdkPackageParameters{}

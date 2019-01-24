@@ -121,25 +121,6 @@ var _ = Describe("VmdkPackager", func() {
 		})
 	})
 
-	Describe("CreateManifest", func() {
-		It("Creates a manifest correctly", func() {
-			expectedManifest := `---
-name: bosh-vsphere-esxi-windows1-go_agent
-version: 'version'
-sha1: sha1sum
-operating_system: windows1
-cloud_properties:
-  infrastructure: vsphere
-  hypervisor: esxi
-stemcell_formats:
-- vsphere-ovf
-- vsphere-ova
-`
-			result := packagers.CreateManifest("1", "version", "sha1sum")
-			Expect(result).To(Equal(expectedManifest))
-		})
-	})
-
 	Describe("ValidateFreeSpaceForPackage", func() {
 		var (
 			mockCtrl       *gomock.Controller

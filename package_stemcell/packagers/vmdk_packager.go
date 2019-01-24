@@ -139,28 +139,6 @@ func (c *VmdkPackager) AddTarFile(tr *tar.Writer, name string) error {
 	return nil
 }
 
-func StemcellFilename(version, os string) string {
-	return fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz",
-		version, os)
-}
-
-func CreateManifest(osVersion, version, sha1sum string) string {
-	const format = `---
-name: bosh-vsphere-esxi-windows%[1]s-go_agent
-version: '%[2]s'
-sha1: %[3]s
-operating_system: windows%[1]s
-cloud_properties:
-  infrastructure: vsphere
-  hypervisor: esxi
-stemcell_formats:
-- vsphere-ovf
-- vsphere-ova
-`
-	return fmt.Sprintf(format, osVersion, version, sha1sum)
-
-}
-
 func (c *VmdkPackager) TempDir() (string, error) {
 	if c.tmpdir != "" {
 		if _, err := os.Stat(c.tmpdir); err != nil {
@@ -231,34 +209,6 @@ func (c *VmdkPackager) CreateStemcell() error {
 	}
 
 	c.Debugf("created stemcell in: %s", time.Since(t))
-
-	return nil
-}
-
-func (c *VmdkPackager) WriteManifest(manifest string) error {
-	// programming error - this should never happen...
-	if c.Manifest != "" {
-		panic("already created manifest: " + c.Manifest)
-	}
-
-	tmpdir, err := c.TempDir()
-	if err != nil {
-		return err
-	}
-
-	c.Manifest = filepath.Join(tmpdir, "stemcell.MF")
-	f, err := os.OpenFile(c.Manifest, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
-	if err != nil {
-		return fmt.Errorf("creating stemcell.MF (%s): %s", c.Manifest, err)
-	}
-	defer f.Close()
-	c.Debugf("created temp stemcell.MF file: %s", c.Manifest)
-
-	if _, err := fmt.Fprintf(f, manifest); err != nil {
-		os.Remove(c.Manifest)
-		return fmt.Errorf("writing stemcell.MF (%s): %s", c.Manifest, err)
-	}
-	c.Debugf("wrote stemcell.MF with sha1: %s and version: %s", c.Sha1sum, c.BuildOptions.Version)
 
 	return nil
 }
@@ -373,9 +323,17 @@ func (c *VmdkPackager) ConvertVMDK() (string, error) {
 	if err := c.CreateImage(); err != nil {
 		return "", err
 	}
-	if err := c.WriteManifest(CreateManifest(c.BuildOptions.OSVersion, c.BuildOptions.Version, c.Sha1sum)); err != nil {
+	_, err := c.TempDir()
+
+	if err != nil {
 		return "", err
 	}
+	manifest := CreateManifest(c.BuildOptions.OSVersion, c.BuildOptions.Version, c.Sha1sum)
+	if err := WriteManifest(manifest, c.tmpdir); err != nil {
+		return "", err
+	}
+	c.Manifest = filepath.Join(c.tmpdir, "stemcell.MF")
+
 	if err := c.CreateStemcell(); err != nil {
 		return "", err
 	}
