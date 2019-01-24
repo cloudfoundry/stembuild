@@ -39,7 +39,7 @@ var _ = Describe("Convert VMDK", func() {
 
 					session := helpers.Stembuild(stembuildExecutable, "package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
 					Eventually(session, 20).Should(Exit(1))
-					Eventually(session.Err).Should(Say(`OS version must be either 2012R2, 2016, or 1803 have:`))
+					Eventually(session.Err).Should(Say(`OS version must be either 2012R2, 2016, 1803, or 2019 have:`))
 				})
 
 			})
@@ -88,6 +88,38 @@ var _ = Describe("Convert VMDK", func() {
 			It("creates a valid 1803 stemcell", func() {
 				osVersion = "1803"
 				version = "1803.0"
+				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
+				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
+
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
+				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
+				Expect(stemcellFilename).To(BeAnExistingFile())
+
+				stemcellDir, err := helpers.ExtractGzipArchive(stemcellFilename)
+				Expect(err).NotTo(HaveOccurred())
+
+				manifestFilepath := filepath.Join(stemcellDir, "stemcell.MF")
+				manifest, err := helpers.ReadFile(manifestFilepath)
+				Expect(err).NotTo(HaveOccurred())
+
+				expectedOs := fmt.Sprintf("operating_system: windows%s", osVersion)
+				Expect(manifest).To(ContainSubstring(expectedOs))
+
+				expectedName := fmt.Sprintf("name: bosh-vsphere-esxi-windows%s-go_agent", osVersion)
+				Expect(manifest).To(ContainSubstring(expectedName))
+
+				imageFilepath := filepath.Join(stemcellDir, "image")
+				imageDir, err := helpers.ExtractGzipArchive(imageFilepath)
+				Expect(err).NotTo(HaveOccurred())
+
+				actualVmdkFilepath := filepath.Join(imageDir, "image-disk1.vmdk")
+				_, err = ioutil.ReadFile(actualVmdkFilepath)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("creates a valid 2019 stemcell", func() {
+				osVersion = "2019"
+				version = "2019.0"
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 

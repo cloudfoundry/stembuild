@@ -52,7 +52,7 @@ func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.Username, "username", "", "vCenter username")
 	f.StringVar(&p.sourceConfig.Password, "password", "", "vCenter password")
 	f.StringVar(&p.sourceConfig.URL, "url", "", "vCenter url")
-	f.StringVar(&p.outputConfig.Os, "os", "", "OS version must be either 2012R2, 2016, or 1803")
+	f.StringVar(&p.outputConfig.Os, "os", "", "OS version must be either 2012R2, 2016, 1803 or 2019")
 	f.StringVar(&p.outputConfig.StemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
 	f.StringVar(&p.outputConfig.StemcellVersion, "s", "", "Stemcell version (shorthand)")
 	f.StringVar(&p.outputConfig.OutputDir, "outputDir", "", "Output directory, default is the current working directory.")

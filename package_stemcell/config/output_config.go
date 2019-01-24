@@ -15,7 +15,7 @@ type OutputConfig struct {
 
 func (c OutputConfig) ValidateConfig() error {
 	if !IsValidOS(c.Os) {
-		return fmt.Errorf("OS version must be either 2012R2, 2016, or 1803 have: %s\n", c.Os)
+		return fmt.Errorf("OS version must be either 2012R2, 2016, 1803, or 2019 have: %s\n", c.Os)
 	}
 	if !IsValidStemcellVersion(c.StemcellVersion) {
 		return fmt.Errorf("invalid stemcell version (%s) expected format [NUMBER].[NUMBER] or "+
@@ -41,7 +41,7 @@ func (c OutputConfig) ValidateConfig() error {
 
 func IsValidOS(os string) bool {
 	switch os {
-	case "2012R2", "1803", "2016":
+	case "2012R2", "1803", "2016", "2019":
 		return true
 	default:
 		return false
