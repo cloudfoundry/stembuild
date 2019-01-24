@@ -59,7 +59,7 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
-				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion, "--outputDir", ".")
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
@@ -91,7 +91,7 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
-				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion, "--outputDir", ".")
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
@@ -123,7 +123,7 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
-				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion, "--outputDir", ".")
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
 
@@ -155,7 +155,7 @@ var _ = Describe("Convert VMDK", func() {
 				stemcellFilename = fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, osVersion)
 				inputVmdk = filepath.Join("..", "test", "data", "expected.vmdk")
 
-				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion)
+				session := expectStembuildToSucceed("package", "--vmdk", inputVmdk, "--stemcell-version", version, "--os", osVersion, "--outputDir", ".")
 
 				Eventually(session).Should(Say(`created stemcell: .*\.tgz`))
 				Expect(stemcellFilename).To(BeAnExistingFile())
