@@ -188,10 +188,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 })
 
 func createVMWithIP(targetIP string) {
-	failureDescription := fmt.Sprintf(
-		"when creating a VM, because %s isn't set and %s is not set",
-		ExistingVmIPVariable, UserProvidedIPVariable,
-	)
+	failureDescription := fmt.Sprintf("when creating a VM, because %s isn't set", ExistingVmIPVariable)
 
 	ovaFile := validatedOVALocation()
 
