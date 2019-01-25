@@ -155,14 +155,14 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	}
 
 	if userProvidedIP != "" && existingVMIP == "" {
-		fmt.Printf("Creating VM with IP: %s\n", targetIP)
 		targetIP = userProvidedIP
+		fmt.Printf("Creating VM with IP: %s\n", targetIP)
 		createVMWithIP(targetIP)
 	}
 	if existingVMIP != "" {
 		existingVM = true
-		fmt.Printf("Using existing VM with IP: %s\n", existingVMIP)
 		targetIP = existingVMIP
+		fmt.Printf("Using existing VM with IP: %s\n", targetIP)
 	}
 	if targetIP == "" {
 		fmt.Println("Finding available IP...")
