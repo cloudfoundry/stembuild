@@ -191,6 +191,19 @@ func BuildStembuild() (string, error) {
 	buildPackage := "github.com/cloudfoundry-incubator/stembuild"
 	buildPackage = filepath.FromSlash(buildPackage)
 
+	generateCommand := fmt.Sprintf("go generate %s", buildPackage)
+	generateCommandSlice := strings.Split(generateCommand, " ")
+
+	genCmd := exec.Command(generateCommandSlice[0], generateCommandSlice[1:]...)
+	genSess, err := gexec.Start(genCmd, stdout, stderr)
+	if err != nil {
+		return "", err
+	}
+	gomega.EventuallyWithOffset(1, genSess, 30*time.Second).Should(
+		gexec.Exit(0),
+		fmt.Sprintf("Generate command failed with exit code %d", genSess.ExitCode()),
+	)
+
 	buildCommand := fmt.Sprintf("go build -o %s %s", stembuildExecutable, buildPackage)
 	buildCommandSlice := strings.Split(buildCommand, " ")
 
