@@ -102,13 +102,8 @@ func claimAvailableIP() string {
 	ipPoolGitURI := envMustExist(IPPoolGitURIVariable)
 	ipPoolName := envMustExist(IPPoolNameVariable)
 
-	wd, err := os.Getwd()
-	Expect(err).NotTo(HaveOccurred())
-	tmpDir, err = ioutil.TempDir(wd, "construct-integration")
-	Expect(err).NotTo(HaveOccurred())
-
 	lockParentDir = filepath.Join(tmpDir, "lockParent")
-	err = os.MkdirAll(lockParentDir, 0755)
+	err := os.MkdirAll(lockParentDir, 0755)
 	Expect(err).NotTo(HaveOccurred())
 
 	keyFile, err := ioutil.TempFile(lockParentDir, "keyfile")
@@ -154,6 +149,14 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	vmPassword := envMustExist(VMPasswordVariable)
 	existingVMIP := os.Getenv(ExistingVmIPVariable)
 	userProvidedIP := os.Getenv(UserProvidedIPVariable)
+
+	wd, err := os.Getwd()
+	Expect(err).NotTo(HaveOccurred())
+	tmpDir, err = ioutil.TempDir(wd, "construct-integration")
+	Expect(err).NotTo(HaveOccurred())
+
+	err = os.MkdirAll(tmpDir, 0755)
+	Expect(err).NotTo(HaveOccurred())
 
 	conf = config{
 		TargetIP:   existingVMIP,
