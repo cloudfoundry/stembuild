@@ -316,7 +316,7 @@ var _ = SynchronizedAfterSuite(func() {
 		deleteCommand := []string{"vm.destroy", fmt.Sprintf("-vm.ip=%s", conf.TargetIP)}
 		Eventually(func() int {
 			return runIgnoringOutput(deleteCommand)
-		}, 3*time.Minute).Should(BeZero())
+		}, 3*time.Minute, 10*time.Second).Should(BeZero())
 		fmt.Println("VM destroyed")
 		if lockDir != "" {
 			_, _, err := lockPool.ReleaseLock(lockDir)
