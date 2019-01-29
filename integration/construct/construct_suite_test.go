@@ -102,7 +102,14 @@ func claimAvailableIP() string {
 	ipPoolGitURI := envMustExist(IPPoolGitURIVariable)
 	ipPoolName := envMustExist(IPPoolNameVariable)
 
-	lockParentDir = os.TempDir()
+	wd, err := os.Getwd()
+	Expect(err).NotTo(HaveOccurred())
+	tmpDir, err = ioutil.TempDir(wd, "construct-integration")
+	Expect(err).NotTo(HaveOccurred())
+
+	lockParentDir = filepath.Join(tmpDir, "lockParent")
+	err = os.MkdirAll(lockParentDir, 0755)
+	Expect(err).NotTo(HaveOccurred())
 
 	keyFile, err := ioutil.TempFile(lockParentDir, "keyfile")
 	Expect(err).NotTo(HaveOccurred())
@@ -263,7 +270,7 @@ func validatedOVALocation() string {
 		s3Region,
 	)
 
-	ovaFile, err := ioutil.TempFile(os.TempDir(), "stembuild-construct-test.ova")
+	ovaFile, err := ioutil.TempFile(tmpDir, "stembuild-construct-test.ova")
 	Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("%s unable to create temporary OVA file", failureDescription))
 
 	sess, _ := session.NewSession(
@@ -282,6 +289,8 @@ func validatedOVALocation() string {
 	)
 
 	Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("%s failed to download test OVA", failureDescription))
+
+	fmt.Printf("Downloaded OVA file to %s\n", ovaFile.Name())
 
 	return ovaFile.Name()
 }
@@ -308,8 +317,6 @@ func runIgnoringOutput(args []string) int {
 }
 
 var _ = SynchronizedAfterSuite(func() {
-	_ = os.RemoveAll(tmpDir)
-
 	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
 
 	if !existingVM && skipCleanup != "TRUE" {
@@ -333,6 +340,8 @@ var _ = SynchronizedAfterSuite(func() {
 			}
 		}
 	}
+
+	_ = os.RemoveAll(tmpDir)
 }, func() {
 	Expect(os.RemoveAll(stembuildExecutable)).To(Succeed())
 })
