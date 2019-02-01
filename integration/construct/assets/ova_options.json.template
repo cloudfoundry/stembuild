@@ -7,7 +7,7 @@
   "NetworkMapping": [
     {
       "Name": "custom",
-      "Network": "/canada-dc/network/winnipeg"
+      "Network": "{{.VMNetwork}}"
     }
   ],
   "PropertyMapping": [

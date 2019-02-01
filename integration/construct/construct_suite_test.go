@@ -47,6 +47,7 @@ const (
 	VMFolderVariable            = "VM_FOLDER"
 	VMUsernameVariable          = "VM_USERNAME"
 	VMPasswordVariable          = "VM_PASSWORD"
+	VMNetworkVariable           = "GOVC_NETWORK"
 	ExistingVmIPVariable        = "EXISTING_VM_IP"
 	UserProvidedIPVariable      = "USER_PROVIDED_IP"
 	LockPrivateKeyVariable      = "LOCK_PRIVATE_KEY"
@@ -77,6 +78,7 @@ type config struct {
 	VMUsername     string
 	VMPassword     string
 	VMName         string
+	VMNetwork      string
 }
 
 func envMustExist(variableName string) string {
@@ -206,6 +208,7 @@ func createVMWithIP(targetIP string) {
 	vmFolder := envMustExistWithDescription(VMFolderVariable, failureDescription)
 	conf.NetworkGateway = envMustExistWithDescription(NetworkGatewayVariable, failureDescription)
 	conf.SubnetMask = envMustExistWithDescription(SubnetMaskVariable, failureDescription)
+	conf.VMNetwork = envMustExistWithDescription(VMNetworkVariable, failureDescription)
 
 	conf.TargetIP = targetIP
 	fmt.Printf("Target ip is %s\n", targetIP)
