@@ -49,7 +49,7 @@ func (w *WinRM) ExecuteCommand(command string) error {
 		return err
 	}
 	errBuffer := new(bytes.Buffer)
-	exitCode, err := client.RunWithInput(command, os.Stdout, io.MultiWriter(errBuffer, os.Stderr), os.Stdin)
+	exitCode, err := client.Run(command, os.Stdout, io.MultiWriter(errBuffer, os.Stderr))
 	if err == nil && exitCode != 0 {
 		err = fmt.Errorf("powershell encountered an issue: %s", errBuffer.String())
 	}

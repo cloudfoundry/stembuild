@@ -12,7 +12,7 @@ type VMConstruct struct {
 const provisionDir = "C:\\provision\\"
 const stemcellAutomationDest = provisionDir + "StemcellAutomation.zip"
 const lgpoDest = provisionDir + "LGPO.zip"
-const stemcellAutomationScript = provisionDir + "StemcellAutomation\\Setup.ps1"
+const stemcellAutomationScript = provisionDir + "Setup.ps1"
 
 func NewVMConstruct(winrmIP, winrmUsername, winrmPassword string) *VMConstruct {
 	return &VMConstruct{NewWinRM(winrmIP, winrmUsername, winrmPassword)}
