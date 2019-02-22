@@ -26,7 +26,7 @@ import (
 
 var _ = Describe("Package", func() {
 	const (
-		baseVMName              = "stembuild-package-integration-tests-base-vm"
+		baseVMNameEnvVar        = "PACKAGE_TEST_BASE_VM_NAME"
 		stemcellVersion         = "1803.5.3999-manual.1"
 		osVersion               = "1803"
 		vcenterURLVariable      = "GOVC_URL"
@@ -38,6 +38,7 @@ var _ = Describe("Package", func() {
 
 	var (
 		workingDir      string
+		baseVMName      string
 		sourceVMName    string
 		vmPath          string
 		vcenterURL      string
@@ -50,6 +51,9 @@ var _ = Describe("Package", func() {
 	BeforeSuite(func() {
 		executable, err = helpers.BuildStembuild()
 		Expect(err).NotTo(HaveOccurred())
+
+		baseVMName = os.Getenv(baseVMNameEnvVar)
+		Expect(baseVMName).NotTo(Equal(""), fmt.Sprintf("%s required", baseVMNameEnvVar))
 	})
 
 	BeforeEach(func() {

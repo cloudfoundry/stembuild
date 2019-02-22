@@ -15,7 +15,7 @@ var _ = Describe("GovcCli", func() {
 		})
 
 		It("lists the devices for a known VCenter VM", func() {
-			out, _, err := runner.RunWithOutput([]string{"device.ls", "-vm", "/canada-dc/vm/calgary/stembuild-package-integration-tests-base-vm"})
+			out, _, err := runner.RunWithOutput([]string{"device.ls", "-vm", targetVMPath})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(out).To(Equal(
 				`ide-200            VirtualIDEController          IDE 0

@@ -24,8 +24,11 @@ test : units
 
 units : format build
 	@ginkgo version
-	PATH="$(PWD)/out:$(PATH)" ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration
+	PATH="$(PWD)/out:$(PATH)" ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
 	@echo "\nSWEET SUITE SUCCESS"
+
+contract :
+	ginkgo -r -v -randomizeAllSpecs -randomizeSuites iaas_cli
 
 .PHONY : all build clean format
 .PHONY : test units units-full integration integration-tests-full
