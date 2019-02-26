@@ -92,6 +92,9 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	}
 
 	if err := packager.Package(); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err.Error())
+		_, _ = fmt.Fprintln(os.Stderr, "Please provide the error logs to bosh-windows-eng@pivotal.io")
+
 		return subcommands.ExitFailure
 	}
 

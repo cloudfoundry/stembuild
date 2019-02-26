@@ -2,6 +2,7 @@ package packagers
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -56,6 +57,7 @@ func (v VCenterPackager) Package() error {
 		return errors.New("failed to export the prepared VM")
 	}
 
+	fmt.Println("Converting VMDK into stemcell")
 	vmName := path.Base(v.SourceConfig.VmInventoryPath)
 	shaSum, err := TarGenerator(filepath.Join(stemcellDir, "image"), filepath.Join(workingDir, vmName))
 	manifestContents := CreateManifest(v.OutputConfig.Os, v.OutputConfig.StemcellVersion, shaSum)
@@ -68,6 +70,7 @@ func (v VCenterPackager) Package() error {
 	stemcellFilename := StemcellFilename(v.OutputConfig.StemcellVersion, v.OutputConfig.Os)
 	_, err = TarGenerator(filepath.Join(v.OutputConfig.OutputDir, stemcellFilename), stemcellDir)
 
+	fmt.Println(fmt.Printf("Stemcell successfully created: %s", stemcellFilename))
 	return nil
 }
 
