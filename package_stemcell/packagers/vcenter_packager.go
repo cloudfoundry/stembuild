@@ -70,7 +70,7 @@ func (v VCenterPackager) Package() error {
 	stemcellFilename := StemcellFilename(v.OutputConfig.StemcellVersion, v.OutputConfig.Os)
 	_, err = TarGenerator(filepath.Join(v.OutputConfig.OutputDir, stemcellFilename), stemcellDir)
 
-	fmt.Println(fmt.Printf("Stemcell successfully created: %s", stemcellFilename))
+	fmt.Printf("Stemcell successfully created: %s\n", stemcellFilename)
 	return nil
 }
 

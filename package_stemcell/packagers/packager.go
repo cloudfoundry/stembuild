@@ -6,7 +6,7 @@ import (
 )
 
 type Packager struct {
-	source Source
+	source            Source
 	stemcellGenerator StemcellGenerator
 }
 
@@ -14,6 +14,7 @@ type Packager struct {
 type Source interface {
 	ArtifactReader() (io.Reader, error)
 }
+
 //go:generate counterfeiter . StemcellGenerator
 type StemcellGenerator interface {
 	Generate(reader io.Reader) error
@@ -35,4 +36,3 @@ func (p *Packager) Package() error {
 
 	return nil
 }
-

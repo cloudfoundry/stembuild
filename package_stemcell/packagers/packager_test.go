@@ -9,17 +9,14 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-
-
 var _ = Describe("Packager", func() {
 	Describe("Package", func() {
 
 		var (
-			source *packagersfakes.FakeSource
-			stemcellGenerator  *packagersfakes.FakeStemcellGenerator
-			packager *packagers.Packager
+			source            *packagersfakes.FakeSource
+			stemcellGenerator *packagersfakes.FakeStemcellGenerator
+			packager          *packagers.Packager
 		)
-
 
 		BeforeEach(func() {
 			source = &packagersfakes.FakeSource{}
@@ -52,7 +49,7 @@ var _ = Describe("Packager", func() {
 			Expect(err).To(MatchError("packager failed to generate stemcell: other bad thing"))
 		})
 
-		It("uses source object to generate stemcell", func(){
+		It("uses source object to generate stemcell", func() {
 			fakeIoReader := bytes.NewReader([]byte{})
 			source.ArtifactReaderReturns(fakeIoReader, nil)
 
