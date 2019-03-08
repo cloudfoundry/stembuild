@@ -24,13 +24,6 @@ var _ = Describe("Packager", func() {
 			packager = packagers.NewPackager(source, stemcellGenerator)
 		})
 
-		It("doesn't return an error", func() {
-
-			err := packager.Package()
-
-			Expect(err).NotTo(HaveOccurred())
-		})
-
 		It("returns an error if ArtifactReader does", func() {
 
 			source.ArtifactReaderReturns(nil, errors.New("bad thing"))
@@ -53,13 +46,14 @@ var _ = Describe("Packager", func() {
 			fakeIoReader := bytes.NewReader([]byte{})
 			source.ArtifactReaderReturns(fakeIoReader, nil)
 
-			packager.Package()
+			err := packager.Package()
+
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(source.ArtifactReaderCallCount()).To(Equal(1))
 			Expect(stemcellGenerator.GenerateCallCount()).To(Equal(1))
 
 			argsForFirstCall := stemcellGenerator.GenerateArgsForCall(0)
-
 			Expect(argsForFirstCall).To(BeIdenticalTo(fakeIoReader))
 		})
 	})
