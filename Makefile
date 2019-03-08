@@ -16,7 +16,7 @@ format :
 	go fmt ./...
 
 integration : build
-	PATH="$(PWD)/out:$(PATH)" ginkgo -r -v -randomizeAllSpecs integration
+	ginkgo -r -v -randomizeAllSpecs integration
 
 out/stembuild : $(GOSRC)
 	go generate
@@ -28,7 +28,7 @@ test : units
 
 units : format build
 	@ginkgo version
-	PATH="$(PWD)/out:$(PATH)" ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
+	ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
 	@echo "\nSWEET SUITE SUCCESS"
 
 contract :
