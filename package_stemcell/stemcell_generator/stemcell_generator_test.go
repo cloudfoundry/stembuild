@@ -33,6 +33,5 @@ var _ = Describe("StemcellGenerator", func() {
 			Expect(args).To(Equal(fakeImage))
 		})
 
-
 	})
 })

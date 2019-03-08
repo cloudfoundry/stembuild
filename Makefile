@@ -15,18 +15,20 @@ clean :
 format :
 	go fmt ./...
 
-integration : build
+integration : generate
 	ginkgo -r -v -randomizeAllSpecs integration
 
-out/stembuild : $(GOSRC)
+generate: $(GOSRC) $(AUTOMATION_PATH)
 	go generate
 	go get -u github.com/jteeuwen/go-bindata/...
 	go-bindata -o stemcell_automation.go -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
+
+out/stembuild : generate $(GOSRC)
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
 
 test : units
 
-units : format build
+units : format generate
 	@ginkgo version
 	ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
 	@echo "\nSWEET SUITE SUCCESS"
@@ -34,5 +36,5 @@ units : format build
 contract :
 	ginkgo -r -v -randomizeAllSpecs -randomizeSuites iaas_cli
 
-.PHONY : all build clean format
+.PHONY : all build clean format generate
 .PHONY : test units units-full integration integration-tests-full

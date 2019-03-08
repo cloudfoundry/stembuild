@@ -9,7 +9,6 @@ type ManifestGenerator interface {
 
 type StemcellGenerator struct {
 	manifestGenerator ManifestGenerator
-
 }
 
 func NewStemcellGenerator(m ManifestGenerator) *StemcellGenerator {
