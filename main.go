@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 
@@ -15,6 +16,18 @@ import (
 //go:generate go run gen.go
 
 func main() {
+	data, err := Asset("StemcellAutomation.zip")
+	if err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, "StemcellAutomation not found")
+		os.Exit(1)
+	}
+	s := "./StemcellAutomation.zip"
+	err = ioutil.WriteFile(s, data, 0644)
+	if err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, "Unable to write StemcellAutomation.zip")
+		os.Exit(1)
+	}
+
 	var gf GlobalFlags
 	packageCmd := PackageCmd{}
 	packageCmd.GlobalFlags = &gf
@@ -47,9 +60,12 @@ func main() {
 	_ = fs.Parse(os.Args[1:])
 	if gf.ShowVersion {
 		_, _ = fmt.Fprintf(os.Stdout, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version)
+		_ = os.Remove(s)
 		os.Exit(0)
 	}
 
 	ctx := context.Background()
-	os.Exit(int(commander.Execute(ctx)))
+	i := int(commander.Execute(ctx))
+	_ = os.Remove(s)
+	os.Exit(i)
 }

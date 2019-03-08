@@ -4,6 +4,7 @@ stembuild
 stembuild.exe
 gordiff
 gordiff.exe
+stemcell_automation.go
 temp
 rdiff/*.c
 rdiff/*.h

@@ -26,10 +26,7 @@ var _ = Describe("stembuild construct", func() {
 
 	Context("run successfully", func() {
 		It("transfers LGPO and StemcellAutomation archives, unarchive them and execute automation script", func() {
-			err := CopyFile(filepath.Join(workingDir, "assets", "StemcellAutomation.zip"), filepath.Join(workingDir, "StemcellAutomation.zip"))
-			Expect(err).ToNot(HaveOccurred())
-
-			err = CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
+			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 			Expect(err).ToNot(HaveOccurred())
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-stemcell-version", "1709.1", "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword)
@@ -45,15 +42,14 @@ var _ = Describe("stembuild construct", func() {
 		})
 	})
 
-	It("fails with an appropriate error when LGPO and/or StemcellAutomation is missing", func() {
+	It("fails with an appropriate error when LGPO is missing", func() {
 		session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-stemcell-version", "1803.1", "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword)
 
 		Eventually(session, 20).Should(Exit(1))
-		Eventually(session.Err).Should(Say(`automation artifact not found in current directory`))
+		Eventually(session.Err).Should(Say(`lgpo not found in current directory`))
 	})
 
 	AfterEach(func() {
-		_ = os.Remove(filepath.Join(workingDir, "StemcellAutomation.zip"))
 		_ = os.Remove(filepath.Join(workingDir, "LGPO.zip"))
 	})
 })

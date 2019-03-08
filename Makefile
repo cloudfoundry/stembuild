@@ -1,6 +1,8 @@
 LD_FLAGS = "-w -s"
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 COMMAND = out/stembuild
+AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
+AUTOMATION_PREFIX = $(shell dirname "${AUTOMATION_PATH}")
 
 all : test build
 
@@ -18,6 +20,8 @@ integration : build
 
 out/stembuild : $(GOSRC)
 	go generate
+	go get -u github.com/jteeuwen/go-bindata/...
+	go-bindata -o stemcell_automation.go -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
 
 test : units

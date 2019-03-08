@@ -69,10 +69,6 @@ Flags:
 
 Process can take between 10 and 20 minutes. See Progress with `-debug` flag.
 
-## Compilation
-
-See the [wiki](https://github.com/cloudfoundry-incubator/stembuild/wiki/build-stembuild)
-
 ## Testing
 
 Older tests were written using the default testing framework.  However, more recent code

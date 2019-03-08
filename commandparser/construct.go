@@ -37,15 +37,14 @@ Requirements:
 		- Up to date Operating System
 		- WinRm enabled
 		- Reachable by IP
-		- Username and password with Administrator privileges 
-	StemcellAutomation.zip in current working directory
+		- Username and password with Administrator privileges
 	LGPO.zip in current working directory
 
 Examples:
 	%[1]s construct -stemcell-version 1709.1 -winrm-ip '10.0.0.5' -winrm-username Admin -winrm-password 'password'
 
-	This will connect to VM with IP 10.0.0.5 using credentials Admin:password, upload and execute StemcellAutomation.zip found in the working directory.
-	StemcellAutomation.zip requires LGPO.zip to be present in the working directory.
+	This will connect to VM with IP 10.0.0.5 using credentials Admin:password, and execute setup script which
+	requires LGPO.zip to be present in the working directory.
 	When command exits successfully, the VM will be Sysprepped and powered off.
 
 Flags:
@@ -82,11 +81,7 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		_, _ = fmt.Fprint(os.Stderr, "unable to find current working directory", err)
 		return subcommands.ExitFailure
 	}
-	automationArtifactPresent, err := IsArtifactInDirectory(pwd, "StemcellAutomation.zip")
-	if !automationArtifactPresent {
-		_, _ = fmt.Fprintf(os.Stderr, "automation artifact not found in current directory")
-		return subcommands.ExitFailure
-	}
+
 	lgpoPresent, err := IsArtifactInDirectory(pwd, "LGPO.zip")
 	if !lgpoPresent {
 		_, _ = fmt.Fprintf(os.Stderr, "lgpo not found in current directory")
