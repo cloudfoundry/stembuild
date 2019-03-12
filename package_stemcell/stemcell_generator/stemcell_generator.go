@@ -19,7 +19,7 @@ type TarWriter interface {
 type StemcellGenerator struct {
 	manifestGenerator ManifestGenerator
 	fileNameGenerator FileNameGenerator
-	tarWriter TarWriter
+	tarWriter         TarWriter
 }
 
 func NewStemcellGenerator(m ManifestGenerator, f FileNameGenerator, t TarWriter) *StemcellGenerator {

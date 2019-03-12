@@ -49,7 +49,7 @@ func (c VcenterClient) FindVM(vmInventoryPath string) error {
 }
 
 func (c VcenterClient) ListDevices(vmInventoryPath string) ([]string, error) {
-	o, exitCode, err := c.Runner.RunWithOutput([]string{"device.ls", "-vm", vmInventoryPath})
+	o, exitCode, err := c.Runner.RunWithOutput([]string{"device.ls", "-u", c.credentialUrl, "-vm", vmInventoryPath})
 
 	if exitCode != 0 {
 		return []string{}, fmt.Errorf("vcenter_client - failed to list devices in vCenter, govc exit code %d", exitCode)

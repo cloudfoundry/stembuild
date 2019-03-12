@@ -164,7 +164,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 				"ide-200", "ide-201", "ps2-300", "pci-100", "sio-400", "floppy-8000", "ethernet-0",
 			))
 
-			Expect(runner.RunWithOutputArgsForCall(0)).To(Equal([]string{"device.ls", "-vm", "/path/to/vm"}))
+			Expect(runner.RunWithOutputArgsForCall(0)).To(Equal([]string{"device.ls", "-u", credentialUrl, "-vm", "/path/to/vm"}))
 		})
 
 		It("returns an error if govc runner returns non zero exit code", func() {

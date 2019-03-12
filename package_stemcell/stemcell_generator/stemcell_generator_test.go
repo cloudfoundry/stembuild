@@ -2,11 +2,12 @@ package stemcell_generator_test
 
 import (
 	"bytes"
+	"io"
+
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
 	fakes "github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/stemcell_generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io"
 )
 
 var _ = Describe("StemcellGenerator", func() {
@@ -15,7 +16,7 @@ var _ = Describe("StemcellGenerator", func() {
 			stemcellGenerator *stemcell_generator.StemcellGenerator
 			manifestGenerator *fakes.FakeManifestGenerator
 			fileNameGenerator *fakes.FakeFileNameGenerator
-			tarWriter *fakes.FakeTarWriter
+			tarWriter         *fakes.FakeTarWriter
 			fakeImage         io.Reader
 		)
 
@@ -43,7 +44,7 @@ var _ = Describe("StemcellGenerator", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fileNameGenerator.FileNameCallCount()).To(Equal(1))
 		})
-		It("should generate a tarball", func(){
+		It("should generate a tarball", func() {
 			expectedFileName := "the-file.tgz"
 			expectedManifest := bytes.NewReader([]byte("manifest"))
 
@@ -59,6 +60,5 @@ var _ = Describe("StemcellGenerator", func() {
 
 			Expect(objects).To(ConsistOf(expectedManifest, fakeImage))
 		})
-
 	})
 })
