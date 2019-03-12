@@ -22,25 +22,41 @@ type PackageCmd struct {
 	outputConfig config.OutputConfig
 }
 
-func (*PackageCmd) Name() string     { return "package" }
-func (*PackageCmd) Synopsis() string { return "Create a BOSH Stemcell from a VMDK file" }
+func (*PackageCmd) Name() string { return "package" }
+func (*PackageCmd) Synopsis() string {
+	return "Create a BOSH Stemcell from a VMDK file or a provisioned vCenter VM"
+}
 func (*PackageCmd) Usage() string {
-	return fmt.Sprintf(`%[1]s package -vmdk <path-to-vmdk> -stemcellVersion <stemcell stemcellVersion> -os <os stemcellVersion> 
+	return fmt.Sprintf(`
+Create a BOSH Stemcell from a VMDK file or a provisioned vCenter VM
 
-Create a BOSH Stemcell from a VMDK file
+VM on vCenter:
 
-The [vmdk], [stemcellVersion], and [os] flags must be specified.  If the [output] flag is
-not specified the stemcell will be created in the current working directory.
+  %[1]s package -stemcell-version <stemcell version> -os <os> -vcenter-url <vCenter URL> -vcenter-username <vCenter username> -vcenter-password <vCenter password> -vm-inventory-path <vCenter VM inventory path>
 
-Requirements:
-	The VMware 'ovftool' binary must be on your path or Fusion/Workstation
-	must be installed (both include the 'ovftool').
+  Requirements:
+    - VM provisioned using the stembuild construct command
+    - Access to vCenter environment
+    - The [vcenter-url], [vcenter-username], [vcenter-password], [stemcell-version], and [os] flags must be specified. 
+    - NOTE: The 'vm' keyword must be included between the datacenter name and folder name for the vm-inventory-path (e.g: <datacenter>/vm/<vm-folder>/<vm-name>) 
+  Example:
+    %[1]s package -stemcell-version 1803.1 -os 1803 -vcenter-url vcenter.example.com -vcenter-username root -vcenter-password 'password' -vm-inventory-path '/my-datacenter/vm/my-folder/my-vm' 
 
-Examples:
-	%[1]s package -vmdk disk.vmdk -stemcell-version 1.2 -os 1803
+VMDK: 
 
-	Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk', and set the stemcell version to 1.2.
-	The final stemcell will be found in the current working directory.
+  %[1]s package -vmdk <path-to-vmdk> -stemcell-version <stemcell version> -os <os>
+
+  Requirements:
+    - The VMware 'ovftool' binary must be on your path or Fusion/Workstation
+    must be installed (both include the 'ovftool').
+    - The [vmdk], [stemcell-version], and [os] flags must be specified.  If the [output] flag is
+    not specified the stemcell will be created in the current working directory.
+
+  Example:
+    %[1]s package -vmdk disk.vmdk -stemcell-version 1.2 -os 1803
+
+    Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk', and set the stemcell version to 1.2.
+    The final stemcell will be found in the current working directory.
 
 Flags:
 `, filepath.Base(os.Args[0]))
@@ -48,10 +64,10 @@ Flags:
 
 func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.Vmdk, "vmdk", "", "VMDK file to create stemcell from")
-	f.StringVar(&p.sourceConfig.VmInventoryPath, "vm-inventory-path", "", "vCenter VM inventory path. (e.g. /my-datacenter/vm/my-folder/my-vm )")
-	f.StringVar(&p.sourceConfig.Username, "username", "", "vCenter username")
-	f.StringVar(&p.sourceConfig.Password, "password", "", "vCenter password")
-	f.StringVar(&p.sourceConfig.URL, "url", "", "vCenter url")
+	f.StringVar(&p.sourceConfig.VmInventoryPath, "vm-inventory-path", "", "vCenter VM inventory path. (e.g: <datacenter>/vm/<vm-folder>/<vm-name>)")
+	f.StringVar(&p.sourceConfig.Username, "vcenter-username", "", "vCenter username")
+	f.StringVar(&p.sourceConfig.Password, "vcenter-password", "", "vCenter password")
+	f.StringVar(&p.sourceConfig.URL, "vcenter-url", "", "vCenter url")
 	f.StringVar(&p.outputConfig.Os, "os", "", "OS version must be either 2012R2, 2016, 1803 or 2019")
 	f.StringVar(&p.outputConfig.StemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
 	f.StringVar(&p.outputConfig.StemcellVersion, "s", "", "Stemcell version (shorthand)")

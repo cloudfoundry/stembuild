@@ -89,9 +89,9 @@ var _ = Describe("Package", func() {
 		session := helpers.RunCommandInDir(
 			workingDir,
 			executable, "package",
-			"-url", vcenterURL,
-			"-username", vcenterUsername,
-			"-password", vcenterPassword,
+			"-vcenter-url", vcenterURL,
+			"-vcenter-username", vcenterUsername,
+			"-vcenter-password", vcenterPassword,
 			"-vm-inventory-path", vmPath,
 			"-stemcell-version", stemcellVersion,
 			"-os", osVersion,

@@ -27,70 +27,29 @@ var _ = Describe("construct", func() {
 			"-winrm-username", "Admin",
 			"-winrm-password", "some_password",
 		}
-		var shortformArgs = []string{"-s", "1803.45",
-			"-ip", "10.0.0.5",
-			"-u", "Admin",
-			"-p", "some_password",
-		}
 
-		Context("a stemcell version is specified as a flag parameter", func() {
-			It("stores the value when using the long form", func() {
-				err := f.Parse(longformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetStemcellVersion()).To(Equal("1803.45"))
-			})
-
-			It("stores the value when using the short form", func() {
-				err := f.Parse(shortformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetStemcellVersion()).To(Equal("1803.45"))
-			})
-
+		It("stores the value of stemcell version", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetStemcellVersion()).To(Equal("1803.45"))
 		})
 
-		Context("a WinRM user is specified as a flag parameter", func() {
-			It("stores the value when using the long form", func() {
-				err := f.Parse(longformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetWinRMUser()).To(Equal("Admin"))
-			})
-
-			It("stores the value when using the short form", func() {
-				err := f.Parse(shortformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetWinRMUser()).To(Equal("Admin"))
-			})
-
+		It("stores the value of a WinRM user", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetWinRMUser()).To(Equal("Admin"))
 		})
 
-		Context("a WinRM password is specified as a flag parameter", func() {
-			It("stores the value when using the long form", func() {
-				err := f.Parse(longformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetWinRMPwd()).To(Equal("some_password"))
-			})
-
-			It("stores the value when using the short form", func() {
-				err := f.Parse(shortformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetWinRMPwd()).To(Equal("some_password"))
-			})
-
+		It("stores the value of a WinRM password ", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetWinRMPwd()).To(Equal("some_password"))
 		})
 
-		Context("a WinRM IP is specified as a flag parameter", func() {
-			It("stores the value when using the long form", func() {
-				err := f.Parse(longformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetWinRMIp()).To(Equal("10.0.0.5"))
-			})
-
-			It("stores the value when using the short form", func() {
-				err := f.Parse(shortformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(ConstrCmd.GetWinRMIp()).To(Equal("10.0.0.5"))
-			})
-
+		It("stores the value of the a WinRM IP", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetWinRMIp()).To(Equal("10.0.0.5"))
 		})
 
 	})

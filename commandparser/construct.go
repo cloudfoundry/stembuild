@@ -22,44 +22,37 @@ type ConstructCmd struct {
 	GlobalFlags     *GlobalFlags
 }
 
-func (*ConstructCmd) Name() string     { return "construct" }
-func (*ConstructCmd) Synopsis() string { return "Transfer automation artifact and LGPO to a vCenter VM" }
+func (*ConstructCmd) Name() string { return "construct" }
+func (*ConstructCmd) Synopsis() string {
+	return "Provisions and syspreps an existing VM on vCenter, ready to be packaged into a stemcell"
+}
 
 func (*ConstructCmd) Usage() string {
-	return fmt.Sprintf(`%[1]s construct -stemcell-version <stemcell stemcellVersion> -winrm-ip <winrm ip of VM> -winrm-username <winrm username> -winrm-password <winrm password>
+	return fmt.Sprintf(`%[1]s construct -stemcell-version <stemcell version> -winrm-ip <IP of VM> -winrum-username <WinRm username> -winrm-password <WinRm password>
 
-Prepare a VM to be used by stembuild package. It leverages Stemcell Automation Scripts to construct a VM to be used as a stemcell.
-
-The [stemcell-version], [winrm-ip], [winrm-username], [winrm-password] flags must be specified.
+Prepares a VM to be used by stembuild package. It leverages stemcell automation scripts to provision a VM to be used as a stemcell.
 
 Requirements:
+	LGPO.zip in current working directory
 	Running Windows VM with:
 		- Up to date Operating System
 		- WinRm enabled
 		- Reachable by IP
 		- Username and password with Administrator privileges
-	LGPO.zip in current working directory
+	The [stemcell-version], [ip], [winrm-username], [winrm-password] flags must be specified.
 
-Examples:
-	%[1]s construct -stemcell-version 1709.1 -winrm-ip '10.0.0.5' -winrm-username Admin -winrm-password 'password'
-
-	This will connect to VM with IP 10.0.0.5 using credentials Admin:password, and execute setup script which
-	requires LGPO.zip to be present in the working directory.
-	When command exits successfully, the VM will be Sysprepped and powered off.
+Example:
+	%[1]s construct -stemcell-version 1803.1 -winrm-ip '10.0.0.5' -winrm-username Admin -winrm-password 'password'
 
 Flags:
 `, filepath.Base(os.Args[0]))
 }
 
 func (p *ConstructCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&p.stemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
-	f.StringVar(&p.stemcellVersion, "s", "", "Stemcell version (shorthand)")
+	f.StringVar(&p.stemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 1803.1)")
 	f.StringVar(&p.winrmIP, "winrm-ip", "", "IP of machine for WinRM connection")
-	f.StringVar(&p.winrmIP, "ip", "", "winrm-ip (shorthand)")
-	f.StringVar(&p.winrmUsername, "winrm-username", "", "Username for winRM connection")
-	f.StringVar(&p.winrmUsername, "u", "", "winrm-username (shorthand)")
-	f.StringVar(&p.winrmPassword, "winrm-password", "", "Password for winRM connection")
-	f.StringVar(&p.winrmPassword, "p", "", "winrm-password (shorthand)")
+	f.StringVar(&p.winrmUsername, "winrm-username", "", "Username for WinRM connection")
+	f.StringVar(&p.winrmPassword, "winrm-password", "", "Password for WinRM connection. Needs to be wrapped in single quotations.")
 }
 
 func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
