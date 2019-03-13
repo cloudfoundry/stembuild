@@ -37,7 +37,7 @@ func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error
 }
 
 func (w *WinRM) ExtractArchive(source, destination string) error {
-	command := fmt.Sprintf("powershell.exe Expand-Archive %s %s", source, destination)
+	command := fmt.Sprintf("powershell.exe Expand-Archive %s %s -Force", source, destination)
 	err := w.ExecuteCommand(command)
 	return err
 }
