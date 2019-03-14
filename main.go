@@ -31,7 +31,7 @@ func main() {
 	var gf GlobalFlags
 	packageCmd := PackageCmd{}
 	packageCmd.GlobalFlags = &gf
-	constructCmd := NewConstructCmd(&vmconstruct_factory.VMConstructFactory{})
+	constructCmd := NewConstructCmd(&vmconstruct_factory.VMConstructFactory{}, &ConstructValidator{})
 	constructCmd.GlobalFlags = &gf
 
 	var commands = make([]Command, 0)

@@ -17,7 +17,7 @@ var _ = Describe("Factory", func() {
 		})
 
 		It("should return a VMPreparer", func() {
-			vmPreparer := factory.GetVMPreparer("0.0.0.0", "pivotal", "password")
+			vmPreparer := factory.VMPreparer("0.0.0.0", "pivotal", "password")
 			Expect(vmPreparer).To(BeAssignableToTypeOf(&construct.VMConstruct{}))
 		})
 	})

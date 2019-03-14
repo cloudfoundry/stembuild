@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	"os"
 	"path/filepath"
 
@@ -17,9 +16,16 @@ type VMPreparer interface {
 	PrepareVM() error
 }
 
-//go:generate counterfeiter . IVMConstructFactory
-type IVMConstructFactory interface {
-	GetVMPreparer(string, string, string) VMPreparer
+//go:generate counterfeiter . VMPreparerFactory
+type VMPreparerFactory interface {
+	VMPreparer(string, string, string) VMPreparer
+}
+
+//go:generate counterfeiter . ConstructCmdValidator
+type ConstructCmdValidator interface {
+	NonEmptyArgs(...string) bool
+	LGPOInDirectory() bool
+	ValidStemcellInfo(string) bool
 }
 
 type ConstructCmd struct {
@@ -27,12 +33,13 @@ type ConstructCmd struct {
 	winrmUsername   string
 	winrmPassword   string
 	winrmIP         string
-	factory         IVMConstructFactory
+	factory         VMPreparerFactory
+	validator       ConstructCmdValidator
 	GlobalFlags     *GlobalFlags
 }
 
-func NewConstructCmd(factory IVMConstructFactory) ConstructCmd {
-	return ConstructCmd{factory: factory}
+func NewConstructCmd(factory VMPreparerFactory, validator ConstructCmdValidator) ConstructCmd {
+	return ConstructCmd{factory: factory, validator: validator}
 }
 
 func (*ConstructCmd) Name() string { return "construct" }
@@ -76,26 +83,22 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 	logger := colorlogger.ConstructLogger(logLevel, p.GlobalFlags.Color, os.Stderr)
 	logger.Debugf("hello, world.")
 
-	if !config.IsValidStemcellVersion(p.stemcellVersion) {
+	if !p.validator.NonEmptyArgs(p.winrmIP, p.winrmUsername, p.winrmPassword, p.stemcellVersion) {
+		_, _ = fmt.Fprintf(os.Stderr, "All arguments must be provided")
+		return subcommands.ExitFailure
+	}
+	if !p.validator.ValidStemcellInfo(p.stemcellVersion) {
 		_, _ = fmt.Fprintf(os.Stderr, "invalid stemcellVersion (%s) expected format [NUMBER].[NUMBER] or "+
 			"[NUMBER].[NUMBER].[NUMBER]\n", p.stemcellVersion)
 		return subcommands.ExitFailure
 	}
-
-	pwd, err := os.Getwd()
-	if err != nil {
-		_, _ = fmt.Fprint(os.Stderr, "unable to find current working directory", err)
-		return subcommands.ExitFailure
-	}
-
-	lgpoPresent, err := IsArtifactInDirectory(pwd, "LGPO.zip")
-	if !lgpoPresent {
+	if !p.validator.LGPOInDirectory() {
 		_, _ = fmt.Fprintf(os.Stderr, "lgpo not found in current directory")
 		return subcommands.ExitFailure
 	}
 
-	vmConstruct := p.factory.GetVMPreparer(p.winrmIP, p.winrmUsername, p.winrmPassword)
-	err = vmConstruct.PrepareVM()
+	vmConstruct := p.factory.VMPreparer(p.winrmIP, p.winrmUsername, p.winrmPassword)
+	err := vmConstruct.PrepareVM()
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, err.Error())
 		return subcommands.ExitFailure

@@ -67,19 +67,19 @@ var _ = Describe("construct", func() {
 		var ConstrCmd ConstructCmd
 		var emptyContext context.Context
 
-		var fakeFactory *commandparserfakes.FakeIVMConstructFactory
+		var fakeFactory *commandparserfakes.FakeVMPreparerFactory
 		var fakeVMPreparer *commandparserfakes.FakeVMPreparer
 
 		BeforeEach(func() {
 			f = flag.NewFlagSet("test", flag.ExitOnError)
 			gf = &GlobalFlags{true, true, true}
 
-			fakeFactory = &commandparserfakes.FakeIVMConstructFactory{}
+			fakeFactory = &commandparserfakes.FakeVMPreparerFactory{}
 			fakeVMPreparer = &commandparserfakes.FakeVMPreparer{}
-			fakeFactory.GetVMPreparerReturns(fakeVMPreparer)
+			fakeFactory.VMPreparerReturns(fakeVMPreparer)
 
 			ConstrCmd.SetFlags(f)
-			ConstrCmd = NewConstructCmd(fakeFactory)
+			ConstrCmd = NewConstructCmd(fakeFactory, &ConstructValidator{})
 			ConstrCmd.GlobalFlags = gf
 			emptyContext = context.Background()
 			os.Create("LGPO.zip")
