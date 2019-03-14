@@ -4,22 +4,35 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	"os"
 	"path/filepath"
 
-	. "github.com/cloudfoundry-incubator/stembuild/construct"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
-
-	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	"github.com/google/subcommands"
 )
+
+//go:generate counterfeiter . VMPreparer
+type VMPreparer interface {
+	PrepareVM() error
+}
+
+//go:generate counterfeiter . IVMConstructFactory
+type IVMConstructFactory interface {
+	GetVMPreparer(string, string, string) VMPreparer
+}
 
 type ConstructCmd struct {
 	stemcellVersion string
 	winrmUsername   string
 	winrmPassword   string
 	winrmIP         string
+	factory         IVMConstructFactory
 	GlobalFlags     *GlobalFlags
+}
+
+func NewConstructCmd(factory IVMConstructFactory) ConstructCmd {
+	return ConstructCmd{factory: factory}
 }
 
 func (*ConstructCmd) Name() string { return "construct" }
@@ -62,10 +75,10 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 	}
 	logger := colorlogger.ConstructLogger(logLevel, p.GlobalFlags.Color, os.Stderr)
 	logger.Debugf("hello, world.")
+
 	if !config.IsValidStemcellVersion(p.stemcellVersion) {
 		_, _ = fmt.Fprintf(os.Stderr, "invalid stemcellVersion (%s) expected format [NUMBER].[NUMBER] or "+
 			"[NUMBER].[NUMBER].[NUMBER]\n", p.stemcellVersion)
-
 		return subcommands.ExitFailure
 	}
 
@@ -81,7 +94,7 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		return subcommands.ExitFailure
 	}
 
-	vmConstruct := NewVMConstruct(p.winrmIP, p.winrmUsername, p.winrmPassword)
+	vmConstruct := p.factory.GetVMPreparer(p.winrmIP, p.winrmUsername, p.winrmPassword)
 	err = vmConstruct.PrepareVM()
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, err.Error())

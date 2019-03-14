@@ -4,13 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
+	"github.com/cloudfoundry-incubator/stembuild/construct/factory"
+	"github.com/cloudfoundry-incubator/stembuild/version"
+	. "github.com/google/subcommands"
 	"io/ioutil"
 	"os"
 	"path"
-
-	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/version"
-	. "github.com/google/subcommands"
 )
 
 //go:generate go run gen.go
@@ -31,7 +31,7 @@ func main() {
 	var gf GlobalFlags
 	packageCmd := PackageCmd{}
 	packageCmd.GlobalFlags = &gf
-	constructCmd := ConstructCmd{}
+	constructCmd := NewConstructCmd(&vmconstruct_factory.VMConstructFactory{})
 	constructCmd.GlobalFlags = &gf
 
 	var commands = make([]Command, 0)
