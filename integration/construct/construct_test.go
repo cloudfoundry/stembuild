@@ -2,10 +2,11 @@ package construct_test
 
 import (
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo"
@@ -46,7 +47,7 @@ var _ = Describe("stembuild construct", func() {
 		session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-stemcell-version", "1803.1", "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword)
 
 		Eventually(session, 20).Should(Exit(1))
-		Eventually(session.Err).Should(Say(`lgpo not found in current directory`))
+		Eventually(session.Err).Should(Say(`Could not find LGPO.zip in the current directory`))
 	})
 
 	AfterEach(func() {

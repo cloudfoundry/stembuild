@@ -3,6 +3,7 @@ package commandparser
 import (
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	"os"
+	"path/filepath"
 )
 
 type ConstructValidator struct{}
@@ -17,7 +18,8 @@ func (c *ConstructValidator) PopulatedArgs(args ...string) bool {
 }
 
 func (c *ConstructValidator) LGPOInDirectory() bool {
-	_, err := os.Stat("LGPO.zip")
+	dir, _ := os.Getwd()
+	_, err := os.Stat(filepath.Join(dir, "LGPO.zip"))
 	if err != nil {
 		return false
 	}

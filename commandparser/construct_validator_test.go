@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"os"
+	"path/filepath"
 )
 
 var _ = Describe("ConstructValidator", func() {
@@ -44,16 +45,22 @@ var _ = Describe("ConstructValidator", func() {
 	})
 
 	Describe("LGPOInDirectory", func() {
+		wd, _ := os.Getwd()
+		LGPOPath := filepath.Join(wd, "LGPO.zip")
+
 		It("should return true if LGPO exists in the directory", func() {
-			_, err := os.Create("LGPO.zip")
-			os.Stat("LGPO.zip")
+			file, err := os.Create(LGPOPath)
 			Expect(err).ToNot(HaveOccurred())
+			_, err = os.Stat(LGPOPath)
+			Expect(err).ToNot(HaveOccurred())
+			file.Close()
 
 			result := c.LGPOInDirectory()
 
 			Expect(result).To(BeTrue())
 
-			os.Remove("LGPO.zip")
+			err = os.Remove(LGPOPath)
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should return false if LGPO doesn't exist in the directory", func() {
