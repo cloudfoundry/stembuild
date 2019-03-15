@@ -18,15 +18,15 @@ type FakeConstructCmdValidator struct {
 	lGPOInDirectoryReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	NonEmptyArgsStub        func(...string) bool
-	nonEmptyArgsMutex       sync.RWMutex
-	nonEmptyArgsArgsForCall []struct {
+	PopulatedArgsStub        func(...string) bool
+	populatedArgsMutex       sync.RWMutex
+	populatedArgsArgsForCall []struct {
 		arg1 []string
 	}
-	nonEmptyArgsReturns struct {
+	populatedArgsReturns struct {
 		result1 bool
 	}
-	nonEmptyArgsReturnsOnCall map[int]struct {
+	populatedArgsReturnsOnCall map[int]struct {
 		result1 bool
 	}
 	ValidStemcellInfoStub        func(string) bool
@@ -96,62 +96,62 @@ func (fake *FakeConstructCmdValidator) LGPOInDirectoryReturnsOnCall(i int, resul
 	}{result1}
 }
 
-func (fake *FakeConstructCmdValidator) NonEmptyArgs(arg1 ...string) bool {
-	fake.nonEmptyArgsMutex.Lock()
-	ret, specificReturn := fake.nonEmptyArgsReturnsOnCall[len(fake.nonEmptyArgsArgsForCall)]
-	fake.nonEmptyArgsArgsForCall = append(fake.nonEmptyArgsArgsForCall, struct {
+func (fake *FakeConstructCmdValidator) PopulatedArgs(arg1 ...string) bool {
+	fake.populatedArgsMutex.Lock()
+	ret, specificReturn := fake.populatedArgsReturnsOnCall[len(fake.populatedArgsArgsForCall)]
+	fake.populatedArgsArgsForCall = append(fake.populatedArgsArgsForCall, struct {
 		arg1 []string
 	}{arg1})
-	fake.recordInvocation("NonEmptyArgs", []interface{}{arg1})
-	fake.nonEmptyArgsMutex.Unlock()
-	if fake.NonEmptyArgsStub != nil {
-		return fake.NonEmptyArgsStub(arg1...)
+	fake.recordInvocation("PopulatedArgs", []interface{}{arg1})
+	fake.populatedArgsMutex.Unlock()
+	if fake.PopulatedArgsStub != nil {
+		return fake.PopulatedArgsStub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.nonEmptyArgsReturns
+	fakeReturns := fake.populatedArgsReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeConstructCmdValidator) NonEmptyArgsCallCount() int {
-	fake.nonEmptyArgsMutex.RLock()
-	defer fake.nonEmptyArgsMutex.RUnlock()
-	return len(fake.nonEmptyArgsArgsForCall)
+func (fake *FakeConstructCmdValidator) PopulatedArgsCallCount() int {
+	fake.populatedArgsMutex.RLock()
+	defer fake.populatedArgsMutex.RUnlock()
+	return len(fake.populatedArgsArgsForCall)
 }
 
-func (fake *FakeConstructCmdValidator) NonEmptyArgsCalls(stub func(...string) bool) {
-	fake.nonEmptyArgsMutex.Lock()
-	defer fake.nonEmptyArgsMutex.Unlock()
-	fake.NonEmptyArgsStub = stub
+func (fake *FakeConstructCmdValidator) PopulatedArgsCalls(stub func(...string) bool) {
+	fake.populatedArgsMutex.Lock()
+	defer fake.populatedArgsMutex.Unlock()
+	fake.PopulatedArgsStub = stub
 }
 
-func (fake *FakeConstructCmdValidator) NonEmptyArgsArgsForCall(i int) []string {
-	fake.nonEmptyArgsMutex.RLock()
-	defer fake.nonEmptyArgsMutex.RUnlock()
-	argsForCall := fake.nonEmptyArgsArgsForCall[i]
+func (fake *FakeConstructCmdValidator) PopulatedArgsArgsForCall(i int) []string {
+	fake.populatedArgsMutex.RLock()
+	defer fake.populatedArgsMutex.RUnlock()
+	argsForCall := fake.populatedArgsArgsForCall[i]
 	return argsForCall.arg1
 }
 
-func (fake *FakeConstructCmdValidator) NonEmptyArgsReturns(result1 bool) {
-	fake.nonEmptyArgsMutex.Lock()
-	defer fake.nonEmptyArgsMutex.Unlock()
-	fake.NonEmptyArgsStub = nil
-	fake.nonEmptyArgsReturns = struct {
+func (fake *FakeConstructCmdValidator) PopulatedArgsReturns(result1 bool) {
+	fake.populatedArgsMutex.Lock()
+	defer fake.populatedArgsMutex.Unlock()
+	fake.PopulatedArgsStub = nil
+	fake.populatedArgsReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeConstructCmdValidator) NonEmptyArgsReturnsOnCall(i int, result1 bool) {
-	fake.nonEmptyArgsMutex.Lock()
-	defer fake.nonEmptyArgsMutex.Unlock()
-	fake.NonEmptyArgsStub = nil
-	if fake.nonEmptyArgsReturnsOnCall == nil {
-		fake.nonEmptyArgsReturnsOnCall = make(map[int]struct {
+func (fake *FakeConstructCmdValidator) PopulatedArgsReturnsOnCall(i int, result1 bool) {
+	fake.populatedArgsMutex.Lock()
+	defer fake.populatedArgsMutex.Unlock()
+	fake.PopulatedArgsStub = nil
+	if fake.populatedArgsReturnsOnCall == nil {
+		fake.populatedArgsReturnsOnCall = make(map[int]struct {
 			result1 bool
 		})
 	}
-	fake.nonEmptyArgsReturnsOnCall[i] = struct {
+	fake.populatedArgsReturnsOnCall[i] = struct {
 		result1 bool
 	}{result1}
 }
@@ -221,8 +221,8 @@ func (fake *FakeConstructCmdValidator) Invocations() map[string][][]interface{} 
 	defer fake.invocationsMutex.RUnlock()
 	fake.lGPOInDirectoryMutex.RLock()
 	defer fake.lGPOInDirectoryMutex.RUnlock()
-	fake.nonEmptyArgsMutex.RLock()
-	defer fake.nonEmptyArgsMutex.RUnlock()
+	fake.populatedArgsMutex.RLock()
+	defer fake.populatedArgsMutex.RUnlock()
 	fake.validStemcellInfoMutex.RLock()
 	defer fake.validStemcellInfoMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

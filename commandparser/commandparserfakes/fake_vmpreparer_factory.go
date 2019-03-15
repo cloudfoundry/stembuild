@@ -8,7 +8,7 @@ import (
 )
 
 type FakeVMPreparerFactory struct {
-	VMPreparerStub        func(string, string, string) commandparser.VMPreparer
+	VMPreparerStub        func(string, string, string) commandparser.VmConstruct
 	vMPreparerMutex       sync.RWMutex
 	vMPreparerArgsForCall []struct {
 		arg1 string
@@ -16,16 +16,16 @@ type FakeVMPreparerFactory struct {
 		arg3 string
 	}
 	vMPreparerReturns struct {
-		result1 commandparser.VMPreparer
+		result1 commandparser.VmConstruct
 	}
 	vMPreparerReturnsOnCall map[int]struct {
-		result1 commandparser.VMPreparer
+		result1 commandparser.VmConstruct
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeVMPreparerFactory) VMPreparer(arg1 string, arg2 string, arg3 string) commandparser.VMPreparer {
+func (fake *FakeVMPreparerFactory) VMPreparer(arg1 string, arg2 string, arg3 string) commandparser.VmConstruct {
 	fake.vMPreparerMutex.Lock()
 	ret, specificReturn := fake.vMPreparerReturnsOnCall[len(fake.vMPreparerArgsForCall)]
 	fake.vMPreparerArgsForCall = append(fake.vMPreparerArgsForCall, struct {
@@ -51,7 +51,7 @@ func (fake *FakeVMPreparerFactory) VMPreparerCallCount() int {
 	return len(fake.vMPreparerArgsForCall)
 }
 
-func (fake *FakeVMPreparerFactory) VMPreparerCalls(stub func(string, string, string) commandparser.VMPreparer) {
+func (fake *FakeVMPreparerFactory) VMPreparerCalls(stub func(string, string, string) commandparser.VmConstruct) {
 	fake.vMPreparerMutex.Lock()
 	defer fake.vMPreparerMutex.Unlock()
 	fake.VMPreparerStub = stub
@@ -64,26 +64,26 @@ func (fake *FakeVMPreparerFactory) VMPreparerArgsForCall(i int) (string, string,
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeVMPreparerFactory) VMPreparerReturns(result1 commandparser.VMPreparer) {
+func (fake *FakeVMPreparerFactory) VMPreparerReturns(result1 commandparser.VmConstruct) {
 	fake.vMPreparerMutex.Lock()
 	defer fake.vMPreparerMutex.Unlock()
 	fake.VMPreparerStub = nil
 	fake.vMPreparerReturns = struct {
-		result1 commandparser.VMPreparer
+		result1 commandparser.VmConstruct
 	}{result1}
 }
 
-func (fake *FakeVMPreparerFactory) VMPreparerReturnsOnCall(i int, result1 commandparser.VMPreparer) {
+func (fake *FakeVMPreparerFactory) VMPreparerReturnsOnCall(i int, result1 commandparser.VmConstruct) {
 	fake.vMPreparerMutex.Lock()
 	defer fake.vMPreparerMutex.Unlock()
 	fake.VMPreparerStub = nil
 	if fake.vMPreparerReturnsOnCall == nil {
 		fake.vMPreparerReturnsOnCall = make(map[int]struct {
-			result1 commandparser.VMPreparer
+			result1 commandparser.VmConstruct
 		})
 	}
 	fake.vMPreparerReturnsOnCall[i] = struct {
-		result1 commandparser.VMPreparer
+		result1 commandparser.VmConstruct
 	}{result1}
 }
 

@@ -2,12 +2,11 @@ package commandparser_test
 
 import (
 	"context"
+	"errors"
 	"flag"
-	"github.com/google/subcommands"
-	"os"
-
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/commandparser/commandparserfakes"
+	"github.com/google/subcommands"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -57,7 +56,6 @@ var _ = Describe("construct", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetWinRMIp()).To(Equal("10.0.0.5"))
 		})
-
 	})
 
 	Describe("Execute", func() {
@@ -68,40 +66,84 @@ var _ = Describe("construct", func() {
 		var emptyContext context.Context
 
 		var fakeFactory *commandparserfakes.FakeVMPreparerFactory
-		var fakeVMPreparer *commandparserfakes.FakeVMPreparer
+		var fakeVmConstruct *commandparserfakes.FakeVMPreparer
+		var fakeValidator *commandparserfakes.FakeConstructCmdValidator
+		var fakeMessenger *commandparserfakes.FakeConstructMessenger
 
 		BeforeEach(func() {
 			f = flag.NewFlagSet("test", flag.ExitOnError)
-			gf = &GlobalFlags{true, true, true}
+			gf = &GlobalFlags{false, false, false}
 
 			fakeFactory = &commandparserfakes.FakeVMPreparerFactory{}
-			fakeVMPreparer = &commandparserfakes.FakeVMPreparer{}
-			fakeFactory.VMPreparerReturns(fakeVMPreparer)
+			fakeVmConstruct = &commandparserfakes.FakeVMPreparer{}
+			fakeValidator = &commandparserfakes.FakeConstructCmdValidator{}
+			fakeMessenger = &commandparserfakes.FakeConstructMessenger{}
+			fakeFactory.VMPreparerReturns(fakeVmConstruct)
 
 			ConstrCmd.SetFlags(f)
-			ConstrCmd = NewConstructCmd(fakeFactory, &ConstructValidator{})
+			ConstrCmd = NewConstructCmd(fakeFactory, fakeValidator, fakeMessenger)
 			ConstrCmd.GlobalFlags = gf
 			emptyContext = context.Background()
-			os.Create("LGPO.zip")
-		})
-
-		AfterSuite(func() {
-			os.Remove("LGPO.zip")
 		})
 
 		It("should execute the construct VM command", func() {
-			args := []string{"-stemcell-version", "1803.45",
-				"-winrm-ip", "10.0.0.5",
-				"-winrm-username", "Admin",
-				"-winrm-password", "some_password",
-			}
-			err := f.Parse(args)
-			Expect(err).ToNot(HaveOccurred())
+			fakeValidator.PopulatedArgsReturns(true)
+			fakeValidator.ValidStemcellInfoReturns(true)
+			fakeValidator.LGPOInDirectoryReturns(true)
 
 			exitStatus := ConstrCmd.Execute(emptyContext, f)
 
 			Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
+			Expect(fakeVmConstruct.PrepareVMCallCount()).To(Equal(1))
+		})
+
+		Context("with missing arguments", func() {
+			It("should return an error", func() {
+				fakeValidator.PopulatedArgsReturns(false)
+
+				exitStatus := ConstrCmd.Execute(emptyContext, f)
+
+				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
+				Expect(fakeMessenger.ArgumentsNotProvidedCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("with invalid stemcell info", func() {
+			It("should return an error", func() {
+				fakeValidator.PopulatedArgsReturns(true)
+				fakeValidator.ValidStemcellInfoReturns(false)
+
+				exitStatus := ConstrCmd.Execute(emptyContext, f)
+
+				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
+				Expect(fakeMessenger.InvalidStemcellVersionCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("with LGPO.zip not in current directory", func() {
+			It("should return an error", func() {
+				fakeValidator.PopulatedArgsReturns(true)
+				fakeValidator.ValidStemcellInfoReturns(true)
+				fakeValidator.LGPOInDirectoryReturns(false)
+
+				exitStatus := ConstrCmd.Execute(emptyContext, f)
+
+				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
+				Expect(fakeMessenger.LGPONotFoundCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("with an error during VMPrepare", func() {
+			It("should retrun an error", func() {
+				fakeValidator.PopulatedArgsReturns(true)
+				fakeValidator.ValidStemcellInfoReturns(true)
+				fakeValidator.LGPOInDirectoryReturns(true)
+				fakeVmConstruct.PrepareVMReturns(errors.New("some error"))
+
+				exitStatus := ConstrCmd.Execute(emptyContext, f)
+
+				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
+			})
 		})
 	})
-
 })

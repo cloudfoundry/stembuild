@@ -4,35 +4,34 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	"os"
 	"path/filepath"
 
 	"github.com/google/subcommands"
 )
 
-//go:generate counterfeiter . VMPreparer
-type VMPreparer interface {
+//go:generate counterfeiter . VmConstruct
+type VmConstruct interface {
 	PrepareVM() error
 }
 
 //go:generate counterfeiter . VMPreparerFactory
 type VMPreparerFactory interface {
-	VMPreparer(string, string, string) VMPreparer
+	VMPreparer(string, string, string) VmConstruct
 }
 
 //go:generate counterfeiter . ConstructCmdValidator
 type ConstructCmdValidator interface {
-	NonEmptyArgs(...string) bool
+	PopulatedArgs(...string) bool
 	LGPOInDirectory() bool
 	ValidStemcellInfo(string) bool
 }
 
 //go:generate counterfeiter . ConstructMessenger
 type ConstructMessenger interface {
-	ArgumentsNotProvided() error
-	InvalidStemcellVersion(string) error
-	LGPONotFound() error
+	ArgumentsNotProvided()
+	InvalidStemcellVersion()
+	LGPONotFound()
 }
 
 type ConstructCmd struct {
@@ -42,11 +41,12 @@ type ConstructCmd struct {
 	winrmIP         string
 	factory         VMPreparerFactory
 	validator       ConstructCmdValidator
+	messenger       ConstructMessenger
 	GlobalFlags     *GlobalFlags
 }
 
-func NewConstructCmd(factory VMPreparerFactory, validator ConstructCmdValidator) ConstructCmd {
-	return ConstructCmd{factory: factory, validator: validator}
+func NewConstructCmd(factory VMPreparerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) ConstructCmd {
+	return ConstructCmd{factory: factory, validator: validator, messenger: messenger}
 }
 
 func (*ConstructCmd) Name() string { return "construct" }
@@ -83,24 +83,16 @@ func (p *ConstructCmd) SetFlags(f *flag.FlagSet) {
 }
 
 func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	logLevel := colorlogger.NONE
-	if p.GlobalFlags.Debug {
-		logLevel = colorlogger.DEBUG
-	}
-	logger := colorlogger.ConstructLogger(logLevel, p.GlobalFlags.Color, os.Stderr)
-	logger.Debugf("hello, world.")
-
-	if !p.validator.NonEmptyArgs(p.winrmIP, p.winrmUsername, p.winrmPassword, p.stemcellVersion) {
-		_, _ = fmt.Fprintf(os.Stderr, "All arguments must be provided")
+	if !p.validator.PopulatedArgs(p.winrmIP, p.winrmUsername, p.winrmPassword, p.stemcellVersion) {
+		p.messenger.ArgumentsNotProvided()
 		return subcommands.ExitFailure
 	}
 	if !p.validator.ValidStemcellInfo(p.stemcellVersion) {
-		_, _ = fmt.Fprintf(os.Stderr, "invalid stemcellVersion (%s) expected format [NUMBER].[NUMBER] or "+
-			"[NUMBER].[NUMBER].[NUMBER]\n", p.stemcellVersion)
+		p.messenger.InvalidStemcellVersion()
 		return subcommands.ExitFailure
 	}
 	if !p.validator.LGPOInDirectory() {
-		_, _ = fmt.Fprintf(os.Stderr, "lgpo not found in current directory")
+		p.messenger.LGPONotFound()
 		return subcommands.ExitFailure
 	}
 

@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 )
 
-type FakeVMPreparer struct {
+type FakeVmConstruct struct {
 	PrepareVMStub        func() error
 	prepareVMMutex       sync.RWMutex
 	prepareVMArgsForCall []struct {
@@ -22,7 +22,7 @@ type FakeVMPreparer struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeVMPreparer) PrepareVM() error {
+func (fake *FakeVmConstruct) PrepareVM() error {
 	fake.prepareVMMutex.Lock()
 	ret, specificReturn := fake.prepareVMReturnsOnCall[len(fake.prepareVMArgsForCall)]
 	fake.prepareVMArgsForCall = append(fake.prepareVMArgsForCall, struct {
@@ -39,19 +39,19 @@ func (fake *FakeVMPreparer) PrepareVM() error {
 	return fakeReturns.result1
 }
 
-func (fake *FakeVMPreparer) PrepareVMCallCount() int {
+func (fake *FakeVmConstruct) PrepareVMCallCount() int {
 	fake.prepareVMMutex.RLock()
 	defer fake.prepareVMMutex.RUnlock()
 	return len(fake.prepareVMArgsForCall)
 }
 
-func (fake *FakeVMPreparer) PrepareVMCalls(stub func() error) {
+func (fake *FakeVmConstruct) PrepareVMCalls(stub func() error) {
 	fake.prepareVMMutex.Lock()
 	defer fake.prepareVMMutex.Unlock()
 	fake.PrepareVMStub = stub
 }
 
-func (fake *FakeVMPreparer) PrepareVMReturns(result1 error) {
+func (fake *FakeVmConstruct) PrepareVMReturns(result1 error) {
 	fake.prepareVMMutex.Lock()
 	defer fake.prepareVMMutex.Unlock()
 	fake.PrepareVMStub = nil
@@ -60,7 +60,7 @@ func (fake *FakeVMPreparer) PrepareVMReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeVMPreparer) PrepareVMReturnsOnCall(i int, result1 error) {
+func (fake *FakeVmConstruct) PrepareVMReturnsOnCall(i int, result1 error) {
 	fake.prepareVMMutex.Lock()
 	defer fake.prepareVMMutex.Unlock()
 	fake.PrepareVMStub = nil
@@ -74,7 +74,7 @@ func (fake *FakeVMPreparer) PrepareVMReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeVMPreparer) Invocations() map[string][][]interface{} {
+func (fake *FakeVmConstruct) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.prepareVMMutex.RLock()
@@ -86,7 +86,7 @@ func (fake *FakeVMPreparer) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeVMPreparer) recordInvocation(key string, args []interface{}) {
+func (fake *FakeVmConstruct) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -98,4 +98,4 @@ func (fake *FakeVMPreparer) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ commandparser.VMPreparer = new(FakeVMPreparer)
+var _ commandparser.VmConstruct = new(FakeVmConstruct)

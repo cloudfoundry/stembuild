@@ -8,6 +8,6 @@ import (
 type VMConstructFactory struct {
 }
 
-func (f *VMConstructFactory) VMPreparer(winrmIp string, winrmUsername string, winrmPassword string) commandparser.VMPreparer {
+func (f *VMConstructFactory) VMPreparer(winrmIp string, winrmUsername string, winrmPassword string) commandparser.VmConstruct {
 	return construct.NewVMConstruct(winrmIp, winrmUsername, winrmPassword)
 }

@@ -7,7 +7,7 @@ import (
 
 type ConstructValidator struct{}
 
-func (c *ConstructValidator) NonEmptyArgs(args ...string) bool {
+func (c *ConstructValidator) PopulatedArgs(args ...string) bool {
 	for _, arg := range args {
 		if arg == "" {
 			return false

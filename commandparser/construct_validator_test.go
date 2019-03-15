@@ -16,29 +16,29 @@ var _ = Describe("ConstructValidator", func() {
 		c = commandparser.ConstructValidator{}
 	})
 
-	Describe("NonEmptyArgs", func() {
+	Describe("PopulatedArgs", func() {
 		It("should return true if all arguments are present", func() {
-			nonEmptyArgs := c.NonEmptyArgs("version", "ip", "username", "password")
+			nonEmptyArgs := c.PopulatedArgs("version", "ip", "username", "password")
 			Expect(nonEmptyArgs).To(BeTrue())
 		})
 
 		It("should return false if stemcellVersion argument is empty", func() {
-			nonEmptyArgs := c.NonEmptyArgs("", "ip", "username", "password")
+			nonEmptyArgs := c.PopulatedArgs("", "ip", "username", "password")
 			Expect(nonEmptyArgs).To(BeFalse())
 		})
 
 		It("should return false if winrmIp argument is empty", func() {
-			nonEmptyArgs := c.NonEmptyArgs("version", "", "username", "password")
+			nonEmptyArgs := c.PopulatedArgs("version", "", "username", "password")
 			Expect(nonEmptyArgs).To(BeFalse())
 		})
 
 		It("should return false if username argument is empty", func() {
-			nonEmptyArgs := c.NonEmptyArgs("version", "ip", "", "password")
+			nonEmptyArgs := c.PopulatedArgs("version", "ip", "", "password")
 			Expect(nonEmptyArgs).To(BeFalse())
 		})
 
 		It("should return false if password argument is empty", func() {
-			nonEmptyArgs := c.NonEmptyArgs("version", "ip", "username", "")
+			nonEmptyArgs := c.PopulatedArgs("version", "ip", "username", "")
 			Expect(nonEmptyArgs).To(BeFalse())
 		})
 	})
