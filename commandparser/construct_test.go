@@ -66,7 +66,7 @@ var _ = Describe("construct", func() {
 		var emptyContext context.Context
 
 		var fakeFactory *commandparserfakes.FakeVMPreparerFactory
-		var fakeVmConstruct *commandparserfakes.FakeVMPreparer
+		var fakeVmConstruct *commandparserfakes.FakeVmConstruct
 		var fakeValidator *commandparserfakes.FakeConstructCmdValidator
 		var fakeMessenger *commandparserfakes.FakeConstructMessenger
 
@@ -75,7 +75,7 @@ var _ = Describe("construct", func() {
 			gf = &GlobalFlags{false, false, false}
 
 			fakeFactory = &commandparserfakes.FakeVMPreparerFactory{}
-			fakeVmConstruct = &commandparserfakes.FakeVMPreparer{}
+			fakeVmConstruct = &commandparserfakes.FakeVmConstruct{}
 			fakeValidator = &commandparserfakes.FakeConstructCmdValidator{}
 			fakeMessenger = &commandparserfakes.FakeConstructMessenger{}
 			fakeFactory.VMPreparerReturns(fakeVmConstruct)
