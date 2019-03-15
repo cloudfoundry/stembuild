@@ -28,6 +28,13 @@ type ConstructCmdValidator interface {
 	ValidStemcellInfo(string) bool
 }
 
+//go:generate counterfeiter . ConstructMessenger
+type ConstructMessenger interface {
+	ArgumentsNotProvided() error
+	InvalidStemcellVersion(string) error
+	LGPONotFound() error
+}
+
 type ConstructCmd struct {
 	stemcellVersion string
 	winrmUsername   string
