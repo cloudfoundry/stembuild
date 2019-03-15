@@ -69,18 +69,4 @@ var _ = Describe("ConstructValidator", func() {
 			Expect(result).To(BeFalse())
 		})
 	})
-
-	Describe("ValidStemcellInfo", func() {
-		It("should return true if the given stemcell info is valid", func() {
-			result := c.ValidStemcellInfo("1803.9999")
-
-			Expect(result).To(BeTrue())
-		})
-
-		It("Should return false if the given stemcell info is invalid", func() {
-			result := c.ValidStemcellInfo("completely-invalid")
-
-			Expect(result).To(BeFalse())
-		})
-	})
 })

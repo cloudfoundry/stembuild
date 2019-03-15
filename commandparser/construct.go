@@ -24,25 +24,22 @@ type VMPreparerFactory interface {
 type ConstructCmdValidator interface {
 	PopulatedArgs(...string) bool
 	LGPOInDirectory() bool
-	ValidStemcellInfo(string) bool
 }
 
 //go:generate counterfeiter . ConstructMessenger
 type ConstructMessenger interface {
 	ArgumentsNotProvided()
-	InvalidStemcellVersion()
 	LGPONotFound()
 }
 
 type ConstructCmd struct {
-	stemcellVersion string
-	winrmUsername   string
-	winrmPassword   string
-	winrmIP         string
-	factory         VMPreparerFactory
-	validator       ConstructCmdValidator
-	messenger       ConstructMessenger
-	GlobalFlags     *GlobalFlags
+	winrmUsername string
+	winrmPassword string
+	winrmIP       string
+	factory       VMPreparerFactory
+	validator     ConstructCmdValidator
+	messenger     ConstructMessenger
+	GlobalFlags   *GlobalFlags
 }
 
 func NewConstructCmd(factory VMPreparerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) ConstructCmd {
@@ -55,7 +52,7 @@ func (*ConstructCmd) Synopsis() string {
 }
 
 func (*ConstructCmd) Usage() string {
-	return fmt.Sprintf(`%[1]s construct -stemcell-version <stemcell version> -winrm-ip <IP of VM> -winrum-username <WinRm username> -winrm-password <WinRm password>
+	return fmt.Sprintf(`%[1]s construct -winrm-ip <IP of VM> -winrum-username <WinRm username> -winrm-password <WinRm password>
 
 Prepares a VM to be used by stembuild package. It leverages stemcell automation scripts to provision a VM to be used as a stemcell.
 
@@ -66,29 +63,24 @@ Requirements:
 		- WinRm enabled
 		- Reachable by IP
 		- Username and password with Administrator privileges
-	The [stemcell-version], [ip], [winrm-username], [winrm-password] flags must be specified.
+	The [winrm-ip], [winrm-username], [winrm-password] flags must be specified.
 
 Example:
-	%[1]s construct -stemcell-version 1803.1 -winrm-ip '10.0.0.5' -winrm-username Admin -winrm-password 'password'
+	%[1]s construct -winrm-ip '10.0.0.5' -winrm-username Admin -winrm-password 'password'
 
 Flags:
 `, filepath.Base(os.Args[0]))
 }
 
 func (p *ConstructCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&p.stemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 1803.1)")
 	f.StringVar(&p.winrmIP, "winrm-ip", "", "IP of machine for WinRM connection")
 	f.StringVar(&p.winrmUsername, "winrm-username", "", "Username for WinRM connection")
 	f.StringVar(&p.winrmPassword, "winrm-password", "", "Password for WinRM connection. Needs to be wrapped in single quotations.")
 }
 
 func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	if !p.validator.PopulatedArgs(p.winrmIP, p.winrmUsername, p.winrmPassword, p.stemcellVersion) {
+	if !p.validator.PopulatedArgs(p.winrmIP, p.winrmUsername, p.winrmPassword) {
 		p.messenger.ArgumentsNotProvided()
-		return subcommands.ExitFailure
-	}
-	if !p.validator.ValidStemcellInfo(p.stemcellVersion) {
-		p.messenger.InvalidStemcellVersion()
 		return subcommands.ExitFailure
 	}
 	if !p.validator.LGPOInDirectory() {

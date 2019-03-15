@@ -25,13 +25,6 @@ var _ = Describe("ConstructMessenger", func() {
 		})
 	})
 
-	Describe("InvalidStemcellVersion", func() {
-		It("should output an appropriate error", func() {
-			cm.InvalidStemcellVersion()
-			Eventually(g).Should(Say("Invalid stemcell version provided"))
-		})
-	})
-
 	Describe("LGPONotFound", func() {
 		It("should output an appropriate error", func() {
 			cm.LGPONotFound()

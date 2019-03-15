@@ -30,7 +30,7 @@ var _ = Describe("stembuild construct", func() {
 			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 			Expect(err).ToNot(HaveOccurred())
 
-			session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-stemcell-version", "1709.1", "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword)
+			session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword)
 
 			Eventually(session, 20).Should(Exit(0))
 			Eventually(session.Out).Should(Say(`mock stemcell automation script executed`))
@@ -44,7 +44,7 @@ var _ = Describe("stembuild construct", func() {
 	})
 
 	It("fails with an appropriate error when LGPO is missing", func() {
-		session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-stemcell-version", "1803.1", "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword)
+		session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword)
 
 		Eventually(session, 20).Should(Exit(1))
 		Eventually(session.Err).Should(Say(`Could not find LGPO.zip in the current directory`))

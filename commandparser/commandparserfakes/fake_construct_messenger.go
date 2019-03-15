@@ -12,10 +12,6 @@ type FakeConstructMessenger struct {
 	argumentsNotProvidedMutex       sync.RWMutex
 	argumentsNotProvidedArgsForCall []struct {
 	}
-	InvalidStemcellVersionStub        func()
-	invalidStemcellVersionMutex       sync.RWMutex
-	invalidStemcellVersionArgsForCall []struct {
-	}
 	LGPONotFoundStub        func()
 	lGPONotFoundMutex       sync.RWMutex
 	lGPONotFoundArgsForCall []struct {
@@ -47,29 +43,6 @@ func (fake *FakeConstructMessenger) ArgumentsNotProvidedCalls(stub func()) {
 	fake.ArgumentsNotProvidedStub = stub
 }
 
-func (fake *FakeConstructMessenger) InvalidStemcellVersion() {
-	fake.invalidStemcellVersionMutex.Lock()
-	fake.invalidStemcellVersionArgsForCall = append(fake.invalidStemcellVersionArgsForCall, struct {
-	}{})
-	fake.recordInvocation("InvalidStemcellVersion", []interface{}{})
-	fake.invalidStemcellVersionMutex.Unlock()
-	if fake.InvalidStemcellVersionStub != nil {
-		fake.InvalidStemcellVersionStub()
-	}
-}
-
-func (fake *FakeConstructMessenger) InvalidStemcellVersionCallCount() int {
-	fake.invalidStemcellVersionMutex.RLock()
-	defer fake.invalidStemcellVersionMutex.RUnlock()
-	return len(fake.invalidStemcellVersionArgsForCall)
-}
-
-func (fake *FakeConstructMessenger) InvalidStemcellVersionCalls(stub func()) {
-	fake.invalidStemcellVersionMutex.Lock()
-	defer fake.invalidStemcellVersionMutex.Unlock()
-	fake.InvalidStemcellVersionStub = stub
-}
-
 func (fake *FakeConstructMessenger) LGPONotFound() {
 	fake.lGPONotFoundMutex.Lock()
 	fake.lGPONotFoundArgsForCall = append(fake.lGPONotFoundArgsForCall, struct {
@@ -98,8 +71,6 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.argumentsNotProvidedMutex.RLock()
 	defer fake.argumentsNotProvidedMutex.RUnlock()
-	fake.invalidStemcellVersionMutex.RLock()
-	defer fake.invalidStemcellVersionMutex.RUnlock()
 	fake.lGPONotFoundMutex.RLock()
 	defer fake.lGPONotFoundMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -29,17 +29,6 @@ type FakeConstructCmdValidator struct {
 	populatedArgsReturnsOnCall map[int]struct {
 		result1 bool
 	}
-	ValidStemcellInfoStub        func(string) bool
-	validStemcellInfoMutex       sync.RWMutex
-	validStemcellInfoArgsForCall []struct {
-		arg1 string
-	}
-	validStemcellInfoReturns struct {
-		result1 bool
-	}
-	validStemcellInfoReturnsOnCall map[int]struct {
-		result1 bool
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -156,66 +145,6 @@ func (fake *FakeConstructCmdValidator) PopulatedArgsReturnsOnCall(i int, result1
 	}{result1}
 }
 
-func (fake *FakeConstructCmdValidator) ValidStemcellInfo(arg1 string) bool {
-	fake.validStemcellInfoMutex.Lock()
-	ret, specificReturn := fake.validStemcellInfoReturnsOnCall[len(fake.validStemcellInfoArgsForCall)]
-	fake.validStemcellInfoArgsForCall = append(fake.validStemcellInfoArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("ValidStemcellInfo", []interface{}{arg1})
-	fake.validStemcellInfoMutex.Unlock()
-	if fake.ValidStemcellInfoStub != nil {
-		return fake.ValidStemcellInfoStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.validStemcellInfoReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeConstructCmdValidator) ValidStemcellInfoCallCount() int {
-	fake.validStemcellInfoMutex.RLock()
-	defer fake.validStemcellInfoMutex.RUnlock()
-	return len(fake.validStemcellInfoArgsForCall)
-}
-
-func (fake *FakeConstructCmdValidator) ValidStemcellInfoCalls(stub func(string) bool) {
-	fake.validStemcellInfoMutex.Lock()
-	defer fake.validStemcellInfoMutex.Unlock()
-	fake.ValidStemcellInfoStub = stub
-}
-
-func (fake *FakeConstructCmdValidator) ValidStemcellInfoArgsForCall(i int) string {
-	fake.validStemcellInfoMutex.RLock()
-	defer fake.validStemcellInfoMutex.RUnlock()
-	argsForCall := fake.validStemcellInfoArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeConstructCmdValidator) ValidStemcellInfoReturns(result1 bool) {
-	fake.validStemcellInfoMutex.Lock()
-	defer fake.validStemcellInfoMutex.Unlock()
-	fake.ValidStemcellInfoStub = nil
-	fake.validStemcellInfoReturns = struct {
-		result1 bool
-	}{result1}
-}
-
-func (fake *FakeConstructCmdValidator) ValidStemcellInfoReturnsOnCall(i int, result1 bool) {
-	fake.validStemcellInfoMutex.Lock()
-	defer fake.validStemcellInfoMutex.Unlock()
-	fake.ValidStemcellInfoStub = nil
-	if fake.validStemcellInfoReturnsOnCall == nil {
-		fake.validStemcellInfoReturnsOnCall = make(map[int]struct {
-			result1 bool
-		})
-	}
-	fake.validStemcellInfoReturnsOnCall[i] = struct {
-		result1 bool
-	}{result1}
-}
-
 func (fake *FakeConstructCmdValidator) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -223,8 +152,6 @@ func (fake *FakeConstructCmdValidator) Invocations() map[string][][]interface{} 
 	defer fake.lGPOInDirectoryMutex.RUnlock()
 	fake.populatedArgsMutex.RLock()
 	defer fake.populatedArgsMutex.RUnlock()
-	fake.validStemcellInfoMutex.RLock()
-	defer fake.validStemcellInfoMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

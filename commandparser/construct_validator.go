@@ -1,7 +1,6 @@
 package commandparser
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	"os"
 	"path/filepath"
 )
@@ -24,8 +23,4 @@ func (c *ConstructValidator) LGPOInDirectory() bool {
 		return false
 	}
 	return true
-}
-
-func (c *ConstructValidator) ValidStemcellInfo(stemcellVersion string) bool {
-	return config.IsValidStemcellVersion(stemcellVersion)
 }

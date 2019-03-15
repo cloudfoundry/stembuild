@@ -27,17 +27,11 @@ var _ = Describe("construct", func() {
 			ConstrCmd.SetFlags(f)
 		})
 
-		var longformArgs = []string{"-stemcell-version", "1803.45",
+		var longformArgs = []string{
 			"-winrm-ip", "10.0.0.5",
 			"-winrm-username", "Admin",
 			"-winrm-password", "some_password",
 		}
-
-		It("stores the value of stemcell version", func() {
-			err := f.Parse(longformArgs)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(ConstrCmd.GetStemcellVersion()).To(Equal("1803.45"))
-		})
 
 		It("stores the value of a WinRM user", func() {
 			err := f.Parse(longformArgs)
@@ -88,7 +82,6 @@ var _ = Describe("construct", func() {
 
 		It("should execute the construct VM command", func() {
 			fakeValidator.PopulatedArgsReturns(true)
-			fakeValidator.ValidStemcellInfoReturns(true)
 			fakeValidator.LGPOInDirectoryReturns(true)
 
 			exitStatus := ConstrCmd.Execute(emptyContext, f)
@@ -108,22 +101,9 @@ var _ = Describe("construct", func() {
 			})
 		})
 
-		Context("with invalid stemcell info", func() {
-			It("should return an error", func() {
-				fakeValidator.PopulatedArgsReturns(true)
-				fakeValidator.ValidStemcellInfoReturns(false)
-
-				exitStatus := ConstrCmd.Execute(emptyContext, f)
-
-				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
-				Expect(fakeMessenger.InvalidStemcellVersionCallCount()).To(Equal(1))
-			})
-		})
-
 		Context("with LGPO.zip not in current directory", func() {
 			It("should return an error", func() {
 				fakeValidator.PopulatedArgsReturns(true)
-				fakeValidator.ValidStemcellInfoReturns(true)
 				fakeValidator.LGPOInDirectoryReturns(false)
 
 				exitStatus := ConstrCmd.Execute(emptyContext, f)
@@ -136,7 +116,6 @@ var _ = Describe("construct", func() {
 		Context("with an error during VMPrepare", func() {
 			It("should retrun an error", func() {
 				fakeValidator.PopulatedArgsReturns(true)
-				fakeValidator.ValidStemcellInfoReturns(true)
 				fakeValidator.LGPOInDirectoryReturns(true)
 				fakeVmConstruct.PrepareVMReturns(errors.New("some error"))
 
