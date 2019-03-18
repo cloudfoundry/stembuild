@@ -1,6 +1,9 @@
 package stemcell_generator
 
-import "io"
+import (
+	"fmt"
+	"io"
+)
 
 //go:generate counterfeiter . ManifestGenerator
 type ManifestGenerator interface {
@@ -9,12 +12,12 @@ type ManifestGenerator interface {
 
 //go:generate counterfeiter . FileNameGenerator
 type FileNameGenerator interface {
-	FileName() string
+	FileName() (string, error)
 }
 
 //go:generate counterfeiter . TarWriter
 type TarWriter interface {
-	Write(string, ...io.Reader)
+	Write(string, ...io.Reader) error
 }
 type StemcellGenerator struct {
 	manifestGenerator ManifestGenerator
@@ -27,8 +30,18 @@ func NewStemcellGenerator(m ManifestGenerator, f FileNameGenerator, t TarWriter)
 }
 
 func (g *StemcellGenerator) Generate(image io.Reader) error {
-	manifest, _ := g.manifestGenerator.Manifest(image)
-	filename := g.fileNameGenerator.FileName()
-	g.tarWriter.Write(filename, image, manifest)
+	manifest, err := g.manifestGenerator.Manifest(image)
+	if err != nil {
+		return fmt.Errorf("failed to generate stemcell manifest: %s", err)
+	}
+	filename, err := g.fileNameGenerator.FileName()
+	if err != nil {
+		return fmt.Errorf("failed to generate stemcell filename: %s", err)
+	}
+	err = g.tarWriter.Write(filename, image, manifest)
+	if err != nil {
+		return fmt.Errorf("failed to generate stemcell tarball: %s", err)
+	}
+
 	return nil
 }

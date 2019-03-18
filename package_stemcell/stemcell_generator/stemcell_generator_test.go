@@ -2,6 +2,8 @@ package stemcell_generator_test
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"io"
 
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
@@ -38,17 +40,36 @@ var _ = Describe("StemcellGenerator", func() {
 			Expect(args).To(Equal(fakeImage))
 		})
 
+		It("returns an error when manifest generation fails", func() {
+			manifestGenerator.ManifestReturns(nil, errors.New("some manifest error"))
+
+			err := stemcellGenerator.Generate(fakeImage)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("failed to generate stemcell manifest: some manifest error"))
+		})
+
 		It("generates a filename", func() {
 			err := stemcellGenerator.Generate(fakeImage)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fileNameGenerator.FileNameCallCount()).To(Equal(1))
 		})
+
+		It("should return an error when filename generator fails", func() {
+			fileNameGenerator.FileNameReturns("", errors.New("some filename error"))
+
+			err := stemcellGenerator.Generate(fakeImage)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("failed to generate stemcell filename: some filename error"))
+		})
+
 		It("should generate a tarball", func() {
 			expectedFileName := "the-file.tgz"
 			expectedManifest := bytes.NewReader([]byte("manifest"))
 
-			fileNameGenerator.FileNameReturns(expectedFileName)
+			fileNameGenerator.FileNameReturns(expectedFileName, nil)
 			manifestGenerator.ManifestReturns(expectedManifest, nil)
 
 			stemcellGenerator.Generate(fakeImage)
@@ -59,6 +80,16 @@ var _ = Describe("StemcellGenerator", func() {
 			Expect(actualFileName).To(Equal(expectedFileName))
 
 			Expect(objects).To(ConsistOf(expectedManifest, fakeImage))
+		})
+
+		It("should return an error when tar writer fails", func() {
+			tarWriterError := errors.New("some tar writer error")
+			tarWriter.WriteReturns(tarWriterError)
+
+			err := stemcellGenerator.Generate(fakeImage)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError(fmt.Sprintf("failed to generate stemcell tarball: %s", tarWriterError)))
 		})
 	})
 })

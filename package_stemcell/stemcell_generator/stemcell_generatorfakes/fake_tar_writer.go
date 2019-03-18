@@ -9,18 +9,25 @@ import (
 )
 
 type FakeTarWriter struct {
-	WriteStub        func(string, ...io.Reader)
+	WriteStub        func(string, ...io.Reader) error
 	writeMutex       sync.RWMutex
 	writeArgsForCall []struct {
 		arg1 string
 		arg2 []io.Reader
 	}
+	writeReturns struct {
+		result1 error
+	}
+	writeReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeTarWriter) Write(arg1 string, arg2 ...io.Reader) {
+func (fake *FakeTarWriter) Write(arg1 string, arg2 ...io.Reader) error {
 	fake.writeMutex.Lock()
+	ret, specificReturn := fake.writeReturnsOnCall[len(fake.writeArgsForCall)]
 	fake.writeArgsForCall = append(fake.writeArgsForCall, struct {
 		arg1 string
 		arg2 []io.Reader
@@ -28,8 +35,13 @@ func (fake *FakeTarWriter) Write(arg1 string, arg2 ...io.Reader) {
 	fake.recordInvocation("Write", []interface{}{arg1, arg2})
 	fake.writeMutex.Unlock()
 	if fake.WriteStub != nil {
-		fake.WriteStub(arg1, arg2...)
+		return fake.WriteStub(arg1, arg2...)
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.writeReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeTarWriter) WriteCallCount() int {
@@ -38,7 +50,7 @@ func (fake *FakeTarWriter) WriteCallCount() int {
 	return len(fake.writeArgsForCall)
 }
 
-func (fake *FakeTarWriter) WriteCalls(stub func(string, ...io.Reader)) {
+func (fake *FakeTarWriter) WriteCalls(stub func(string, ...io.Reader) error) {
 	fake.writeMutex.Lock()
 	defer fake.writeMutex.Unlock()
 	fake.WriteStub = stub
@@ -49,6 +61,29 @@ func (fake *FakeTarWriter) WriteArgsForCall(i int) (string, []io.Reader) {
 	defer fake.writeMutex.RUnlock()
 	argsForCall := fake.writeArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeTarWriter) WriteReturns(result1 error) {
+	fake.writeMutex.Lock()
+	defer fake.writeMutex.Unlock()
+	fake.WriteStub = nil
+	fake.writeReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeTarWriter) WriteReturnsOnCall(i int, result1 error) {
+	fake.writeMutex.Lock()
+	defer fake.writeMutex.Unlock()
+	fake.WriteStub = nil
+	if fake.writeReturnsOnCall == nil {
+		fake.writeReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.writeReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeTarWriter) Invocations() map[string][][]interface{} {

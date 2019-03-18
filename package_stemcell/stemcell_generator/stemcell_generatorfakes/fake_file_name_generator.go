@@ -8,21 +8,23 @@ import (
 )
 
 type FakeFileNameGenerator struct {
-	FileNameStub        func() string
+	FileNameStub        func() (string, error)
 	fileNameMutex       sync.RWMutex
 	fileNameArgsForCall []struct {
 	}
 	fileNameReturns struct {
 		result1 string
+		result2 error
 	}
 	fileNameReturnsOnCall map[int]struct {
 		result1 string
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeFileNameGenerator) FileName() string {
+func (fake *FakeFileNameGenerator) FileName() (string, error) {
 	fake.fileNameMutex.Lock()
 	ret, specificReturn := fake.fileNameReturnsOnCall[len(fake.fileNameArgsForCall)]
 	fake.fileNameArgsForCall = append(fake.fileNameArgsForCall, struct {
@@ -33,10 +35,10 @@ func (fake *FakeFileNameGenerator) FileName() string {
 		return fake.FileNameStub()
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
 	fakeReturns := fake.fileNameReturns
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeFileNameGenerator) FileNameCallCount() int {
@@ -45,33 +47,36 @@ func (fake *FakeFileNameGenerator) FileNameCallCount() int {
 	return len(fake.fileNameArgsForCall)
 }
 
-func (fake *FakeFileNameGenerator) FileNameCalls(stub func() string) {
+func (fake *FakeFileNameGenerator) FileNameCalls(stub func() (string, error)) {
 	fake.fileNameMutex.Lock()
 	defer fake.fileNameMutex.Unlock()
 	fake.FileNameStub = stub
 }
 
-func (fake *FakeFileNameGenerator) FileNameReturns(result1 string) {
+func (fake *FakeFileNameGenerator) FileNameReturns(result1 string, result2 error) {
 	fake.fileNameMutex.Lock()
 	defer fake.fileNameMutex.Unlock()
 	fake.FileNameStub = nil
 	fake.fileNameReturns = struct {
 		result1 string
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeFileNameGenerator) FileNameReturnsOnCall(i int, result1 string) {
+func (fake *FakeFileNameGenerator) FileNameReturnsOnCall(i int, result1 string, result2 error) {
 	fake.fileNameMutex.Lock()
 	defer fake.fileNameMutex.Unlock()
 	fake.FileNameStub = nil
 	if fake.fileNameReturnsOnCall == nil {
 		fake.fileNameReturnsOnCall = make(map[int]struct {
 			result1 string
+			result2 error
 		})
 	}
 	fake.fileNameReturnsOnCall[i] = struct {
 		result1 string
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeFileNameGenerator) Invocations() map[string][][]interface{} {
