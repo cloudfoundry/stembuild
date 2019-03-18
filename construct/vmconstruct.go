@@ -18,7 +18,16 @@ func NewVMConstruct(winrmIP, winrmUsername, winrmPassword string) *VMConstruct {
 	return &VMConstruct{NewWinRM(winrmIP, winrmUsername, winrmPassword)}
 }
 
+func (c *VMConstruct) CanConnectToVM() error {
+	err := c.remoteManager.CanConnectToVM()
+	if err != nil {
+		return fmt.Errorf("cannot connect to VM: %s", err)
+	}
+
+	return nil
+}
 func (c *VMConstruct) PrepareVM() error {
+
 	fmt.Printf("upload artifact...")
 	err := c.uploadArtifact()
 	if err != nil {

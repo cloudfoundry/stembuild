@@ -12,6 +12,7 @@ import (
 
 //go:generate counterfeiter . VmConstruct
 type VmConstruct interface {
+	CanConnectToVM() error
 	PrepareVM() error
 }
 

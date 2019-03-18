@@ -2,9 +2,9 @@
 package commandparserfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
+	commandparser "github.com/cloudfoundry-incubator/stembuild/commandparser"
 )
 
 type FakeConstructCmdValidator struct {

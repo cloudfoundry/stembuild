@@ -2,12 +2,22 @@
 package commandparserfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
+	commandparser "github.com/cloudfoundry-incubator/stembuild/commandparser"
 )
 
 type FakeVmConstruct struct {
+	CanConnectToVMStub        func() error
+	canConnectToVMMutex       sync.RWMutex
+	canConnectToVMArgsForCall []struct {
+	}
+	canConnectToVMReturns struct {
+		result1 error
+	}
+	canConnectToVMReturnsOnCall map[int]struct {
+		result1 error
+	}
 	PrepareVMStub        func() error
 	prepareVMMutex       sync.RWMutex
 	prepareVMArgsForCall []struct {
@@ -20,6 +30,58 @@ type FakeVmConstruct struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeVmConstruct) CanConnectToVM() error {
+	fake.canConnectToVMMutex.Lock()
+	ret, specificReturn := fake.canConnectToVMReturnsOnCall[len(fake.canConnectToVMArgsForCall)]
+	fake.canConnectToVMArgsForCall = append(fake.canConnectToVMArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CanConnectToVM", []interface{}{})
+	fake.canConnectToVMMutex.Unlock()
+	if fake.CanConnectToVMStub != nil {
+		return fake.CanConnectToVMStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.canConnectToVMReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeVmConstruct) CanConnectToVMCallCount() int {
+	fake.canConnectToVMMutex.RLock()
+	defer fake.canConnectToVMMutex.RUnlock()
+	return len(fake.canConnectToVMArgsForCall)
+}
+
+func (fake *FakeVmConstruct) CanConnectToVMCalls(stub func() error) {
+	fake.canConnectToVMMutex.Lock()
+	defer fake.canConnectToVMMutex.Unlock()
+	fake.CanConnectToVMStub = stub
+}
+
+func (fake *FakeVmConstruct) CanConnectToVMReturns(result1 error) {
+	fake.canConnectToVMMutex.Lock()
+	defer fake.canConnectToVMMutex.Unlock()
+	fake.CanConnectToVMStub = nil
+	fake.canConnectToVMReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeVmConstruct) CanConnectToVMReturnsOnCall(i int, result1 error) {
+	fake.canConnectToVMMutex.Lock()
+	defer fake.canConnectToVMMutex.Unlock()
+	fake.CanConnectToVMStub = nil
+	if fake.canConnectToVMReturnsOnCall == nil {
+		fake.canConnectToVMReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.canConnectToVMReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeVmConstruct) PrepareVM() error {
@@ -77,6 +139,8 @@ func (fake *FakeVmConstruct) PrepareVMReturnsOnCall(i int, result1 error) {
 func (fake *FakeVmConstruct) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.canConnectToVMMutex.RLock()
+	defer fake.canConnectToVMMutex.RUnlock()
 	fake.prepareVMMutex.RLock()
 	defer fake.prepareVMMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -73,3 +73,17 @@ func (mr *MockRemoteManagerMockRecorder) ExecuteCommand(file interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteCommand", reflect.TypeOf((*MockRemoteManager)(nil).ExecuteCommand), file)
 }
+
+// CanConnectToVM mocks base method
+func (m *MockRemoteManager) CanConnectToVM() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CanConnectToVM")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CanConnectToVM indicates an expected call of CanConnectToVM
+func (mr *MockRemoteManagerMockRecorder) CanConnectToVM() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CanConnectToVM", reflect.TypeOf((*MockRemoteManager)(nil).CanConnectToVM))
+}

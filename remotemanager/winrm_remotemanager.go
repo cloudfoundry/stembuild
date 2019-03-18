@@ -11,6 +11,8 @@ import (
 	"github.com/masterzen/winrm"
 )
 
+const WinrmPort = 5985
+
 type WinRM struct {
 	host     string
 	username string
@@ -19,6 +21,24 @@ type WinRM struct {
 
 func NewWinRM(host, username, password string) RemoteManager {
 	return &WinRM{host, username, password}
+}
+
+func (w *WinRM) CanConnectToVM() error {
+	endpoint := winrm.NewEndpoint(w.host, WinrmPort, false, true, nil, nil, nil, time.Second*60)
+	winrmClient, err := winrm.NewClient(endpoint, w.username, w.password)
+	if err != nil {
+		fmt.Printf("Failed to create WinRM client")
+		return err
+	}
+
+	s, err := winrmClient.CreateShell()
+	if err != nil {
+		fmt.Printf("Failed to connect to VM")
+		return err
+	}
+	defer s.Close()
+
+	return nil
 }
 
 func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error {
@@ -33,6 +53,7 @@ func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error
 	if err != nil {
 		return err
 	}
+
 	return client.Copy(sourceFilePath, destinationFilePath)
 }
 
