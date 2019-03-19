@@ -19,26 +19,28 @@ func NewVMConstruct(winrmIP, winrmUsername, winrmPassword string) *VMConstruct {
 }
 
 func (c *VMConstruct) CanConnectToVM() error {
-	err := c.remoteManager.CanConnectToVM()
-	if err != nil {
-		return fmt.Errorf("cannot connect to VM: %s", err)
-	}
 
-	return nil
+	fmt.Println("validating connection to vm...")
+	err := c.remoteManager.CanReachVM()
+	if err != nil {
+		return err
+	}
+	return c.remoteManager.CanLoginVM()
 }
+
 func (c *VMConstruct) PrepareVM() error {
 
-	fmt.Printf("upload artifact...")
+	fmt.Println("upload artifact...")
 	err := c.uploadArtifact()
 	if err != nil {
 		return err
 	}
-	fmt.Printf("extract artifact...")
+	fmt.Println("extract artifact...")
 	err = c.extractArchive()
 	if err != nil {
 		return err
 	}
-	fmt.Printf("execute script...")
+	fmt.Println("execute script...")
 	err = c.executeSetupScript()
 	if err != nil {
 		return err

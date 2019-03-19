@@ -2,7 +2,6 @@ package construct_test
 
 import (
 	"errors"
-	"fmt"
 	. "github.com/cloudfoundry-incubator/stembuild/construct"
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager/mock"
 	"github.com/golang/mock/gomock"
@@ -28,23 +27,32 @@ var _ = Describe("construct_helpers", func() {
 	})
 
 	Describe("CanConnectToVM", func() {
-		It("should not return an error if endpoint is valid", func() {
-
-			mockRemoteManager.EXPECT().CanConnectToVM().Return(nil).Times(1)
+		It("should not return an error if vm & credential are valid", func() {
+			mockRemoteManager.EXPECT().CanReachVM().Return(nil).Times(1)
+			mockRemoteManager.EXPECT().CanLoginVM().Return(nil).Times(1)
 
 			err := mockVMConstruct.CanConnectToVM()
 			Expect(err).ToNot(HaveOccurred())
-
 		})
-		It("should return an error if endpoint is invalid", func() {
 
-			invalidEndpointError := errors.New("invalid endpoint")
-			mockRemoteManager.EXPECT().CanConnectToVM().Return(invalidEndpointError).Times(1)
+		It("should return an error if vm is invalid", func() {
+			invalidVMError := errors.New("invalid vm")
+			mockRemoteManager.EXPECT().CanReachVM().Return(invalidVMError).Times(1)
+			mockRemoteManager.EXPECT().CanLoginVM().Return(nil).Times(0)
 
 			err := mockVMConstruct.CanConnectToVM()
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(fmt.Errorf("cannot connect to VM: %s", invalidEndpointError)))
+			Expect(err).To(MatchError(invalidVMError))
+		})
 
+		It("should return an error if username/password is invalid", func() {
+			invalidPwdError := errors.New("invalid password")
+			mockRemoteManager.EXPECT().CanReachVM().Return(nil).Times(1)
+			mockRemoteManager.EXPECT().CanLoginVM().Return(invalidPwdError).Times(1)
+
+			err := mockVMConstruct.CanConnectToVM()
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError(invalidPwdError))
 		})
 	})
 

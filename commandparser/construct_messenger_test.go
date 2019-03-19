@@ -1,6 +1,7 @@
 package commandparser_test
 
 import (
+	"errors"
 	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,6 +30,14 @@ var _ = Describe("ConstructMessenger", func() {
 		It("should output an appropriate error", func() {
 			cm.LGPONotFound()
 			Eventually(g).Should(Say("Could not find LGPO.zip in the current directory"))
+		})
+	})
+
+	Describe("CannotConnectToVM", func() {
+		It("should output an appropriate error", func() {
+			connectionError := errors.New("some connection error")
+			cm.CannotConnectToVM(connectionError)
+			Eventually(g).Should(Say("Cannot connect to VM: %s", connectionError))
 		})
 	})
 })

@@ -31,6 +31,7 @@ type ConstructCmdValidator interface {
 type ConstructMessenger interface {
 	ArgumentsNotProvided()
 	LGPONotFound()
+	CannotConnectToVM(err error)
 }
 
 type ConstructCmd struct {
@@ -90,7 +91,14 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 	}
 
 	vmConstruct := p.factory.VMPreparer(p.winrmIP, p.winrmUsername, p.winrmPassword)
-	err := vmConstruct.PrepareVM()
+
+	err := vmConstruct.CanConnectToVM()
+	if err != nil {
+		p.messenger.CannotConnectToVM(err)
+		return subcommands.ExitFailure
+	}
+
+	err = vmConstruct.PrepareVM()
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, err.Error())
 		return subcommands.ExitFailure

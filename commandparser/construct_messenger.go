@@ -10,7 +10,7 @@ type ConstructCmdMessenger struct {
 }
 
 func (m *ConstructCmdMessenger) printMessage(message string) {
-	fmt.Fprint(m.OutputChannel, message)
+	fmt.Fprintln(m.OutputChannel, message)
 }
 
 func (m *ConstructCmdMessenger) ArgumentsNotProvided() {
@@ -19,4 +19,8 @@ func (m *ConstructCmdMessenger) ArgumentsNotProvided() {
 
 func (m *ConstructCmdMessenger) LGPONotFound() {
 	m.printMessage("Could not find LGPO.zip in the current directory")
+}
+
+func (m *ConstructCmdMessenger) CannotConnectToVM(err error) {
+	m.printMessage(fmt.Sprintf("Cannot connect to VM: %s", err))
 }

@@ -12,6 +12,11 @@ type FakeConstructMessenger struct {
 	argumentsNotProvidedMutex       sync.RWMutex
 	argumentsNotProvidedArgsForCall []struct {
 	}
+	CannotConnectToVMStub        func(error)
+	cannotConnectToVMMutex       sync.RWMutex
+	cannotConnectToVMArgsForCall []struct {
+		arg1 error
+	}
 	LGPONotFoundStub        func()
 	lGPONotFoundMutex       sync.RWMutex
 	lGPONotFoundArgsForCall []struct {
@@ -43,6 +48,37 @@ func (fake *FakeConstructMessenger) ArgumentsNotProvidedCalls(stub func()) {
 	fake.ArgumentsNotProvidedStub = stub
 }
 
+func (fake *FakeConstructMessenger) CannotConnectToVM(arg1 error) {
+	fake.cannotConnectToVMMutex.Lock()
+	fake.cannotConnectToVMArgsForCall = append(fake.cannotConnectToVMArgsForCall, struct {
+		arg1 error
+	}{arg1})
+	fake.recordInvocation("CannotConnectToVM", []interface{}{arg1})
+	fake.cannotConnectToVMMutex.Unlock()
+	if fake.CannotConnectToVMStub != nil {
+		fake.CannotConnectToVMStub(arg1)
+	}
+}
+
+func (fake *FakeConstructMessenger) CannotConnectToVMCallCount() int {
+	fake.cannotConnectToVMMutex.RLock()
+	defer fake.cannotConnectToVMMutex.RUnlock()
+	return len(fake.cannotConnectToVMArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) CannotConnectToVMCalls(stub func(error)) {
+	fake.cannotConnectToVMMutex.Lock()
+	defer fake.cannotConnectToVMMutex.Unlock()
+	fake.CannotConnectToVMStub = stub
+}
+
+func (fake *FakeConstructMessenger) CannotConnectToVMArgsForCall(i int) error {
+	fake.cannotConnectToVMMutex.RLock()
+	defer fake.cannotConnectToVMMutex.RUnlock()
+	argsForCall := fake.cannotConnectToVMArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeConstructMessenger) LGPONotFound() {
 	fake.lGPONotFoundMutex.Lock()
 	fake.lGPONotFoundArgsForCall = append(fake.lGPONotFoundArgsForCall, struct {
@@ -71,6 +107,8 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.argumentsNotProvidedMutex.RLock()
 	defer fake.argumentsNotProvidedMutex.RUnlock()
+	fake.cannotConnectToVMMutex.RLock()
+	defer fake.cannotConnectToVMMutex.RUnlock()
 	fake.lGPONotFoundMutex.RLock()
 	defer fake.lGPONotFoundMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

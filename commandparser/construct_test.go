@@ -83,11 +83,17 @@ var _ = Describe("construct", func() {
 		It("should execute the construct VM command", func() {
 			fakeValidator.PopulatedArgsReturns(true)
 			fakeValidator.LGPOInDirectoryReturns(true)
+			fakeVmConstruct.CanConnectToVMReturns(nil)
 
 			exitStatus := ConstrCmd.Execute(emptyContext, f)
 
 			Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
+			Expect(fakeValidator.PopulatedArgsCallCount()).To(Equal(1))
+			Expect(fakeValidator.LGPOInDirectoryCallCount()).To(Equal(1))
+
+			Expect(fakeVmConstruct.CanConnectToVMCallCount()).To(Equal(1))
 			Expect(fakeVmConstruct.PrepareVMCallCount()).To(Equal(1))
+
 		})
 
 		Context("with missing arguments", func() {
@@ -110,6 +116,23 @@ var _ = Describe("construct", func() {
 
 				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
 				Expect(fakeMessenger.LGPONotFoundCallCount()).To(Equal(1))
+			})
+		})
+
+		Context("with VM being unreachable", func() {
+			It("should return an error", func() {
+				fakeValidator.PopulatedArgsReturns(true)
+				fakeValidator.LGPOInDirectoryReturns(true)
+
+				connectionError := errors.New("can't reach the vm")
+				fakeVmConstruct.CanConnectToVMReturns(connectionError)
+
+				exitStatus := ConstrCmd.Execute(emptyContext, f)
+
+				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
+				arg := fakeMessenger.CannotConnectToVMArgsForCall(0)
+				Expect(arg).To(Equal(connectionError))
+				Expect(fakeMessenger.CannotConnectToVMCallCount()).To(Equal(1))
 			})
 		})
 

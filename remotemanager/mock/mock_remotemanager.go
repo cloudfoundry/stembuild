@@ -74,16 +74,30 @@ func (mr *MockRemoteManagerMockRecorder) ExecuteCommand(file interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteCommand", reflect.TypeOf((*MockRemoteManager)(nil).ExecuteCommand), file)
 }
 
-// CanConnectToVM mocks base method
-func (m *MockRemoteManager) CanConnectToVM() error {
+// CanReachVM mocks base method
+func (m *MockRemoteManager) CanReachVM() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CanConnectToVM")
+	ret := m.ctrl.Call(m, "CanReachVM")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CanConnectToVM indicates an expected call of CanConnectToVM
-func (mr *MockRemoteManagerMockRecorder) CanConnectToVM() *gomock.Call {
+// CanReachVM indicates an expected call of CanReachVM
+func (mr *MockRemoteManagerMockRecorder) CanReachVM() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CanConnectToVM", reflect.TypeOf((*MockRemoteManager)(nil).CanConnectToVM))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CanReachVM", reflect.TypeOf((*MockRemoteManager)(nil).CanReachVM))
+}
+
+// CanLoginVM mocks base method
+func (m *MockRemoteManager) CanLoginVM() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CanLoginVM")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CanLoginVM indicates an expected call of CanLoginVM
+func (mr *MockRemoteManagerMockRecorder) CanLoginVM() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CanLoginVM", reflect.TypeOf((*MockRemoteManager)(nil).CanLoginVM))
 }

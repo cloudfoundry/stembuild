@@ -2,8 +2,10 @@ package remotemanager
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"time"
 
@@ -23,20 +25,27 @@ func NewWinRM(host, username, password string) RemoteManager {
 	return &WinRM{host, username, password}
 }
 
-func (w *WinRM) CanConnectToVM() error {
+func (w *WinRM) CanReachVM() error {
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", w.host, WinrmPort), time.Duration(time.Second*60))
+	if err != nil {
+		return fmt.Errorf("host %s is unreachable. Please ensure WinRM is enabled and the IP is correct", w.host)
+	}
+	conn.Close()
+	return nil
+}
+
+func (w *WinRM) CanLoginVM() error {
 	endpoint := winrm.NewEndpoint(w.host, WinrmPort, false, true, nil, nil, nil, time.Second*60)
 	winrmClient, err := winrm.NewClient(endpoint, w.username, w.password)
 	if err != nil {
-		fmt.Printf("Failed to create WinRM client")
-		return err
+		return fmt.Errorf("failed to create winrm client: %s", err)
 	}
 
 	s, err := winrmClient.CreateShell()
 	if err != nil {
-		fmt.Printf("Failed to connect to VM")
-		return err
+		return errors.New("username and password for given IP is invalid")
 	}
-	defer s.Close()
+	s.Close()
 
 	return nil
 }
