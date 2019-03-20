@@ -1,6 +1,6 @@
 package remotemanager
 
-//go:generate mockgen -source=remotemanager.go -destination=mock/mock_remotemanager.go RemoteManager
+//go:generate counterfeiter . RemoteManager
 
 type RemoteManager interface {
 	UploadArtifact(source, destination string) error

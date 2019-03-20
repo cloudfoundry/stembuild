@@ -3,56 +3,58 @@ package construct_test
 import (
 	"errors"
 	. "github.com/cloudfoundry-incubator/stembuild/construct"
-	. "github.com/cloudfoundry-incubator/stembuild/remotemanager/mock"
-	"github.com/golang/mock/gomock"
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager/remotemanagerfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("construct_helpers", func() {
 	var (
-		mockCtrl          *gomock.Controller
-		mockRemoteManager *MockRemoteManager
+		fakeRemoteManager *remotemanagerfakes.FakeRemoteManager
 		mockVMConstruct   *VMConstruct
 	)
 
 	BeforeEach(func() {
-		mockCtrl = gomock.NewController(GinkgoT())
-		mockRemoteManager = NewMockRemoteManager(mockCtrl)
-		mockVMConstruct = NewMockVMConstruct(mockRemoteManager)
-	})
-
-	AfterEach(func() {
-		mockCtrl.Finish()
+		fakeRemoteManager = &remotemanagerfakes.FakeRemoteManager{}
+		mockVMConstruct = NewMockVMConstruct(fakeRemoteManager)
 	})
 
 	Describe("CanConnectToVM", func() {
 		It("should not return an error if vm & credential are valid", func() {
-			mockRemoteManager.EXPECT().CanReachVM().Return(nil).Times(1)
-			mockRemoteManager.EXPECT().CanLoginVM().Return(nil).Times(1)
+			fakeRemoteManager.CanReachVMReturns(nil)
+			fakeRemoteManager.CanLoginVMReturns(nil)
 
 			err := mockVMConstruct.CanConnectToVM()
 			Expect(err).ToNot(HaveOccurred())
+			Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
+			Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
+
 		})
 
 		It("should return an error if vm is invalid", func() {
 			invalidVMError := errors.New("invalid vm")
-			mockRemoteManager.EXPECT().CanReachVM().Return(invalidVMError).Times(1)
-			mockRemoteManager.EXPECT().CanLoginVM().Return(nil).Times(0)
+			fakeRemoteManager.CanReachVMReturns(invalidVMError)
 
 			err := mockVMConstruct.CanConnectToVM()
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(invalidVMError))
+
+			Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
+			Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(0))
 		})
 
 		It("should return an error if username/password is invalid", func() {
 			invalidPwdError := errors.New("invalid password")
-			mockRemoteManager.EXPECT().CanReachVM().Return(nil).Times(1)
-			mockRemoteManager.EXPECT().CanLoginVM().Return(invalidPwdError).Times(1)
+			fakeRemoteManager.CanReachVMReturns(nil)
+			fakeRemoteManager.CanLoginVMReturns(invalidPwdError)
 
 			err := mockVMConstruct.CanConnectToVM()
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(invalidPwdError))
+
+			Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
+			Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
+
 		})
 	})
 
@@ -60,31 +62,45 @@ var _ = Describe("construct_helpers", func() {
 
 		Context("Upload all artifacts correctly", func() {
 			It("passes successfully", func() {
-				mockRemoteManager.EXPECT().UploadArtifact(gomock.Any(), gomock.Any()).Return(nil).Times(2)
 
+				fakeRemoteManager.UploadArtifactReturns(nil)
 				err := mockVMConstruct.UploadArtifact()
 				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeRemoteManager.UploadArtifactCallCount()).To(Equal(2))
 			})
 
 		})
 
 		Context("Fails to upload one or more artifacts", func() {
 			It("fails when it cannot upload LGPO", func() {
-				mockRemoteManager.EXPECT().UploadArtifact("./LGPO.zip", gomock.Any()).Return(errors.New("failed to upload LGPO")).Times(1)
-				mockRemoteManager.EXPECT().UploadArtifact("./StemcellAutomation.zip", gomock.Any()).Return(nil).Times(0)
+
+				uploadError := errors.New("failed to upload LGPO")
+				fakeRemoteManager.UploadArtifactReturns(uploadError)
 
 				err := mockVMConstruct.UploadArtifact()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("failed to upload LGPO"))
+
+				artifact, _ := fakeRemoteManager.UploadArtifactArgsForCall(0)
+				Expect(artifact).To(Equal("./LGPO.zip"))
+				Expect(fakeRemoteManager.UploadArtifactCallCount()).To(Equal(1))
 			})
 
 			It("fails when it cannot upload Stemcell Automation scripts", func() {
-				mockRemoteManager.EXPECT().UploadArtifact("./LGPO.zip", gomock.Any()).Return(nil).Times(1)
-				mockRemoteManager.EXPECT().UploadArtifact("./StemcellAutomation.zip", gomock.Any()).Return(errors.New("failed to upload stemcell automation")).Times(1)
+
+				uploadError := errors.New("failed to upload stemcell automation")
+				fakeRemoteManager.UploadArtifactReturnsOnCall(0, nil)
+				fakeRemoteManager.UploadArtifactReturnsOnCall(1, uploadError)
 
 				err := mockVMConstruct.UploadArtifact()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("failed to upload stemcell automation"))
+
+				artifact, _ := fakeRemoteManager.UploadArtifactArgsForCall(0)
+				Expect(artifact).To(Equal("./LGPO.zip"))
+				artifact, _ = fakeRemoteManager.UploadArtifactArgsForCall(1)
+				Expect(artifact).To(Equal("./StemcellAutomation.zip"))
+				Expect(fakeRemoteManager.UploadArtifactCallCount()).To(Equal(2))
 			})
 		})
 
@@ -93,35 +109,45 @@ var _ = Describe("construct_helpers", func() {
 	Describe("ExtractArchive", func() {
 
 		It("returns failure when it fails to extract archive", func() {
-			mockRemoteManager.EXPECT().ExtractArchive(gomock.Any(), gomock.Any()).Return(errors.New("failed to extract archive")).Times(1)
+			extractError := errors.New("failed to extract archive")
+			fakeRemoteManager.ExtractArchiveReturns(extractError)
 
 			err := mockVMConstruct.ExtractArchive()
 			Expect(err).To(HaveOccurred())
+			Expect(fakeRemoteManager.ExtractArchiveCallCount()).To(Equal(1))
 			Expect(err.Error()).To(Equal("failed to extract archive"))
 		})
 
-		It("returns success when it properly extrects archive", func() {
-			mockRemoteManager.EXPECT().ExtractArchive(gomock.Any(), gomock.Any()).Return(nil).Times(1)
+		It("returns success when it properly extracts archive", func() {
+			fakeRemoteManager.ExtractArchiveReturns(nil)
 
 			err := mockVMConstruct.ExtractArchive()
 			Expect(err).ToNot(HaveOccurred())
+			Expect(fakeRemoteManager.ExtractArchiveCallCount()).To(Equal(1))
+
 		})
 	})
 
 	Describe("ExecuteSetupScript", func() {
 		It("returns failure when it fails to execute setup script", func() {
-			mockRemoteManager.EXPECT().ExecuteCommand(gomock.Any()).Return(errors.New("failed to execute setup script")).Times(1)
+			execError := errors.New("failed to execute setup script")
+			fakeRemoteManager.ExecuteCommandReturns(execError)
 
 			err := mockVMConstruct.ExecuteSetupScript()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("failed to execute setup script"))
+
+			Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
 		})
 
 		It("returns success when it properly executes the setup script", func() {
-			mockRemoteManager.EXPECT().ExecuteCommand(gomock.Any()).Return(nil).Times(1)
+			fakeRemoteManager.ExecuteCommandReturns(nil)
 
 			err := mockVMConstruct.ExecuteSetupScript()
 			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
+
 		})
 	})
 })
