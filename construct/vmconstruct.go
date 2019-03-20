@@ -19,45 +19,59 @@ func NewVMConstruct(winrmIP, winrmUsername, winrmPassword string) *VMConstruct {
 }
 
 func (c *VMConstruct) CanConnectToVM() error {
-
-	fmt.Println("validating connection to vm...")
+	fmt.Print("Validating connection to vm...")
 	err := c.remoteManager.CanReachVM()
 	if err != nil {
 		return err
 	}
-	return c.remoteManager.CanLoginVM()
+	err = c.remoteManager.CanLoginVM()
+	if err != nil {
+		return err
+	}
+	fmt.Println(" succeeded.")
+
+	return nil
 }
 
 func (c *VMConstruct) PrepareVM() error {
-
-	fmt.Println("upload artifact...")
+	fmt.Println("\nTransfering ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes")
 	err := c.uploadArtifact()
 	if err != nil {
 		return err
 	}
-	fmt.Println("extract artifact...")
+	fmt.Println("All files have been uploaded.")
+
+	fmt.Print("\nExtracting artifacts...")
 	err = c.extractArchive()
 	if err != nil {
 		return err
 	}
-	fmt.Println("execute script...")
+	fmt.Println(" Artifacts Extracted.")
+
+	fmt.Println("\nExecuting setup script...")
 	err = c.executeSetupScript()
 	if err != nil {
 		return err
 	}
+	fmt.Println("\nFinished executing setup script.")
 
 	return nil
 }
 
 func (c *VMConstruct) uploadArtifact() error {
+	fmt.Print("\tUploading LGPO to target VM...")
 	err := c.remoteManager.UploadArtifact("./LGPO.zip", lgpoDest)
 	if err != nil {
 		return err
 	}
+	fmt.Println(" Finished uploading LGPO.")
+
+	fmt.Print("\tUploading stemcell preparation artifacts to target VM...")
 	err = c.remoteManager.UploadArtifact("./StemcellAutomation.zip", stemcellAutomationDest)
 	if err != nil {
 		return err
 	}
+	fmt.Println(" Finished uploading artifacts to target VM.")
 
 	return nil
 }

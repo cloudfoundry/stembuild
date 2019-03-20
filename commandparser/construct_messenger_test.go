@@ -40,4 +40,12 @@ var _ = Describe("ConstructMessenger", func() {
 			Eventually(g).Should(Say("Cannot connect to VM: %s", connectionError))
 		})
 	})
+
+	Describe("CannotPrepareVM", func() {
+		It("should output an appropriate error", func() {
+			preparationError := errors.New("PrepareVM failed")
+			cm.CannotPrepareVM(preparationError)
+			Eventually(g).Should(Say("Could not prepare VM: %s", preparationError))
+		})
+	})
 })

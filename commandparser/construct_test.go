@@ -145,6 +145,7 @@ var _ = Describe("construct", func() {
 				exitStatus := ConstrCmd.Execute(emptyContext, f)
 
 				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
+				Expect(fakeMessenger.CannotPrepareVMCallCount()).To(Equal(1))
 			})
 		})
 	})

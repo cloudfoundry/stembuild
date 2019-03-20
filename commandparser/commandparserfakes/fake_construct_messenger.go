@@ -2,9 +2,9 @@
 package commandparserfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	commandparser "github.com/cloudfoundry-incubator/stembuild/commandparser"
+	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 )
 
 type FakeConstructMessenger struct {
@@ -15,6 +15,11 @@ type FakeConstructMessenger struct {
 	CannotConnectToVMStub        func(error)
 	cannotConnectToVMMutex       sync.RWMutex
 	cannotConnectToVMArgsForCall []struct {
+		arg1 error
+	}
+	CannotPrepareVMStub        func(error)
+	cannotPrepareVMMutex       sync.RWMutex
+	cannotPrepareVMArgsForCall []struct {
 		arg1 error
 	}
 	LGPONotFoundStub        func()
@@ -79,6 +84,37 @@ func (fake *FakeConstructMessenger) CannotConnectToVMArgsForCall(i int) error {
 	return argsForCall.arg1
 }
 
+func (fake *FakeConstructMessenger) CannotPrepareVM(arg1 error) {
+	fake.cannotPrepareVMMutex.Lock()
+	fake.cannotPrepareVMArgsForCall = append(fake.cannotPrepareVMArgsForCall, struct {
+		arg1 error
+	}{arg1})
+	fake.recordInvocation("CannotPrepareVM", []interface{}{arg1})
+	fake.cannotPrepareVMMutex.Unlock()
+	if fake.CannotPrepareVMStub != nil {
+		fake.CannotPrepareVMStub(arg1)
+	}
+}
+
+func (fake *FakeConstructMessenger) CannotPrepareVMCallCount() int {
+	fake.cannotPrepareVMMutex.RLock()
+	defer fake.cannotPrepareVMMutex.RUnlock()
+	return len(fake.cannotPrepareVMArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) CannotPrepareVMCalls(stub func(error)) {
+	fake.cannotPrepareVMMutex.Lock()
+	defer fake.cannotPrepareVMMutex.Unlock()
+	fake.CannotPrepareVMStub = stub
+}
+
+func (fake *FakeConstructMessenger) CannotPrepareVMArgsForCall(i int) error {
+	fake.cannotPrepareVMMutex.RLock()
+	defer fake.cannotPrepareVMMutex.RUnlock()
+	argsForCall := fake.cannotPrepareVMArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeConstructMessenger) LGPONotFound() {
 	fake.lGPONotFoundMutex.Lock()
 	fake.lGPONotFoundArgsForCall = append(fake.lGPONotFoundArgsForCall, struct {
@@ -109,6 +145,8 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.argumentsNotProvidedMutex.RUnlock()
 	fake.cannotConnectToVMMutex.RLock()
 	defer fake.cannotConnectToVMMutex.RUnlock()
+	fake.cannotPrepareVMMutex.RLock()
+	defer fake.cannotPrepareVMMutex.RUnlock()
 	fake.lGPONotFoundMutex.RLock()
 	defer fake.lGPONotFoundMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

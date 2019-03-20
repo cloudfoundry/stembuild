@@ -32,6 +32,7 @@ type ConstructMessenger interface {
 	ArgumentsNotProvided()
 	LGPONotFound()
 	CannotConnectToVM(err error)
+	CannotPrepareVM(err error)
 }
 
 type ConstructCmd struct {
@@ -100,7 +101,7 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 
 	err = vmConstruct.PrepareVM()
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, err.Error())
+		p.messenger.CannotPrepareVM(err)
 		return subcommands.ExitFailure
 	}
 

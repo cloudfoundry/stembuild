@@ -24,3 +24,7 @@ func (m *ConstructCmdMessenger) LGPONotFound() {
 func (m *ConstructCmdMessenger) CannotConnectToVM(err error) {
 	m.printMessage(fmt.Sprintf("Cannot connect to VM: %s", err))
 }
+
+func (m *ConstructCmdMessenger) CannotPrepareVM(err error) {
+	m.printMessage(fmt.Sprintf("Could not prepare VM: %s", err))
+}

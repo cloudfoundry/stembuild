@@ -63,6 +63,19 @@ func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error
 		return err
 	}
 
+	// We override Stderr because WinRM Copy output a lot of XML status messages to StdErr
+	// even though they are not errors. In addition, these status messages are difficult to read
+	// and add little customer value. WinRM does not have an output override for Copy yet
+	reader, tmpStdOut, _ := os.Pipe()
+	oldStdErr := os.Stderr
+	os.Stderr = tmpStdOut
+
+	defer func() {
+		os.Stderr = oldStdErr
+		_ = tmpStdOut.Close()
+		_ = reader.Close()
+	}()
+
 	return client.Copy(sourceFilePath, destinationFilePath)
 }
 
