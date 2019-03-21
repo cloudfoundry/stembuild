@@ -277,8 +277,12 @@ function Validate-OSVersion
         {
             Write-Log "Found correct OS version: Windows Server 2016, Version 1803"
         }
+        elseif ($osVersion -match "10\.0\.17763\..+")
+        {
+            Write-Log "Found correct OS version: Windows Server 2019"
+        }
         else {
-            throw "OS Version Mismatch: Please use Windows Server 2016, Version 1709 or 1803"
+            throw "OS Version Mismatch: Please use Windows Server 2019 or Windows Server 2016, Version 1709 or 1803"
         }
     }
     catch [Exception]

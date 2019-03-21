@@ -29,8 +29,11 @@ The BOSH Windows stemcell automation tool will create stemcells for the followin
 
 ## Supported Windows Server versions
 The BOSH Windows stemcell automation tool is compatible with the following Windows versions:
+
 * Windows Server 1709
 * Windows Server 1803
+* Windows Server 2019
+
 
 ## Prerequisites
 The following need to be downloaded:
