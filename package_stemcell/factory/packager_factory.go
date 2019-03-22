@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/iaas_clients"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
 
 	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 

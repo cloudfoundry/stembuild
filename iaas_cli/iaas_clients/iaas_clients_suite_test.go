@@ -1,4 +1,4 @@
-package iaas_clients_test
+package iaas_clients
 
 import (
 	"testing"
