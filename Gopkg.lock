@@ -227,7 +227,7 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:d6c9b36ea4960b181ee88e895f425b15959ec03ea00868ed0e632a071d45d33e"
+  digest = "1:a692a816f36d85508c7a786fe4e1604fb6f9bece04de44d8f74f2c08d51781bf"
   name = "github.com/vmware/govmomi"
   packages = [
     "find",
@@ -241,6 +241,9 @@
     "govc/importx",
     "govc/object",
     "govc/vm",
+    "govc/vm/guest",
+    "guest",
+    "guest/toolbox",
     "internal",
     "list",
     "nfc",
@@ -364,6 +367,7 @@
     "github.com/vmware/govmomi/govc/importx",
     "github.com/vmware/govmomi/govc/object",
     "github.com/vmware/govmomi/govc/vm",
+    "github.com/vmware/govmomi/govc/vm/guest",
     "github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp",
     "golang.org/x/sys/windows/registry",
   ]

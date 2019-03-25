@@ -59,6 +59,10 @@ const (
 	AwsAccessKeyVariable        = "AWS_ACCESS_KEY_ID"
 	AwsSecretKeyVariable        = "AWS_SECRET_ACCESS_KEY"
 	SkipCleanupVariable         = "SKIP_CLEANUP"
+	vcenterFolderVariable       = "VM_FOLDER"
+	vcenterURLVariable          = "GOVC_URL"
+	vcenterUsernameVariable     = "GOVC_USERNAME"
+	vcenterPasswordVariable     = "GOVC_PASSWORD"
 )
 
 var (
@@ -72,13 +76,17 @@ var (
 )
 
 type config struct {
-	TargetIP       string
-	NetworkGateway string
-	SubnetMask     string
-	VMUsername     string
-	VMPassword     string
-	VMName         string
-	VMNetwork      string
+	TargetIP        string
+	NetworkGateway  string
+	SubnetMask      string
+	VMUsername      string
+	VMPassword      string
+	VMName          string
+	VMNetwork       string
+	VCenterURL      string
+	VCenterUsername string
+	VCenterPassword string
+	VMInventoryPath string
 }
 
 func envMustExist(variableName string) string {
@@ -204,6 +212,10 @@ func createVMWithIP(targetIP string) {
 
 	ovaFile := validatedOVALocation()
 
+	conf.VCenterURL = helpers.EnvMustExist(vcenterURLVariable)
+	conf.VCenterUsername = helpers.EnvMustExist(vcenterUsernameVariable)
+	conf.VCenterPassword = helpers.EnvMustExist(vcenterPasswordVariable)
+
 	vmNamePrefix := envMustExistWithDescription(VMNamePrefixVariable, failureDescription)
 	vmFolder := envMustExistWithDescription(VMFolderVariable, failureDescription)
 	conf.NetworkGateway = envMustExistWithDescription(NetworkGatewayVariable, failureDescription)
@@ -216,6 +228,9 @@ func createVMWithIP(targetIP string) {
 	vmNameSuffix := strings.Split(targetIP, ".")[3]
 	vmName := fmt.Sprintf("%s%s", vmNamePrefix, vmNameSuffix)
 	conf.VMName = vmName
+
+	vcenterFolder := helpers.EnvMustExist(vcenterFolderVariable)
+	conf.VMInventoryPath = strings.Join([]string{vcenterFolder, vmName}, "/")
 
 	templateFile, err := filepath.Abs("assets/ova_options.json.template")
 	Expect(err).NotTo(HaveOccurred())

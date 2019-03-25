@@ -2,18 +2,17 @@
 package commandparserfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
+	commandparser "github.com/cloudfoundry-incubator/stembuild/commandparser"
+	config "github.com/cloudfoundry-incubator/stembuild/construct/config"
 )
 
 type FakeVMPreparerFactory struct {
-	VMPreparerStub        func(string, string, string) commandparser.VmConstruct
+	VMPreparerStub        func(config.SourceConfig) commandparser.VmConstruct
 	vMPreparerMutex       sync.RWMutex
 	vMPreparerArgsForCall []struct {
-		arg1 string
-		arg2 string
-		arg3 string
+		arg1 config.SourceConfig
 	}
 	vMPreparerReturns struct {
 		result1 commandparser.VmConstruct
@@ -25,18 +24,16 @@ type FakeVMPreparerFactory struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeVMPreparerFactory) VMPreparer(arg1 string, arg2 string, arg3 string) commandparser.VmConstruct {
+func (fake *FakeVMPreparerFactory) VMPreparer(arg1 config.SourceConfig) commandparser.VmConstruct {
 	fake.vMPreparerMutex.Lock()
 	ret, specificReturn := fake.vMPreparerReturnsOnCall[len(fake.vMPreparerArgsForCall)]
 	fake.vMPreparerArgsForCall = append(fake.vMPreparerArgsForCall, struct {
-		arg1 string
-		arg2 string
-		arg3 string
-	}{arg1, arg2, arg3})
-	fake.recordInvocation("VMPreparer", []interface{}{arg1, arg2, arg3})
+		arg1 config.SourceConfig
+	}{arg1})
+	fake.recordInvocation("VMPreparer", []interface{}{arg1})
 	fake.vMPreparerMutex.Unlock()
 	if fake.VMPreparerStub != nil {
-		return fake.VMPreparerStub(arg1, arg2, arg3)
+		return fake.VMPreparerStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
@@ -51,17 +48,17 @@ func (fake *FakeVMPreparerFactory) VMPreparerCallCount() int {
 	return len(fake.vMPreparerArgsForCall)
 }
 
-func (fake *FakeVMPreparerFactory) VMPreparerCalls(stub func(string, string, string) commandparser.VmConstruct) {
+func (fake *FakeVMPreparerFactory) VMPreparerCalls(stub func(config.SourceConfig) commandparser.VmConstruct) {
 	fake.vMPreparerMutex.Lock()
 	defer fake.vMPreparerMutex.Unlock()
 	fake.VMPreparerStub = stub
 }
 
-func (fake *FakeVMPreparerFactory) VMPreparerArgsForCall(i int) (string, string, string) {
+func (fake *FakeVMPreparerFactory) VMPreparerArgsForCall(i int) config.SourceConfig {
 	fake.vMPreparerMutex.RLock()
 	defer fake.vMPreparerMutex.RUnlock()
 	argsForCall := fake.vMPreparerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.arg1
 }
 
 func (fake *FakeVMPreparerFactory) VMPreparerReturns(result1 commandparser.VmConstruct) {

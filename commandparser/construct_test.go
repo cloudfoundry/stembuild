@@ -31,24 +31,52 @@ var _ = Describe("construct", func() {
 			"-winrm-ip", "10.0.0.5",
 			"-winrm-username", "Admin",
 			"-winrm-password", "some_password",
+			"-vcenter-url", "vcenter.example.com",
+			"-vcenter-username", "vCenterUsername",
+			"-vcenter-password", "vCenterPassword",
+			"-vm-inventory-path", "/my-datacenter/vm/my-folder/my-vm",
 		}
 
 		It("stores the value of a WinRM user", func() {
 			err := f.Parse(longformArgs)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(ConstrCmd.GetWinRMUser()).To(Equal("Admin"))
+			Expect(ConstrCmd.GetSourceConfig().GuestVMUsername).To(Equal("Admin"))
 		})
 
 		It("stores the value of a WinRM password ", func() {
 			err := f.Parse(longformArgs)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(ConstrCmd.GetWinRMPwd()).To(Equal("some_password"))
+			Expect(ConstrCmd.GetSourceConfig().GuestVMPassword).To(Equal("some_password"))
 		})
 
 		It("stores the value of the a WinRM IP", func() {
 			err := f.Parse(longformArgs)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(ConstrCmd.GetWinRMIp()).To(Equal("10.0.0.5"))
+			Expect(ConstrCmd.GetSourceConfig().GuestVmIp).To(Equal("10.0.0.5"))
+		})
+
+		It("stores the value of vCenter url", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetSourceConfig().VCenterUrl).To(Equal("vcenter.example.com"))
+		})
+
+		It("stores the value of vCenter username", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetSourceConfig().VCenterUsername).To(Equal("vCenterUsername"))
+		})
+
+		It("stores the value of vCenter password", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetSourceConfig().VCenterPassword).To(Equal("vCenterPassword"))
+		})
+
+		It("stores the value of VM inventory path", func() {
+			err := f.Parse(longformArgs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetSourceConfig().VmInventoryPath).To(Equal("/my-datacenter/vm/my-folder/my-vm"))
 		})
 	})
 

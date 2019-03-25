@@ -4,10 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/construct/config"
+	"github.com/google/subcommands"
 	"os"
 	"path/filepath"
-
-	"github.com/google/subcommands"
 )
 
 //go:generate counterfeiter . VmConstruct
@@ -18,7 +18,7 @@ type VmConstruct interface {
 
 //go:generate counterfeiter . VMPreparerFactory
 type VMPreparerFactory interface {
-	VMPreparer(string, string, string) VmConstruct
+	VMPreparer(config config.SourceConfig) VmConstruct
 }
 
 //go:generate counterfeiter . ConstructCmdValidator
@@ -36,13 +36,11 @@ type ConstructMessenger interface {
 }
 
 type ConstructCmd struct {
-	winrmUsername string
-	winrmPassword string
-	winrmIP       string
-	factory       VMPreparerFactory
-	validator     ConstructCmdValidator
-	messenger     ConstructMessenger
-	GlobalFlags   *GlobalFlags
+	sourceConfig config.SourceConfig
+	factory      VMPreparerFactory
+	validator    ConstructCmdValidator
+	messenger    ConstructMessenger
+	GlobalFlags  *GlobalFlags
 }
 
 func NewConstructCmd(factory VMPreparerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) ConstructCmd {
@@ -76,13 +74,18 @@ Flags:
 }
 
 func (p *ConstructCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&p.winrmIP, "winrm-ip", "", "IP of machine for WinRM connection")
-	f.StringVar(&p.winrmUsername, "winrm-username", "", "Username for WinRM connection")
-	f.StringVar(&p.winrmPassword, "winrm-password", "", "Password for WinRM connection. Needs to be wrapped in single quotations.")
+	f.StringVar(&p.sourceConfig.GuestVmIp, "winrm-ip", "", "IP of machine for WinRM connection")
+	f.StringVar(&p.sourceConfig.GuestVMUsername, "winrm-username", "", "Username for WinRM connection")
+	f.StringVar(&p.sourceConfig.GuestVMPassword, "winrm-password", "", "Password for WinRM connection. Needs to be wrapped in single quotations.")
+	f.StringVar(&p.sourceConfig.VCenterUrl, "vcenter-url", "", "vCenter url")
+	f.StringVar(&p.sourceConfig.VCenterUsername, "vcenter-username", "", "vCenter username")
+	f.StringVar(&p.sourceConfig.VCenterPassword, "vcenter-password", "", "vCenter password")
+	f.StringVar(&p.sourceConfig.VmInventoryPath, "vm-inventory-path", "", "vCenter VM inventory path. (e.g: <datacenter>/vm/<vm-folder>/<vm-name>)")
 }
 
 func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	if !p.validator.PopulatedArgs(p.winrmIP, p.winrmUsername, p.winrmPassword) {
+	c := p.sourceConfig
+	if !p.validator.PopulatedArgs(c.GuestVmIp, c.GuestVMUsername, c.GuestVMPassword, c.VCenterUrl, c.VCenterUsername, c.VCenterPassword, c.VmInventoryPath) {
 		p.messenger.ArgumentsNotProvided()
 		return subcommands.ExitFailure
 	}
@@ -91,7 +94,7 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		return subcommands.ExitFailure
 	}
 
-	vmConstruct := p.factory.VMPreparer(p.winrmIP, p.winrmUsername, p.winrmPassword)
+	vmConstruct := p.factory.VMPreparer(p.sourceConfig)
 
 	err := vmConstruct.CanConnectToVM()
 	if err != nil {

@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	. "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clifakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -235,7 +234,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 	Describe("UploadArtifact", func() {
 		It("Uploads artifact to the given vm", func() {
 			runner.RunReturns(0)
-			err := vcenterClient.UploadArtifact("validVMPath", "artifact", "C:\\provision\\artifact")
+			err := vcenterClient.UploadArtifact("validVMPath", "artifact", "C:\\provision\\artifact", "user", "pass")
 
 			Expect(err).To(Not(HaveOccurred()))
 			expectedArgs := []string{"guest.upload", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "artifact", "C:\\provision\\artifact"}
@@ -244,7 +243,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 
 		It("Returns an error if VCenter reports a failure uploading the artifact", func() {
 			runner.RunReturns(1)
-			err := vcenterClient.UploadArtifact("validVMPath", "artifact", "C:\\provision\\artifact")
+			err := vcenterClient.UploadArtifact("validVMPath", "artifact", "C:\\provision\\artifact", "user", "pass")
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError("vcenter_client - artifact could not be uploaded"))

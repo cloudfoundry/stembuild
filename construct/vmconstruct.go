@@ -6,7 +6,11 @@ import (
 )
 
 type VMConstruct struct {
-	remoteManager RemoteManager
+	remoteManager   RemoteManager
+	Client          IaasClient
+	vmInventoryPath string
+	vmUsername      string
+	vmPassword      string
 }
 
 const provisionDir = "C:\\provision\\"
@@ -14,8 +18,13 @@ const stemcellAutomationDest = provisionDir + "StemcellAutomation.zip"
 const lgpoDest = provisionDir + "LGPO.zip"
 const stemcellAutomationScript = provisionDir + "Setup.ps1"
 
-func NewVMConstruct(winrmIP, winrmUsername, winrmPassword string) *VMConstruct {
-	return &VMConstruct{NewWinRM(winrmIP, winrmUsername, winrmPassword)}
+func NewVMConstruct(winrmIP, winrmUsername, winrmPassword, vmInventoryPath string, client IaasClient) *VMConstruct {
+	return &VMConstruct{NewWinRM(winrmIP, winrmUsername, winrmPassword), client, vmInventoryPath, winrmUsername, winrmPassword}
+}
+
+//go:generate counterfeiter . IaasClient
+type IaasClient interface {
+	UploadArtifact(vmInventoryPath, artifact, destination, username, password string) error
 }
 
 func (c *VMConstruct) CanConnectToVM() error {
@@ -60,14 +69,14 @@ func (c *VMConstruct) PrepareVM() error {
 
 func (c *VMConstruct) uploadArtifact() error {
 	fmt.Print("\tUploading LGPO to target VM...")
-	err := c.remoteManager.UploadArtifact("./LGPO.zip", lgpoDest)
+	err := c.Client.UploadArtifact(c.vmInventoryPath, "./LGPO.zip", lgpoDest, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}
 	fmt.Println(" Finished uploading LGPO.")
 
 	fmt.Print("\tUploading stemcell preparation artifacts to target VM...")
-	err = c.remoteManager.UploadArtifact("./StemcellAutomation.zip", stemcellAutomationDest)
+	err = c.Client.UploadArtifact(c.vmInventoryPath, "./StemcellAutomation.zip", stemcellAutomationDest, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}

@@ -3,11 +3,17 @@ package vmconstruct_factory
 import (
 	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct/config"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
 )
 
 type VMConstructFactory struct {
 }
 
-func (f *VMConstructFactory) VMPreparer(winrmIp string, winrmUsername string, winrmPassword string) commandparser.VmConstruct {
-	return construct.NewVMConstruct(winrmIp, winrmUsername, winrmPassword)
+func (f *VMConstructFactory) VMPreparer(config config.SourceConfig) commandparser.VmConstruct {
+	runner := &iaas_cli.GovcRunner{}
+	client := iaas_clients.NewVcenterClient(config.VCenterUsername, config.VCenterPassword, config.VCenterUrl, runner)
+
+	return construct.NewVMConstruct(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, config.VmInventoryPath, client)
 }

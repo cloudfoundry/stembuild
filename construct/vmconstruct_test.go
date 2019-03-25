@@ -3,6 +3,7 @@ package construct_test
 import (
 	"errors"
 	. "github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct/constructfakes"
 	"github.com/cloudfoundry-incubator/stembuild/remotemanager/remotemanagerfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,11 +13,13 @@ var _ = Describe("construct_helpers", func() {
 	var (
 		fakeRemoteManager *remotemanagerfakes.FakeRemoteManager
 		mockVMConstruct   *VMConstruct
+		fakeVcenterClient *constructfakes.FakeIaasClient
 	)
 
 	BeforeEach(func() {
 		fakeRemoteManager = &remotemanagerfakes.FakeRemoteManager{}
-		mockVMConstruct = NewMockVMConstruct(fakeRemoteManager)
+		fakeVcenterClient = &constructfakes.FakeIaasClient{}
+		mockVMConstruct = NewMockVMConstruct(fakeRemoteManager, fakeVcenterClient, "fakeVmPath", "fakeUser", "fakePass")
 	})
 
 	Describe("CanConnectToVM", func() {
@@ -63,10 +66,16 @@ var _ = Describe("construct_helpers", func() {
 		Context("Upload all artifacts correctly", func() {
 			It("passes successfully", func() {
 
-				fakeRemoteManager.UploadArtifactReturns(nil)
+				fakeVcenterClient.UploadArtifactReturns(nil)
 				err := mockVMConstruct.UploadArtifact()
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeRemoteManager.UploadArtifactCallCount()).To(Equal(2))
+				vmPath, artifact, dest, user, pass := fakeVcenterClient.UploadArtifactArgsForCall(0)
+				Expect(artifact).To(Equal("./LGPO.zip"))
+				Expect(vmPath).To(Equal("fakeVmPath"))
+				Expect(dest).To(Equal("C:\\provision\\LGPO.zip"))
+				Expect(user).To(Equal("fakeUser"))
+				Expect(pass).To(Equal("fakePass"))
+				Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(2))
 			})
 
 		})
@@ -75,35 +84,37 @@ var _ = Describe("construct_helpers", func() {
 			It("fails when it cannot upload LGPO", func() {
 
 				uploadError := errors.New("failed to upload LGPO")
-				fakeRemoteManager.UploadArtifactReturns(uploadError)
+				fakeVcenterClient.UploadArtifactReturns(uploadError)
 
 				err := mockVMConstruct.UploadArtifact()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("failed to upload LGPO"))
 
-				artifact, _ := fakeRemoteManager.UploadArtifactArgsForCall(0)
+				vmPath, artifact, _, _, _ := fakeVcenterClient.UploadArtifactArgsForCall(0)
 				Expect(artifact).To(Equal("./LGPO.zip"))
-				Expect(fakeRemoteManager.UploadArtifactCallCount()).To(Equal(1))
+				Expect(vmPath).To(Equal("fakeVmPath"))
+				Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(1))
 			})
 
 			It("fails when it cannot upload Stemcell Automation scripts", func() {
 
 				uploadError := errors.New("failed to upload stemcell automation")
-				fakeRemoteManager.UploadArtifactReturnsOnCall(0, nil)
-				fakeRemoteManager.UploadArtifactReturnsOnCall(1, uploadError)
+				fakeVcenterClient.UploadArtifactReturnsOnCall(0, nil)
+				fakeVcenterClient.UploadArtifactReturnsOnCall(1, uploadError)
 
 				err := mockVMConstruct.UploadArtifact()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("failed to upload stemcell automation"))
 
-				artifact, _ := fakeRemoteManager.UploadArtifactArgsForCall(0)
+				vmPath, artifact, _, _, _ := fakeVcenterClient.UploadArtifactArgsForCall(0)
 				Expect(artifact).To(Equal("./LGPO.zip"))
-				artifact, _ = fakeRemoteManager.UploadArtifactArgsForCall(1)
+				Expect(vmPath).To(Equal("fakeVmPath"))
+				vmPath, artifact, _, _, _ = fakeVcenterClient.UploadArtifactArgsForCall(1)
 				Expect(artifact).To(Equal("./StemcellAutomation.zip"))
-				Expect(fakeRemoteManager.UploadArtifactCallCount()).To(Equal(2))
+				Expect(vmPath).To(Equal("fakeVmPath"))
+				Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(2))
 			})
 		})
-
 	})
 
 	Describe("ExtractArchive", func() {

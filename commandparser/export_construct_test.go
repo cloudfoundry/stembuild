@@ -1,13 +1,7 @@
 package commandparser
 
-func (p *ConstructCmd) GetWinRMUser() string {
-	return p.winrmUsername
-}
+import "github.com/cloudfoundry-incubator/stembuild/construct/config"
 
-func (p *ConstructCmd) GetWinRMPwd() string {
-	return p.winrmPassword
-}
-
-func (p *ConstructCmd) GetWinRMIp() string {
-	return p.winrmIP
+func (p *ConstructCmd) GetSourceConfig() config.SourceConfig {
+	return p.sourceConfig
 }
