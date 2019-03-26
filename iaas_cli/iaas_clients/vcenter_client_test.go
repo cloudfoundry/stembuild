@@ -249,4 +249,27 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 			Expect(err).To(MatchError("vcenter_client - artifact could not be uploaded"))
 		})
 	})
+
+	Describe("MakeDirectory", func() {
+		It("Creates the directory on the vm", func() {
+			runner.RunReturns(0)
+			err := vcenterClient.MakeDirectory("validVMPath", "C:\\provision", "user", "pass")
+
+			Expect(err).To(Not(HaveOccurred()))
+			expectedArgs := []string{"guest.mkdir", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "-p", "C:\\provision"}
+			Expect(runner.RunArgsForCall(0)).To(Equal(expectedArgs))
+		})
+
+		It("Returns an error if VCenter reports a failure making the directory", func() {
+			runner.RunReturns(1)
+			err := vcenterClient.MakeDirectory("validVMPath", "C:\\provision", "user", "pass")
+
+			Expect(err).To(HaveOccurred())
+			expectedArgs := []string{"guest.mkdir", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "-p", "C:\\provision"}
+			Expect(runner.RunArgsForCall(0)).To(Equal(expectedArgs))
+
+			Expect(err).To(MatchError("vcenter_client - directory `C:\\provision` could not be created"))
+
+		})
+	})
 })

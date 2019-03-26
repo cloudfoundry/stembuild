@@ -66,9 +66,11 @@ var _ = Describe("construct_helpers", func() {
 		Context("Upload all artifacts correctly", func() {
 			It("passes successfully", func() {
 
+				fakeVcenterClient.MakeDirectoryReturns(nil)
 				fakeVcenterClient.UploadArtifactReturns(nil)
 				err := mockVMConstruct.UploadArtifact()
 				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
 				vmPath, artifact, dest, user, pass := fakeVcenterClient.UploadArtifactArgsForCall(0)
 				Expect(artifact).To(Equal("./LGPO.zip"))
 				Expect(vmPath).To(Equal("fakeVmPath"))
@@ -113,6 +115,20 @@ var _ = Describe("construct_helpers", func() {
 				Expect(artifact).To(Equal("./StemcellAutomation.zip"))
 				Expect(vmPath).To(Equal("fakeVmPath"))
 				Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(2))
+			})
+
+			It("fails when the provision dir cannot be created", func() {
+
+				mkDirError := errors.New("failed to create dir")
+				fakeVcenterClient.MakeDirectoryReturns(mkDirError)
+
+				err := mockVMConstruct.UploadArtifact()
+				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
+
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("failed to create dir"))
+
+				Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(0))
 			})
 		})
 	})

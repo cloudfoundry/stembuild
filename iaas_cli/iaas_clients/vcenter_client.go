@@ -107,3 +107,12 @@ func (c VcenterClient) UploadArtifact(vmInventoryPath, artifact, destination, us
 	}
 	return nil
 }
+
+func (c VcenterClient) MakeDirectory(vmInventoryPath, path, username, password string) error {
+	vmCredentials := fmt.Sprintf("%s:%s", username, password)
+	errCode := c.Runner.Run([]string{"guest.mkdir", "-u", c.credentialUrl, "-l", vmCredentials, "-vm", vmInventoryPath, "-p", path})
+	if errCode != 0 {
+		return fmt.Errorf("vcenter_client - directory `%s` could not be created", path)
+	}
+	return nil
+}

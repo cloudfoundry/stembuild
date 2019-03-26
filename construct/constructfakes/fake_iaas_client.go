@@ -8,6 +8,20 @@ import (
 )
 
 type FakeIaasClient struct {
+	MakeDirectoryStub        func(string, string, string, string) error
+	makeDirectoryMutex       sync.RWMutex
+	makeDirectoryArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}
+	makeDirectoryReturns struct {
+		result1 error
+	}
+	makeDirectoryReturnsOnCall map[int]struct {
+		result1 error
+	}
 	UploadArtifactStub        func(string, string, string, string, string) error
 	uploadArtifactMutex       sync.RWMutex
 	uploadArtifactArgsForCall []struct {
@@ -25,6 +39,69 @@ type FakeIaasClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeIaasClient) MakeDirectory(arg1 string, arg2 string, arg3 string, arg4 string) error {
+	fake.makeDirectoryMutex.Lock()
+	ret, specificReturn := fake.makeDirectoryReturnsOnCall[len(fake.makeDirectoryArgsForCall)]
+	fake.makeDirectoryArgsForCall = append(fake.makeDirectoryArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("MakeDirectory", []interface{}{arg1, arg2, arg3, arg4})
+	fake.makeDirectoryMutex.Unlock()
+	if fake.MakeDirectoryStub != nil {
+		return fake.MakeDirectoryStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.makeDirectoryReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeIaasClient) MakeDirectoryCallCount() int {
+	fake.makeDirectoryMutex.RLock()
+	defer fake.makeDirectoryMutex.RUnlock()
+	return len(fake.makeDirectoryArgsForCall)
+}
+
+func (fake *FakeIaasClient) MakeDirectoryCalls(stub func(string, string, string, string) error) {
+	fake.makeDirectoryMutex.Lock()
+	defer fake.makeDirectoryMutex.Unlock()
+	fake.MakeDirectoryStub = stub
+}
+
+func (fake *FakeIaasClient) MakeDirectoryArgsForCall(i int) (string, string, string, string) {
+	fake.makeDirectoryMutex.RLock()
+	defer fake.makeDirectoryMutex.RUnlock()
+	argsForCall := fake.makeDirectoryArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeIaasClient) MakeDirectoryReturns(result1 error) {
+	fake.makeDirectoryMutex.Lock()
+	defer fake.makeDirectoryMutex.Unlock()
+	fake.MakeDirectoryStub = nil
+	fake.makeDirectoryReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeIaasClient) MakeDirectoryReturnsOnCall(i int, result1 error) {
+	fake.makeDirectoryMutex.Lock()
+	defer fake.makeDirectoryMutex.Unlock()
+	fake.MakeDirectoryStub = nil
+	if fake.makeDirectoryReturnsOnCall == nil {
+		fake.makeDirectoryReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.makeDirectoryReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeIaasClient) UploadArtifact(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) error {
@@ -94,6 +171,8 @@ func (fake *FakeIaasClient) UploadArtifactReturnsOnCall(i int, result1 error) {
 func (fake *FakeIaasClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.makeDirectoryMutex.RLock()
+	defer fake.makeDirectoryMutex.RUnlock()
 	fake.uploadArtifactMutex.RLock()
 	defer fake.uploadArtifactMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -25,6 +25,7 @@ func NewVMConstruct(winrmIP, winrmUsername, winrmPassword, vmInventoryPath strin
 //go:generate counterfeiter . IaasClient
 type IaasClient interface {
 	UploadArtifact(vmInventoryPath, artifact, destination, username, password string) error
+	MakeDirectory(vmInventoryPath, path, username, password string) error
 }
 
 func (c *VMConstruct) CanConnectToVM() error {
@@ -68,8 +69,16 @@ func (c *VMConstruct) PrepareVM() error {
 }
 
 func (c *VMConstruct) uploadArtifact() error {
+
+	fmt.Print("\tCreating provision dir on target VM...")
+	err := c.Client.MakeDirectory(c.vmInventoryPath, provisionDir, c.vmUsername, c.vmPassword)
+	if err != nil {
+		return err
+	}
+	fmt.Println(" Finished creating provision dir.")
+
 	fmt.Print("\tUploading LGPO to target VM...")
-	err := c.Client.UploadArtifact(c.vmInventoryPath, "./LGPO.zip", lgpoDest, c.vmUsername, c.vmPassword)
+	err = c.Client.UploadArtifact(c.vmInventoryPath, "./LGPO.zip", lgpoDest, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}
