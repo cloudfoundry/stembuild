@@ -27,54 +27,54 @@ var _ = Describe("construct", func() {
 			ConstrCmd.SetFlags(f)
 		})
 
-		var longformArgs = []string{
-			"-winrm-ip", "10.0.0.5",
-			"-winrm-username", "Admin",
-			"-winrm-password", "some_password",
+		var args = []string{
+			"-vm-ip", "10.0.0.5",
+			"-vm-username", "Admin",
+			"-vm-password", "some_password",
 			"-vcenter-url", "vcenter.example.com",
 			"-vcenter-username", "vCenterUsername",
 			"-vcenter-password", "vCenterPassword",
 			"-vm-inventory-path", "/my-datacenter/vm/my-folder/my-vm",
 		}
 
-		It("stores the value of a WinRM user", func() {
-			err := f.Parse(longformArgs)
+		It("stores the value of a vm user", func() {
+			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().GuestVMUsername).To(Equal("Admin"))
 		})
 
-		It("stores the value of a WinRM password ", func() {
-			err := f.Parse(longformArgs)
+		It("stores the value of a vm password ", func() {
+			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().GuestVMPassword).To(Equal("some_password"))
 		})
 
-		It("stores the value of the a WinRM IP", func() {
-			err := f.Parse(longformArgs)
+		It("stores the value of the a vm IP", func() {
+			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().GuestVmIp).To(Equal("10.0.0.5"))
 		})
 
 		It("stores the value of vCenter url", func() {
-			err := f.Parse(longformArgs)
+			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().VCenterUrl).To(Equal("vcenter.example.com"))
 		})
 
 		It("stores the value of vCenter username", func() {
-			err := f.Parse(longformArgs)
+			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().VCenterUsername).To(Equal("vCenterUsername"))
 		})
 
 		It("stores the value of vCenter password", func() {
-			err := f.Parse(longformArgs)
+			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().VCenterPassword).To(Equal("vCenterPassword"))
 		})
 
 		It("stores the value of VM inventory path", func() {
-			err := f.Parse(longformArgs)
+			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().VmInventoryPath).To(Equal("/my-datacenter/vm/my-folder/my-vm"))
 		})

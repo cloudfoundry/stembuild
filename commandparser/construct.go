@@ -53,7 +53,7 @@ func (*ConstructCmd) Synopsis() string {
 }
 
 func (*ConstructCmd) Usage() string {
-	return fmt.Sprintf(`%[1]s construct -winrm-ip <IP of VM> -winrum-username <WinRm username> -winrm-password <WinRm password>
+	return fmt.Sprintf(`%[1]s construct -vm-ip <IP of VM> -vm-username <vm username> -vm-password <vm password>
 
 Prepares a VM to be used by stembuild package. It leverages stemcell automation scripts to provision a VM to be used as a stemcell.
 
@@ -64,19 +64,19 @@ Requirements:
 		- WinRm enabled
 		- Reachable by IP
 		- Username and password with Administrator privileges
-	The [winrm-ip], [winrm-username], [winrm-password] flags must be specified.
+	The [vm-ip], [vm-username], [vm-password] flags must be specified.
 
 Example:
-	%[1]s construct -winrm-ip '10.0.0.5' -winrm-username Admin -winrm-password 'password'
+	%[1]s construct -vm-ip '10.0.0.5' -vm-username Admin -vm-password 'password'
 
 Flags:
 `, filepath.Base(os.Args[0]))
 }
 
 func (p *ConstructCmd) SetFlags(f *flag.FlagSet) {
-	f.StringVar(&p.sourceConfig.GuestVmIp, "winrm-ip", "", "IP of machine for WinRM connection")
-	f.StringVar(&p.sourceConfig.GuestVMUsername, "winrm-username", "", "Username for WinRM connection")
-	f.StringVar(&p.sourceConfig.GuestVMPassword, "winrm-password", "", "Password for WinRM connection. Needs to be wrapped in single quotations.")
+	f.StringVar(&p.sourceConfig.GuestVmIp, "vm-ip", "", "IP of target machine")
+	f.StringVar(&p.sourceConfig.GuestVMUsername, "vm-username", "", "Username of target machine")
+	f.StringVar(&p.sourceConfig.GuestVMPassword, "vm-password", "", "Password of target machine. Needs to be wrapped in single quotations.")
 	f.StringVar(&p.sourceConfig.VCenterUrl, "vcenter-url", "", "vCenter url")
 	f.StringVar(&p.sourceConfig.VCenterUsername, "vcenter-username", "", "vCenter username")
 	f.StringVar(&p.sourceConfig.VCenterPassword, "vcenter-password", "", "vCenter password")
