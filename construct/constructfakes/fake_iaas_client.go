@@ -2,9 +2,9 @@
 package constructfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	construct "github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeIaasClient struct {
@@ -22,6 +22,23 @@ type FakeIaasClient struct {
 	makeDirectoryReturnsOnCall map[int]struct {
 		result1 error
 	}
+	StartStub        func(string, string, string, string, ...string) (string, error)
+	startMutex       sync.RWMutex
+	startArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 []string
+	}
+	startReturns struct {
+		result1 string
+		result2 error
+	}
+	startReturnsOnCall map[int]struct {
+		result1 string
+		result2 error
+	}
 	UploadArtifactStub        func(string, string, string, string, string) error
 	uploadArtifactMutex       sync.RWMutex
 	uploadArtifactArgsForCall []struct {
@@ -36,6 +53,22 @@ type FakeIaasClient struct {
 	}
 	uploadArtifactReturnsOnCall map[int]struct {
 		result1 error
+	}
+	WaitForExitStub        func(string, string, string, string) (int, error)
+	waitForExitMutex       sync.RWMutex
+	waitForExitArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}
+	waitForExitReturns struct {
+		result1 int
+		result2 error
+	}
+	waitForExitReturnsOnCall map[int]struct {
+		result1 int
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -104,6 +137,73 @@ func (fake *FakeIaasClient) MakeDirectoryReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeIaasClient) Start(arg1 string, arg2 string, arg3 string, arg4 string, arg5 ...string) (string, error) {
+	fake.startMutex.Lock()
+	ret, specificReturn := fake.startReturnsOnCall[len(fake.startArgsForCall)]
+	fake.startArgsForCall = append(fake.startArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 []string
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("Start", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.startMutex.Unlock()
+	if fake.StartStub != nil {
+		return fake.StartStub(arg1, arg2, arg3, arg4, arg5...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.startReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeIaasClient) StartCallCount() int {
+	fake.startMutex.RLock()
+	defer fake.startMutex.RUnlock()
+	return len(fake.startArgsForCall)
+}
+
+func (fake *FakeIaasClient) StartCalls(stub func(string, string, string, string, ...string) (string, error)) {
+	fake.startMutex.Lock()
+	defer fake.startMutex.Unlock()
+	fake.StartStub = stub
+}
+
+func (fake *FakeIaasClient) StartArgsForCall(i int) (string, string, string, string, []string) {
+	fake.startMutex.RLock()
+	defer fake.startMutex.RUnlock()
+	argsForCall := fake.startArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5
+}
+
+func (fake *FakeIaasClient) StartReturns(result1 string, result2 error) {
+	fake.startMutex.Lock()
+	defer fake.startMutex.Unlock()
+	fake.StartStub = nil
+	fake.startReturns = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIaasClient) StartReturnsOnCall(i int, result1 string, result2 error) {
+	fake.startMutex.Lock()
+	defer fake.startMutex.Unlock()
+	fake.StartStub = nil
+	if fake.startReturnsOnCall == nil {
+		fake.startReturnsOnCall = make(map[int]struct {
+			result1 string
+			result2 error
+		})
+	}
+	fake.startReturnsOnCall[i] = struct {
+		result1 string
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeIaasClient) UploadArtifact(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string) error {
 	fake.uploadArtifactMutex.Lock()
 	ret, specificReturn := fake.uploadArtifactReturnsOnCall[len(fake.uploadArtifactArgsForCall)]
@@ -168,13 +268,83 @@ func (fake *FakeIaasClient) UploadArtifactReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakeIaasClient) WaitForExit(arg1 string, arg2 string, arg3 string, arg4 string) (int, error) {
+	fake.waitForExitMutex.Lock()
+	ret, specificReturn := fake.waitForExitReturnsOnCall[len(fake.waitForExitArgsForCall)]
+	fake.waitForExitArgsForCall = append(fake.waitForExitArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+	}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("WaitForExit", []interface{}{arg1, arg2, arg3, arg4})
+	fake.waitForExitMutex.Unlock()
+	if fake.WaitForExitStub != nil {
+		return fake.WaitForExitStub(arg1, arg2, arg3, arg4)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.waitForExitReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeIaasClient) WaitForExitCallCount() int {
+	fake.waitForExitMutex.RLock()
+	defer fake.waitForExitMutex.RUnlock()
+	return len(fake.waitForExitArgsForCall)
+}
+
+func (fake *FakeIaasClient) WaitForExitCalls(stub func(string, string, string, string) (int, error)) {
+	fake.waitForExitMutex.Lock()
+	defer fake.waitForExitMutex.Unlock()
+	fake.WaitForExitStub = stub
+}
+
+func (fake *FakeIaasClient) WaitForExitArgsForCall(i int) (string, string, string, string) {
+	fake.waitForExitMutex.RLock()
+	defer fake.waitForExitMutex.RUnlock()
+	argsForCall := fake.waitForExitArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeIaasClient) WaitForExitReturns(result1 int, result2 error) {
+	fake.waitForExitMutex.Lock()
+	defer fake.waitForExitMutex.Unlock()
+	fake.WaitForExitStub = nil
+	fake.waitForExitReturns = struct {
+		result1 int
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIaasClient) WaitForExitReturnsOnCall(i int, result1 int, result2 error) {
+	fake.waitForExitMutex.Lock()
+	defer fake.waitForExitMutex.Unlock()
+	fake.WaitForExitStub = nil
+	if fake.waitForExitReturnsOnCall == nil {
+		fake.waitForExitReturnsOnCall = make(map[int]struct {
+			result1 int
+			result2 error
+		})
+	}
+	fake.waitForExitReturnsOnCall[i] = struct {
+		result1 int
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeIaasClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.makeDirectoryMutex.RLock()
 	defer fake.makeDirectoryMutex.RUnlock()
+	fake.startMutex.RLock()
+	defer fake.startMutex.RUnlock()
 	fake.uploadArtifactMutex.RLock()
 	defer fake.uploadArtifactMutex.RUnlock()
+	fake.waitForExitMutex.RLock()
+	defer fake.waitForExitMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

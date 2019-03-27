@@ -269,7 +269,85 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 			Expect(runner.RunArgsForCall(0)).To(Equal(expectedArgs))
 
 			Expect(err).To(MatchError("vcenter_client - directory `C:\\provision` could not be created"))
-
 		})
 	})
+
+	Describe("Start", func() {
+		It("runs the command on the vm", func() {
+			runner.RunWithOutputReturns("1856", 0, nil)
+			pid, err := vcenterClient.Start("validVMPath", "user", "pass", "command", "arg1", "arg2", "arg3")
+
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(pid).To(Equal("1856"))
+			expectedArgs := []string{"guest.start", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "command", "arg1", "arg2", "arg3"}
+			Expect(runner.RunWithOutputCallCount()).To(Equal(1))
+			Expect(runner.RunWithOutputArgsForCall(0)).To(Equal(expectedArgs))
+		})
+		It("returns an error when RunWithOutput fails", func() {
+			runner.RunWithOutputReturns("", 0, errors.New("error"))
+			_, err := vcenterClient.Start("validVMPath", "user", "pass", "command2", "arg1", "arg2", "arg3")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("vcenter_client - failed to run 'command2': error"))
+
+		})
+		It("returns an error when RunWithOutput returns an errCode", func() {
+			runner.RunWithOutputReturns("", 1, nil)
+			_, err := vcenterClient.Start("validVMPath", "user", "pass", "command2", "arg1", "arg2", "arg3")
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("vcenter_client - 'command2' returned exit code: 1"))
+		})
+	})
+
+	Describe("WaitForExit", func() {
+		// Sample output came from running `govc guest.ps` with the JSON flag set
+		const sampleOutput = `{"ProcessInfo":[{"Name":"powershell.exe","Pid":1296,"Owner":"Administrator","CmdLine":"\"c:\\Windows\\System32\\WindowsPowershell\\v1.0\\powershell.exe\" dir","StartTime":"2019-03-26T18:33:31Z","EndTime":"2019-03-26T18:33:34Z","ExitCode":42}]}`
+		const sampleOutputPidNotFound = `{"ProcessInfo":null}`
+		const sampleOutputBadJson = `bad bad json format`
+
+		It("returns the process' exit code upon success", func() {
+			runner.RunWithOutputReturns(sampleOutput, 0, nil)
+			exitCode, err := vcenterClient.WaitForExit("validVMPath", "user", "pass", "1296")
+
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(exitCode).To(Equal(42))
+			expectedArgs := []string{"guest.ps", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "-p", "1296", "-X", "-json"}
+			Expect(runner.RunWithOutputCallCount()).To(Equal(1))
+			Expect(runner.RunWithOutputArgsForCall(0)).To(Equal(expectedArgs))
+		})
+
+		It("returns an error if the process ID cannot be found", func() {
+			runner.RunWithOutputReturns(sampleOutputPidNotFound, 0, nil)
+			_, err := vcenterClient.WaitForExit("validVMPath", "user", "pass", "1296")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("vcenter_client - couldn't get exit code for PID 1296"))
+		})
+
+		It("returns an error if a malformed json is returned", func() {
+			runner.RunWithOutputReturns(sampleOutputBadJson, 0, nil)
+			_, err := vcenterClient.WaitForExit("validVMPath", "user", "pass", "1296")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("vcenter_client - received bad JSON output for PID 1296: bad bad json format"))
+
+		})
+
+		It("returns an error when RunWithOutput fails", func() {
+			runner.RunWithOutputReturns(sampleOutput, 0, errors.New("bad command error"))
+			_, err := vcenterClient.WaitForExit("validVMPath", "user", "pass", "3369")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("vcenter_client - failed to fetch exit code for PID 3369: bad command error"))
+
+		})
+
+		It("returns an error when RunWithOutput returns an errCode", func() {
+			runner.RunWithOutputReturns(sampleOutput, 20, nil)
+			_, err := vcenterClient.WaitForExit("validVMPath", "user", "pass", "11678")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(MatchError("vcenter_client - fetching PID 11678 returned with exit code: 20"))
+		})
+	})
+
 })

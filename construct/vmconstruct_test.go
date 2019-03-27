@@ -61,14 +61,14 @@ var _ = Describe("construct_helpers", func() {
 		})
 	})
 
-	Describe("UploadArtifact", func() {
+	Describe("UploadArtifacts", func() {
 
 		Context("Upload all artifacts correctly", func() {
 			It("passes successfully", func() {
 
 				fakeVcenterClient.MakeDirectoryReturns(nil)
 				fakeVcenterClient.UploadArtifactReturns(nil)
-				err := mockVMConstruct.UploadArtifact()
+				err := mockVMConstruct.UploadArtifacts()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
 				vmPath, artifact, dest, user, pass := fakeVcenterClient.UploadArtifactArgsForCall(0)
@@ -88,7 +88,7 @@ var _ = Describe("construct_helpers", func() {
 				uploadError := errors.New("failed to upload LGPO")
 				fakeVcenterClient.UploadArtifactReturns(uploadError)
 
-				err := mockVMConstruct.UploadArtifact()
+				err := mockVMConstruct.UploadArtifacts()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("failed to upload LGPO"))
 
@@ -104,7 +104,7 @@ var _ = Describe("construct_helpers", func() {
 				fakeVcenterClient.UploadArtifactReturnsOnCall(0, nil)
 				fakeVcenterClient.UploadArtifactReturnsOnCall(1, uploadError)
 
-				err := mockVMConstruct.UploadArtifact()
+				err := mockVMConstruct.UploadArtifacts()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("failed to upload stemcell automation"))
 
@@ -122,7 +122,7 @@ var _ = Describe("construct_helpers", func() {
 				mkDirError := errors.New("failed to create dir")
 				fakeVcenterClient.MakeDirectoryReturns(mkDirError)
 
-				err := mockVMConstruct.UploadArtifact()
+				err := mockVMConstruct.UploadArtifacts()
 				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
 
 				Expect(err).To(HaveOccurred())

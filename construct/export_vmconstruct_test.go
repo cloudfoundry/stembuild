@@ -8,8 +8,8 @@ func NewMockVMConstruct(rm remotemanager.RemoteManager, client IaasClient, vmInv
 	return &VMConstruct{rm, client, vmInventoryPath, username, password}
 }
 
-func (c *VMConstruct) UploadArtifact() error {
-	return c.uploadArtifact()
+func (c *VMConstruct) UploadArtifacts() error {
+	return c.uploadArtifacts()
 }
 
 func (c *VMConstruct) ExtractArchive() error {

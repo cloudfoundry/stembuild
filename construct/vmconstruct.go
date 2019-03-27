@@ -26,6 +26,8 @@ func NewVMConstruct(winrmIP, winrmUsername, winrmPassword, vmInventoryPath strin
 type IaasClient interface {
 	UploadArtifact(vmInventoryPath, artifact, destination, username, password string) error
 	MakeDirectory(vmInventoryPath, path, username, password string) error
+	Start(vmInventoryPath, username, password, command string, args ...string) (string, error)
+	WaitForExit(vmInventoryPath, username, password, pid string) (int, error)
 }
 
 func (c *VMConstruct) CanConnectToVM() error {
@@ -44,8 +46,8 @@ func (c *VMConstruct) CanConnectToVM() error {
 }
 
 func (c *VMConstruct) PrepareVM() error {
-	fmt.Println("\nTransfering ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes")
-	err := c.uploadArtifact()
+	fmt.Println("\nTransferring ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes")
+	err := c.uploadArtifacts()
 	if err != nil {
 		return err
 	}
@@ -68,7 +70,7 @@ func (c *VMConstruct) PrepareVM() error {
 	return nil
 }
 
-func (c *VMConstruct) uploadArtifact() error {
+func (c *VMConstruct) uploadArtifacts() error {
 
 	fmt.Print("\tCreating provision dir on target VM...")
 	err := c.Client.MakeDirectory(c.vmInventoryPath, provisionDir, c.vmUsername, c.vmPassword)
