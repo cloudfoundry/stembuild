@@ -3,6 +3,7 @@ package vmconstruct_factory
 import (
 	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct/archive"
 	"github.com/cloudfoundry-incubator/stembuild/construct/config"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
@@ -15,5 +16,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig) commandparse
 	runner := &iaas_cli.GovcRunner{}
 	client := iaas_clients.NewVcenterClient(config.VCenterUsername, config.VCenterPassword, config.VCenterUrl, runner)
 
-	return construct.NewVMConstruct(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, config.VmInventoryPath, client)
+	zip := &archive.Zip{}
+
+	return construct.NewVMConstruct(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, config.VmInventoryPath, client, zip)
 }

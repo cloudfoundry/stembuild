@@ -36,6 +36,17 @@ var _ = Describe("stembuild construct", func() {
 			Eventually(session.Out).Should(Say(`mock stemcell automation script executed`))
 		})
 
+		PIt("extracts the WinRM BOSH powershell script and executes it successfully on the guest VM", func() {
+			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
+			Expect(err).ToNot(HaveOccurred())
+
+			session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
+
+			Eventually(session, 20).Should(Exit(0))
+			Eventually(session.Out).Should(Say(`WinRm enabled on the guest VM`))
+
+		})
+
 		AfterEach(func() {
 			rm := remotemanager.NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 			err := rm.ExecuteCommand("powershell.exe Remove-Item c:\\provision -recurse")

@@ -126,7 +126,8 @@ func (c *VcenterClient) Start(vmInventoryPath, username, password, command strin
 	if exitCode != 0 {
 		return "", fmt.Errorf("vcenter_client - '%s' returned exit code: %d", command, exitCode)
 	}
-	return pid, nil
+	// We trim this suffix since govc outputs the pid with an '\n' in the output
+	return strings.TrimSuffix(pid, "\n"), nil
 }
 
 type govcPS struct {

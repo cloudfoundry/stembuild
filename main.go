@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/assets"
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/construct/factory"
 	"github.com/cloudfoundry-incubator/stembuild/version"
@@ -16,7 +17,7 @@ import (
 //go:generate go run gen.go
 
 func main() {
-	data, err := Asset("StemcellAutomation.zip")
+	data, err := assets.Asset("StemcellAutomation.zip")
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "StemcellAutomation not found")
 		os.Exit(1)

@@ -4,8 +4,8 @@ import (
 	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
 
-func NewMockVMConstruct(rm remotemanager.RemoteManager, client IaasClient, vmInventoryPath, username, password string) *VMConstruct {
-	return &VMConstruct{rm, client, vmInventoryPath, username, password}
+func NewMockVMConstruct(rm remotemanager.RemoteManager, client IaasClient, vmInventoryPath, username, password string, unarchiver zipUnarchiver) *VMConstruct {
+	return &VMConstruct{rm, client, vmInventoryPath, username, password, unarchiver}
 }
 
 func (c *VMConstruct) UploadArtifacts() error {
@@ -18,4 +18,8 @@ func (c *VMConstruct) ExtractArchive() error {
 
 func (c *VMConstruct) ExecuteSetupScript() error {
 	return c.executeSetupScript()
+}
+
+func (c *VMConstruct) EnableWinRM() error {
+	return c.enableWinRM()
 }

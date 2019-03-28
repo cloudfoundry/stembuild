@@ -12,6 +12,7 @@ build : out/stembuild
 clean :
 	rm -r version/version.go
 	rm -r $(wildcard out/*)
+	rm -r assets/stemcell_automation.go
 
 format :
 	go fmt ./...
@@ -23,7 +24,7 @@ generate: $(GOSRC) $(AUTOMATION_PATH)
 	echo $(STEMCELL_VERSION) > version/version
 	go generate
 	go get -u github.com/jteeuwen/go-bindata/...
-	go-bindata -o stemcell_automation.go -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
+	go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
 
 out/stembuild : generate $(GOSRC)
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .

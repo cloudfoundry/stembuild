@@ -274,7 +274,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 
 	Describe("Start", func() {
 		It("runs the command on the vm", func() {
-			runner.RunWithOutputReturns("1856", 0, nil)
+			runner.RunWithOutputReturns("1856\n", 0, nil) // govc add '\n' to the output
 			pid, err := vcenterClient.Start("validVMPath", "user", "pass", "command", "arg1", "arg2", "arg3")
 
 			Expect(err).To(Not(HaveOccurred()))
