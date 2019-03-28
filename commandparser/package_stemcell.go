@@ -4,10 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+	"github.com/cloudfoundry-incubator/stembuild/version"
 	"os"
 	"path/filepath"
-
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/factory"
 
@@ -37,7 +37,7 @@ VM on vCenter:
   Requirements:
     - VM provisioned using the stembuild construct command
     - Access to vCenter environment
-    - The [vcenter-url], [vcenter-username], [vcenter-password], [stemcell-version], and [os] flags must be specified. 
+    - The [vcenter-url], [vcenter-username] and [vcenter-password] flags must be specified.
     - NOTE: The 'vm' keyword must be included between the datacenter name and folder name for the vm-inventory-path (e.g: <datacenter>/vm/<vm-folder>/<vm-name>) 
   Example:
     %[1]s package -stemcell-version 1803.1 -os 1803 -vcenter-url vcenter.example.com -vcenter-username root -vcenter-password 'password' -vm-inventory-path '/my-datacenter/vm/my-folder/my-vm' 
@@ -82,6 +82,10 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		logLevel = colorlogger.DEBUG
 	}
 
+	if p.outputConfig.Os == "" || p.outputConfig.StemcellVersion == "" {
+		p.setOSandStemcellVersions()
+	}
+
 	err := p.outputConfig.ValidateConfig()
 
 	if err != nil {
@@ -115,4 +119,10 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	}
 
 	return subcommands.ExitSuccess
+}
+
+func (p *PackageCmd) setOSandStemcellVersions() {
+	defaultOs, defaultStemcellVersion := version.GetVersions(version.Version)
+	p.outputConfig.Os = defaultOs
+	p.outputConfig.StemcellVersion = defaultStemcellVersion
 }

@@ -3,6 +3,7 @@ GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path 
 COMMAND = out/stembuild
 AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
 AUTOMATION_PREFIX = $(shell dirname "${AUTOMATION_PATH}")
+STEMCELL_VERSION = 0.0.0
 
 all : test build
 
@@ -19,6 +20,7 @@ integration : generate
 	ginkgo -r -v -randomizeAllSpecs integration
 
 generate: $(GOSRC) $(AUTOMATION_PATH)
+	echo $(STEMCELL_VERSION) > version/version
 	go generate
 	go get -u github.com/jteeuwen/go-bindata/...
 	go-bindata -o stemcell_automation.go -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
