@@ -37,25 +37,25 @@ VM on vCenter:
   Requirements:
     - VM provisioned using the stembuild construct command
     - Access to vCenter environment
-    - The [vcenter-url], [vcenter-username] and [vcenter-password] flags must be specified.
+    - The [vcenter-url], [vcenter-username], [vcenter-password], and [vm-inventory-path] flags must be specified.
     - NOTE: The 'vm' keyword must be included between the datacenter name and folder name for the vm-inventory-path (e.g: <datacenter>/vm/<vm-folder>/<vm-name>) 
   Example:
     %[1]s package -stemcell-version 1803.1 -os 1803 -vcenter-url vcenter.example.com -vcenter-username root -vcenter-password 'password' -vm-inventory-path '/my-datacenter/vm/my-folder/my-vm' 
 
 VMDK: 
 
-  %[1]s package -vmdk <path-to-vmdk> -stemcell-version <stemcell version> -os <os>
+  %[1]s package -vmdk <path-to-vmdk> 
 
   Requirements:
     - The VMware 'ovftool' binary must be on your path or Fusion/Workstation
     must be installed (both include the 'ovftool').
-    - The [vmdk], [stemcell-version], and [os] flags must be specified.  If the [output] flag is
+    - The [vmdk] flag must be specified.  If the [output] flag is
     not specified the stemcell will be created in the current working directory.
 
   Example:
-    %[1]s package -vmdk disk.vmdk -stemcell-version 1.2 -os 1803
+    %[1]s package -vmdk disk.vmdk 
 
-    Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk', and set the stemcell version to 1.2.
+    Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk'
     The final stemcell will be found in the current working directory.
 
 Flags:
@@ -68,9 +68,6 @@ func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.Username, "vcenter-username", "", "vCenter username")
 	f.StringVar(&p.sourceConfig.Password, "vcenter-password", "", "vCenter password")
 	f.StringVar(&p.sourceConfig.URL, "vcenter-url", "", "vCenter url")
-	f.StringVar(&p.outputConfig.Os, "os", "", "OS version must be either 2012R2, 2016, 1803 or 2019")
-	f.StringVar(&p.outputConfig.StemcellVersion, "stemcell-version", "", "Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)")
-	f.StringVar(&p.outputConfig.StemcellVersion, "s", "", "Stemcell version (shorthand)")
 	f.StringVar(&p.outputConfig.OutputDir, "outputDir", "", "Output directory, default is the current working directory.")
 	f.StringVar(&p.outputConfig.OutputDir, "o", "", "Output directory (shorthand)")
 }
@@ -82,9 +79,7 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		logLevel = colorlogger.DEBUG
 	}
 
-	if p.outputConfig.Os == "" || p.outputConfig.StemcellVersion == "" {
-		p.setOSandStemcellVersions()
-	}
+	p.setOSandStemcellVersions()
 
 	err := p.outputConfig.ValidateConfig()
 

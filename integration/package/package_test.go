@@ -27,8 +27,7 @@ import (
 var _ = Describe("Package", func() {
 	const (
 		baseVMNameEnvVar        = "PACKAGE_TEST_BASE_VM_NAME"
-		stemcellVersion         = "1803.5.3999-manual.1"
-		osVersion               = "1803"
+		mainVersion             = "1803.5.3999"
 		vcenterURLVariable      = "GOVC_URL"
 		vcenterUsernameVariable = "GOVC_USERNAME"
 		vcenterPasswordVariable = "GOVC_PASSWORD"
@@ -49,6 +48,10 @@ var _ = Describe("Package", func() {
 	)
 
 	BeforeSuite(func() {
+		directory, _ := os.Getwd()
+		versionFilePath := filepath.Join(directory, "..", "..", "version", "version")
+		ioutil.WriteFile(versionFilePath, []byte(mainVersion), 0777)
+
 		executable, err = helpers.BuildStembuild()
 		Expect(err).NotTo(HaveOccurred())
 
@@ -93,8 +96,6 @@ var _ = Describe("Package", func() {
 			"-vcenter-username", vcenterUsername,
 			"-vcenter-password", vcenterPassword,
 			"-vm-inventory-path", vmPath,
-			"-stemcell-version", stemcellVersion,
-			"-os", osVersion,
 		)
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
@@ -102,10 +103,12 @@ var _ = Describe("Package", func() {
 		session.Out.Write(out)
 		fmt.Print(string(out))
 
+		expectedOSVersion := "1803"
+		expectedStemcellVersion := "1803.5"
+
 		expectedFilename := fmt.Sprintf(
-			"bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz",
-			stemcellVersion, osVersion,
-		)
+			"bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", expectedStemcellVersion, expectedOSVersion)
+
 		stemcellPath := filepath.Join(workingDir, expectedFilename)
 
 		image, err := os.Create(filepath.Join(workingDir, "image"))

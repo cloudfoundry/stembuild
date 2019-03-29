@@ -24,13 +24,9 @@ var _ = Describe("package_stemcell", func() {
 		})
 
 		var longformArgs = []string{"-vmdk", "some_vmdk_file",
-			"-os", "1803",
-			"-stemcell-version", "1803.45",
 			"-outputDir", "some_output_dir",
 		}
 		var shortformArgs = []string{"-vmdk", "some_vmdk_file",
-			"-os", "1803",
-			"-s", "1803.45",
 			"-o", "some_output_dir",
 		}
 
@@ -40,29 +36,6 @@ var _ = Describe("package_stemcell", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(PkgCmd.GetVMDK()).To(Equal("some_vmdk_file"))
 			})
-		})
-
-		Context("a os stemcellVersion is specified as a flag parameter", func() {
-			It("then the os stemcellVersion is stored", func() {
-				err := f.Parse(longformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(PkgCmd.GetOS()).To(Equal("1803"))
-			})
-		})
-
-		Context("a stemcell stemcellVersion is specified as a flag parameter", func() {
-			It("when using the long form the stemcell stemcellVersion is stored", func() {
-				err := f.Parse(longformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(PkgCmd.GetStemcellVersion()).To(Equal("1803.45"))
-			})
-
-			It("when using the short form the stemcell stemcellVersion is stored", func() {
-				err := f.Parse(shortformArgs)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(PkgCmd.GetStemcellVersion()).To(Equal("1803.45"))
-			})
-
 		})
 
 		Context("an output directory is specified as a flag parameter", func() {

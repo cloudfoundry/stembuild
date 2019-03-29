@@ -15,10 +15,10 @@ type OutputConfig struct {
 
 func (c OutputConfig) ValidateConfig() error {
 	if !IsValidOS(c.Os) {
-		return fmt.Errorf("OS version must be either 2012R2, 2016, 1803, or 2019 have: %s\n", c.Os)
+		return fmt.Errorf("versioning error; parsed os version is: %s\n", c.Os)
 	}
 	if !IsValidStemcellVersion(c.StemcellVersion) {
-		return fmt.Errorf("invalid stemcell version (%s) expected format [NUMBER].[NUMBER] or "+
+		return fmt.Errorf("versioning error; parsed stemcell version is: %s. Expected format [NUMBER].[NUMBER] or "+
 			"[NUMBER].[NUMBER].[NUMBER]\n", c.StemcellVersion)
 	}
 
