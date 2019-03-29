@@ -3,7 +3,6 @@ package integration_test
 import (
 	"fmt"
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
-	"github.com/cloudfoundry-incubator/stembuild/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -11,8 +10,16 @@ import (
 )
 
 var _ = Describe("Version flag", func() {
+
+	var version = "0.0.0"
+	BeforeEach(func() {
+		var err error
+		buildNewStembuildVersion(version)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
 	Context("when version provided", func() {
-		expectedVersion := fmt.Sprintf(`stembuild(\.exe)? version %s, Windows Stemcell Building Tool`, version.Version)
+		expectedVersion := fmt.Sprintf(`stembuild(\.exe)? version %s, Windows Stemcell Building Tool`, version)
 
 		It("prints version information", func() {
 			session := helpers.Stembuild(stembuildExecutable, "--version")

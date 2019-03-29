@@ -18,4 +18,10 @@ var _ = Describe("GetVersion", func() {
 		Expect(os).To(Equal("2016"))
 		Expect(stemcellVersion).To(Equal("1709.123"))
 	})
+
+	It("should return 2012R2 as OS if given version is 1200", func() {
+		os, stemcellVersion := version.GetVersions("1200.123.13")
+		Expect(os).To(Equal("2012R2"))
+		Expect(stemcellVersion).To(Equal("1200.123"))
+	})
 })
