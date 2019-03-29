@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/commandparser/commandparserfakes"
 	"github.com/google/subcommands"
@@ -165,7 +166,7 @@ var _ = Describe("construct", func() {
 		})
 
 		Context("with an error during VMPrepare", func() {
-			It("should retrun an error", func() {
+			It("should return an error", func() {
 				fakeValidator.PopulatedArgsReturns(true)
 				fakeValidator.LGPOInDirectoryReturns(true)
 				fakeVmConstruct.PrepareVMReturns(errors.New("some error"))

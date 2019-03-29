@@ -5,9 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"unicode/utf16"
+
 	"github.com/cloudfoundry-incubator/stembuild/assets"
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
-	"unicode/utf16"
 )
 
 type VMConstruct struct {
@@ -17,6 +18,7 @@ type VMConstruct struct {
 	vmUsername      string
 	vmPassword      string
 	unarchiver      zipUnarchiver
+	messenger       ConstructMessenger
 }
 
 const provisionDir = "C:\\provision\\"
@@ -25,8 +27,25 @@ const lgpoDest = provisionDir + "LGPO.zip"
 const stemcellAutomationScript = provisionDir + "Setup.ps1"
 const powershell = "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 
-func NewVMConstruct(winrmIP, winrmUsername, winrmPassword, vmInventoryPath string, client IaasClient, unarchiver zipUnarchiver) *VMConstruct {
-	return &VMConstruct{NewWinRM(winrmIP, winrmUsername, winrmPassword), client, vmInventoryPath, winrmUsername, winrmPassword, unarchiver}
+func NewVMConstruct(
+	vmIP,
+	vmUsername,
+	vmPassword,
+	vmInventoryPath string,
+	client IaasClient,
+	unarchiver zipUnarchiver,
+	messenger ConstructMessenger,
+) *VMConstruct {
+
+	return &VMConstruct{
+		NewWinRM(vmIP, vmUsername, vmPassword),
+		client,
+		vmInventoryPath,
+		vmUsername,
+		vmPassword,
+		unarchiver,
+		messenger,
+	}
 }
 
 //go:generate counterfeiter . IaasClient
@@ -40,6 +59,12 @@ type IaasClient interface {
 //go:generate counterfeiter . zipUnarchiver
 type zipUnarchiver interface {
 	Unzip(fileArchive []byte, file string) ([]byte, error)
+}
+
+//go:generate counterfeiter . ConstructMessenger
+type ConstructMessenger interface {
+	EnableWinRMStarted()
+	EnableWinRMSucceeded()
 }
 
 func (c *VMConstruct) CanConnectToVM() error {
@@ -64,6 +89,13 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 	fmt.Println("All files have been uploaded.")
+
+	c.messenger.EnableWinRMStarted()
+	err = c.enableWinRM()
+	if err != nil {
+		return err
+	}
+	c.messenger.EnableWinRMSucceeded()
 
 	fmt.Print("\nExtracting artifacts...")
 	err = c.extractArchive()
@@ -140,16 +172,7 @@ func (c *VMConstruct) enableWinRM() error {
 	// for the function to be executed.
 	rawWinRMwtCmd := append(rawWinRM, []byte("\nEnable-WinRM\n")...)
 
-	//TODO: Maybe extract this code block
-	runeWinRM := []rune(string(rawWinRMwtCmd))
-	utf16WinRM := utf16.Encode(runeWinRM)
-	byteWinRM := &bytes.Buffer{}
-	for _, utf16char := range utf16WinRM {
-		b := make([]byte, 2)
-		binary.LittleEndian.PutUint16(b, utf16char)
-		byteWinRM.Write(b)
-	}
-	base64WinRM := base64.StdEncoding.EncodeToString(byteWinRM.Bytes())
+	base64WinRM := encodePowershellCommand(rawWinRMwtCmd)
 
 	pid, err := c.Client.Start(c.vmInventoryPath, c.vmUsername, c.vmPassword, powershell, "-EncodedCommand", base64WinRM)
 	if err != nil {
@@ -164,7 +187,17 @@ func (c *VMConstruct) enableWinRM() error {
 		return fmt.Errorf(failureString, fmt.Sprintf("WinRM process on guest VM exited with code %d", exitCode))
 	}
 
-	fmt.Println("WinRm enabled on the guest VM")
-
 	return nil
+}
+
+func encodePowershellCommand(command []byte) string {
+	runeCommand := []rune(string(command))
+	utf16Command := utf16.Encode(runeCommand)
+	byteCommand := &bytes.Buffer{}
+	for _, utf16char := range utf16Command {
+		b := make([]byte, 2)
+		binary.LittleEndian.PutUint16(b, utf16char)
+		byteCommand.Write(b) // This write never returns an error.
+	}
+	return base64.StdEncoding.EncodeToString(byteCommand.Bytes())
 }

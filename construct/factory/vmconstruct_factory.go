@@ -1,6 +1,8 @@
 package vmconstruct_factory
 
 import (
+	"os"
+
 	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/construct"
 	"github.com/cloudfoundry-incubator/stembuild/construct/archive"
@@ -18,5 +20,15 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig) commandparse
 
 	zip := &archive.Zip{}
 
-	return construct.NewVMConstruct(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, config.VmInventoryPath, client, zip)
+	messenger := construct.NewMessenger(os.Stdout)
+
+	return construct.NewVMConstruct(
+		config.GuestVmIp,
+		config.GuestVMUsername,
+		config.GuestVMPassword,
+		config.VmInventoryPath,
+		client,
+		zip,
+		messenger,
+	)
 }

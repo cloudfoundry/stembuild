@@ -159,6 +159,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	vmPassword := envMustExist(VMPasswordVariable)
 	existingVMIP := os.Getenv(ExistingVmIPVariable)
 	userProvidedIP := os.Getenv(UserProvidedIPVariable)
+	vCenterUrl := envMustExist(vcenterURLVariable)
+	vCenterUnsername := envMustExist(vcenterUsernameVariable)
+	vCenterPassword := envMustExist(vcenterPasswordVariable)
+	vcenterFolder := envMustExist(vcenterFolderVariable)
+	vmNamePrefix := envMustExist(VMNamePrefixVariable)
 
 	wd, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
@@ -169,25 +174,35 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	conf = config{
-		TargetIP:   existingVMIP,
-		VMUsername: vmUsername,
-		VMPassword: vmPassword,
+		TargetIP:        existingVMIP,
+		VMUsername:      vmUsername,
+		VMPassword:      vmPassword,
+		VCenterURL:      vCenterUrl,
+		VCenterUsername: vCenterUnsername,
+		VCenterPassword: vCenterPassword,
 	}
 
 	if userProvidedIP != "" && existingVMIP == "" {
 		targetIP = userProvidedIP
 		fmt.Printf("Creating VM with IP: %s\n", targetIP)
-		createVMWithIP(targetIP)
+		createVMWithIP(targetIP, vmNamePrefix, vcenterFolder)
 	}
 	if existingVMIP != "" {
 		existingVM = true
 		targetIP = existingVMIP
 		fmt.Printf("Using existing VM with IP: %s\n", targetIP)
+
+		vmNameSuffix := strings.Split(targetIP, ".")[3]
+		vmName := fmt.Sprintf("%s%s", vmNamePrefix, vmNameSuffix)
+		conf.VMName = vmName
+		vmInventoryPath := strings.Join([]string{vcenterFolder, vmName}, "/")
+		conf.VMInventoryPath = vmInventoryPath
+
 	}
 	if targetIP == "" {
 		fmt.Println("Finding available IP...")
 		targetIP = claimAvailableIP()
-		createVMWithIP(targetIP)
+		createVMWithIP(targetIP, vmNamePrefix, vcenterFolder)
 	}
 
 	fmt.Println("Attempting to connect to VM")
@@ -207,16 +222,11 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 }, func(_ []byte) {
 })
 
-func createVMWithIP(targetIP string) {
+func createVMWithIP(targetIP, vmNamePrefix, vcenterFolder string) {
 	failureDescription := fmt.Sprintf("when creating a VM, because %s isn't set", ExistingVmIPVariable)
 
 	ovaFile := validatedOVALocation()
 
-	conf.VCenterURL = helpers.EnvMustExist(vcenterURLVariable)
-	conf.VCenterUsername = helpers.EnvMustExist(vcenterUsernameVariable)
-	conf.VCenterPassword = helpers.EnvMustExist(vcenterPasswordVariable)
-
-	vmNamePrefix := envMustExistWithDescription(VMNamePrefixVariable, failureDescription)
 	vmFolder := envMustExistWithDescription(VMFolderVariable, failureDescription)
 	conf.NetworkGateway = envMustExistWithDescription(NetworkGatewayVariable, failureDescription)
 	conf.SubnetMask = envMustExistWithDescription(SubnetMaskVariable, failureDescription)
@@ -229,7 +239,6 @@ func createVMWithIP(targetIP string) {
 	vmName := fmt.Sprintf("%s%s", vmNamePrefix, vmNameSuffix)
 	conf.VMName = vmName
 
-	vcenterFolder := helpers.EnvMustExist(vcenterFolderVariable)
 	conf.VMInventoryPath = strings.Join([]string{vcenterFolder, vmName}, "/")
 
 	templateFile, err := filepath.Abs("assets/ova_options.json.template")

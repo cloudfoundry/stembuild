@@ -40,10 +40,10 @@ var _ = Describe("stembuild construct", func() {
 			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 			Expect(err).ToNot(HaveOccurred())
 
-			session := helpers.Stembuild(stembuildExecutable, "construct", "-winrm-ip", conf.TargetIP, "-winrm-username", conf.VMUsername, "-winrm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
+			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
 			Eventually(session, 20).Should(Exit(0))
-			Eventually(session.Out).Should(Say(`WinRm enabled on the guest VM`))
+			Eventually(session.Out).Should(Say(`Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM`))
 
 		})
 

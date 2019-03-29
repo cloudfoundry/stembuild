@@ -4,10 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/construct/config"
-	"github.com/google/subcommands"
 	"os"
 	"path/filepath"
+
+	"github.com/cloudfoundry-incubator/stembuild/construct/config"
+	"github.com/google/subcommands"
 )
 
 //go:generate counterfeiter . VmConstruct
