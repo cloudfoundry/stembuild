@@ -13,7 +13,6 @@ import (
 
 //go:generate counterfeiter . VmConstruct
 type VmConstruct interface {
-	CanConnectToVM() error
 	PrepareVM() error
 }
 
@@ -97,13 +96,7 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 
 	vmConstruct := p.factory.VMPreparer(p.sourceConfig)
 
-	err := vmConstruct.CanConnectToVM()
-	if err != nil {
-		p.messenger.CannotConnectToVM(err)
-		return subcommands.ExitFailure
-	}
-
-	err = vmConstruct.PrepareVM()
+	err := vmConstruct.PrepareVM()
 	if err != nil {
 		p.messenger.CannotPrepareVM(err)
 		return subcommands.ExitFailure

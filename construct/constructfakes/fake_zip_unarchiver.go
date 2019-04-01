@@ -2,7 +2,7 @@
 package constructfakes
 
 import (
-	sync "sync"
+	"sync"
 )
 
 type FakeZipUnarchiver struct {

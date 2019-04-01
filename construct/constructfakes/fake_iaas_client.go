@@ -2,23 +2,12 @@
 package constructfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	construct "github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeIaasClient struct {
-	FindVMStub        func(string) error
-	findVMMutex       sync.RWMutex
-	findVMArgsForCall []struct {
-		arg1 string
-	}
-	findVMReturns struct {
-		result1 error
-	}
-	findVMReturnsOnCall map[int]struct {
-		result1 error
-	}
 	MakeDirectoryStub        func(string, string, string, string) error
 	makeDirectoryMutex       sync.RWMutex
 	makeDirectoryArgsForCall []struct {
@@ -83,66 +72,6 @@ type FakeIaasClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeIaasClient) FindVM(arg1 string) error {
-	fake.findVMMutex.Lock()
-	ret, specificReturn := fake.findVMReturnsOnCall[len(fake.findVMArgsForCall)]
-	fake.findVMArgsForCall = append(fake.findVMArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("FindVM", []interface{}{arg1})
-	fake.findVMMutex.Unlock()
-	if fake.FindVMStub != nil {
-		return fake.FindVMStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.findVMReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeIaasClient) FindVMCallCount() int {
-	fake.findVMMutex.RLock()
-	defer fake.findVMMutex.RUnlock()
-	return len(fake.findVMArgsForCall)
-}
-
-func (fake *FakeIaasClient) FindVMCalls(stub func(string) error) {
-	fake.findVMMutex.Lock()
-	defer fake.findVMMutex.Unlock()
-	fake.FindVMStub = stub
-}
-
-func (fake *FakeIaasClient) FindVMArgsForCall(i int) string {
-	fake.findVMMutex.RLock()
-	defer fake.findVMMutex.RUnlock()
-	argsForCall := fake.findVMArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeIaasClient) FindVMReturns(result1 error) {
-	fake.findVMMutex.Lock()
-	defer fake.findVMMutex.Unlock()
-	fake.FindVMStub = nil
-	fake.findVMReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakeIaasClient) FindVMReturnsOnCall(i int, result1 error) {
-	fake.findVMMutex.Lock()
-	defer fake.findVMMutex.Unlock()
-	fake.FindVMStub = nil
-	if fake.findVMReturnsOnCall == nil {
-		fake.findVMReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.findVMReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
 }
 
 func (fake *FakeIaasClient) MakeDirectory(arg1 string, arg2 string, arg3 string, arg4 string) error {
@@ -408,8 +337,6 @@ func (fake *FakeIaasClient) WaitForExitReturnsOnCall(i int, result1 int, result2
 func (fake *FakeIaasClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.findVMMutex.RLock()
-	defer fake.findVMMutex.RUnlock()
 	fake.makeDirectoryMutex.RLock()
 	defer fake.makeDirectoryMutex.RUnlock()
 	fake.startMutex.RLock()

@@ -44,4 +44,33 @@ var _ = Describe("Messenger", func() {
 			Expect(buf).To(gbytes.Say("Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM"))
 		})
 	})
+
+	Describe("ValidateVMConnectionStarted", func() {
+		It("writes the message to the writer", func() {
+
+			m := construct.NewMessenger(buf)
+			m.ValidateVMConnectionStarted()
+
+			Expect(buf).To(gbytes.Say("\nValidating connection to vm..."))
+		})
+	})
+
+	Describe("ValidateVMConnectionSucceeded", func() {
+		It("writes the message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ValidateVMConnectionSucceeded()
+
+			Expect(buf).To(gbytes.Say("succeeded.\n"))
+		})
+	})
+
+	Describe("ValidateVMConnection", func() {
+		It("writes both validate vm connection messages on one line", func() {
+			m := construct.NewMessenger(buf)
+			m.ValidateVMConnectionStarted()
+			m.ValidateVMConnectionSucceeded()
+
+			Expect(buf).To(gbytes.Say("Validating connection to vm...succeeded."))
+		})
+	})
 })

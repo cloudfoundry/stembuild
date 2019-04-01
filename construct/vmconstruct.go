@@ -65,21 +65,8 @@ type zipUnarchiver interface {
 type ConstructMessenger interface {
 	EnableWinRMStarted()
 	EnableWinRMSucceeded()
-}
-
-func (c *VMConstruct) CanConnectToVM() error {
-	fmt.Print("Validating connection to vm...")
-	err := c.remoteManager.CanReachVM()
-	if err != nil {
-		return err
-	}
-	err = c.remoteManager.CanLoginVM()
-	if err != nil {
-		return err
-	}
-	fmt.Println(" succeeded.")
-
-	return nil
+	ValidateVMConnectionStarted()
+	ValidateVMConnectionSucceeded()
 }
 
 func (c *VMConstruct) PrepareVM() error {
@@ -97,6 +84,13 @@ func (c *VMConstruct) PrepareVM() error {
 	}
 	c.messenger.EnableWinRMSucceeded()
 
+	c.messenger.ValidateVMConnectionStarted()
+	err = c.canConnectToVM()
+	if err != nil {
+		return err
+	}
+	c.messenger.ValidateVMConnectionSucceeded()
+
 	fmt.Print("\nExtracting artifacts...")
 	err = c.extractArchive()
 	if err != nil {
@@ -110,6 +104,20 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 	fmt.Println("\nFinished executing setup script.")
+
+	return nil
+}
+
+func (c *VMConstruct) canConnectToVM() error {
+	err := c.remoteManager.CanReachVM()
+	if err != nil {
+		return err
+	}
+
+	err = c.remoteManager.CanLoginVM()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

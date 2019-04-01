@@ -17,3 +17,11 @@ func (m *Messenger) EnableWinRMStarted() {
 func (m *Messenger) EnableWinRMSucceeded() {
 	m.out.Write([]byte("WinRm enabled on the guest VM\n"))
 }
+
+func (m *Messenger) ValidateVMConnectionStarted() {
+	m.out.Write([]byte("\nValidating connection to vm..."))
+}
+
+func (m *Messenger) ValidateVMConnectionSucceeded() {
+	m.out.Write([]byte("succeeded.\n"))
+}

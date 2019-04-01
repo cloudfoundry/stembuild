@@ -174,6 +174,46 @@ var _ = Describe("construct_helpers", func() {
 			})
 		})
 
+		Context("can connect to VM", func() {
+			It("can reach VM and can login to VM", func() {
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).To(BeNil())
+				Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
+				Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
+			})
+			It("returns an error if it cannot reach the VM", func() {
+				fakeRemoteManager.CanReachVMReturns(errors.New("can't reach VM"))
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).NotTo(BeNil())
+				Expect(err).To(MatchError("can't reach VM"))
+				Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
+				Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(0))
+			})
+
+			It("should return an error when login fails", func() {
+				invalidPwdError := errors.New("login error")
+				fakeRemoteManager.CanLoginVMReturns(invalidPwdError)
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(invalidPwdError))
+
+				Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
+				Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
+			})
+
+			It("logs that it successfully validated the vm connection", func() {
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeMessenger.ValidateVMConnectionStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ValidateVMConnectionSucceededCallCount()).To(Equal(1))
+			})
+
+		})
+
 		Context("can upload artifacts", func() {
 			BeforeEach(func() {
 				fakeZipUnarchiver.UnzipReturns([]byte("extracted archive"), nil)
@@ -299,43 +339,6 @@ var _ = Describe("construct_helpers", func() {
 				Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
 
 			})
-
-		})
-	})
-
-	Describe("CanConnectToVM", func() {
-		It("should not return an error if vm & credential are valid", func() {
-
-			err := vmConstruct.CanConnectToVM()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
-			Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
-
-		})
-
-		It("should return an error if vm is invalid", func() {
-			invalidVMError := errors.New("invalid vm")
-			fakeRemoteManager.CanReachVMReturns(invalidVMError)
-
-			err := vmConstruct.CanConnectToVM()
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(invalidVMError))
-
-			Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
-			Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(0))
-		})
-
-		It("should return an error if username/password is invalid", func() {
-			invalidPwdError := errors.New("invalid password")
-			fakeRemoteManager.CanReachVMReturns(nil)
-			fakeRemoteManager.CanLoginVMReturns(invalidPwdError)
-
-			err := vmConstruct.CanConnectToVM()
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(invalidPwdError))
-
-			Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
-			Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
 
 		})
 	})

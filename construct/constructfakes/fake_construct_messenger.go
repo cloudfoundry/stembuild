@@ -2,9 +2,9 @@
 package constructfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	construct "github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeConstructMessenger struct {
@@ -15,6 +15,14 @@ type FakeConstructMessenger struct {
 	EnableWinRMSucceededStub        func()
 	enableWinRMSucceededMutex       sync.RWMutex
 	enableWinRMSucceededArgsForCall []struct {
+	}
+	ValidateVMConnectionStartedStub        func()
+	validateVMConnectionStartedMutex       sync.RWMutex
+	validateVMConnectionStartedArgsForCall []struct {
+	}
+	ValidateVMConnectionSucceededStub        func()
+	validateVMConnectionSucceededMutex       sync.RWMutex
+	validateVMConnectionSucceededArgsForCall []struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -66,6 +74,52 @@ func (fake *FakeConstructMessenger) EnableWinRMSucceededCalls(stub func()) {
 	fake.EnableWinRMSucceededStub = stub
 }
 
+func (fake *FakeConstructMessenger) ValidateVMConnectionStarted() {
+	fake.validateVMConnectionStartedMutex.Lock()
+	fake.validateVMConnectionStartedArgsForCall = append(fake.validateVMConnectionStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ValidateVMConnectionStarted", []interface{}{})
+	fake.validateVMConnectionStartedMutex.Unlock()
+	if fake.ValidateVMConnectionStartedStub != nil {
+		fake.ValidateVMConnectionStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ValidateVMConnectionStartedCallCount() int {
+	fake.validateVMConnectionStartedMutex.RLock()
+	defer fake.validateVMConnectionStartedMutex.RUnlock()
+	return len(fake.validateVMConnectionStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ValidateVMConnectionStartedCalls(stub func()) {
+	fake.validateVMConnectionStartedMutex.Lock()
+	defer fake.validateVMConnectionStartedMutex.Unlock()
+	fake.ValidateVMConnectionStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) ValidateVMConnectionSucceeded() {
+	fake.validateVMConnectionSucceededMutex.Lock()
+	fake.validateVMConnectionSucceededArgsForCall = append(fake.validateVMConnectionSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ValidateVMConnectionSucceeded", []interface{}{})
+	fake.validateVMConnectionSucceededMutex.Unlock()
+	if fake.ValidateVMConnectionSucceededStub != nil {
+		fake.ValidateVMConnectionSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ValidateVMConnectionSucceededCallCount() int {
+	fake.validateVMConnectionSucceededMutex.RLock()
+	defer fake.validateVMConnectionSucceededMutex.RUnlock()
+	return len(fake.validateVMConnectionSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ValidateVMConnectionSucceededCalls(stub func()) {
+	fake.validateVMConnectionSucceededMutex.Lock()
+	defer fake.validateVMConnectionSucceededMutex.Unlock()
+	fake.ValidateVMConnectionSucceededStub = stub
+}
+
 func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -73,6 +127,10 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.enableWinRMStartedMutex.RUnlock()
 	fake.enableWinRMSucceededMutex.RLock()
 	defer fake.enableWinRMSucceededMutex.RUnlock()
+	fake.validateVMConnectionStartedMutex.RLock()
+	defer fake.validateVMConnectionStartedMutex.RUnlock()
+	fake.validateVMConnectionSucceededMutex.RLock()
+	defer fake.validateVMConnectionSucceededMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
