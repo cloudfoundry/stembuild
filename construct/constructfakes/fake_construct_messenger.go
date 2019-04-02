@@ -24,6 +24,39 @@ type FakeConstructMessenger struct {
 	enableWinRMSucceededMutex       sync.RWMutex
 	enableWinRMSucceededArgsForCall []struct {
 	}
+	ExecuteScriptStartedStub        func()
+	executeScriptStartedMutex       sync.RWMutex
+	executeScriptStartedArgsForCall []struct {
+	}
+	ExecuteScriptSucceededStub        func()
+	executeScriptSucceededMutex       sync.RWMutex
+	executeScriptSucceededArgsForCall []struct {
+	}
+	ExtractArtifactsStartedStub        func()
+	extractArtifactsStartedMutex       sync.RWMutex
+	extractArtifactsStartedArgsForCall []struct {
+	}
+	ExtractArtifactsSucceededStub        func()
+	extractArtifactsSucceededMutex       sync.RWMutex
+	extractArtifactsSucceededArgsForCall []struct {
+	}
+	UploadArtifactsStartedStub        func()
+	uploadArtifactsStartedMutex       sync.RWMutex
+	uploadArtifactsStartedArgsForCall []struct {
+	}
+	UploadArtifactsSucceededStub        func()
+	uploadArtifactsSucceededMutex       sync.RWMutex
+	uploadArtifactsSucceededArgsForCall []struct {
+	}
+	UploadFileStartedStub        func(string)
+	uploadFileStartedMutex       sync.RWMutex
+	uploadFileStartedArgsForCall []struct {
+		arg1 string
+	}
+	UploadFileSucceededStub        func()
+	uploadFileSucceededMutex       sync.RWMutex
+	uploadFileSucceededArgsForCall []struct {
+	}
 	ValidateVMConnectionStartedStub        func()
 	validateVMConnectionStartedMutex       sync.RWMutex
 	validateVMConnectionStartedArgsForCall []struct {
@@ -128,6 +161,198 @@ func (fake *FakeConstructMessenger) EnableWinRMSucceededCalls(stub func()) {
 	fake.EnableWinRMSucceededStub = stub
 }
 
+func (fake *FakeConstructMessenger) ExecuteScriptStarted() {
+	fake.executeScriptStartedMutex.Lock()
+	fake.executeScriptStartedArgsForCall = append(fake.executeScriptStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ExecuteScriptStarted", []interface{}{})
+	fake.executeScriptStartedMutex.Unlock()
+	if fake.ExecuteScriptStartedStub != nil {
+		fake.ExecuteScriptStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ExecuteScriptStartedCallCount() int {
+	fake.executeScriptStartedMutex.RLock()
+	defer fake.executeScriptStartedMutex.RUnlock()
+	return len(fake.executeScriptStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ExecuteScriptStartedCalls(stub func()) {
+	fake.executeScriptStartedMutex.Lock()
+	defer fake.executeScriptStartedMutex.Unlock()
+	fake.ExecuteScriptStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) ExecuteScriptSucceeded() {
+	fake.executeScriptSucceededMutex.Lock()
+	fake.executeScriptSucceededArgsForCall = append(fake.executeScriptSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ExecuteScriptSucceeded", []interface{}{})
+	fake.executeScriptSucceededMutex.Unlock()
+	if fake.ExecuteScriptSucceededStub != nil {
+		fake.ExecuteScriptSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ExecuteScriptSucceededCallCount() int {
+	fake.executeScriptSucceededMutex.RLock()
+	defer fake.executeScriptSucceededMutex.RUnlock()
+	return len(fake.executeScriptSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ExecuteScriptSucceededCalls(stub func()) {
+	fake.executeScriptSucceededMutex.Lock()
+	defer fake.executeScriptSucceededMutex.Unlock()
+	fake.ExecuteScriptSucceededStub = stub
+}
+
+func (fake *FakeConstructMessenger) ExtractArtifactsStarted() {
+	fake.extractArtifactsStartedMutex.Lock()
+	fake.extractArtifactsStartedArgsForCall = append(fake.extractArtifactsStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ExtractArtifactsStarted", []interface{}{})
+	fake.extractArtifactsStartedMutex.Unlock()
+	if fake.ExtractArtifactsStartedStub != nil {
+		fake.ExtractArtifactsStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ExtractArtifactsStartedCallCount() int {
+	fake.extractArtifactsStartedMutex.RLock()
+	defer fake.extractArtifactsStartedMutex.RUnlock()
+	return len(fake.extractArtifactsStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ExtractArtifactsStartedCalls(stub func()) {
+	fake.extractArtifactsStartedMutex.Lock()
+	defer fake.extractArtifactsStartedMutex.Unlock()
+	fake.ExtractArtifactsStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) ExtractArtifactsSucceeded() {
+	fake.extractArtifactsSucceededMutex.Lock()
+	fake.extractArtifactsSucceededArgsForCall = append(fake.extractArtifactsSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ExtractArtifactsSucceeded", []interface{}{})
+	fake.extractArtifactsSucceededMutex.Unlock()
+	if fake.ExtractArtifactsSucceededStub != nil {
+		fake.ExtractArtifactsSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ExtractArtifactsSucceededCallCount() int {
+	fake.extractArtifactsSucceededMutex.RLock()
+	defer fake.extractArtifactsSucceededMutex.RUnlock()
+	return len(fake.extractArtifactsSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ExtractArtifactsSucceededCalls(stub func()) {
+	fake.extractArtifactsSucceededMutex.Lock()
+	defer fake.extractArtifactsSucceededMutex.Unlock()
+	fake.ExtractArtifactsSucceededStub = stub
+}
+
+func (fake *FakeConstructMessenger) UploadArtifactsStarted() {
+	fake.uploadArtifactsStartedMutex.Lock()
+	fake.uploadArtifactsStartedArgsForCall = append(fake.uploadArtifactsStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UploadArtifactsStarted", []interface{}{})
+	fake.uploadArtifactsStartedMutex.Unlock()
+	if fake.UploadArtifactsStartedStub != nil {
+		fake.UploadArtifactsStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) UploadArtifactsStartedCallCount() int {
+	fake.uploadArtifactsStartedMutex.RLock()
+	defer fake.uploadArtifactsStartedMutex.RUnlock()
+	return len(fake.uploadArtifactsStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) UploadArtifactsStartedCalls(stub func()) {
+	fake.uploadArtifactsStartedMutex.Lock()
+	defer fake.uploadArtifactsStartedMutex.Unlock()
+	fake.UploadArtifactsStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) UploadArtifactsSucceeded() {
+	fake.uploadArtifactsSucceededMutex.Lock()
+	fake.uploadArtifactsSucceededArgsForCall = append(fake.uploadArtifactsSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UploadArtifactsSucceeded", []interface{}{})
+	fake.uploadArtifactsSucceededMutex.Unlock()
+	if fake.UploadArtifactsSucceededStub != nil {
+		fake.UploadArtifactsSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) UploadArtifactsSucceededCallCount() int {
+	fake.uploadArtifactsSucceededMutex.RLock()
+	defer fake.uploadArtifactsSucceededMutex.RUnlock()
+	return len(fake.uploadArtifactsSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) UploadArtifactsSucceededCalls(stub func()) {
+	fake.uploadArtifactsSucceededMutex.Lock()
+	defer fake.uploadArtifactsSucceededMutex.Unlock()
+	fake.UploadArtifactsSucceededStub = stub
+}
+
+func (fake *FakeConstructMessenger) UploadFileStarted(arg1 string) {
+	fake.uploadFileStartedMutex.Lock()
+	fake.uploadFileStartedArgsForCall = append(fake.uploadFileStartedArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("UploadFileStarted", []interface{}{arg1})
+	fake.uploadFileStartedMutex.Unlock()
+	if fake.UploadFileStartedStub != nil {
+		fake.UploadFileStartedStub(arg1)
+	}
+}
+
+func (fake *FakeConstructMessenger) UploadFileStartedCallCount() int {
+	fake.uploadFileStartedMutex.RLock()
+	defer fake.uploadFileStartedMutex.RUnlock()
+	return len(fake.uploadFileStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) UploadFileStartedCalls(stub func(string)) {
+	fake.uploadFileStartedMutex.Lock()
+	defer fake.uploadFileStartedMutex.Unlock()
+	fake.UploadFileStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) UploadFileStartedArgsForCall(i int) string {
+	fake.uploadFileStartedMutex.RLock()
+	defer fake.uploadFileStartedMutex.RUnlock()
+	argsForCall := fake.uploadFileStartedArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeConstructMessenger) UploadFileSucceeded() {
+	fake.uploadFileSucceededMutex.Lock()
+	fake.uploadFileSucceededArgsForCall = append(fake.uploadFileSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UploadFileSucceeded", []interface{}{})
+	fake.uploadFileSucceededMutex.Unlock()
+	if fake.UploadFileSucceededStub != nil {
+		fake.UploadFileSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) UploadFileSucceededCallCount() int {
+	fake.uploadFileSucceededMutex.RLock()
+	defer fake.uploadFileSucceededMutex.RUnlock()
+	return len(fake.uploadFileSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) UploadFileSucceededCalls(stub func()) {
+	fake.uploadFileSucceededMutex.Lock()
+	defer fake.uploadFileSucceededMutex.Unlock()
+	fake.UploadFileSucceededStub = stub
+}
+
 func (fake *FakeConstructMessenger) ValidateVMConnectionStarted() {
 	fake.validateVMConnectionStartedMutex.Lock()
 	fake.validateVMConnectionStartedArgsForCall = append(fake.validateVMConnectionStartedArgsForCall, struct {
@@ -185,6 +410,22 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.enableWinRMStartedMutex.RUnlock()
 	fake.enableWinRMSucceededMutex.RLock()
 	defer fake.enableWinRMSucceededMutex.RUnlock()
+	fake.executeScriptStartedMutex.RLock()
+	defer fake.executeScriptStartedMutex.RUnlock()
+	fake.executeScriptSucceededMutex.RLock()
+	defer fake.executeScriptSucceededMutex.RUnlock()
+	fake.extractArtifactsStartedMutex.RLock()
+	defer fake.extractArtifactsStartedMutex.RUnlock()
+	fake.extractArtifactsSucceededMutex.RLock()
+	defer fake.extractArtifactsSucceededMutex.RUnlock()
+	fake.uploadArtifactsStartedMutex.RLock()
+	defer fake.uploadArtifactsStartedMutex.RUnlock()
+	fake.uploadArtifactsSucceededMutex.RLock()
+	defer fake.uploadArtifactsSucceededMutex.RUnlock()
+	fake.uploadFileStartedMutex.RLock()
+	defer fake.uploadFileStartedMutex.RUnlock()
+	fake.uploadFileSucceededMutex.RLock()
+	defer fake.uploadFileSucceededMutex.RUnlock()
 	fake.validateVMConnectionStartedMutex.RLock()
 	defer fake.validateVMConnectionStartedMutex.RUnlock()
 	fake.validateVMConnectionSucceededMutex.RLock()

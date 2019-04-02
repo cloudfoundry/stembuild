@@ -204,6 +204,27 @@ func BuildStembuild() (string, error) {
 		fmt.Sprintf("Generate command failed with exit code %d", genSess.ExitCode()),
 	)
 
+	goPath := EnvMustExist("GOPATH")
+	prefix := filepath.Join(goPath, "src", buildPackage, "integration", "construct", "assets")
+	stemcellAutomation := filepath.Join(prefix, "StemcellAutomation.zip")
+	outFile := filepath.Join(goPath, "src", buildPackage, "assets", "stemcell_automation.go")
+	goBindataCommand := fmt.Sprintf("go-bindata -o %s -pkg assets -prefix %s %s", outFile, prefix, stemcellAutomation)
+	goBindataCommandSlice := strings.Split(goBindataCommand, " ")
+	goBinCommand := exec.Command(goBindataCommandSlice[0], goBindataCommandSlice[1:]...)
+	goBinSession, err := gexec.Start(goBinCommand, stdout, stderr)
+	if err != nil {
+		return "", err
+	}
+	gomega.EventuallyWithOffset(1, goBinSession, 30*time.Second).Should(
+		gexec.Exit(0),
+		fmt.Sprintf("go-bindata command `%s` exited with exit code %d, stdout: %s, stderr: %s",
+			goBindataCommand,
+			goBinSession.ExitCode(),
+			string(stdout.Bytes()),
+			string(stderr.Bytes()),
+		),
+	)
+
 	buildCommand := fmt.Sprintf("go build -o %s %s", stembuildExecutable, buildPackage)
 	buildCommandSlice := strings.Split(buildCommand, " ")
 

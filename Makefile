@@ -10,9 +10,9 @@ all : test build
 build : out/stembuild
 
 clean :
-	rm -r version/version.go
-	rm -r $(wildcard out/*)
-	rm -r assets/stemcell_automation.go
+	rm -r version/version.go || true
+	rm -r $(wildcard out/*) || true
+	rm -r assets/stemcell_automation.go || true
 
 format :
 	go fmt ./...

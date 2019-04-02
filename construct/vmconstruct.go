@@ -68,10 +68,18 @@ type zipUnarchiver interface {
 type ConstructMessenger interface {
 	CreateProvisionDirStarted()
 	CreateProvisionDirSucceeded()
+	UploadArtifactsStarted()
+	UploadArtifactsSucceeded()
 	EnableWinRMStarted()
 	EnableWinRMSucceeded()
 	ValidateVMConnectionStarted()
 	ValidateVMConnectionSucceeded()
+	ExtractArtifactsStarted()
+	ExtractArtifactsSucceeded()
+	ExecuteScriptStarted()
+	ExecuteScriptSucceeded()
+	UploadFileStarted(artifact string)
+	UploadFileSucceeded()
 }
 
 func (c *VMConstruct) PrepareVM() error {
@@ -80,12 +88,12 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 
-	fmt.Println("\nTransferring ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes")
+	c.messenger.UploadArtifactsStarted()
 	err = c.uploadArtifacts()
 	if err != nil {
 		return err
 	}
-	fmt.Println("All files have been uploaded.")
+	c.messenger.UploadArtifactsSucceeded()
 
 	c.messenger.EnableWinRMStarted()
 	err = c.enableWinRM()
@@ -101,19 +109,19 @@ func (c *VMConstruct) PrepareVM() error {
 	}
 	c.messenger.ValidateVMConnectionSucceeded()
 
-	fmt.Print("\nExtracting artifacts...")
+	c.messenger.ExtractArtifactsStarted()
 	err = c.extractArchive()
 	if err != nil {
 		return err
 	}
-	fmt.Println(" Artifacts Extracted.")
+	c.messenger.ExtractArtifactsSucceeded()
 
-	fmt.Println("\nExecuting setup script...")
+	c.messenger.ExecuteScriptStarted()
 	err = c.executeSetupScript()
 	if err != nil {
 		return err
 	}
-	fmt.Println("\nFinished executing setup script.")
+	c.messenger.ExecuteScriptSucceeded()
 
 	return nil
 }
@@ -143,19 +151,19 @@ func (c *VMConstruct) createProvisionDirectory() error {
 }
 
 func (c *VMConstruct) uploadArtifacts() error {
-	fmt.Print("\tUploading LGPO to target VM...")
+	c.messenger.UploadFileStarted("LGPO")
 	err := c.Client.UploadArtifact(c.vmInventoryPath, "./LGPO.zip", lgpoDest, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}
-	fmt.Println(" Finished uploading LGPO.")
+	c.messenger.UploadFileSucceeded()
 
-	fmt.Print("\tUploading stemcell preparation artifacts to target VM...")
+	c.messenger.UploadFileStarted("stemcell preparation artifacts")
 	err = c.Client.UploadArtifact(c.vmInventoryPath, fmt.Sprintf("./%s", stemcellAutomationName), stemcellAutomationDest, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}
-	fmt.Println(" Finished uploading artifacts to target VM.")
+	c.messenger.UploadFileSucceeded()
 
 	return nil
 }

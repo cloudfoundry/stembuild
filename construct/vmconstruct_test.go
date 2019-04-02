@@ -39,7 +39,7 @@ var _ = Describe("construct_helpers", func() {
 
 	Describe("PrepareVM", func() {
 		Context("can create provision directory", func() {
-			It("creates it successfully", func(){
+			It("creates it successfully", func() {
 				err := vmConstruct.PrepareVM()
 
 				Expect(err).ToNot(HaveOccurred())
@@ -256,6 +256,16 @@ var _ = Describe("construct_helpers", func() {
 					Expect(user).To(Equal("fakeUser"))
 					Expect(pass).To(Equal("fakePass"))
 					Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(2))
+					Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(1))
+					Expect(fakeMessenger.UploadArtifactsSucceededCallCount()).To(Equal(1))
+
+					Expect(fakeMessenger.UploadFileStartedCallCount()).To(Equal(2))
+					artifact = fakeMessenger.UploadFileStartedArgsForCall(0)
+					Expect(artifact).To(Equal("LGPO"))
+					artifact = fakeMessenger.UploadFileStartedArgsForCall(1)
+					Expect(artifact).To(Equal("stemcell preparation artifacts"))
+
+					Expect(fakeMessenger.UploadFileSucceededCallCount()).To(Equal(2))
 				})
 
 			})
@@ -274,6 +284,8 @@ var _ = Describe("construct_helpers", func() {
 					Expect(artifact).To(Equal("./LGPO.zip"))
 					Expect(vmPath).To(Equal("fakeVmPath"))
 					Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(1))
+					Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(1))
+					Expect(fakeMessenger.UploadArtifactsSucceededCallCount()).To(Equal(0))
 				})
 
 				It("fails when it cannot upload Stemcell Automation scripts", func() {
@@ -293,6 +305,8 @@ var _ = Describe("construct_helpers", func() {
 					Expect(artifact).To(Equal("./StemcellAutomation.zip"))
 					Expect(vmPath).To(Equal("fakeVmPath"))
 					Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(2))
+					Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(1))
+					Expect(fakeMessenger.UploadArtifactsSucceededCallCount()).To(Equal(0))
 				})
 			})
 		})
@@ -311,6 +325,8 @@ var _ = Describe("construct_helpers", func() {
 				Expect(err).To(HaveOccurred())
 				Expect(fakeRemoteManager.ExtractArchiveCallCount()).To(Equal(1))
 				Expect(err.Error()).To(Equal("failed to extract archive"))
+				Expect(fakeMessenger.ExtractArtifactsStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExtractArtifactsSucceededCallCount()).To(Equal(0))
 			})
 
 			It("returns success when it properly extracts archive", func() {
@@ -319,7 +335,12 @@ var _ = Describe("construct_helpers", func() {
 				err := vmConstruct.PrepareVM()
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeRemoteManager.ExtractArchiveCallCount()).To(Equal(1))
+				source, destination := fakeRemoteManager.ExtractArchiveArgsForCall(0)
+				Expect(source).To(Equal("C:\\provision\\StemcellAutomation.zip"))
+				Expect(destination).To(Equal("C:\\provision\\"))
 
+				Expect(fakeMessenger.ExtractArtifactsStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExtractArtifactsSucceededCallCount()).To(Equal(1))
 			})
 
 		})
@@ -338,6 +359,8 @@ var _ = Describe("construct_helpers", func() {
 				Expect(err.Error()).To(Equal("failed to execute setup script"))
 
 				Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecuteScriptStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecuteScriptSucceededCallCount()).To(Equal(0))
 			})
 
 			It("returns success when it properly executes the setup script", func() {
@@ -346,7 +369,11 @@ var _ = Describe("construct_helpers", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
+				command := fakeRemoteManager.ExecuteCommandArgsForCall(0)
+				Expect(command).To(Equal("powershell.exe C:\\provision\\Setup.ps1"))
 
+				Expect(fakeMessenger.ExecuteScriptStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecuteScriptSucceededCallCount()).To(Equal(1))
 			})
 
 		})

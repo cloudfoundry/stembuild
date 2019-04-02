@@ -14,29 +14,22 @@ var _ = Describe("Messenger", func() {
 		buf = gbytes.NewBuffer()
 	})
 
-	Describe("EnableWinRMStarted", func() {
-		It("writes the message to the writer", func() {
-
+	Describe("Enable WinRM messages", func() {
+		It("writes the started message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.EnableWinRMStarted()
 
 			Expect(buf).To(gbytes.Say("\nAttempting to enable WinRM on the guest vm..."))
 		})
-	})
 
-	Describe("EnableWinRMSucceeded", func() {
-		It("writes the message to the writer", func() {
-
+		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.EnableWinRMSucceeded()
 
 			Expect(buf).To(gbytes.Say("WinRm enabled on the guest VM\n"))
 		})
-	})
 
-	Describe("WinRM", func() {
 		It("writes both WinRM messages on one line", func() {
-
 			m := construct.NewMessenger(buf)
 			m.EnableWinRMStarted()
 			m.EnableWinRMSucceeded()
@@ -45,26 +38,21 @@ var _ = Describe("Messenger", func() {
 		})
 	})
 
-	Describe("ValidateVMConnectionStarted", func() {
-		It("writes the message to the writer", func() {
-
+	Describe("Validate VM connection messages", func() {
+		It("writes the started message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ValidateVMConnectionStarted()
 
 			Expect(buf).To(gbytes.Say("\nValidating connection to vm..."))
 		})
-	})
 
-	Describe("ValidateVMConnectionSucceeded", func() {
-		It("writes the message to the writer", func() {
+		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ValidateVMConnectionSucceeded()
 
 			Expect(buf).To(gbytes.Say("succeeded.\n"))
 		})
-	})
 
-	Describe("ValidateVMConnection", func() {
 		It("writes both validate vm connection messages on one line", func() {
 			m := construct.NewMessenger(buf)
 			m.ValidateVMConnectionStarted()
@@ -74,32 +62,107 @@ var _ = Describe("Messenger", func() {
 		})
 	})
 
-	Describe("CreateProvisionDirStarted", func() {
-		It("writes the message to the writer", func() {
-
+	Describe("Create provision directory messages", func() {
+		It("writes the started message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.CreateProvisionDirStarted()
 
 			Expect(buf).To(gbytes.Say("\nCreating provision dir on target VM..."))
 		})
-	})
 
-	Describe("CreateProvisionDirSucceeded", func() {
-		It("writes the message to the writer", func() {
+		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.CreateProvisionDirSucceeded()
 
 			Expect(buf).To(gbytes.Say("succeeded.\n"))
 		})
-	})
 
-	Describe("CreateProvisionDir", func() {
 		It("writes both messages on one line", func() {
 			m := construct.NewMessenger(buf)
 			m.CreateProvisionDirStarted()
 			m.CreateProvisionDirSucceeded()
 
 			Expect(buf).To(gbytes.Say("\nCreating provision dir on target VM...succeeded.\n"))
+		})
+	})
+
+	Describe("Upload artifacts messages", func() {
+		It("writes the started message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.UploadArtifactsStarted()
+
+			Expect(buf).To(gbytes.Say("\nTransferring ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes\n"))
+		})
+
+		It("writes the succeeded message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.UploadArtifactsSucceeded()
+
+			Expect(buf).To(gbytes.Say("\nAll files have been uploaded.\n"))
+		})
+	})
+
+	Describe("Extract artifact messages", func() {
+		It("writes the started message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ExtractArtifactsStarted()
+
+			Expect(buf).To(gbytes.Say("\nExtracting artifacts..."))
+		})
+
+		It("writes the succeeded message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ExtractArtifactsSucceeded()
+
+			Expect(buf).To(gbytes.Say("succeeded.\n"))
+		})
+
+		It("writes both messages on one line", func() {
+			m := construct.NewMessenger(buf)
+			m.ExtractArtifactsStarted()
+			m.ExtractArtifactsSucceeded()
+
+			Expect(buf).To(gbytes.Say("\nExtracting artifacts...succeeded.\n"))
+		})
+	})
+
+	Describe("Execute setup script messages", func() {
+		It("writes the started message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ExecuteScriptStarted()
+
+			Expect(buf).To(gbytes.Say("\nExecuting setup script...\n"))
+		})
+
+		It("writes the succeeded message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ExecuteScriptSucceeded()
+
+			Expect(buf).To(gbytes.Say("\nFinished executing setup script.\n"))
+		})
+	})
+
+	Describe("Upload file messages", func() {
+		It("writes the started message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.UploadFileStarted("some artifact")
+
+			Expect(buf).To(gbytes.Say("\tUploading some artifact to target VM..."))
+		})
+
+		It("writes the succeeded message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.UploadFileSucceeded()
+
+			Expect(buf).To(gbytes.Say("succeeded.\n"))
+		})
+
+		It("writes both messages on one line", func() {
+			m := construct.NewMessenger(buf)
+			m.UploadFileStarted("some third artifact")
+			m.UploadFileSucceeded()
+
+			Expect(buf).To(gbytes.Say("Uploading some third artifact to target VM...succeed."))
 		})
 	})
 })

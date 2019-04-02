@@ -36,7 +36,7 @@ var _ = Describe("stembuild construct", func() {
 			Eventually(session.Out).Should(Say(`mock stemcell automation script executed`))
 		})
 
-		PIt("extracts the WinRM BOSH powershell script and executes it successfully on the guest VM", func() {
+		It("extracts the WinRM BOSH powershell script and executes it successfully on the guest VM", func() {
 			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 			Expect(err).ToNot(HaveOccurred())
 

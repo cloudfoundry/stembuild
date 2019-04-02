@@ -1,6 +1,9 @@
 package construct
 
-import "io"
+import (
+	"fmt"
+	"io"
+)
 
 type Messenger struct {
 	out io.Writer
@@ -31,5 +34,37 @@ func (m *Messenger) CreateProvisionDirStarted() {
 }
 
 func (m *Messenger) CreateProvisionDirSucceeded() {
+	m.out.Write([]byte("succeeded.\n"))
+}
+
+func (m *Messenger) UploadArtifactsStarted() {
+	m.out.Write([]byte("\nTransferring ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes\n"))
+}
+
+func (m *Messenger) UploadArtifactsSucceeded() {
+	m.out.Write([]byte("\nAll files have been uploaded.\n"))
+}
+
+func (m *Messenger) ExtractArtifactsStarted() {
+	m.out.Write([]byte("\nExtracting artifacts..."))
+}
+
+func (m *Messenger) ExtractArtifactsSucceeded() {
+	m.out.Write([]byte("succeeded.\n"))
+}
+
+func (m *Messenger) ExecuteScriptStarted() {
+	m.out.Write([]byte("\nExecuting setup script...\n"))
+}
+
+func (m *Messenger) ExecuteScriptSucceeded() {
+	m.out.Write([]byte("\nFinished executing setup script.\n"))
+}
+
+func (m *Messenger) UploadFileStarted(artifact string) {
+	m.out.Write([]byte(fmt.Sprintf("\tUploading %s to target VM...", artifact)))
+}
+
+func (m *Messenger) UploadFileSucceeded() {
 	m.out.Write([]byte("succeeded.\n"))
 }
