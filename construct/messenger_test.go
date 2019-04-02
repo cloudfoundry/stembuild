@@ -73,4 +73,33 @@ var _ = Describe("Messenger", func() {
 			Expect(buf).To(gbytes.Say("Validating connection to vm...succeeded."))
 		})
 	})
+
+	Describe("CreateProvisionDirStarted", func() {
+		It("writes the message to the writer", func() {
+
+			m := construct.NewMessenger(buf)
+			m.CreateProvisionDirStarted()
+
+			Expect(buf).To(gbytes.Say("\nCreating provision dir on target VM..."))
+		})
+	})
+
+	Describe("CreateProvisionDirSucceeded", func() {
+		It("writes the message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.CreateProvisionDirSucceeded()
+
+			Expect(buf).To(gbytes.Say("succeeded.\n"))
+		})
+	})
+
+	Describe("CreateProvisionDir", func() {
+		It("writes both messages on one line", func() {
+			m := construct.NewMessenger(buf)
+			m.CreateProvisionDirStarted()
+			m.CreateProvisionDirSucceeded()
+
+			Expect(buf).To(gbytes.Say("\nCreating provision dir on target VM...succeeded.\n"))
+		})
+	})
 })

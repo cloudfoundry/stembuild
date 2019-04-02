@@ -25,3 +25,11 @@ func (m *Messenger) ValidateVMConnectionStarted() {
 func (m *Messenger) ValidateVMConnectionSucceeded() {
 	m.out.Write([]byte("succeeded.\n"))
 }
+
+func (m *Messenger) CreateProvisionDirStarted() {
+	m.out.Write([]byte("\nCreating provision dir on target VM..."))
+}
+
+func (m *Messenger) CreateProvisionDirSucceeded() {
+	m.out.Write([]byte("succeeded.\n"))
+}

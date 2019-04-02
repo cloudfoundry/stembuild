@@ -66,6 +66,8 @@ type zipUnarchiver interface {
 
 //go:generate counterfeiter . ConstructMessenger
 type ConstructMessenger interface {
+	CreateProvisionDirStarted()
+	CreateProvisionDirSucceeded()
 	EnableWinRMStarted()
 	EnableWinRMSucceeded()
 	ValidateVMConnectionStarted()
@@ -73,8 +75,13 @@ type ConstructMessenger interface {
 }
 
 func (c *VMConstruct) PrepareVM() error {
+	err := c.createProvisionDirectory()
+	if err != nil {
+		return err
+	}
+
 	fmt.Println("\nTransferring ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes")
-	err := c.uploadArtifacts()
+	err = c.uploadArtifacts()
 	if err != nil {
 		return err
 	}
@@ -125,17 +132,19 @@ func (c *VMConstruct) canConnectToVM() error {
 	return nil
 }
 
-func (c *VMConstruct) uploadArtifacts() error {
-
-	fmt.Print("\tCreating provision dir on target VM...")
+func (c *VMConstruct) createProvisionDirectory() error {
+	c.messenger.CreateProvisionDirStarted()
 	err := c.Client.MakeDirectory(c.vmInventoryPath, provisionDir, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}
-	fmt.Println(" Finished creating provision dir.")
+	c.messenger.CreateProvisionDirSucceeded()
+	return nil
+}
 
+func (c *VMConstruct) uploadArtifacts() error {
 	fmt.Print("\tUploading LGPO to target VM...")
-	err = c.Client.UploadArtifact(c.vmInventoryPath, "./LGPO.zip", lgpoDest, c.vmUsername, c.vmPassword)
+	err := c.Client.UploadArtifact(c.vmInventoryPath, "./LGPO.zip", lgpoDest, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}

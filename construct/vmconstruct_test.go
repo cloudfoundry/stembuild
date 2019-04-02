@@ -38,6 +38,30 @@ var _ = Describe("construct_helpers", func() {
 	})
 
 	Describe("PrepareVM", func() {
+		Context("can create provision directory", func() {
+			It("creates it successfully", func(){
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
+				Expect(fakeMessenger.CreateProvisionDirStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.CreateProvisionDirSucceededCallCount()).To(Equal(1))
+			})
+
+			It("fails when the provision dir cannot be created", func() {
+				mkDirError := errors.New("failed to create dir")
+				fakeVcenterClient.MakeDirectoryReturns(mkDirError)
+
+				err := vmConstruct.PrepareVM()
+
+				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("failed to create dir"))
+				Expect(fakeMessenger.CreateProvisionDirStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.CreateProvisionDirSucceededCallCount()).To(Equal(0))
+			})
+		})
+
 		Context("enable WinRM", func() {
 			var saByteData []byte
 
@@ -225,7 +249,6 @@ var _ = Describe("construct_helpers", func() {
 
 					err := vmConstruct.PrepareVM()
 					Expect(err).ToNot(HaveOccurred())
-					Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
 					vmPath, artifact, dest, user, pass := fakeVcenterClient.UploadArtifactArgsForCall(0)
 					Expect(artifact).To(Equal("./LGPO.zip"))
 					Expect(vmPath).To(Equal("fakeVmPath"))
@@ -270,20 +293,6 @@ var _ = Describe("construct_helpers", func() {
 					Expect(artifact).To(Equal("./StemcellAutomation.zip"))
 					Expect(vmPath).To(Equal("fakeVmPath"))
 					Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(2))
-				})
-
-				It("fails when the provision dir cannot be created", func() {
-
-					mkDirError := errors.New("failed to create dir")
-					fakeVcenterClient.MakeDirectoryReturns(mkDirError)
-
-					err := vmConstruct.PrepareVM()
-					Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(1))
-
-					Expect(err).To(HaveOccurred())
-					Expect(err.Error()).To(Equal("failed to create dir"))
-
-					Expect(fakeVcenterClient.UploadArtifactCallCount()).To(Equal(0))
 				})
 			})
 		})

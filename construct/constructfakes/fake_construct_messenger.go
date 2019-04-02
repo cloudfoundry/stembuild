@@ -8,6 +8,14 @@ import (
 )
 
 type FakeConstructMessenger struct {
+	CreateProvisionDirStartedStub        func()
+	createProvisionDirStartedMutex       sync.RWMutex
+	createProvisionDirStartedArgsForCall []struct {
+	}
+	CreateProvisionDirSucceededStub        func()
+	createProvisionDirSucceededMutex       sync.RWMutex
+	createProvisionDirSucceededArgsForCall []struct {
+	}
 	EnableWinRMStartedStub        func()
 	enableWinRMStartedMutex       sync.RWMutex
 	enableWinRMStartedArgsForCall []struct {
@@ -26,6 +34,52 @@ type FakeConstructMessenger struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeConstructMessenger) CreateProvisionDirStarted() {
+	fake.createProvisionDirStartedMutex.Lock()
+	fake.createProvisionDirStartedArgsForCall = append(fake.createProvisionDirStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CreateProvisionDirStarted", []interface{}{})
+	fake.createProvisionDirStartedMutex.Unlock()
+	if fake.CreateProvisionDirStartedStub != nil {
+		fake.CreateProvisionDirStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) CreateProvisionDirStartedCallCount() int {
+	fake.createProvisionDirStartedMutex.RLock()
+	defer fake.createProvisionDirStartedMutex.RUnlock()
+	return len(fake.createProvisionDirStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) CreateProvisionDirStartedCalls(stub func()) {
+	fake.createProvisionDirStartedMutex.Lock()
+	defer fake.createProvisionDirStartedMutex.Unlock()
+	fake.CreateProvisionDirStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) CreateProvisionDirSucceeded() {
+	fake.createProvisionDirSucceededMutex.Lock()
+	fake.createProvisionDirSucceededArgsForCall = append(fake.createProvisionDirSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CreateProvisionDirSucceeded", []interface{}{})
+	fake.createProvisionDirSucceededMutex.Unlock()
+	if fake.CreateProvisionDirSucceededStub != nil {
+		fake.CreateProvisionDirSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) CreateProvisionDirSucceededCallCount() int {
+	fake.createProvisionDirSucceededMutex.RLock()
+	defer fake.createProvisionDirSucceededMutex.RUnlock()
+	return len(fake.createProvisionDirSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) CreateProvisionDirSucceededCalls(stub func()) {
+	fake.createProvisionDirSucceededMutex.Lock()
+	defer fake.createProvisionDirSucceededMutex.Unlock()
+	fake.CreateProvisionDirSucceededStub = stub
 }
 
 func (fake *FakeConstructMessenger) EnableWinRMStarted() {
@@ -123,6 +177,10 @@ func (fake *FakeConstructMessenger) ValidateVMConnectionSucceededCalls(stub func
 func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.createProvisionDirStartedMutex.RLock()
+	defer fake.createProvisionDirStartedMutex.RUnlock()
+	fake.createProvisionDirSucceededMutex.RLock()
+	defer fake.createProvisionDirSucceededMutex.RUnlock()
 	fake.enableWinRMStartedMutex.RLock()
 	defer fake.enableWinRMStartedMutex.RUnlock()
 	fake.enableWinRMSucceededMutex.RLock()
