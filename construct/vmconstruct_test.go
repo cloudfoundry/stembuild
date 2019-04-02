@@ -88,18 +88,18 @@ var _ = Describe("construct_helpers", func() {
 				Expect(fakeVcenterClient.WaitForExitCallCount()).To(Equal(1))
 			})
 
-			It("returns a failure when it fails to find bosh-modules.zip in the achive artifact", func() {
-				execError := errors.New("failed to find bosh-modules.zip")
+			It("returns a failure when it fails to find bosh-psmodules.zip in the achive artifact", func() {
+				execError := errors.New("failed to find bosh-psmodules.zip")
 				fakeZipUnarchiver.UnzipReturnsOnCall(0, nil, execError)
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError("failed to enable WinRM: failed to find bosh-modules.zip"))
+				Expect(err).To(MatchError("failed to enable WinRM: failed to find bosh-psmodules.zip"))
 				Expect(fakeZipUnarchiver.UnzipCallCount()).To(Equal(1))
 
 				archive, fileName := fakeZipUnarchiver.UnzipArgsForCall(0)
 
-				Expect(fileName).To(Equal("bosh-modules.zip"))
+				Expect(fileName).To(Equal("bosh-psmodules.zip"))
 				Expect(archive).To(Equal(saByteData))
 
 				Expect(fakeVcenterClient.StartCallCount()).To(Equal(0))
@@ -107,7 +107,7 @@ var _ = Describe("construct_helpers", func() {
 
 			})
 
-			It("returns a failure when fails to find BOSH.WinRM.psm1 in bosh-modules.zip", func() {
+			It("returns a failure when fails to find BOSH.WinRM.psm1 in bosh-psmodules.zip", func() {
 				execError := errors.New("failed to find BOSH.WinRM.psm1")
 				fakeZipUnarchiver.UnzipReturnsOnCall(0, []byte("bosh-psmodules.zip extracted byte array"), nil)
 				fakeZipUnarchiver.UnzipReturnsOnCall(1, nil, execError)
@@ -118,7 +118,7 @@ var _ = Describe("construct_helpers", func() {
 				Expect(fakeZipUnarchiver.UnzipCallCount()).To(Equal(2))
 
 				archive, fileName := fakeZipUnarchiver.UnzipArgsForCall(0)
-				Expect(fileName).To(Equal("bosh-modules.zip"))
+				Expect(fileName).To(Equal("bosh-psmodules.zip"))
 				Expect(archive).To(Equal(saByteData))
 
 				archive, fileName = fakeZipUnarchiver.UnzipArgsForCall(1)
@@ -142,7 +142,7 @@ var _ = Describe("construct_helpers", func() {
 				Expect(fakeVcenterClient.WaitForExitCallCount()).To(Equal(1))
 
 				archive, fileName := fakeZipUnarchiver.UnzipArgsForCall(0)
-				Expect(fileName).To(Equal("bosh-modules.zip"))
+				Expect(fileName).To(Equal("bosh-psmodules.zip"))
 				Expect(archive).To(Equal(saByteData))
 
 				archive, fileName = fakeZipUnarchiver.UnzipArgsForCall(1)

@@ -22,10 +22,13 @@ type VMConstruct struct {
 }
 
 const provisionDir = "C:\\provision\\"
-const stemcellAutomationDest = provisionDir + "StemcellAutomation.zip"
+const stemcellAutomationName = "StemcellAutomation.zip"
+const stemcellAutomationDest = provisionDir + stemcellAutomationName
 const lgpoDest = provisionDir + "LGPO.zip"
 const stemcellAutomationScript = provisionDir + "Setup.ps1"
 const powershell = "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
+const boshPsModules = "bosh-psmodules.zip"
+const winRMPsScript = "BOSH.WinRM.psm1"
 
 func NewVMConstruct(
 	vmIP,
@@ -139,7 +142,7 @@ func (c *VMConstruct) uploadArtifacts() error {
 	fmt.Println(" Finished uploading LGPO.")
 
 	fmt.Print("\tUploading stemcell preparation artifacts to target VM...")
-	err = c.Client.UploadArtifact(c.vmInventoryPath, "./StemcellAutomation.zip", stemcellAutomationDest, c.vmUsername, c.vmPassword)
+	err = c.Client.UploadArtifact(c.vmInventoryPath, fmt.Sprintf("./%s", stemcellAutomationName), stemcellAutomationDest, c.vmUsername, c.vmPassword)
 	if err != nil {
 		return err
 	}
@@ -161,17 +164,17 @@ func (c *VMConstruct) executeSetupScript() error {
 func (c *VMConstruct) enableWinRM() error {
 	failureString := "failed to enable WinRM: %s"
 
-	saZip, err := assets.Asset("StemcellAutomation.zip")
+	saZip, err := assets.Asset(stemcellAutomationName)
 	if err != nil {
 		return fmt.Errorf(failureString, err)
 	}
 
-	bmZip, err := c.unarchiver.Unzip(saZip, "bosh-modules.zip")
+	bmZip, err := c.unarchiver.Unzip(saZip, boshPsModules)
 	if err != nil {
 		return fmt.Errorf(failureString, err)
 	}
 
-	rawWinRM, err := c.unarchiver.Unzip(bmZip, "BOSH.WinRM.psm1")
+	rawWinRM, err := c.unarchiver.Unzip(bmZip, winRMPsScript)
 	if err != nil {
 		return fmt.Errorf(failureString, err)
 	}
