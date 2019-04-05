@@ -32,7 +32,7 @@ Create a BOSH Stemcell from a VMDK file or a provisioned vCenter VM
 
 VM on vCenter:
 
-  %[1]s package -stemcell-version <stemcell version> -os <os> -vcenter-url <vCenter URL> -vcenter-username <vCenter username> -vcenter-password <vCenter password> -vm-inventory-path <vCenter VM inventory path>
+  %[1]s package -vcenter-url <vCenter URL> -vcenter-username <vCenter username> -vcenter-password <vCenter password> -vm-inventory-path <vCenter VM inventory path>
 
   Requirements:
     - VM provisioned using the stembuild construct command
@@ -40,7 +40,7 @@ VM on vCenter:
     - The [vcenter-url], [vcenter-username], [vcenter-password], and [vm-inventory-path] flags must be specified.
     - NOTE: The 'vm' keyword must be included between the datacenter name and folder name for the vm-inventory-path (e.g: <datacenter>/vm/<vm-folder>/<vm-name>) 
   Example:
-    %[1]s package -stemcell-version 1803.1 -os 1803 -vcenter-url vcenter.example.com -vcenter-username root -vcenter-password 'password' -vm-inventory-path '/my-datacenter/vm/my-folder/my-vm' 
+    %[1]s package -vcenter-url vcenter.example.com -vcenter-username root -vcenter-password 'password' -vm-inventory-path '/my-datacenter/vm/my-folder/my-vm' 
 
 VMDK: 
 

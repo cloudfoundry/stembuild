@@ -34,7 +34,7 @@ Global Options:
 
 This command converts a VMDK into a bosh-deployable Windows Stemcell 
 ```
-stembuild package -vmdk <path-to-vmdk> -stemcell-version <stemcell stemcell-version> -os <os stemcell-version>
+stembuild package -vmdk <path-to-vmdk>
 
 Create a BOSH Stemcell from a VMDK file
 
@@ -46,7 +46,7 @@ Requirements:
 	must be installed (both include the 'ovftool').
 
 Examples:
-	stembuild package -vmdk disk.vmdk -stemcell-version 1.2 -os 1803
+	stembuild package -vmdk disk.vmdk
 
 	Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk', and set the stemcell version to 1.2.
 	The final stemcell will be found in the current working directory.
@@ -54,14 +54,10 @@ Examples:
 Flags:
   -o string
     	Output directory (shorthand)
-  -os string
-    	OS version must be either 2012R2, 2016, or 1803
   -outputDir string
     	Output directory, default is the current working directory.
   -s string
     	Stemcell version (shorthand)
-  -stemcell-version string
-    	Stemcell version in the form of [DIGITS].[DIGITS] (e.g. 123.01)
   -vmdk string
     	VMDK file to create stemcell from
       
