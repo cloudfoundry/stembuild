@@ -17,13 +17,30 @@ var _ = Describe("VcenterClient", func() {
 		username, password, url string
 		vcenterClient           *VcenterClient
 		credentialUrl           string
+		caCertFile				string
 	)
 
 	BeforeEach(func() {
 		runner = &iaas_clifakes.FakeCliRunner{}
-		username, password, url = "username", "password", "url"
-		vcenterClient = NewVcenterClient(username, password, url, runner)
+		username, password, caCertFile, url = "username", "password", "", "url"
+		vcenterClient = NewVcenterClient(username, password, url, caCertFile, runner)
 		credentialUrl = fmt.Sprintf("%s:%s@%s", username, password, url)
+	})
+
+
+	Context("A ca cert file is specified", func() {
+		It("Passes the ca cert to govc", func() {
+			vcenterClient = NewVcenterClient(username, password, url, "somefile.txt", runner)
+			expectedArgs := []string{"about", "-u", credentialUrl, "-tls-ca-certs=somefile.txt"}
+
+			runner.RunReturns(0)
+			err := vcenterClient.ValidateCredentials()
+			argsForRun := runner.RunArgsForCall(0)
+
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(runner.RunCallCount()).To(Equal(1))
+			Expect(argsForRun).To(Equal(expectedArgs))
+		})
 	})
 
 	Context("ValidateCredentials", func() {
@@ -77,6 +94,20 @@ var _ = Describe("VcenterClient", func() {
 			Expect(runner.RunCallCount()).To(Equal(1))
 			Expect(argsForRun).To(Equal(expectedArgs))
 			Expect(err).To(MatchError("vcenter_client - unable to validate url: url"))
+		})
+
+		It("passes the ca cert to govc when specified", func() {
+
+			vcenterClient = NewVcenterClient(username, password, url, "somefile.txt", runner)
+			expectedArgs := []string{"about", "-u", url, "-tls-ca-certs=somefile.txt"}
+
+			runner.RunReturns(0)
+			err := vcenterClient.ValidateUrl()
+			argsForRun := runner.RunArgsForCall(0)
+
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(runner.RunCallCount()).To(Equal(1))
+			Expect(argsForRun).To(Equal(expectedArgs))
 		})
 	})
 

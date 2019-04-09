@@ -14,16 +14,21 @@ import (
 type VcenterClient struct {
 	Url           string
 	credentialUrl string
+	caCertFile    string
 	Runner        iaas_cli.CliRunner
 }
 
-func NewVcenterClient(username string, password string, url string, runner iaas_cli.CliRunner) *VcenterClient {
+func NewVcenterClient(username string, password string, url string, caCertFile string, runner iaas_cli.CliRunner) *VcenterClient {
 	urlWithCredentials := fmt.Sprintf("%s:%s@%s", username, password, url)
-	return &VcenterClient{Url: url, credentialUrl: urlWithCredentials, Runner: runner}
+	return &VcenterClient{Url: url, credentialUrl: urlWithCredentials, caCertFile: caCertFile, Runner: runner}
 }
 
 func (c *VcenterClient) ValidateUrl() error {
-	errCode := c.Runner.Run([]string{"about", "-u", c.Url})
+	args := []string{"about", "-u", c.Url}
+	if c.caCertFile != "" {
+		args = append(args, fmt.Sprintf("-tls-ca-certs=%s", c.caCertFile))
+	}
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return errors.New(fmt.Sprintf("vcenter_client - unable to validate url: %s", c.Url))
 	}
@@ -178,6 +183,9 @@ func (c *VcenterClient) WaitForExit(vmInventoryPath, username, password, pid str
 
 func (c *VcenterClient) buildGovcCommand(args ...string) []string {
 	commonArgs := []string{"-u", c.credentialUrl}
+	if c.caCertFile != "" {
+		commonArgs = append(commonArgs, fmt.Sprintf("-tls-ca-certs=%s", c.caCertFile))
+	}
 	args = append(args[:1], append(commonArgs, args[1:]...)...)
 	return args
 }
