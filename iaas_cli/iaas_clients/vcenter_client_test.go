@@ -82,7 +82,7 @@ var _ = Describe("VcenterClient", func() {
 
 	Context("FindVM", func() {
 		It("If the VM path is valid, and the VM is found", func() {
-			expectedArgs := []string{"find", "-maxdepth=0", "-u", credentialUrl, "validVMPath"}
+			expectedArgs := []string{"find", "-u", credentialUrl, "-maxdepth=0", "validVMPath"}
 			runner.RunReturns(0)
 			err := vcenterClient.FindVM("validVMPath")
 			argsForRun := runner.RunArgsForCall(0)
@@ -93,7 +93,7 @@ var _ = Describe("VcenterClient", func() {
 		})
 
 		It("If the VM path is invalid", func() {
-			expectedArgs := []string{"find", "-maxdepth=0", "-u", credentialUrl, "invalidVMPath"}
+			expectedArgs := []string{"find", "-u", credentialUrl, "-maxdepth=0", "invalidVMPath"}
 			runner.RunReturns(1)
 			err := vcenterClient.FindVM("invalidVMPath")
 			argsForRun := runner.RunArgsForCall(0)
@@ -237,7 +237,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 			err := vcenterClient.UploadArtifact("validVMPath", "artifact", "C:\\provision\\artifact", "user", "pass")
 
 			Expect(err).To(Not(HaveOccurred()))
-			expectedArgs := []string{"guest.upload", "-f", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "artifact", "C:\\provision\\artifact"}
+			expectedArgs := []string{"guest.upload", "-u", credentialUrl, "-f", "-l", "user:pass", "-vm", "validVMPath", "artifact", "C:\\provision\\artifact"}
 			Expect(runner.RunArgsForCall(0)).To(Equal(expectedArgs))
 		})
 

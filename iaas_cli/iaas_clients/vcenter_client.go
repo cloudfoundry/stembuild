@@ -32,7 +32,8 @@ func (c *VcenterClient) ValidateUrl() error {
 }
 
 func (c *VcenterClient) ValidateCredentials() error {
-	errCode := c.Runner.Run([]string{"about", "-u", c.credentialUrl})
+	args := c.buildGovcCommand("about")
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return errors.New(fmt.Sprintf("vcenter_client - invalid credentials for: %s", c.Url))
 	}
@@ -41,7 +42,8 @@ func (c *VcenterClient) ValidateCredentials() error {
 }
 
 func (c *VcenterClient) FindVM(vmInventoryPath string) error {
-	errCode := c.Runner.Run([]string{"find", "-maxdepth=0", "-u", c.credentialUrl, vmInventoryPath})
+	args := c.buildGovcCommand("find", "-maxdepth=0", vmInventoryPath)
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return errors.New(fmt.Sprintf("vcenter_client - unable to find VM: %s. Ensure your inventory path is formatted properly and includes \"vm\" in its path, example: /my-datacenter/vm/my-folder/my-vm-name", vmInventoryPath))
 	}
@@ -50,7 +52,8 @@ func (c *VcenterClient) FindVM(vmInventoryPath string) error {
 }
 
 func (c *VcenterClient) ListDevices(vmInventoryPath string) ([]string, error) {
-	o, exitCode, err := c.Runner.RunWithOutput([]string{"device.ls", "-u", c.credentialUrl, "-vm", vmInventoryPath})
+	args := c.buildGovcCommand("device.ls", "-vm", vmInventoryPath)
+	o, exitCode, err := c.Runner.RunWithOutput(args)
 
 	if exitCode != 0 {
 		return []string{}, fmt.Errorf("vcenter_client - failed to list devices in vCenter, govc exit code %d", exitCode)
@@ -71,7 +74,8 @@ func (c *VcenterClient) ListDevices(vmInventoryPath string) ([]string, error) {
 	return devices, nil
 }
 func (c *VcenterClient) RemoveDevice(vmInventoryPath string, deviceName string) error {
-	errCode := c.Runner.Run([]string{"device.remove", "-u", c.credentialUrl, "-vm", vmInventoryPath, deviceName})
+	args := c.buildGovcCommand("device.remove", "-vm", vmInventoryPath, deviceName)
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be removed", deviceName)
 	}
@@ -80,7 +84,8 @@ func (c *VcenterClient) RemoveDevice(vmInventoryPath string, deviceName string) 
 
 func (c *VcenterClient) EjectCDRom(vmInventoryPath string, deviceName string) error {
 
-	errCode := c.Runner.Run([]string{"device.cdrom.eject", "-u", c.credentialUrl, "-vm", vmInventoryPath, "-device", deviceName})
+	args := c.buildGovcCommand("device.cdrom.eject", "-vm", vmInventoryPath, "-device", deviceName)
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be ejected", deviceName)
 	}
@@ -92,7 +97,8 @@ func (c *VcenterClient) ExportVM(vmInventoryPath string, destination string) err
 	if err != nil {
 		return errors.New(fmt.Sprintf("vcenter_client - provided destination directory: %s does not exist", destination))
 	}
-	errCode := c.Runner.Run([]string{"export.ovf", "-u", c.credentialUrl, "-sha", "1", "-vm", vmInventoryPath, destination})
+	args := c.buildGovcCommand("export.ovf", "-sha", "1", "-vm", vmInventoryPath, destination)
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return errors.New(fmt.Sprintf("vcenter_client - %s could not be exported", vmInventoryPath))
 	}
@@ -101,7 +107,8 @@ func (c *VcenterClient) ExportVM(vmInventoryPath string, destination string) err
 
 func (c *VcenterClient) UploadArtifact(vmInventoryPath, artifact, destination, username, password string) error {
 	vmCredentials := fmt.Sprintf("%s:%s", username, password)
-	errCode := c.Runner.Run([]string{"guest.upload", "-f", "-u", c.credentialUrl, "-l", vmCredentials, "-vm", vmInventoryPath, artifact, destination})
+	args := c.buildGovcCommand("guest.upload", "-f", "-l", vmCredentials, "-vm", vmInventoryPath, artifact, destination)
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be uploaded", artifact)
 	}
@@ -110,7 +117,9 @@ func (c *VcenterClient) UploadArtifact(vmInventoryPath, artifact, destination, u
 
 func (c *VcenterClient) MakeDirectory(vmInventoryPath, path, username, password string) error {
 	vmCredentials := fmt.Sprintf("%s:%s", username, password)
-	errCode := c.Runner.Run([]string{"guest.mkdir", "-u", c.credentialUrl, "-l", vmCredentials, "-vm", vmInventoryPath, "-p", path})
+
+	args := c.buildGovcCommand("guest.mkdir", "-l", vmCredentials, "-vm", vmInventoryPath, "-p", path)
+	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - directory `%s` could not be created", path)
 	}
@@ -119,7 +128,9 @@ func (c *VcenterClient) MakeDirectory(vmInventoryPath, path, username, password 
 
 func (c *VcenterClient) Start(vmInventoryPath, username, password, command string, args ...string) (string, error) {
 	vmCredentials := fmt.Sprintf("%s:%s", username, password)
-	pid, exitCode, err := c.Runner.RunWithOutput(append([]string{"guest.start", "-u", c.credentialUrl, "-l", vmCredentials, "-vm", vmInventoryPath, command}, args...))
+
+	cmdArgs := c.buildGovcCommand(append([]string{"guest.start", "-l", vmCredentials, "-vm", vmInventoryPath, command}, args...)...)
+	pid, exitCode, err := c.Runner.RunWithOutput(cmdArgs)
 	if err != nil {
 		return "", fmt.Errorf("vcenter_client - failed to run '%s': %s", command, err)
 	}
@@ -144,7 +155,8 @@ type govcPS struct {
 
 func (c *VcenterClient) WaitForExit(vmInventoryPath, username, password, pid string) (int, error) {
 	vmCredentials := fmt.Sprintf("%s:%s", username, password)
-	output, exitCode, err := c.Runner.RunWithOutput([]string{"guest.ps", "-u", c.credentialUrl, "-l", vmCredentials, "-vm", vmInventoryPath, "-p", pid, "-X", "-json"})
+	args := c.buildGovcCommand("guest.ps", "-l", vmCredentials, "-vm", vmInventoryPath, "-p", pid, "-X", "-json")
+	output, exitCode, err := c.Runner.RunWithOutput(args)
 	if err != nil {
 		return 0, fmt.Errorf("vcenter_client - failed to fetch exit code for PID %s: %s", pid, err)
 	}
@@ -162,4 +174,10 @@ func (c *VcenterClient) WaitForExit(vmInventoryPath, username, password, pid str
 	}
 
 	return ps.ProcessInfo[0].ExitCode, nil
+}
+
+func (c *VcenterClient) buildGovcCommand(args ...string) []string {
+	commonArgs := []string{"-u", c.credentialUrl}
+	args = append(args[:1], append(commonArgs, args[1:]...)...)
+	return args
 }
