@@ -237,7 +237,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 			err := vcenterClient.UploadArtifact("validVMPath", "artifact", "C:\\provision\\artifact", "user", "pass")
 
 			Expect(err).To(Not(HaveOccurred()))
-			expectedArgs := []string{"guest.upload", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "artifact", "C:\\provision\\artifact"}
+			expectedArgs := []string{"guest.upload", "-f", "-u", credentialUrl, "-l", "user:pass", "-vm", "validVMPath", "artifact", "C:\\provision\\artifact"}
 			Expect(runner.RunArgsForCall(0)).To(Equal(expectedArgs))
 		})
 

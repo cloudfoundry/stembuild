@@ -101,7 +101,7 @@ func (c *VcenterClient) ExportVM(vmInventoryPath string, destination string) err
 
 func (c *VcenterClient) UploadArtifact(vmInventoryPath, artifact, destination, username, password string) error {
 	vmCredentials := fmt.Sprintf("%s:%s", username, password)
-	errCode := c.Runner.Run([]string{"guest.upload", "-u", c.credentialUrl, "-l", vmCredentials, "-vm", vmInventoryPath, artifact, destination})
+	errCode := c.Runner.Run([]string{"guest.upload", "-f", "-u", c.credentialUrl, "-l", vmCredentials, "-vm", vmInventoryPath, artifact, destination})
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be uploaded", artifact)
 	}
