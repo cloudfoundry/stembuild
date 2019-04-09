@@ -17,7 +17,7 @@ var _ = Describe("VcenterClient", func() {
 		username, password, url string
 		vcenterClient           *VcenterClient
 		credentialUrl           string
-		caCertFile				string
+		caCertFile              string
 	)
 
 	BeforeEach(func() {
@@ -26,7 +26,6 @@ var _ = Describe("VcenterClient", func() {
 		vcenterClient = NewVcenterClient(username, password, url, caCertFile, runner)
 		credentialUrl = fmt.Sprintf("%s:%s@%s", username, password, url)
 	})
-
 
 	Context("A ca cert file is specified", func() {
 		It("Passes the ca cert to govc", func() {

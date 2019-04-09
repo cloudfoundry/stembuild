@@ -70,6 +70,7 @@ func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.URL, "vcenter-url", "", "vCenter url")
 	f.StringVar(&p.outputConfig.OutputDir, "outputDir", "", "Output directory, default is the current working directory.")
 	f.StringVar(&p.outputConfig.OutputDir, "o", "", "Output directory (shorthand)")
+	f.StringVar(&p.sourceConfig.CaCertFile, "vcenter-ca-certs", "", "filepath for custom ca certs")
 }
 
 func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {

@@ -8,4 +8,5 @@ type SourceConfig struct {
 	VCenterUsername string
 	VCenterPassword string
 	VmInventoryPath string
+	CaCertFile      string
 }

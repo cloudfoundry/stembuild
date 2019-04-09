@@ -16,7 +16,7 @@ type VMConstructFactory struct {
 
 func (f *VMConstructFactory) VMPreparer(config config.SourceConfig) commandparser.VmConstruct {
 	runner := &iaas_cli.GovcRunner{}
-	client := iaas_clients.NewVcenterClient(config.VCenterUsername, config.VCenterPassword, config.VCenterUrl, runner)
+	client := iaas_clients.NewVcenterClient(config.VCenterUsername, config.VCenterPassword, config.VCenterUrl, config.CaCertFile, runner)
 
 	zip := &archive.Zip{}
 

@@ -36,6 +36,7 @@ var _ = Describe("construct", func() {
 			"-vcenter-username", "vCenterUsername",
 			"-vcenter-password", "vCenterPassword",
 			"-vm-inventory-path", "/my-datacenter/vm/my-folder/my-vm",
+			"-vcenter-ca-certs", "somecerts.txt",
 		}
 
 		It("stores the value of a vm user", func() {
@@ -78,6 +79,18 @@ var _ = Describe("construct", func() {
 			err := f.Parse(args)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().VmInventoryPath).To(Equal("/my-datacenter/vm/my-folder/my-vm"))
+		})
+
+		It("stores the value of VM inventory path", func() {
+			err := f.Parse(args)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetSourceConfig().VmInventoryPath).To(Equal("/my-datacenter/vm/my-folder/my-vm"))
+		})
+
+		It("stores the value of the ca cert filepath", func() {
+			err := f.Parse(args)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ConstrCmd.GetSourceConfig().CaCertFile).To(Equal("somecerts.txt"))
 		})
 	})
 

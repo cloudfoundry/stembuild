@@ -81,6 +81,7 @@ func (p *ConstructCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.VCenterUsername, "vcenter-username", "", "vCenter username")
 	f.StringVar(&p.sourceConfig.VCenterPassword, "vcenter-password", "", "vCenter password")
 	f.StringVar(&p.sourceConfig.VmInventoryPath, "vm-inventory-path", "", "vCenter VM inventory path. (e.g: <datacenter>/vm/<vm-folder>/<vm-name>)")
+	f.StringVar(&p.sourceConfig.CaCertFile, "vcenter-ca-certs", "", "filepath for custom ca certs")
 }
 
 func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {

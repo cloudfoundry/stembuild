@@ -8,6 +8,7 @@ type SourceConfig struct {
 	Username        string
 	Password        string
 	VmInventoryPath string
+	CaCertFile      string
 }
 
 type Source int
