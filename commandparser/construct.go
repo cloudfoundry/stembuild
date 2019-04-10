@@ -53,7 +53,7 @@ func (*ConstructCmd) Synopsis() string {
 }
 
 func (*ConstructCmd) Usage() string {
-	return fmt.Sprintf(`%[1]s construct -vm-ip <IP of VM> -vm-username <vm username> -vm-password <vm password>
+	return fmt.Sprintf(`%[1]s construct -vm-ip <IP of VM> -vm-username <vm username> -vm-password <vm password>  -vcenter-url <vCenter URL> -vcenter-username <vCenter username> -vcenter-password <vCenter password> -vm-inventory-path <vCenter VM inventory path>
 
 Prepares a VM to be used by stembuild package. It leverages stemcell automation scripts to provision a VM to be used as a stemcell.
 
@@ -61,13 +61,14 @@ Requirements:
 	LGPO.zip in current working directory
 	Running Windows VM with:
 		- Up to date Operating System
-		- WinRm enabled
 		- Reachable by IP
 		- Username and password with Administrator privileges
-	The [vm-ip], [vm-username], [vm-password] flags must be specified.
+		- vCenter URL, username and password
+		- vCenter Inventory Path
+	The [vm-ip], [vm-username], [vm-password], [vcenter-url], [vcenter-username], [vcenter-password], [vm-inventory-path] must be specified
 
 Example:
-	%[1]s construct -vm-ip '10.0.0.5' -vm-username Admin -vm-password 'password'
+	%[1]s construct -vm-ip '10.0.0.5' -vm-username Admin -vm-password 'password' -vcenter-url vcenter.example.com -vcenter-username root -vcenter-password 'password' -vm-inventory-path '/datacenter/vm/folder/vm-name'
 
 Flags:
 `, filepath.Base(os.Args[0]))
