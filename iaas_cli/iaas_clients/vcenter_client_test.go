@@ -95,6 +95,21 @@ var _ = Describe("VcenterClient", func() {
 			Expect(err).To(MatchError("vcenter_client - unable to validate url: url"))
 		})
 
+		It("a validateUrl failure mentions the ca cert if one was specified", func() {
+
+			vcenterClient = NewVcenterClient(username, password, url, "somefile.txt", runner)
+			expectedArgs := []string{"about", "-u", url, "-tls-ca-certs=somefile.txt"}
+
+			runner.RunReturns(1)
+			err := vcenterClient.ValidateUrl()
+			argsForRun := runner.RunArgsForCall(0)
+
+			Expect(err).To(HaveOccurred())
+			Expect(runner.RunCallCount()).To(Equal(1))
+			Expect(argsForRun).To(Equal(expectedArgs))
+			Expect(err).To(MatchError("vcenter_client - invalid ca certs or url: url"))
+		})
+
 		It("passes the ca cert to govc when specified", func() {
 
 			vcenterClient = NewVcenterClient(username, password, url, "somefile.txt", runner)

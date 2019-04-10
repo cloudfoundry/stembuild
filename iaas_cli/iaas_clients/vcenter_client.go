@@ -25,12 +25,14 @@ func NewVcenterClient(username string, password string, url string, caCertFile s
 
 func (c *VcenterClient) ValidateUrl() error {
 	args := []string{"about", "-u", c.Url}
+	errMsg := fmt.Sprintf("vcenter_client - unable to validate url: %s", c.Url)
 	if c.caCertFile != "" {
 		args = append(args, fmt.Sprintf("-tls-ca-certs=%s", c.caCertFile))
+		errMsg = fmt.Sprintf("vcenter_client - invalid ca certs or url: %s", c.Url)
 	}
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
-		return errors.New(fmt.Sprintf("vcenter_client - unable to validate url: %s", c.Url))
+		return errors.New(errMsg)
 	}
 	return nil
 
