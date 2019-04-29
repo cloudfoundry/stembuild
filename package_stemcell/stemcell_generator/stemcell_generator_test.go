@@ -56,20 +56,11 @@ var _ = Describe("StemcellGenerator", func() {
 			Expect(fileNameGenerator.FileNameCallCount()).To(Equal(1))
 		})
 
-		It("should return an error when filename generator fails", func() {
-			fileNameGenerator.FileNameReturns("", errors.New("some filename error"))
-
-			err := stemcellGenerator.Generate(fakeImage)
-
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError("failed to generate stemcell filename: some filename error"))
-		})
-
 		It("should generate a tarball", func() {
 			expectedFileName := "the-file.tgz"
 			expectedManifest := bytes.NewReader([]byte("manifest"))
 
-			fileNameGenerator.FileNameReturns(expectedFileName, nil)
+			fileNameGenerator.FileNameReturns(expectedFileName)
 			manifestGenerator.ManifestReturns(expectedManifest, nil)
 
 			stemcellGenerator.Generate(fakeImage)

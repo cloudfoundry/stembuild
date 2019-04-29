@@ -30,7 +30,11 @@ stemcell_formats:
 - vsphere-ova
 `
 	sha1Hash := sha1.New()
-	io.Copy(sha1Hash, image)
+
+	_, err := io.Copy(sha1Hash, image)
+	if err != nil {
+		return nil, fmt.Errorf("failed to calculate image shasum: %s", err)
+	}
 
 	sum := sha1Hash.Sum(nil)
 

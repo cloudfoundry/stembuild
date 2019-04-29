@@ -2,29 +2,27 @@
 package stemcell_generatorfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
+	stemcell_generator "github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
 )
 
 type FakeFileNameGenerator struct {
-	FileNameStub        func() (string, error)
+	FileNameStub        func() string
 	fileNameMutex       sync.RWMutex
 	fileNameArgsForCall []struct {
 	}
 	fileNameReturns struct {
 		result1 string
-		result2 error
 	}
 	fileNameReturnsOnCall map[int]struct {
 		result1 string
-		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeFileNameGenerator) FileName() (string, error) {
+func (fake *FakeFileNameGenerator) FileName() string {
 	fake.fileNameMutex.Lock()
 	ret, specificReturn := fake.fileNameReturnsOnCall[len(fake.fileNameArgsForCall)]
 	fake.fileNameArgsForCall = append(fake.fileNameArgsForCall, struct {
@@ -35,10 +33,10 @@ func (fake *FakeFileNameGenerator) FileName() (string, error) {
 		return fake.FileNameStub()
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
 	fakeReturns := fake.fileNameReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *FakeFileNameGenerator) FileNameCallCount() int {
@@ -47,36 +45,33 @@ func (fake *FakeFileNameGenerator) FileNameCallCount() int {
 	return len(fake.fileNameArgsForCall)
 }
 
-func (fake *FakeFileNameGenerator) FileNameCalls(stub func() (string, error)) {
+func (fake *FakeFileNameGenerator) FileNameCalls(stub func() string) {
 	fake.fileNameMutex.Lock()
 	defer fake.fileNameMutex.Unlock()
 	fake.FileNameStub = stub
 }
 
-func (fake *FakeFileNameGenerator) FileNameReturns(result1 string, result2 error) {
+func (fake *FakeFileNameGenerator) FileNameReturns(result1 string) {
 	fake.fileNameMutex.Lock()
 	defer fake.fileNameMutex.Unlock()
 	fake.FileNameStub = nil
 	fake.fileNameReturns = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
-func (fake *FakeFileNameGenerator) FileNameReturnsOnCall(i int, result1 string, result2 error) {
+func (fake *FakeFileNameGenerator) FileNameReturnsOnCall(i int, result1 string) {
 	fake.fileNameMutex.Lock()
 	defer fake.fileNameMutex.Unlock()
 	fake.FileNameStub = nil
 	if fake.fileNameReturnsOnCall == nil {
 		fake.fileNameReturnsOnCall = make(map[int]struct {
 			result1 string
-			result2 error
 		})
 	}
 	fake.fileNameReturnsOnCall[i] = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
 func (fake *FakeFileNameGenerator) Invocations() map[string][][]interface{} {

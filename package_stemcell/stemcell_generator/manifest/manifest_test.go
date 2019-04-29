@@ -2,6 +2,7 @@ package manifest_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/manifest"
@@ -37,11 +38,26 @@ stemcell_formats:
 			Expect(err).NotTo(HaveOccurred())
 			s := buf.String()
 
-			//output of `echo "An image" | shasum`
-			// TODO: work out where this shasum comes from
+			//output of `echo -n "An image" | shasum`
 			shaSum := "bf8a473a2baa3988b4e7fc4702c35303cdf6df6b"
 
 			Expect(s).To(Equal(fmt.Sprintf(format, "1709", "1709.999", shaSum)))
 		})
+
+		It("should return an error if the image returns an error during read", func() {
+			manifestGenerator := manifest.NewManifestGenerator("1709", "1709.999")
+			fakeImage := FailReader{}
+			_, err := manifestGenerator.Manifest(fakeImage)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal("failed to calculate image shasum: failed read"))
+		})
 	})
 })
+
+type FailReader struct {
+}
+
+func (f FailReader) Read(p []byte) (int, error) {
+	return 0, errors.New("failed read")
+}

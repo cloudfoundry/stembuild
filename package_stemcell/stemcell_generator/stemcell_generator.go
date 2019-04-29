@@ -12,7 +12,7 @@ type ManifestGenerator interface {
 
 //go:generate counterfeiter . FileNameGenerator
 type FileNameGenerator interface {
-	FileName() (string, error)
+	FileName() string
 }
 
 //go:generate counterfeiter . TarWriter
@@ -34,10 +34,8 @@ func (g *StemcellGenerator) Generate(image io.Reader) error {
 	if err != nil {
 		return fmt.Errorf("failed to generate stemcell manifest: %s", err)
 	}
-	filename, err := g.fileNameGenerator.FileName()
-	if err != nil {
-		return fmt.Errorf("failed to generate stemcell filename: %s", err)
-	}
+	filename := g.fileNameGenerator.FileName()
+
 	err = g.tarWriter.Write(filename, image, manifest)
 	if err != nil {
 		return fmt.Errorf("failed to generate stemcell tarball: %s", err)
