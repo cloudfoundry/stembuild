@@ -53,9 +53,9 @@ VMDK:
     not specified the stemcell will be created in the current working directory.
 
   Example:
-    %[1]s package -vmdk disk.vmdk 
+    %[1]s package -vmdk my-1803-vmdk.vmdk 
 
-    Will create an Windows 1803 stemcell using [vmdk] 'disk.vmdk'
+    Will create an Windows 1803 stemcell using [vmdk] 'my-1803-vmdk.vmdk'
     The final stemcell will be found in the current working directory.
 
 Flags:
