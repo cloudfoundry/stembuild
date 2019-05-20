@@ -4,6 +4,7 @@ import (
 	archiveTar "archive/tar"
 	"bytes"
 	"compress/gzip"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/tar/tarfakes"
 	"io"
 	"io/ioutil"
 	"os"
@@ -17,7 +18,8 @@ import (
 var _ = Describe("TarWriter", func() {
 	Describe("Write", func() {
 		var (
-			workingDir string
+			workingDir  string
+			fakeTarable *tarfakes.FakeTarable
 		)
 
 		BeforeEach(func() {
@@ -25,6 +27,12 @@ var _ = Describe("TarWriter", func() {
 			var err error
 			workingDir, err = ioutil.TempDir(tmpDir, "TarWriterTest")
 			Expect(err).NotTo(HaveOccurred())
+
+			fakeFile := bytes.NewReader([]byte{})
+			fakeTarable = &tarfakes.FakeTarable{}
+			fakeTarable.ReadStub = fakeFile.Read
+			fakeTarable.SizeStub = fakeFile.Size
+			fakeTarable.NameReturns("some-file")
 		})
 
 		AfterEach(func() {
@@ -33,24 +41,22 @@ var _ = Describe("TarWriter", func() {
 
 		It("should not fail", func() {
 			w := tar.NewTarWriter()
-			fakeFile := bytes.NewReader([]byte{})
 
 			err := os.Chdir(workingDir)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = w.Write("some-file", fakeFile)
+			err = w.Write("some-file", fakeTarable)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("creates a file with the filename", func() {
 			w := tar.NewTarWriter()
-			fakeFile := bytes.NewReader([]byte{})
 
 			err := os.Chdir(workingDir)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = w.Write("some-file", fakeFile)
+			err = w.Write("some-file", fakeTarable)
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -60,14 +66,24 @@ var _ = Describe("TarWriter", func() {
 
 		It("tars and zips the given readers", func() {
 			w := tar.NewTarWriter()
-			expectedContents := []string{"file1 content", "file2 content"}
+			expectedContents := []string{"file1 content", "file2 slightly longer content"}
 			fakeFile1 := bytes.NewReader([]byte(expectedContents[0]))
 			fakeFile2 := bytes.NewReader([]byte(expectedContents[1]))
+			fakeTarable1 := &tarfakes.FakeTarable{}
+			fakeTarable2 := &tarfakes.FakeTarable{}
+
+			fakeTarable1.ReadStub = fakeFile1.Read
+			fakeTarable1.SizeStub = fakeFile1.Size
+			fakeTarable1.NameReturns("firstfile")
+
+			fakeTarable2.ReadStub = fakeFile2.Read
+			fakeTarable2.SizeStub = fakeFile2.Size
+			fakeTarable2.NameReturns("secondfile")
 
 			err := os.Chdir(workingDir)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = w.Write("some-zipped-tar", fakeFile1, fakeFile2)
+			err = w.Write("some-zipped-tar", fakeTarable1, fakeTarable2)
 
 			var fileReader, _ = os.OpenFile("some-zipped-tar", os.O_RDONLY, 0777)
 
@@ -76,13 +92,16 @@ var _ = Describe("TarWriter", func() {
 			defer gzr.Close()
 			tarfileReader := archiveTar.NewReader(gzr)
 			var actualContents []string
+			var actualFilenames []string
 			for {
-				_, err := tarfileReader.Next()
+				header, err := tarfileReader.Next()
 				if err == io.EOF {
 					break
 				}
-
 				Expect(err).NotTo(HaveOccurred())
+				actualFilenames = append(actualFilenames, header.Name)
+				Expect(header.Mode).To(Equal(int64(os.FileMode(0644))))
+
 				buf := new(bytes.Buffer)
 				_, err = buf.ReadFrom(tarfileReader)
 				if err != nil {
@@ -90,7 +109,10 @@ var _ = Describe("TarWriter", func() {
 				}
 				actualContents = append(actualContents, buf.String())
 			}
-			Expect(len(actualContents)).To(Equal(2))
+
+			Expect(actualContents).To(ConsistOf(expectedContents))
+			Expect(actualFilenames).To(ConsistOf("firstfile", "secondfile"))
+
 		})
 	})
 })
