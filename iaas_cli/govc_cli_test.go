@@ -29,10 +29,10 @@ video-500          VirtualMachineVideoCard       Video card
 vmci-12000         VirtualMachineVMCIDevice      Device on the virtual machine PCI bus that provides support for the virtual machine communication interface
 lsilogic-sas-1000  VirtualLsiLogicSASController  LSI Logic SAS
 ahci-15000         VirtualAHCIController         AHCI
+cdrom-16000        VirtualCdrom                  Remote device
 disk-1000-0        VirtualDisk                   41,943,040 KB
 floppy-8000        VirtualFloppy                 Remote
 ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 5a-56 d1 f3 82 a6 1e 2a ed
-cdrom-16000        VirtualCdrom                  Remote device
 `,
 			))
 		})
