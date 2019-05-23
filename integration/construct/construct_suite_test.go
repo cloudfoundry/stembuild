@@ -61,20 +61,21 @@ const (
 	SkipCleanupVariable              = "SKIP_CLEANUP"
 	vcenterFolderVariable            = "VM_FOLDER"
 	vcenterURLVariable               = "GOVC_URL"
-	vcenterUsernameVariable          = "GOVC_USERNAME"
-	vcenterPasswordVariable          = "GOVC_PASSWORD"
+	vcenterAdminUsernameVariable     = "VCENTER_ADMIN_USERNAME"
+	vcenterAdminPasswordVariable     = "VCENTER_ADMIN_PASSWORD"
 	vcenterStembuildUsernameVariable = "VCENTER_STEMBUILD_USER"
 	vcenterStembuildPasswordVariable = "VCENTER_STEMBUILD_PASSWORD"
 )
 
 var (
-	conf                config
-	tmpDir              string
-	lockParentDir       string
-	lockPool            out.LockPool
-	lockDir             string
-	stembuildExecutable string
-	existingVM          bool
+	conf                      config
+	tmpDir                    string
+	lockParentDir             string
+	lockPool                  out.LockPool
+	lockDir                   string
+	stembuildExecutable       string
+	existingVM                bool
+	vcenterAdminCredentialUrl string
 )
 
 type config struct {
@@ -165,8 +166,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	vcenterFolder := envMustExist(vcenterFolderVariable)
 	vmNamePrefix := envMustExist(VMNamePrefixVariable)
 
-	envMustExist(vcenterUsernameVariable)
-	envMustExist(vcenterPasswordVariable)
+	vcenterAdminUsername := envMustExist(vcenterAdminUsernameVariable)
+	vcenterAdminPassword := envMustExist(vcenterAdminPasswordVariable)
+	vcenterAdminCredentialUrl = fmt.Sprintf("%s:%s@s", vcenterAdminUsername, vcenterAdminPassword, vCenterUrl)
+
 	vCenterStembuildUser := envMustExist(vcenterStembuildUsernameVariable)
 	vCenterStembuildPassword := envMustExist(vcenterStembuildPasswordVariable)
 
@@ -264,6 +267,7 @@ func createVMWithIP(targetIP, vmNamePrefix, vcenterFolder string) {
 		fmt.Sprintf("--options=%s", optionsFile.Name()),
 		fmt.Sprintf("--name=%s", vmName),
 		fmt.Sprintf("--folder=%s", vmFolder),
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
 		ovaFile,
 	}
 
@@ -355,7 +359,11 @@ var _ = SynchronizedAfterSuite(func() {
 	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
 
 	if !existingVM && skipCleanup != "TRUE" {
-		deleteCommand := []string{"vm.destroy", fmt.Sprintf("-vm.ip=%s", conf.TargetIP)}
+		deleteCommand := []string{
+			"vm.destroy",
+			fmt.Sprintf("-vm.ip=%s", conf.TargetIP),
+			fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		}
 		Eventually(func() int {
 			return runIgnoringOutput(deleteCommand)
 		}, 3*time.Minute, 10*time.Second).Should(BeZero())
