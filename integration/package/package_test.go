@@ -85,7 +85,7 @@ var _ = Describe("Package", func() {
 		vcenterURL = helpers.EnvMustExist(vcenterURLVariable)
 		helpers.EnvMustExist(vcenterUsernameVariable)
 		helpers.EnvMustExist(vcenterPasswordVariable)
-		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsername)
+		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsernameVariable)
 		vcenterStembuildPassword = helpers.EnvMustExist(vcenterStembuildPasswordVariable)
 
 		workingDir, err = ioutil.TempDir(os.TempDir(), "stembuild-package-test")
