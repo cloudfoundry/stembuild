@@ -26,25 +26,27 @@ import (
 
 var _ = Describe("Package", func() {
 	const (
-		baseVMNameEnvVar        = "PACKAGE_TEST_BASE_VM_NAME"
-		mainVersion             = "1803.5.3999"
-		vcenterURLVariable      = "GOVC_URL"
-		vcenterUsernameVariable = "GOVC_USERNAME"
-		vcenterPasswordVariable = "GOVC_PASSWORD"
-		vcenterFolderVariable   = "VM_FOLDER"
-		existingVMVariable      = "EXISTING_SOURCE_VM"
+		baseVMNameEnvVar                 = "PACKAGE_TEST_BASE_VM_NAME"
+		mainVersion                      = "1803.5.3999"
+		vcenterURLVariable               = "GOVC_URL"
+		vcenterUsernameVariable          = "GOVC_USERNAME"
+		vcenterPasswordVariable          = "GOVC_PASSWORD"
+		vcenterFolderVariable            = "VM_FOLDER"
+		existingVMVariable               = "EXISTING_SOURCE_VM"
+		vcenterStembuildUsernameVariable = "VCENTER_STEMBUILD_USER"
+		vcenterStembuildPasswordVariable = "VCENTER_STEMBUILD_PASSWORD"
 	)
 
 	var (
-		workingDir      string
-		baseVMName      string
-		sourceVMName    string
-		vmPath          string
-		vcenterURL      string
-		vcenterUsername string
-		vcenterPassword string
-		executable      string
-		err             error
+		workingDir               string
+		baseVMName               string
+		sourceVMName             string
+		vmPath                   string
+		vcenterURL               string
+		vcenterStembuildUsername string
+		vcenterStembuildPassword string
+		executable               string
+		err                      error
 	)
 
 	BeforeSuite(func() {
@@ -81,8 +83,10 @@ var _ = Describe("Package", func() {
 		})
 
 		vcenterURL = helpers.EnvMustExist(vcenterURLVariable)
-		vcenterUsername = helpers.EnvMustExist(vcenterUsernameVariable)
-		vcenterPassword = helpers.EnvMustExist(vcenterPasswordVariable)
+		helpers.EnvMustExist(vcenterUsernameVariable)
+		helpers.EnvMustExist(vcenterPasswordVariable)
+		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsername)
+		vcenterStembuildPassword = helpers.EnvMustExist(vcenterStembuildPasswordVariable)
 
 		workingDir, err = ioutil.TempDir(os.TempDir(), "stembuild-package-test")
 		Expect(err).NotTo(HaveOccurred())
@@ -93,8 +97,8 @@ var _ = Describe("Package", func() {
 			workingDir,
 			executable, "package",
 			"-vcenter-url", vcenterURL,
-			"-vcenter-username", vcenterUsername,
-			"-vcenter-password", vcenterPassword,
+			"-vcenter-username", vcenterStembuildUsername,
+			"-vcenter-password", vcenterStembuildPassword,
 			"-vm-inventory-path", vmPath,
 		)
 

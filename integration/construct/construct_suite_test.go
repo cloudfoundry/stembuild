@@ -40,29 +40,31 @@ func TestConstruct(t *testing.T) {
 }
 
 const (
-	NetworkGatewayVariable      = "NETWORK_GATEWAY"
-	SubnetMaskVariable          = "SUBNET_MASK"
-	OvaFileVariable             = "OVA_FILE"
-	VMNamePrefixVariable        = "VM_NAME_PREFIX"
-	VMFolderVariable            = "VM_FOLDER"
-	VMUsernameVariable          = "VM_USERNAME"
-	VMPasswordVariable          = "VM_PASSWORD"
-	VMNetworkVariable           = "GOVC_NETWORK"
-	ExistingVmIPVariable        = "EXISTING_VM_IP"
-	UserProvidedIPVariable      = "USER_PROVIDED_IP"
-	LockPrivateKeyVariable      = "LOCK_PRIVATE_KEY"
-	IPPoolGitURIVariable        = "IP_POOL_GIT_URI"
-	IPPoolNameVariable          = "IP_POOL_NAME"
-	OvaSourceS3RegionVariable   = "OVA_SOURCE_S3_REGION"
-	OvaSourceS3BucketVariable   = "OVA_SOURCE_S3_BUCKET"
-	OvaSourceS3FilenameVariable = "OVA_SOURCE_S3_FILENAME"
-	AwsAccessKeyVariable        = "AWS_ACCESS_KEY_ID"
-	AwsSecretKeyVariable        = "AWS_SECRET_ACCESS_KEY"
-	SkipCleanupVariable         = "SKIP_CLEANUP"
-	vcenterFolderVariable       = "VM_FOLDER"
-	vcenterURLVariable          = "GOVC_URL"
-	vcenterUsernameVariable     = "GOVC_USERNAME"
-	vcenterPasswordVariable     = "GOVC_PASSWORD"
+	NetworkGatewayVariable           = "NETWORK_GATEWAY"
+	SubnetMaskVariable               = "SUBNET_MASK"
+	OvaFileVariable                  = "OVA_FILE"
+	VMNamePrefixVariable             = "VM_NAME_PREFIX"
+	VMFolderVariable                 = "VM_FOLDER"
+	VMUsernameVariable               = "VM_USERNAME"
+	VMPasswordVariable               = "VM_PASSWORD"
+	VMNetworkVariable                = "GOVC_NETWORK"
+	ExistingVmIPVariable             = "EXISTING_VM_IP"
+	UserProvidedIPVariable           = "USER_PROVIDED_IP"
+	LockPrivateKeyVariable           = "LOCK_PRIVATE_KEY"
+	IPPoolGitURIVariable             = "IP_POOL_GIT_URI"
+	IPPoolNameVariable               = "IP_POOL_NAME"
+	OvaSourceS3RegionVariable        = "OVA_SOURCE_S3_REGION"
+	OvaSourceS3BucketVariable        = "OVA_SOURCE_S3_BUCKET"
+	OvaSourceS3FilenameVariable      = "OVA_SOURCE_S3_FILENAME"
+	AwsAccessKeyVariable             = "AWS_ACCESS_KEY_ID"
+	AwsSecretKeyVariable             = "AWS_SECRET_ACCESS_KEY"
+	SkipCleanupVariable              = "SKIP_CLEANUP"
+	vcenterFolderVariable            = "VM_FOLDER"
+	vcenterURLVariable               = "GOVC_URL"
+	vcenterUsernameVariable          = "GOVC_USERNAME"
+	vcenterPasswordVariable          = "GOVC_PASSWORD"
+	vcenterStembuildUsernameVariable = "VCENTER_STEMBUILD_USER"
+	vcenterStembuildPasswordVariable = "VCENTER_STEMBUILD_PASSWORD"
 )
 
 var (
@@ -160,10 +162,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	existingVMIP := os.Getenv(ExistingVmIPVariable)
 	userProvidedIP := os.Getenv(UserProvidedIPVariable)
 	vCenterUrl := envMustExist(vcenterURLVariable)
-	vCenterUnsername := envMustExist(vcenterUsernameVariable)
-	vCenterPassword := envMustExist(vcenterPasswordVariable)
 	vcenterFolder := envMustExist(vcenterFolderVariable)
 	vmNamePrefix := envMustExist(VMNamePrefixVariable)
+
+	envMustExist(vcenterUsernameVariable)
+	envMustExist(vcenterPasswordVariable)
+	vCenterStembuildUser := envMustExist(vcenterStembuildUsernameVariable)
+	vCenterStembuildPassword := envMustExist(vcenterStembuildPasswordVariable)
 
 	wd, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
@@ -178,8 +183,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		VMUsername:      vmUsername,
 		VMPassword:      vmPassword,
 		VCenterURL:      vCenterUrl,
-		VCenterUsername: vCenterUnsername,
-		VCenterPassword: vCenterPassword,
+		VCenterUsername: vCenterStembuildUser,
+		VCenterPassword: vCenterStembuildPassword,
 	}
 
 	if userProvidedIP != "" && existingVMIP == "" {
