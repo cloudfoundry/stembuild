@@ -81,7 +81,7 @@ var _ = Describe("Package", func() {
 
 		vcenterURL = helpers.EnvMustExist(vcenterURLVariable)
 
-		vcenterAdminCredentialUrl = fmt.Sprintf("%s:%s@s", vcenterAdminUsername, vcenterAdminPassword, vcenterURL)
+		vcenterAdminCredentialUrl = fmt.Sprintf("%s:%s@%s", vcenterAdminUsername, vcenterAdminPassword, vcenterURL)
 
 		cli.Run([]string{
 			"vm.clone",

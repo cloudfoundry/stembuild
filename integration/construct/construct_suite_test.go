@@ -168,7 +168,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	vcenterAdminUsername := envMustExist(vcenterAdminUsernameVariable)
 	vcenterAdminPassword := envMustExist(vcenterAdminPasswordVariable)
-	vcenterAdminCredentialUrl = fmt.Sprintf("%s:%s@s", vcenterAdminUsername, vcenterAdminPassword, vCenterUrl)
+	vcenterAdminCredentialUrl = fmt.Sprintf("%s:%s@%s", vcenterAdminUsername, vcenterAdminPassword, vCenterUrl)
 
 	vCenterStembuildUser := envMustExist(vcenterStembuildUsernameVariable)
 	vCenterStembuildPassword := envMustExist(vcenterStembuildPasswordVariable)
