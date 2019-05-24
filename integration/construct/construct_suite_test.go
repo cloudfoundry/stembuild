@@ -40,31 +40,30 @@ func TestConstruct(t *testing.T) {
 }
 
 const (
-	NetworkGatewayVariable           = "NETWORK_GATEWAY"
-	SubnetMaskVariable               = "SUBNET_MASK"
-	OvaFileVariable                  = "OVA_FILE"
-	VMNamePrefixVariable             = "VM_NAME_PREFIX"
-	VMFolderVariable                 = "VM_FOLDER"
-	VMUsernameVariable               = "VM_USERNAME"
-	VMPasswordVariable               = "VM_PASSWORD"
-	VMNetworkVariable                = "GOVC_NETWORK"
-	ExistingVmIPVariable             = "EXISTING_VM_IP"
-	UserProvidedIPVariable           = "USER_PROVIDED_IP"
-	LockPrivateKeyVariable           = "LOCK_PRIVATE_KEY"
-	IPPoolGitURIVariable             = "IP_POOL_GIT_URI"
-	IPPoolNameVariable               = "IP_POOL_NAME"
-	OvaSourceS3RegionVariable        = "OVA_SOURCE_S3_REGION"
-	OvaSourceS3BucketVariable        = "OVA_SOURCE_S3_BUCKET"
-	OvaSourceS3FilenameVariable      = "OVA_SOURCE_S3_FILENAME"
-	AwsAccessKeyVariable             = "AWS_ACCESS_KEY_ID"
-	AwsSecretKeyVariable             = "AWS_SECRET_ACCESS_KEY"
-	SkipCleanupVariable              = "SKIP_CLEANUP"
-	vcenterFolderVariable            = "VM_FOLDER"
-	vcenterURLVariable               = "GOVC_URL"
-	vcenterAdminUsernameVariable     = "VCENTER_ADMIN_USERNAME"
-	vcenterAdminPasswordVariable     = "VCENTER_ADMIN_PASSWORD"
-	vcenterStembuildUsernameVariable = "VCENTER_STEMBUILD_USER"
-	vcenterStembuildPasswordVariable = "VCENTER_STEMBUILD_PASSWORD"
+	NetworkGatewayVariable            = "NETWORK_GATEWAY"
+	SubnetMaskVariable                = "SUBNET_MASK"
+	OvaFileVariable                   = "OVA_FILE"
+	VMNamePrefixVariable              = "VM_NAME_PREFIX"
+	VMFolderVariable                  = "VM_FOLDER"
+	VMUsernameVariable                = "VM_USERNAME"
+	VMPasswordVariable                = "VM_PASSWORD"
+	VMNetworkVariable                 = "GOVC_NETWORK"
+	ExistingVmIPVariable              = "EXISTING_VM_IP"
+	UserProvidedIPVariable            = "USER_PROVIDED_IP"
+	LockPrivateKeyVariable            = "LOCK_PRIVATE_KEY"
+	IPPoolGitURIVariable              = "IP_POOL_GIT_URI"
+	IPPoolNameVariable                = "IP_POOL_NAME"
+	OvaSourceS3RegionVariable         = "OVA_SOURCE_S3_REGION"
+	OvaSourceS3BucketVariable         = "OVA_SOURCE_S3_BUCKET"
+	OvaSourceS3FilenameVariable       = "OVA_SOURCE_S3_FILENAME"
+	AwsAccessKeyVariable              = "AWS_ACCESS_KEY_ID"
+	AwsSecretKeyVariable              = "AWS_SECRET_ACCESS_KEY"
+	SkipCleanupVariable               = "SKIP_CLEANUP"
+	vcenterFolderVariable             = "VM_FOLDER"
+	vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
+	vcenterBaseURLVariable            = "VCENTER_BASE_URL"
+	vcenterStembuildUsernameVariable  = "VCENTER_STEMBUILD_USER"
+	vcenterStembuildPasswordVariable  = "VCENTER_STEMBUILD_PASSWORD"
 )
 
 var (
@@ -162,13 +161,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	vmPassword := envMustExist(VMPasswordVariable)
 	existingVMIP := os.Getenv(ExistingVmIPVariable)
 	userProvidedIP := os.Getenv(UserProvidedIPVariable)
-	vCenterUrl := envMustExist(vcenterURLVariable)
+	vCenterUrl := envMustExist(vcenterBaseURLVariable)
 	vcenterFolder := envMustExist(vcenterFolderVariable)
 	vmNamePrefix := envMustExist(VMNamePrefixVariable)
-
-	vcenterAdminUsername := envMustExist(vcenterAdminUsernameVariable)
-	vcenterAdminPassword := envMustExist(vcenterAdminPasswordVariable)
-	vcenterAdminCredentialUrl = fmt.Sprintf("%s:%s@%s", vcenterAdminUsername, vcenterAdminPassword, vCenterUrl)
+	vcenterAdminCredentialUrl = envMustExist(vcenterAdminCredentialUrlVariable)
 
 	vCenterStembuildUser := envMustExist(vcenterStembuildUsernameVariable)
 	vCenterStembuildPassword := envMustExist(vcenterStembuildPasswordVariable)

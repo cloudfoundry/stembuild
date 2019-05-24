@@ -26,15 +26,14 @@ import (
 
 var _ = Describe("Package", func() {
 	const (
-		baseVMNameEnvVar                 = "PACKAGE_TEST_BASE_VM_NAME"
-		mainVersion                      = "1803.5.3999"
-		vcenterURLVariable               = "GOVC_URL"
-		vcenterAdminUsernameVariable     = "VCENTER_ADMIN_USERNAME"
-		vcenterAdminPasswordVariable     = "VCENTER_ADMIN_PASSWORD"
-		vcenterFolderVariable            = "VM_FOLDER"
-		existingVMVariable               = "EXISTING_SOURCE_VM"
-		vcenterStembuildUsernameVariable = "VCENTER_STEMBUILD_USER"
-		vcenterStembuildPasswordVariable = "VCENTER_STEMBUILD_PASSWORD"
+		baseVMNameEnvVar                  = "PACKAGE_TEST_BASE_VM_NAME"
+		mainVersion                       = "1803.5.3999"
+		vcenterURLVariable                = "VCENTER_BASE_URL"
+		vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
+		vcenterFolderVariable             = "VM_FOLDER"
+		existingVMVariable                = "EXISTING_SOURCE_VM"
+		vcenterStembuildUsernameVariable  = "VCENTER_STEMBUILD_USER"
+		vcenterStembuildPasswordVariable  = "VCENTER_STEMBUILD_PASSWORD"
 	)
 
 	var (
@@ -76,21 +75,17 @@ var _ = Describe("Package", func() {
 		baseVMWithPath := fmt.Sprintf(vcenterFolder + "/" + baseVMName)
 		vmPath = strings.Join([]string{vcenterFolder, sourceVMName}, "/")
 
-		vcenterAdminUsername := helpers.EnvMustExist(vcenterAdminUsernameVariable)
-		vcenterAdminPassword := helpers.EnvMustExist(vcenterAdminPasswordVariable)
-
-		vcenterURL = helpers.EnvMustExist(vcenterURLVariable)
-
-		vcenterAdminCredentialUrl = fmt.Sprintf("%s:%s@%s", vcenterAdminUsername, vcenterAdminPassword, vcenterURL)
+		vcenterAdminCredentialUrl = helpers.EnvMustExist(vcenterAdminCredentialUrlVariable)
 
 		cli.Run([]string{
 			"vm.clone",
 			"-vm", baseVMWithPath,
 			"-on=false",
-			"-u=%s", vcenterAdminCredentialUrl,
+			"-u", vcenterAdminCredentialUrl,
 			sourceVMName,
 		})
 
+		vcenterURL = helpers.EnvMustExist(vcenterURLVariable)
 		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsernameVariable)
 		vcenterStembuildPassword = helpers.EnvMustExist(vcenterStembuildPasswordVariable)
 
@@ -145,7 +140,7 @@ var _ = Describe("Package", func() {
 	AfterEach(func() {
 		os.RemoveAll(workingDir)
 		if vmPath != "" {
-			cli.Run([]string{"vm.destroy", "-vm.ipath", vmPath, "-u=%s", vcenterAdminCredentialUrl})
+			cli.Run([]string{"vm.destroy", "-vm.ipath", vmPath, "-u", vcenterAdminCredentialUrl})
 		}
 	})
 })

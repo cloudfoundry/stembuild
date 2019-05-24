@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

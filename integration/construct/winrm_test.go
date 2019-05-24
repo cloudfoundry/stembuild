@@ -1,10 +1,11 @@
 package construct_test
 
 import (
+	"path/filepath"
+
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"path/filepath"
 )
 
 var _ = Describe("WinRM Remote Manager", func() {

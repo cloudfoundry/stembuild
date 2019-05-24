@@ -15,7 +15,7 @@ var _ = Describe("GovcCli", func() {
 		})
 
 		It("lists the devices for a known VCenter VM", func() {
-			out, _, err := runner.RunWithOutput([]string{"device.ls", "-vm", targetVMPath})
+			out, _, err := runner.RunWithOutput([]string{"device.ls", "-vm", targetVMPath, "-u", vCenterCredentialUrl})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(out).To(Equal(
 				`ide-200            VirtualIDEController          IDE 0
@@ -38,7 +38,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 		})
 
 		It("returns exit code 1, if VM doesn't exist", func() {
-			out, exitCode, err := runner.RunWithOutput([]string{"device.ls", "-vm", "/vm/does/not/exist"})
+			out, exitCode, err := runner.RunWithOutput([]string{"device.ls", "-vm", "/vm/does/not/exist", "-u", vCenterCredentialUrl})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(exitCode).To(Equal(1))
 			Expect(out).To(Equal(""))
