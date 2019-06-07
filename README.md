@@ -36,11 +36,11 @@ This command provisions and syspreps an existing VM on vCenter. It prepares a VM
 stembuild construct -vm-ip <IP of VM> -vm-username <vm username> -vm-password <vm password>  -vcenter-url <vCenter URL> -vcenter-username <vCenter username> -vcenter-password <vCenter password> -vm-inventory-path <vCenter VM inventory path>
 ```
 
-*Requirements*:
+### Requirements
 - LGPO.zip in current working directory
 - Running Windows VM with:
 	- Up to date Operating System
-	- Reachable by IP
+	- Reachable by IP over port 5985
 	- Username and password with Administrator privileges
 	- vCenter URL, username and password
 	- vCenter Inventory Path
@@ -69,6 +69,11 @@ Flags:
     	Username of target machine
 	
 ```
+
+### Troubleshooting
+After running `stembuild construct`, you may find yourself with a connection issue to the VM
+- Confirm port 5985 is reachable via something like `nmap [vm-ip] -Pn`
+
 
 ## `stembuild package`
 
