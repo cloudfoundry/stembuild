@@ -2,7 +2,6 @@ package remotemanager
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -43,7 +42,7 @@ func (w *WinRM) CanLoginVM() error {
 
 	s, err := winrmClient.CreateShell()
 	if err != nil {
-		return errors.New("username and password for given IP is invalid")
+		return fmt.Errorf("failed to create winrm shell: %s", err)
 	}
 	s.Close()
 
