@@ -332,3 +332,77 @@ function Create-VMPrepTaskAction {
 
     New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arguments
 }
+
+function Remove-SSHKeys
+{
+    $SSHDir = "C:\Program Files\OpenSSH"
+
+    Push-Location $SSHDir
+    New-Item -ItemType Directory -Path "$env:ProgramData\ssh" -ErrorAction Ignore
+
+    "Removing any existing host keys"
+    Remove-Item -Path "$env:ProgramData\ssh\ssh_host_*" -ErrorAction Ignore
+    Pop-Location
+}
+
+function Run-LGPO
+{
+    param (
+        [string]$LGPOPath = $( Throw "Provide LGPO path" ),
+        [string]$InfFilePath = $( Throw "Provide Inf file path" )
+    )
+    & $LGPOPath /s $InfFilePath
+}
+
+function Enable-SSHD
+{
+    if ((Get-NetFirewallRule | where { $_.DisplayName -ieq 'SSH' }) -eq $null)
+    {
+        "Creating firewall rule for SSH"
+        New-NetFirewallRule -Protocol TCP -LocalPort 22 -Direction Inbound -Action Allow -DisplayName SSH
+    }
+    else
+    {
+        "Firewall rule for SSH already exists"
+    }
+
+    $InfFilePath = "$env:WINDIR\Temp\enable-ssh.inf"
+
+    $InfFileContents = @'
+[Unicode]
+Unicode=yes
+[Version]
+signature=$CHICAGO$
+Revision=1:w
+[Registry Values]
+[System Access]
+[Privilege Rights]
+SeDenyNetworkLogonRight=*S-1-5-32-546
+SeAssignPrimaryTokenPrivilege=*S-1-5-19,*S-1-5-20,*S-1-5-80-3847866527-469524349-687026318-516638107-1125189541
+'@
+    $LGPOPath = "$env:WINDIR\LGPO.exe"
+    if (Test-Path $LGPOPath)
+    {
+        Out-File -FilePath $InfFilePath -Encoding unicode -InputObject $InfFileContents -Force
+        Try
+        {
+            Run-LGPO -LGPOPath $LGPOPath -InfFilePath $InfFilePath
+        }
+        Catch
+        {
+            throw "LGPO.exe failed with: $_.Exception.Message"
+        }
+    }
+    else
+    {
+        "Did not find $LGPOPath. Assuming existing security policies are sufficient to support ssh."
+    }
+
+    Set-Service -Name sshd -StartupType Automatic
+    # ssh-agent is not the same as ssh-agent in *nix openssh
+    Set-Service -Name ssh-agent -StartupType Automatic
+
+    Remove-SSHKeys
+}
+
+

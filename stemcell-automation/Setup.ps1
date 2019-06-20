@@ -44,6 +44,7 @@ try {
     CopyPSModules
     InstallBoshAgent
     InstallOpenSSH
+    Enable-SSHD
     InstallCFFeatures
 } catch [Exception] {
     Write-Log "Failed to install Bosh dependencies. See 'c:\provisions\log.log' for more info."

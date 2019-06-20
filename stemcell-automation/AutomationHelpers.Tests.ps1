@@ -723,3 +723,161 @@ Describe "Set-RegKeys" {
     }
 }
 
+function CreateFakeOpenSSHZip
+{
+    param([string]$dir, [string]$installScriptSpyStatus, [string]$fakeZipPath)
+
+    mkdir "$dir\OpenSSH-Win64"
+    $installSpyBehavior = "echo installed > $installScriptSpyStatus"
+    echo $installSpyBehavior > "$dir\OpenSSH-Win64\install-sshd.ps1"
+    echo "fake sshd" > "$dir\OpenSSH-Win64\sshd.exe"
+
+    Compress-Archive -Force -Path "$dir\OpenSSH-Win64" -DestinationPath $fakeZipPath
+}
+
+Describe "Enable-SSHD" {
+    BeforeEach {
+        Mock Set-Service { }
+        Mock Run-LGPO { }
+
+        $guid = $( New-Guid ).Guid
+        $TMP_DIR = "$env:TEMP\BOSH.SSH.Tests-$guid"
+
+        $FAKE_ZIP = "$TMP_DIR\OpenSSH-TestFake.zip"
+        $INSTALL_SCRIPT_SPY_STATUS = "$TMP_DIR\install-script-status"
+
+        CreateFakeOpenSSHZip -dir $TMP_DIR -installScriptSpyStatus $INSTALL_SCRIPT_SPY_STATUS -fakeZipPath $FAKE_ZIP
+
+        mkdir -p "$TMP_DIR\Windows\Temp"
+        echo "fake LGPO" > "$TMP_DIR\Windows\LGPO.exe"
+
+        $ORIGINAL_WINDIR = $env:WINDIR
+        $env:WINDIR = "$TMP_DIR\Windows"
+
+        $ORIGINAL_PROGRAMDATA = $env:ProgramData
+        $env:PROGRAMDATA = "$TMP_DIR\ProgramData"
+  }
+
+    AfterEach {
+        rmdir $TMP_DIR -Recurse -ErrorAction Ignore
+        $env:WINDIR = $ORIGINAL_WINDIR
+        $env:PROGRAMDATA = $ORIGINAL_PROGRAMDATA
+    }
+
+    It "sets the startup type of sshd to automatic" {
+        Mock Set-Service { } -Verifiable  -ParameterFilter { $Name -eq "sshd" -and $StartupType -eq "Automatic" }
+
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+
+        Assert-VerifiableMock
+    }
+
+    It "sets the startup type of ssh-agent to automatic" {
+        Mock Set-Service { } -Verifiable  -ParameterFilter { $Name -eq "ssh-agent" -and $StartupType -eq "Automatic" }
+
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+
+        Assert-VerifiableMock
+    }
+
+    It "sets up firewall when ssh not already set up" {
+        Mock Get-NetFirewallRule {
+            return [ordered]@{
+                "Name" = "{3c06039b-ece1-4da3-8ece-255894975894}"
+                "DisplayName" = "NTP"
+                "Description" = ""
+                "DisplayGroup" = ""
+                "Group" = ""
+                "Enabled" = "True"
+                "Profile" = "Any"
+                "Platform" = "{}"
+                "Direction" = "Outbound"
+                "Action" = "Allow"
+                "EdgeTraversalPolicy" = "Block"
+                "LooseSourceMapping" = "False"
+                "LocalOnlyMapping" = "False"
+                "Owner" = ""
+                "PrimaryStatus" = "OK"
+                "Status" = "The rule was parsed successfully from the store. (65536)"
+                "EnforcementStatus" = "NotApplicable"
+                "PolicyStoreSource" = "PersistentStore"
+                "PolicyStoreSourceType" = "Local"
+            }
+        }
+
+        Mock New-NetFirewallRule { }
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+        Assert-MockCalled New-NetFirewallRule -Times 1  -Scope It
+    }
+
+    It "doesn't set up firewall when ssh is already set up " {
+        Mock Get-NetFirewallRule {
+            return [ordered]@{
+                "Name" = "{ E02857AB-8EA8-4358-8119-ED7D20DA7712 }"
+                "DisplayName" = "SSH"
+                "Description" = ""
+                "DisplayGroup" = ""
+                "Group" = ""
+                "Enabled" = "True"
+                "Profile" = "Any"
+                "Platform" = "{ }"
+                "Direction" = "Inbound"
+                "Action" = "Allow"
+                "EdgeTraversalPolicy" = "Block"
+                "LooseSourceMapping" = "False"
+                "LocalOnlyMapping" = "False"
+                "Owner" = ""
+                "PrimaryStatus" = "OK"
+                "Status" = "The rule was parsed successfully from the store. (65536)"
+                "EnforcementStatus" = "NotApplicable"
+                "PolicyStoreSource" = "PersistentStore"
+                "PolicyStoreSourceType" = "Local"
+            }
+        }
+
+        Mock New-NetFirewallRule { }
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+        Assert-MockCalled New-NetFirewallRule -Times 0 -Scope It
+    }
+
+    It "Generates inf and invokes LGPO if LGPO exists" {
+        Mock Run-LGPO -Verifiable -ParameterFilter { $LGPOPath -eq "$TMP_DIR\Windows\LGPO.exe" -and $InfFilePath -eq "$TMP_DIR\Windows\Temp\enable-ssh.inf" }
+
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+
+        Assert-VerifiableMock
+    }
+
+    It "Skips LGPO if LGPO.exe not found" {
+        rm "$TMP_DIR\Windows\LGPO.exe"
+
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+
+        Assert-MockCalled Run-LGPO -Times 0 -Scope It
+    }
+
+    Context "When LGPO executable fails" {
+        It "Throws an appropriate error" {
+            Mock Run-LGPO { throw "some error" } -Verifiable -ParameterFilter { $LGPOPath -eq "$TMP_DIR\Windows\LGPO.exe" -and $InfFilePath -eq "$TMP_DIR\Windows\Temp\enable-ssh.inf" }
+            { Enable-SSHD -SSHZipFile $FAKE_ZIP } | Should -Throw "LGPO.exe failed with: some error"
+        }
+    }
+
+    It "removes existing SSH keys" {
+        New-Item -ItemType Directory -Path "$TMP_DIR\ProgramData\ssh" -ErrorAction Ignore
+        echo "delete" > "$TMP_DIR\ProgramData\ssh\ssh_host_1"
+        echo "delete" > "$TMP_DIR\ProgramData\ssh\ssh_host_2"
+        echo "delete" > "$TMP_DIR\ProgramData\ssh\ssh_host_3"
+        echo "ignore" > "$TMP_DIR\ProgramData\ssh\not_ssh_host_4"
+
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+
+        $numHosts = (Get-ChildItem "$TMP_DIR\ProgramData\ssh\").count
+        $numHosts | Should -eq 1
+    }
+
+    It "creates empty ssh program dir if it doesn't exist" {
+        Enable-SSHD -SSHZipFile $FAKE_ZIP
+        { Test-Path "$TMP_DIR\ProgramData\ssh" } | Should -eq $True
+    }
+}
