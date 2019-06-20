@@ -75,7 +75,8 @@ function InstallOpenSSH
     }
 }
 
-function Set-MeltdownRegKeys
+#This function contains all our registry changes related to fixing the zombieload and meltdown bugs
+function Set-RegKeys
 {
     $PathExists = Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat'
     try
@@ -88,17 +89,16 @@ function Set-MeltdownRegKeys
         New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat' -Value 0 -Name 'cadca5fe-87d3-4b96-b7fb-a231484277cc' -force
         New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization' -Value 1.0 -Name 'MinVmVersionForCpuBasedMitigations' -force
         New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 3 -Name 'FeatureSettingsOverrideMask' -force
-        New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 0 -Name 'FeatureSettingsOverride' -force
-        Write-Log "Meltdown registry keys successfully added"
+        New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -Value 72 -Name 'FeatureSettingsOverride' -force
+        Write-Log "Meltdown/zombieload registry keys successfully added"
     }
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to set meltdown registry keys. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to set meltdown/zombieload registry keys. See 'c:\provisions\log.log' for mor info."
         throw $_.Exception
     }
 }
-
 
 function CleanUpVM
 {

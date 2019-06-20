@@ -29,7 +29,7 @@ function Write-Log
 try {
     Validate-OSVersion
     Check-Dependencies
-    Set-MeltdownRegKeys
+    Set-RegKeys
 
     # create the scheduled task to run second script here!
     $Sta = Create-VMPrepTaskAction -Organization $Organization -Owner $Owner
