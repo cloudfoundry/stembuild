@@ -14,8 +14,6 @@ import (
 	"path"
 )
 
-//go:generate go run gen.go
-
 func main() {
 	data, err := assets.Asset("StemcellAutomation.zip")
 	if err != nil {

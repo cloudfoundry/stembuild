@@ -26,10 +26,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(helpers.CopyRecursive(".", "../test/data")).To(Succeed())
 	Expect(CheckOVFToolOnPath()).To(Succeed())
 
-	var err error
-	stembuildExecutable, err = helpers.BuildStembuild()
-	Expect(err).NotTo(HaveOccurred())
-
 	return nil
 }, func(_ []byte) {
 })
@@ -37,7 +33,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 var _ = SynchronizedAfterSuite(func() {
 }, func() {
 	Expect(os.RemoveAll("./data")).To(Succeed())
-	Expect(os.RemoveAll(stembuildExecutable)).To(Succeed())
 })
 
 func CheckOVFToolOnPath() error {

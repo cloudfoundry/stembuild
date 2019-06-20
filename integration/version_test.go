@@ -15,7 +15,7 @@ var _ = Describe("Version flag", func() {
 	var version = "0.0.0"
 	BeforeEach(func() {
 		var err error
-		buildNewStembuildVersion(version)
+		stembuildExecutable, err = helpers.BuildStembuild(version)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

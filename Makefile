@@ -1,9 +1,9 @@
-LD_FLAGS = "-w -s"
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 COMMAND = out/stembuild
 AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
 AUTOMATION_PREFIX = $(shell dirname "${AUTOMATION_PATH}")
-STEMCELL_VERSION = 0.0.0
+STEMCELL_VERSION = $(shell echo "$${STEMBUILD_VERSION}")
+LD_FLAGS = "-w -s -X github.com/cloudfoundry-incubator/stembuild/version.Version=${STEMCELL_VERSION}"
 
 all : test build
 
@@ -21,8 +21,6 @@ integration : generate
 	ginkgo -r -v -randomizeAllSpecs integration
 
 generate: $(GOSRC) $(AUTOMATION_PATH)
-	echo $(STEMCELL_VERSION) > version/version
-	go generate
 	go get -u github.com/jteeuwen/go-bindata/...
 	go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
 

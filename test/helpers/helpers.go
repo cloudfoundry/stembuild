@@ -172,7 +172,7 @@ func ReadFile(name string) (string, error) {
 	return string(b), err
 }
 
-func BuildStembuild() (string, error) {
+func BuildStembuild(version string) (string, error) {
 	var stembuildExe = "stembuild"
 	if runtime.GOOS == "windows" {
 		stembuildExe += ".exe"
@@ -225,10 +225,17 @@ func BuildStembuild() (string, error) {
 		),
 	)
 
-	buildCommand := fmt.Sprintf("go build -o %s %s", stembuildExecutable, buildPackage)
-	buildCommandSlice := strings.Split(buildCommand, " ")
+	args := []string{
+		"build",
+		"-ldflags",
+		fmt.Sprintf(`-X github.com/cloudfoundry-incubator/stembuild/version.Version=%s`, version),
+		"-o",
+		stembuildExecutable,
+		buildPackage,
+	}
 
-	cmd := exec.Command(buildCommandSlice[0], buildCommandSlice[1:]...)
+	cmd := exec.Command("go", args...)
+
 	session, err := gexec.Start(cmd, stdout, stderr)
 	if err != nil {
 		return "", err
@@ -236,8 +243,8 @@ func BuildStembuild() (string, error) {
 	gomega.EventuallyWithOffset(1, session, 30*time.Second).Should(
 		gexec.Exit(0),
 		fmt.Sprintf(
-			"Build command %s exited with exit code: %d, stdout: %s, stderr: %s",
-			buildCommand,
+			"Build command was called with args: %v \n exited with exit code: %d, stdout: %s, stderr: %s",
+			args,
 			session.ExitCode(),
 			string(stdout.Bytes()),
 			string(stderr.Bytes()),

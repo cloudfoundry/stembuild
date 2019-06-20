@@ -64,6 +64,7 @@ const (
 	vcenterBaseURLVariable            = "VCENTER_BASE_URL"
 	vcenterStembuildUsernameVariable  = "VCENTER_STEMBUILD_USER"
 	vcenterStembuildPasswordVariable  = "VCENTER_STEMBUILD_PASSWORD"
+	StembuildVersionVariable          = "STEMBUILD_VERSION"
 )
 
 var (
@@ -154,7 +155,9 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	existingVM = false
 	var err error
 	var targetIP string
-	stembuildExecutable, err = helpers.BuildStembuild()
+
+	stembuildVersion := envMustExist(StembuildVersionVariable)
+	stembuildExecutable, err = helpers.BuildStembuild(stembuildVersion)
 	Expect(err).NotTo(HaveOccurred())
 
 	vmUsername := envMustExist(VMUsernameVariable)

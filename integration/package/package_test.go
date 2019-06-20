@@ -27,13 +27,13 @@ import (
 var _ = Describe("Package", func() {
 	const (
 		baseVMNameEnvVar                  = "PACKAGE_TEST_BASE_VM_NAME"
-		mainVersion                       = "1803.5.3999"
 		vcenterURLVariable                = "VCENTER_BASE_URL"
 		vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
 		vcenterFolderVariable             = "VM_FOLDER"
 		existingVMVariable                = "EXISTING_SOURCE_VM"
 		vcenterStembuildUsernameVariable  = "VCENTER_STEMBUILD_USER"
 		vcenterStembuildPasswordVariable  = "VCENTER_STEMBUILD_PASSWORD"
+		stembuildVersionVariable          = "STEMBUILD_VERSION"
 	)
 
 	var (
@@ -45,16 +45,15 @@ var _ = Describe("Package", func() {
 		vcenterAdminCredentialUrl string
 		vcenterStembuildUsername  string
 		vcenterStembuildPassword  string
+		stembuildVersion          string
 		executable                string
 		err                       error
 	)
 
 	BeforeSuite(func() {
-		directory, _ := os.Getwd()
-		versionFilePath := filepath.Join(directory, "..", "..", "version", "version")
-		ioutil.WriteFile(versionFilePath, []byte(mainVersion), 0777)
 
-		executable, err = helpers.BuildStembuild()
+		stembuildVersion = helpers.EnvMustExist(stembuildVersionVariable)
+		executable, err = helpers.BuildStembuild(stembuildVersion)
 		Expect(err).NotTo(HaveOccurred())
 
 		baseVMName = os.Getenv(baseVMNameEnvVar)
@@ -108,11 +107,11 @@ var _ = Describe("Package", func() {
 		session.Out.Write(out)
 		fmt.Print(string(out))
 
-		expectedOSVersion := "1803"
-		expectedStemcellVersion := "1803.5"
+		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
+		expectedStemcellVersion := strings.Split(stembuildVersion, ".")[:2]
 
 		expectedFilename := fmt.Sprintf(
-			"bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", expectedStemcellVersion, expectedOSVersion)
+			"bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", strings.Join(expectedStemcellVersion, "."), expectedOSVersion)
 
 		stemcellPath := filepath.Join(workingDir, expectedFilename)
 

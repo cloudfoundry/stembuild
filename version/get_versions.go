@@ -4,6 +4,8 @@ import (
 	"strings"
 )
 
+var Version = "dev"
+
 func GetVersions(mainVersion string) (string, string) {
 	stringArr := strings.Split(mainVersion, ".")
 

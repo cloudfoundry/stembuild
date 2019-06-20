@@ -19,7 +19,11 @@ var _ = Describe("Interrupts", func() {
 			if runtime.GOOS == "windows" {
 				Skip("Skipping, test not supported on Windows.")
 			}
-			buildNewStembuildVersion("1200.0.0")
+
+			var err error
+			stembuildExecutable, err = helpers.BuildStembuild("1200.0.0")
+			Expect(err).ToNot(HaveOccurred())
+
 			inputVmdk := filepath.Join("..", "test", "data", "expected.vmdk")
 			tmpDir, err := ioutil.TempDir(os.TempDir(), "stembuild-interrupts")
 

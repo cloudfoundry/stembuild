@@ -10,6 +10,9 @@
 export VM_USERNAME=
 export VM_PASSWORD=
 
+# Version of stembuild to build in integration tests ([2019|1803|1709].X.X, the major must match the server version of ova)
+export STEMBUILD_VERSION=
+
 # When using an existing VM, configure the IP
 export EXISTING_VM_IP=
 
