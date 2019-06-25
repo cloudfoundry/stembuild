@@ -118,6 +118,14 @@
   revision = "46f0354f63152e8801bb460d26f5b6c4c878efbb"
 
 [[projects]]
+  digest = "1:582b704bebaa06b48c29b0cec224a6058a09c86883aaddabde889cd1a5f73e1b"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0cd6bf5da1e1c83f8b45653022c74f71af0538a4"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:bb81097a5b62634f3e9fec1014657855610c82d19b9a40c17612e32651e35dca"
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
@@ -227,7 +235,7 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:a692a816f36d85508c7a786fe4e1604fb6f9bece04de44d8f74f2c08d51781bf"
+  digest = "1:ba17eb5b44f68784150d1be741dcb53e85d95c8d15c3053b8f38505179773068"
   name = "github.com/vmware/govmomi"
   packages = [
     "find",
@@ -246,13 +254,20 @@
     "guest/toolbox",
     "internal",
     "list",
+    "lookup",
+    "lookup/methods",
+    "lookup/types",
     "nfc",
     "object",
     "ovf",
     "property",
     "session",
+    "sts",
+    "sts/internal",
     "task",
     "units",
+    "vapi/internal",
+    "vapi/rest",
     "view",
     "vim25",
     "vim25/debug",
@@ -265,8 +280,8 @@
     "vmdk",
   ]
   pruneopts = "UT"
-  revision = "3617f28d167d448f93f282a867870f109516d2a5"
-  version = "v0.19.0"
+  revision = "4514987f2ddb8875c44cff1d5a24c59425fa6b92"
+  version = "v0.20.1"
 
 [[projects]]
   branch = "master"
@@ -368,6 +383,11 @@
     "github.com/vmware/govmomi/govc/object",
     "github.com/vmware/govmomi/govc/vm",
     "github.com/vmware/govmomi/govc/vm/guest",
+    "github.com/vmware/govmomi/guest",
+    "github.com/vmware/govmomi/vim25",
+    "github.com/vmware/govmomi/vim25/methods",
+    "github.com/vmware/govmomi/vim25/soap",
+    "github.com/vmware/govmomi/vim25/types",
     "github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp",
     "golang.org/x/sys/windows/registry",
   ]
