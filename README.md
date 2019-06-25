@@ -60,7 +60,7 @@ Flags:
   -vcenter-username string
     	vCenter username
   -vm-inventory-path string
-    	vCenter VM inventory path. (e.g: <datacenter>/vm/<vm-folder>/<vm-name>)
+    	vCenter VM inventory path. (e.g: /<datacenter>/vm/<vm-folder>/<vm-name>)
   -vm-ip string
     	IP of target machine
   -vm-password string
@@ -87,7 +87,7 @@ This command creates a BOSH Stemcell from a provisioned vCenter VM
 - VM provisioned using the stembuild construct command
 - Access to vCenter environment
 - The `vcenter-url`, `vcenter-username`, `vcenter-password`, and `vm-inventory-path` flags must be specified.
-- **NOTE**: The 'vm' keyword must be included between the datacenter name and folder name for the vm-inventory-path (e.g: <datacenter>/vm/<vm-folder>/<vm-name>)
+- **NOTE**: The 'vm' keyword must be included between the datacenter name and folder name for the vm-inventory-path (e.g: /<datacenter>/vm/<vm-folder>/<vm-name>)
  
 ```
 Example:
@@ -107,7 +107,7 @@ Flags:
   -vcenter-username string
     	vCenter username
   -vm-inventory-path string
-    	vCenter VM inventory path. (e.g: <datacenter>/vm/<vm-folder>/<vm-name>)
+    	vCenter VM inventory path. (e.g: /<datacenter>/vm/<vm-folder>/<vm-name>)
 ```
 
 ## [DEPRECATED] Package a Windows Stemcell from a VMDK using `stembuild package`
