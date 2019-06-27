@@ -235,9 +235,10 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:ba17eb5b44f68784150d1be741dcb53e85d95c8d15c3053b8f38505179773068"
+  digest = "1:e1abd926c000e69df42383bd53bda1eb1148a78a6258c762f53975f153634ec1"
   name = "github.com/vmware/govmomi"
   packages = [
+    ".",
     "find",
     "govc/about",
     "govc/cli",
@@ -374,6 +375,7 @@
     "github.com/onsi/gomega",
     "github.com/onsi/gomega/gbytes",
     "github.com/onsi/gomega/gexec",
+    "github.com/vmware/govmomi",
     "github.com/vmware/govmomi/govc/about",
     "github.com/vmware/govmomi/govc/cli",
     "github.com/vmware/govmomi/govc/device",
@@ -384,6 +386,7 @@
     "github.com/vmware/govmomi/govc/vm",
     "github.com/vmware/govmomi/govc/vm/guest",
     "github.com/vmware/govmomi/guest",
+    "github.com/vmware/govmomi/session",
     "github.com/vmware/govmomi/vim25",
     "github.com/vmware/govmomi/vim25/methods",
     "github.com/vmware/govmomi/vim25/soap",
