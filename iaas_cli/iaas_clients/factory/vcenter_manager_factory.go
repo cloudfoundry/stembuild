@@ -45,12 +45,12 @@ func (g *GovmomiFinderCreator) NewFinder(client *vim25.Client, all bool) *find.F
 }
 
 type ManagerFactory struct {
-	VCenterServer      string
-	Username           string
-	Password           string
-	InsecureConnection bool
-	ClientCreator      Vim25ClientCreator
-	FinderCreator      FinderCreator
+	VCenterServer  string
+	Username       string
+	Password       string
+	ClientCreator  Vim25ClientCreator
+	FinderCreator  FinderCreator
+	RootCACertPath string
 }
 
 func (f *ManagerFactory) VCenterManager(ctx context.Context) (*vcenter_manager.VCenterManager, error) {
@@ -94,9 +94,14 @@ func (f *ManagerFactory) soapClient() (*soap.Client, error) {
 	credentials := url.UserPassword(f.Username, f.Password)
 	vCenterURL.User = credentials
 
-	soapClient := soap.NewClient(vCenterURL, f.InsecureConnection)
-	//soapClient.SetRootCAs()
-	//soapClient.SetRootCAs()
+	soapClient := soap.NewClient(vCenterURL, false)
+
+	if f.RootCACertPath != "" {
+		err = soapClient.SetRootCAs(f.RootCACertPath)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return soapClient, nil
 }

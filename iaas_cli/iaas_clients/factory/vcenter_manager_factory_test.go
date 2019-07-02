@@ -31,12 +31,12 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeFinderCreator.NewFinderReturns(fakeFinder)
 
 			f := vcenter_client_factory.ManagerFactory{
-				VCenterServer:      "example.com",
-				Username:           "user",
-				Password:           "pass",
-				InsecureConnection: true,
-				ClientCreator:      fakeClientCreator,
-				FinderCreator:      fakeFinderCreator,
+				VCenterServer:  "example.com",
+				Username:       "user",
+				Password:       "pass",
+				ClientCreator:  fakeClientCreator,
+				FinderCreator:  fakeFinderCreator,
+				RootCACertPath: "",
 			}
 
 			manager, err := f.VCenterManager(context.TODO())
@@ -52,11 +52,10 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 
 			f := vcenter_client_factory.ManagerFactory{
-				VCenterServer:      string(127),
-				Username:           "user",
-				Password:           "pass",
-				InsecureConnection: true,
-				ClientCreator:      fakeClientCreator,
+				VCenterServer: string(127), // make soap.ParseURL fail with
+				Username:      "user",
+				Password:      "pass",
+				ClientCreator: fakeClientCreator,
 			}
 
 			_, err := f.VCenterManager(context.TODO())
@@ -71,11 +70,10 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeClientCreator.NewClientReturns(nil, clientErr)
 
 			f := vcenter_client_factory.ManagerFactory{
-				VCenterServer:      "example.com",
-				Username:           "user",
-				Password:           "pass",
-				InsecureConnection: true,
-				ClientCreator:      fakeClientCreator,
+				VCenterServer: "example.com",
+				Username:      "user",
+				Password:      "pass",
+				ClientCreator: fakeClientCreator,
 			}
 
 			_, err := f.VCenterManager(context.TODO())
