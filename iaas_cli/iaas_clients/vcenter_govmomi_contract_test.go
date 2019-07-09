@@ -13,16 +13,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const (
-	VcenterUrl      = "VCENTER_URL"
-	VcenterUsername = "VCENTER_USERNAME"
-	VcenterPassword = "VCENTER_PASSWORD"
-	VcenterCACert   = "VCENTER_CA_CERT"
-	TestVmPath      = "CONTRACT_TEST_VM_PATH"
-	TestVmPassword  = "CONTRACT_TEST_VM_PASSWORD"
-	TestVmUsername  = "CONTRACT_TEST_VM_USERNAME"
-)
-
 func envMustExist(variableName string) string {
 	result := os.Getenv(variableName)
 	if result == "" {
@@ -32,9 +22,8 @@ func envMustExist(variableName string) string {
 	return result
 }
 
-//TODO: create test vm dynamically from a base
 var _ = Describe("VcenterClient", func() {
-	FDescribe("StartProgram", func() {
+	Describe("StartProgram", func() {
 
 		var managerFactory *vcenter_client_factory.ManagerFactory
 
@@ -43,25 +32,25 @@ var _ = Describe("VcenterClient", func() {
 			ctx := context.TODO()
 
 			vCenterManager, err := managerFactory.VCenterManager(ctx)
-			ExpectWithOffset(1, err).ToNot(HaveOccurred())
+			Expect(err).ToNot(HaveOccurred())
 
 			err = vCenterManager.Login(ctx)
-			ExpectWithOffset(1, err).ToNot(HaveOccurred())
+			Expect(err).ToNot(HaveOccurred())
 
-			vm, err := vCenterManager.FindVM(ctx, envMustExist(TestVmPath))
-			ExpectWithOffset(1, err).ToNot(HaveOccurred())
+			vm, err := vCenterManager.FindVM(ctx, TestVmPath)
+			Expect(err).ToNot(HaveOccurred())
 
 			opsManager := vCenterManager.OperationsManager(ctx, vm)
 			guestManager, err := vCenterManager.GuestManager(ctx, opsManager, envMustExist(TestVmUsername), envMustExist(TestVmPassword))
-			ExpectWithOffset(1, err).ToNot(HaveOccurred())
+			Expect(err).ToNot(HaveOccurred())
 
 			powershell := "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 			pid, err := guestManager.StartProgramInGuest(ctx, powershell, "Exit 59")
-			ExpectWithOffset(1, err).ToNot(HaveOccurred())
+			Expect(err).ToNot(HaveOccurred())
 
 			exitCode, err := guestManager.ExitCodeForProgramInGuest(ctx, pid)
-			ExpectWithOffset(1, err).ToNot(HaveOccurred())
-			ExpectWithOffset(1, exitCode).To(Equal(int32(59)))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(exitCode).To(Equal(int32(59)))
 		}
 
 		BeforeEach(func() {

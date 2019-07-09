@@ -6,10 +6,64 @@ import (
 	sync "sync"
 
 	vcenter_manager "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	find "github.com/vmware/govmomi/find"
 	object "github.com/vmware/govmomi/object"
 )
 
 type FakeFinder struct {
+	DatacenterOrDefaultStub        func(context.Context, string) (*object.Datacenter, error)
+	datacenterOrDefaultMutex       sync.RWMutex
+	datacenterOrDefaultArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	datacenterOrDefaultReturns struct {
+		result1 *object.Datacenter
+		result2 error
+	}
+	datacenterOrDefaultReturnsOnCall map[int]struct {
+		result1 *object.Datacenter
+		result2 error
+	}
+	FolderOrDefaultStub        func(context.Context, string) (*object.Folder, error)
+	folderOrDefaultMutex       sync.RWMutex
+	folderOrDefaultArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	folderOrDefaultReturns struct {
+		result1 *object.Folder
+		result2 error
+	}
+	folderOrDefaultReturnsOnCall map[int]struct {
+		result1 *object.Folder
+		result2 error
+	}
+	ResourcePoolOrDefaultStub        func(context.Context, string) (*object.ResourcePool, error)
+	resourcePoolOrDefaultMutex       sync.RWMutex
+	resourcePoolOrDefaultArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	resourcePoolOrDefaultReturns struct {
+		result1 *object.ResourcePool
+		result2 error
+	}
+	resourcePoolOrDefaultReturnsOnCall map[int]struct {
+		result1 *object.ResourcePool
+		result2 error
+	}
+	SetDatacenterStub        func(*object.Datacenter) *find.Finder
+	setDatacenterMutex       sync.RWMutex
+	setDatacenterArgsForCall []struct {
+		arg1 *object.Datacenter
+	}
+	setDatacenterReturns struct {
+		result1 *find.Finder
+	}
+	setDatacenterReturnsOnCall map[int]struct {
+		result1 *find.Finder
+	}
 	VirtualMachineStub        func(context.Context, string) (*object.VirtualMachine, error)
 	virtualMachineMutex       sync.RWMutex
 	virtualMachineArgsForCall []struct {
@@ -26,6 +80,258 @@ type FakeFinder struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeFinder) DatacenterOrDefault(arg1 context.Context, arg2 string) (*object.Datacenter, error) {
+	fake.datacenterOrDefaultMutex.Lock()
+	ret, specificReturn := fake.datacenterOrDefaultReturnsOnCall[len(fake.datacenterOrDefaultArgsForCall)]
+	fake.datacenterOrDefaultArgsForCall = append(fake.datacenterOrDefaultArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("DatacenterOrDefault", []interface{}{arg1, arg2})
+	fake.datacenterOrDefaultMutex.Unlock()
+	if fake.DatacenterOrDefaultStub != nil {
+		return fake.DatacenterOrDefaultStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.datacenterOrDefaultReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeFinder) DatacenterOrDefaultCallCount() int {
+	fake.datacenterOrDefaultMutex.RLock()
+	defer fake.datacenterOrDefaultMutex.RUnlock()
+	return len(fake.datacenterOrDefaultArgsForCall)
+}
+
+func (fake *FakeFinder) DatacenterOrDefaultCalls(stub func(context.Context, string) (*object.Datacenter, error)) {
+	fake.datacenterOrDefaultMutex.Lock()
+	defer fake.datacenterOrDefaultMutex.Unlock()
+	fake.DatacenterOrDefaultStub = stub
+}
+
+func (fake *FakeFinder) DatacenterOrDefaultArgsForCall(i int) (context.Context, string) {
+	fake.datacenterOrDefaultMutex.RLock()
+	defer fake.datacenterOrDefaultMutex.RUnlock()
+	argsForCall := fake.datacenterOrDefaultArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFinder) DatacenterOrDefaultReturns(result1 *object.Datacenter, result2 error) {
+	fake.datacenterOrDefaultMutex.Lock()
+	defer fake.datacenterOrDefaultMutex.Unlock()
+	fake.DatacenterOrDefaultStub = nil
+	fake.datacenterOrDefaultReturns = struct {
+		result1 *object.Datacenter
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFinder) DatacenterOrDefaultReturnsOnCall(i int, result1 *object.Datacenter, result2 error) {
+	fake.datacenterOrDefaultMutex.Lock()
+	defer fake.datacenterOrDefaultMutex.Unlock()
+	fake.DatacenterOrDefaultStub = nil
+	if fake.datacenterOrDefaultReturnsOnCall == nil {
+		fake.datacenterOrDefaultReturnsOnCall = make(map[int]struct {
+			result1 *object.Datacenter
+			result2 error
+		})
+	}
+	fake.datacenterOrDefaultReturnsOnCall[i] = struct {
+		result1 *object.Datacenter
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFinder) FolderOrDefault(arg1 context.Context, arg2 string) (*object.Folder, error) {
+	fake.folderOrDefaultMutex.Lock()
+	ret, specificReturn := fake.folderOrDefaultReturnsOnCall[len(fake.folderOrDefaultArgsForCall)]
+	fake.folderOrDefaultArgsForCall = append(fake.folderOrDefaultArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("FolderOrDefault", []interface{}{arg1, arg2})
+	fake.folderOrDefaultMutex.Unlock()
+	if fake.FolderOrDefaultStub != nil {
+		return fake.FolderOrDefaultStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.folderOrDefaultReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeFinder) FolderOrDefaultCallCount() int {
+	fake.folderOrDefaultMutex.RLock()
+	defer fake.folderOrDefaultMutex.RUnlock()
+	return len(fake.folderOrDefaultArgsForCall)
+}
+
+func (fake *FakeFinder) FolderOrDefaultCalls(stub func(context.Context, string) (*object.Folder, error)) {
+	fake.folderOrDefaultMutex.Lock()
+	defer fake.folderOrDefaultMutex.Unlock()
+	fake.FolderOrDefaultStub = stub
+}
+
+func (fake *FakeFinder) FolderOrDefaultArgsForCall(i int) (context.Context, string) {
+	fake.folderOrDefaultMutex.RLock()
+	defer fake.folderOrDefaultMutex.RUnlock()
+	argsForCall := fake.folderOrDefaultArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFinder) FolderOrDefaultReturns(result1 *object.Folder, result2 error) {
+	fake.folderOrDefaultMutex.Lock()
+	defer fake.folderOrDefaultMutex.Unlock()
+	fake.FolderOrDefaultStub = nil
+	fake.folderOrDefaultReturns = struct {
+		result1 *object.Folder
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFinder) FolderOrDefaultReturnsOnCall(i int, result1 *object.Folder, result2 error) {
+	fake.folderOrDefaultMutex.Lock()
+	defer fake.folderOrDefaultMutex.Unlock()
+	fake.FolderOrDefaultStub = nil
+	if fake.folderOrDefaultReturnsOnCall == nil {
+		fake.folderOrDefaultReturnsOnCall = make(map[int]struct {
+			result1 *object.Folder
+			result2 error
+		})
+	}
+	fake.folderOrDefaultReturnsOnCall[i] = struct {
+		result1 *object.Folder
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFinder) ResourcePoolOrDefault(arg1 context.Context, arg2 string) (*object.ResourcePool, error) {
+	fake.resourcePoolOrDefaultMutex.Lock()
+	ret, specificReturn := fake.resourcePoolOrDefaultReturnsOnCall[len(fake.resourcePoolOrDefaultArgsForCall)]
+	fake.resourcePoolOrDefaultArgsForCall = append(fake.resourcePoolOrDefaultArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("ResourcePoolOrDefault", []interface{}{arg1, arg2})
+	fake.resourcePoolOrDefaultMutex.Unlock()
+	if fake.ResourcePoolOrDefaultStub != nil {
+		return fake.ResourcePoolOrDefaultStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.resourcePoolOrDefaultReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeFinder) ResourcePoolOrDefaultCallCount() int {
+	fake.resourcePoolOrDefaultMutex.RLock()
+	defer fake.resourcePoolOrDefaultMutex.RUnlock()
+	return len(fake.resourcePoolOrDefaultArgsForCall)
+}
+
+func (fake *FakeFinder) ResourcePoolOrDefaultCalls(stub func(context.Context, string) (*object.ResourcePool, error)) {
+	fake.resourcePoolOrDefaultMutex.Lock()
+	defer fake.resourcePoolOrDefaultMutex.Unlock()
+	fake.ResourcePoolOrDefaultStub = stub
+}
+
+func (fake *FakeFinder) ResourcePoolOrDefaultArgsForCall(i int) (context.Context, string) {
+	fake.resourcePoolOrDefaultMutex.RLock()
+	defer fake.resourcePoolOrDefaultMutex.RUnlock()
+	argsForCall := fake.resourcePoolOrDefaultArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeFinder) ResourcePoolOrDefaultReturns(result1 *object.ResourcePool, result2 error) {
+	fake.resourcePoolOrDefaultMutex.Lock()
+	defer fake.resourcePoolOrDefaultMutex.Unlock()
+	fake.ResourcePoolOrDefaultStub = nil
+	fake.resourcePoolOrDefaultReturns = struct {
+		result1 *object.ResourcePool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFinder) ResourcePoolOrDefaultReturnsOnCall(i int, result1 *object.ResourcePool, result2 error) {
+	fake.resourcePoolOrDefaultMutex.Lock()
+	defer fake.resourcePoolOrDefaultMutex.Unlock()
+	fake.ResourcePoolOrDefaultStub = nil
+	if fake.resourcePoolOrDefaultReturnsOnCall == nil {
+		fake.resourcePoolOrDefaultReturnsOnCall = make(map[int]struct {
+			result1 *object.ResourcePool
+			result2 error
+		})
+	}
+	fake.resourcePoolOrDefaultReturnsOnCall[i] = struct {
+		result1 *object.ResourcePool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeFinder) SetDatacenter(arg1 *object.Datacenter) *find.Finder {
+	fake.setDatacenterMutex.Lock()
+	ret, specificReturn := fake.setDatacenterReturnsOnCall[len(fake.setDatacenterArgsForCall)]
+	fake.setDatacenterArgsForCall = append(fake.setDatacenterArgsForCall, struct {
+		arg1 *object.Datacenter
+	}{arg1})
+	fake.recordInvocation("SetDatacenter", []interface{}{arg1})
+	fake.setDatacenterMutex.Unlock()
+	if fake.SetDatacenterStub != nil {
+		return fake.SetDatacenterStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.setDatacenterReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeFinder) SetDatacenterCallCount() int {
+	fake.setDatacenterMutex.RLock()
+	defer fake.setDatacenterMutex.RUnlock()
+	return len(fake.setDatacenterArgsForCall)
+}
+
+func (fake *FakeFinder) SetDatacenterCalls(stub func(*object.Datacenter) *find.Finder) {
+	fake.setDatacenterMutex.Lock()
+	defer fake.setDatacenterMutex.Unlock()
+	fake.SetDatacenterStub = stub
+}
+
+func (fake *FakeFinder) SetDatacenterArgsForCall(i int) *object.Datacenter {
+	fake.setDatacenterMutex.RLock()
+	defer fake.setDatacenterMutex.RUnlock()
+	argsForCall := fake.setDatacenterArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeFinder) SetDatacenterReturns(result1 *find.Finder) {
+	fake.setDatacenterMutex.Lock()
+	defer fake.setDatacenterMutex.Unlock()
+	fake.SetDatacenterStub = nil
+	fake.setDatacenterReturns = struct {
+		result1 *find.Finder
+	}{result1}
+}
+
+func (fake *FakeFinder) SetDatacenterReturnsOnCall(i int, result1 *find.Finder) {
+	fake.setDatacenterMutex.Lock()
+	defer fake.setDatacenterMutex.Unlock()
+	fake.SetDatacenterStub = nil
+	if fake.setDatacenterReturnsOnCall == nil {
+		fake.setDatacenterReturnsOnCall = make(map[int]struct {
+			result1 *find.Finder
+		})
+	}
+	fake.setDatacenterReturnsOnCall[i] = struct {
+		result1 *find.Finder
+	}{result1}
 }
 
 func (fake *FakeFinder) VirtualMachine(arg1 context.Context, arg2 string) (*object.VirtualMachine, error) {
@@ -95,6 +401,14 @@ func (fake *FakeFinder) VirtualMachineReturnsOnCall(i int, result1 *object.Virtu
 func (fake *FakeFinder) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.datacenterOrDefaultMutex.RLock()
+	defer fake.datacenterOrDefaultMutex.RUnlock()
+	fake.folderOrDefaultMutex.RLock()
+	defer fake.folderOrDefaultMutex.RUnlock()
+	fake.resourcePoolOrDefaultMutex.RLock()
+	defer fake.resourcePoolOrDefaultMutex.RUnlock()
+	fake.setDatacenterMutex.RLock()
+	defer fake.setDatacenterMutex.RUnlock()
 	fake.virtualMachineMutex.RLock()
 	defer fake.virtualMachineMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

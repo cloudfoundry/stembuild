@@ -3,6 +3,9 @@ package vcenter_manager_test
 import (
 	"context"
 	"errors"
+	"runtime"
+
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
 
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/vmware/govmomi/guest"
@@ -121,6 +124,48 @@ var _ = Describe("VcenterManager", func() {
 			_, err = vcManager.GuestManager(context.TODO(), fakeOpsManager, "guestUser", "guestPass")
 			Expect(err).To(MatchError(guestErr))
 
+		})
+	})
+
+	Context("running against vcsim server", func() {
+
+		if runtime.GOOS == "windows" {
+			Skip("windows cannot run a vcsim server")
+		}
+
+		Context("CloneVM", func() {
+			It("clones a vm", func() {
+
+				inventoryPath := "/DC0/vm/DC0_H0_VM0"
+				clonePath := "/DC0/vm/DC0_H0_VM0_NewClone"
+
+				managerFactory := &vcenter_client_factory.ManagerFactory{
+					VCenterServer:  "https://user:pass@127.0.0.1:8989/sdk",
+					Username:       "user",
+					Password:       "pass",
+					ClientCreator:  &vcenter_client_factory.ClientCreator{},
+					FinderCreator:  &vcenter_client_factory.GovmomiFinderCreator{},
+					RootCACertPath: CertPath,
+				}
+
+				ctx := context.TODO()
+
+				vCenterManager, err := managerFactory.VCenterManager(ctx)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = vCenterManager.Login(ctx)
+				Expect(err).ToNot(HaveOccurred())
+
+				vmToClone, err := vCenterManager.FindVM(ctx, inventoryPath)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = vCenterManager.CloneVM(ctx, vmToClone, clonePath)
+				Expect(err).ToNot(HaveOccurred())
+
+				_, err = vCenterManager.FindVM(ctx, clonePath)
+				Expect(err).ToNot(HaveOccurred())
+
+			})
 		})
 	})
 })
