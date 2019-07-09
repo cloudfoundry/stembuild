@@ -128,13 +128,11 @@ var _ = Describe("VcenterManager", func() {
 	})
 
 	Context("running against vcsim server", func() {
-
-		if runtime.GOOS == "windows" {
-			Skip("windows cannot run a vcsim server")
-		}
-
 		Context("CloneVM", func() {
 			It("clones a vm", func() {
+				if runtime.GOOS == "windows" {
+					Skip("windows cannot run a vcsim server")
+				}
 
 				inventoryPath := "/DC0/vm/DC0_H0_VM0"
 				clonePath := "/DC0/vm/DC0_H0_VM0_NewClone"
