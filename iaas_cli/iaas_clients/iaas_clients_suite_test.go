@@ -21,7 +21,7 @@ func TestIaasClients(t *testing.T) {
 }
 
 const (
-	VcenterUrl      = "VCENTER_URL"
+	VcenterUrl      = "VCENTER_BASE_URL"
 	VcenterUsername = "VCENTER_USERNAME"
 	VcenterPassword = "VCENTER_PASSWORD"
 	VcenterCACert   = "VCENTER_CA_CERT"
