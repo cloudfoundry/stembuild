@@ -3,7 +3,7 @@ package vcenter_manager
 import (
 	"context"
 	"net/url"
-	"path/filepath"
+	"path"
 	"strings"
 
 	"github.com/vmware/govmomi/find"
@@ -85,10 +85,13 @@ func (v *VCenterManager) CloneVM(ctx context.Context, vm *object.VirtualMachine,
 		return err
 	}
 
-	folder, err := v.finder.FolderOrDefault(ctx, filepath.Dir(clonePath))
+	// use path, not filepath so the windows stembuild executable
+	//	still respects vsphere's forward slash scheme
+	folder, err := v.finder.FolderOrDefault(ctx, path.Dir(clonePath))
 	if err != nil {
 		return err
 	}
+
 	ref := resourcePool.Reference()
 
 	config := types.VirtualMachineCloneSpec{
@@ -98,7 +101,7 @@ func (v *VCenterManager) CloneVM(ctx context.Context, vm *object.VirtualMachine,
 		PowerOn: true,
 	}
 
-	task, err := vm.Clone(ctx, folder, filepath.Base(clonePath), config)
+	task, err := vm.Clone(ctx, folder, path.Base(clonePath), config)
 	if err != nil {
 		return err
 	}
