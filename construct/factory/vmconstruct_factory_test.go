@@ -1,6 +1,7 @@
 package vmconstruct_factory
 
 import (
+	"github.com/cloudfoundry-incubator/stembuild/commandparser/commandparserfakes"
 	"github.com/cloudfoundry-incubator/stembuild/construct"
 	"github.com/cloudfoundry-incubator/stembuild/construct/config"
 	. "github.com/onsi/ginkgo"
@@ -18,6 +19,8 @@ var _ = Describe("Factory", func() {
 		})
 
 		It("should return a VMPreparer", func() {
+			fakeVCenterManager := &commandparserfakes.FakeVCenterManager{}
+
 			sourceConfig := config.SourceConfig{
 				GuestVmIp:       "vmIP",
 				GuestVMUsername: "vmUser",
@@ -28,7 +31,8 @@ var _ = Describe("Factory", func() {
 				VmInventoryPath: "some-vm-inventory-path",
 			}
 
-			vmPreparer := factory.VMPreparer(sourceConfig)
+			vmPreparer, err := factory.VMPreparer(sourceConfig, fakeVCenterManager)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(vmPreparer).To(BeAssignableToTypeOf(&construct.VMConstruct{}))
 		})
 	})

@@ -137,13 +137,17 @@ var _ = Describe("VcenterManager", func() {
 				inventoryPath := "/DC0/vm/DC0_H0_VM0"
 				clonePath := "/DC0/vm/DC0_H0_VM0_NewClone"
 
-				managerFactory := &vcenter_client_factory.ManagerFactory{
+				factoryConfig := &vcenter_client_factory.FactoryConfig{
 					VCenterServer:  "https://user:pass@127.0.0.1:8989/sdk",
 					Username:       "user",
 					Password:       "pass",
 					ClientCreator:  &vcenter_client_factory.ClientCreator{},
 					FinderCreator:  &vcenter_client_factory.GovmomiFinderCreator{},
 					RootCACertPath: CertPath,
+				}
+
+				managerFactory := &vcenter_client_factory.ManagerFactory{
+					*factoryConfig,
 				}
 
 				ctx := context.TODO()

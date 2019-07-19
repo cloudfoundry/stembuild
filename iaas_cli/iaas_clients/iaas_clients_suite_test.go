@@ -35,12 +35,13 @@ var VM *object.VirtualMachine
 var CTX context.Context
 var _ = BeforeSuite(func() {
 
-	managerFactory := &vcenter_client_factory.ManagerFactory{
+	managerFactory := &vcenter_client_factory.ManagerFactory{Config: vcenter_client_factory.FactoryConfig{
 		VCenterServer: envMustExist(VcenterUrl),
 		Username:      envMustExist(VcenterUsername),
 		Password:      envMustExist(VcenterPassword),
 		ClientCreator: &vcenter_client_factory.ClientCreator{},
 		FinderCreator: &vcenter_client_factory.GovmomiFinderCreator{},
+	},
 	}
 
 	CTX = context.TODO()

@@ -4,6 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/vmware/govmomi/guest"
+	"github.com/vmware/govmomi/object"
 	"os"
 	"path/filepath"
 
@@ -16,9 +21,23 @@ type VmConstruct interface {
 	PrepareVM() error
 }
 
+//go:generate counterfeiter . VCenterManager
+type VCenterManager interface {
+	OperationsManager(ctx context.Context, vm *object.VirtualMachine) *guest.OperationsManager
+	GuestManager(ctx context.Context, opsManager vcenter_manager.OpsManager, username, password string) (*guest_manager.GuestManager, error)
+	FindVM(ctx context.Context, inventoryPath string) (*object.VirtualMachine, error)
+	Login(ctx context.Context) error
+}
+
 //go:generate counterfeiter . VMPreparerFactory
 type VMPreparerFactory interface {
-	VMPreparer(config config.SourceConfig) VmConstruct
+	VMPreparer(config config.SourceConfig, vCenterManager VCenterManager) (VmConstruct, error)
+}
+
+//go:generate counterfeiter . ManagerFactory
+type ManagerFactory interface {
+	VCenterManager(ctx context.Context) (*vcenter_manager.VCenterManager, error)
+	SetConfig(config vcenter_client_factory.FactoryConfig)
 }
 
 //go:generate counterfeiter . ConstructCmdValidator
@@ -36,15 +55,17 @@ type ConstructMessenger interface {
 }
 
 type ConstructCmd struct {
-	sourceConfig config.SourceConfig
-	factory      VMPreparerFactory
-	validator    ConstructCmdValidator
-	messenger    ConstructMessenger
-	GlobalFlags  *GlobalFlags
+	ctx            context.Context
+	sourceConfig   config.SourceConfig
+	prepFactory    VMPreparerFactory
+	managerFactory ManagerFactory
+	validator      ConstructCmdValidator
+	messenger      ConstructMessenger
+	GlobalFlags    *GlobalFlags
 }
 
-func NewConstructCmd(factory VMPreparerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) ConstructCmd {
-	return ConstructCmd{factory: factory, validator: validator, messenger: messenger}
+func NewConstructCmd(ctx context.Context, prepFactory VMPreparerFactory, managerFactory ManagerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) ConstructCmd {
+	return ConstructCmd{ctx: ctx, prepFactory: prepFactory, managerFactory: managerFactory, validator: validator, messenger: messenger}
 }
 
 func (*ConstructCmd) Name() string { return "construct" }
@@ -96,9 +117,28 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		return subcommands.ExitFailure
 	}
 
-	vmConstruct := p.factory.VMPreparer(p.sourceConfig)
+	p.managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
+		p.sourceConfig.VCenterUrl,
+		p.sourceConfig.VCenterUsername,
+		p.sourceConfig.VCenterPassword,
+		&vcenter_client_factory.ClientCreator{},
+		&vcenter_client_factory.GovmomiFinderCreator{},
+		p.sourceConfig.CaCertFile,
+	})
 
-	err := vmConstruct.PrepareVM()
+	vCenterManager, err := p.managerFactory.VCenterManager(p.ctx)
+	if err != nil {
+		p.messenger.CannotPrepareVM(err)
+		return subcommands.ExitFailure
+	}
+
+	vmConstruct, err := p.prepFactory.VMPreparer(p.sourceConfig, vCenterManager)
+	if err != nil {
+		p.messenger.CannotPrepareVM(err)
+		return subcommands.ExitFailure
+	}
+
+	err = vmConstruct.PrepareVM()
 	if err != nil {
 		p.messenger.CannotPrepareVM(err)
 		return subcommands.ExitFailure

@@ -18,21 +18,21 @@ var _ = Describe("GovcCli", func() {
 			out, _, err := runner.RunWithOutput([]string{"device.ls", "-vm", targetVMPath, "-u", vCenterCredentialUrl})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(out).To(Equal(
-				`ide-200            VirtualIDEController          IDE 0
+				`pci-100            VirtualPCIController          PCI controller 0
+ide-200            VirtualIDEController          IDE 0
 ide-201            VirtualIDEController          IDE 1
 ps2-300            VirtualPS2Controller          PS2 controller 0
-pci-100            VirtualPCIController          PCI controller 0
 sio-400            VirtualSIOController          SIO controller 0
+video-500          VirtualMachineVideoCard       Video card
 keyboard-600       VirtualKeyboard               Keyboard
 pointing-700       VirtualPointingDevice         Pointing device; Device
-video-500          VirtualMachineVideoCard       Video card
-vmci-12000         VirtualMachineVMCIDevice      Device on the virtual machine PCI bus that provides support for the virtual machine communication interface
 lsilogic-sas-1000  VirtualLsiLogicSASController  LSI Logic SAS
+disk-1000-0        VirtualDisk                   41,943,040 KB
+ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 5a-56 d1 f3 82 a6 1e 2a ed
+floppy-8000        VirtualFloppy                 Remote
+vmci-12000         VirtualMachineVMCIDevice      Device on the virtual machine PCI bus that provides support for the virtual machine communication interface
 ahci-15000         VirtualAHCIController         AHCI
 cdrom-16000        VirtualCdrom                  Remote device
-disk-1000-0        VirtualDisk                   41,943,040 KB
-floppy-8000        VirtualFloppy                 Remote
-ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 5a-56 d1 f3 82 a6 1e 2a ed
 `,
 			))
 		})

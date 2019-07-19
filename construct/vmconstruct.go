@@ -2,6 +2,7 @@ package construct
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
@@ -12,8 +13,10 @@ import (
 )
 
 type VMConstruct struct {
+	ctx             context.Context
 	remoteManager   RemoteManager
 	Client          IaasClient
+	guestManager    GuestManager
 	vmInventoryPath string
 	vmUsername      string
 	vmPassword      string
@@ -31,24 +34,34 @@ const boshPsModules = "bosh-psmodules.zip"
 const winRMPsScript = "BOSH.WinRM.psm1"
 
 func NewVMConstruct(
-	vmIP,
+	ctx context.Context,
+	remoteManager RemoteManager,
 	vmUsername,
 	vmPassword,
 	vmInventoryPath string,
 	client IaasClient,
+	guestManager GuestManager,
 	unarchiver zipUnarchiver,
 	messenger ConstructMessenger,
 ) *VMConstruct {
 
 	return &VMConstruct{
-		NewWinRM(vmIP, vmUsername, vmPassword),
+		ctx,
+		remoteManager,
 		client,
+		guestManager,
 		vmInventoryPath,
 		vmUsername,
 		vmPassword,
 		unarchiver,
 		messenger,
 	}
+}
+
+//go:generate counterfeiter . GuestManager
+type GuestManager interface {
+	ExitCodeForProgramInGuest(ctx context.Context, pid int64) (int32, error)
+	StartProgramInGuest(ctx context.Context, command, args string) (int64, error)
 }
 
 //go:generate counterfeiter . IaasClient
@@ -83,6 +96,7 @@ type ConstructMessenger interface {
 }
 
 func (c *VMConstruct) PrepareVM() error {
+
 	err := c.createProvisionDirectory()
 	if err != nil {
 		return err
@@ -196,18 +210,18 @@ func (c *VMConstruct) enableWinRM() error {
 		return fmt.Errorf(failureString, err)
 	}
 
-	// Since BOSH.WinRM.psm1 just contains the enable WinRM function, we need to append 'Enable-WinRM' in order
-	// for the function to be executed.
+	// because we are streaming the contents of BOSH.WinRM.ps1 directly as the command, we must append Enable-WinRM
+	//	so it gets invoked, and we must base64 encode so the contents are safely executed on the command line.
 	rawWinRMwtCmd := append(rawWinRM, []byte("\nEnable-WinRM\n")...)
 
 	base64WinRM := encodePowershellCommand(rawWinRMwtCmd)
 
-	pid, err := c.Client.Start(c.vmInventoryPath, c.vmUsername, c.vmPassword, powershell, "-EncodedCommand", base64WinRM)
+	pid, err := c.guestManager.StartProgramInGuest(c.ctx, powershell, fmt.Sprintf("-EncodedCommand %s", base64WinRM))
 	if err != nil {
 		return fmt.Errorf(failureString, err)
 	}
 
-	exitCode, err := c.Client.WaitForExit(c.vmInventoryPath, c.vmUsername, c.vmPassword, pid)
+	exitCode, err := c.guestManager.ExitCodeForProgramInGuest(c.ctx, pid)
 	if err != nil {
 		return fmt.Errorf(failureString, err)
 	}

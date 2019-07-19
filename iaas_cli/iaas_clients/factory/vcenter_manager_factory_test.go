@@ -18,6 +18,14 @@ import (
 
 var _ = Describe("VcenterManagerFactory", func() {
 
+	var (
+		managerFactory *vcenter_client_factory.ManagerFactory
+	)
+
+	BeforeEach(func() {
+		managerFactory = &vcenter_client_factory.ManagerFactory{}
+	})
+
 	Context("VCenterManager", func() {
 		It("returns a vcenter manager", func() {
 
@@ -30,16 +38,16 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeFinderCreator := &factoryfakes.FakeFinderCreator{}
 			fakeFinderCreator.NewFinderReturns(fakeFinder)
 
-			f := vcenter_client_factory.ManagerFactory{
+			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
 				VCenterServer:  "example.com",
 				Username:       "user",
 				Password:       "pass",
 				ClientCreator:  fakeClientCreator,
 				FinderCreator:  fakeFinderCreator,
 				RootCACertPath: "",
-			}
+			})
 
-			manager, err := f.VCenterManager(context.TODO())
+			manager, err := managerFactory.VCenterManager(context.TODO())
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(manager).To(BeAssignableToTypeOf(&vcenter_manager.VCenterManager{}))
@@ -51,14 +59,14 @@ var _ = Describe("VcenterManagerFactory", func() {
 			parseErr := errors.New("net/url: invalid control character in URL")
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 
-			f := vcenter_client_factory.ManagerFactory{
+			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
 				VCenterServer: string(127), // make soap.ParseURL fail with
 				Username:      "user",
 				Password:      "pass",
 				ClientCreator: fakeClientCreator,
-			}
+			})
 
-			_, err := f.VCenterManager(context.TODO())
+			_, err := managerFactory.VCenterManager(context.TODO())
 			Expect(err.Error()).To(ContainSubstring(parseErr.Error()))
 
 		})
@@ -69,14 +77,14 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 			fakeClientCreator.NewClientReturns(nil, clientErr)
 
-			f := vcenter_client_factory.ManagerFactory{
+			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
 				VCenterServer: "example.com",
 				Username:      "user",
 				Password:      "pass",
 				ClientCreator: fakeClientCreator,
-			}
+			})
 
-			_, err := f.VCenterManager(context.TODO())
+			_, err := managerFactory.VCenterManager(context.TODO())
 			Expect(err).To(MatchError(clientErr))
 		})
 	})

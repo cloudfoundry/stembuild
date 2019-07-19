@@ -45,12 +45,20 @@ func (g *GovmomiFinderCreator) NewFinder(client *vim25.Client, all bool) *find.F
 }
 
 type ManagerFactory struct {
+	Config FactoryConfig
+}
+
+type FactoryConfig struct {
 	VCenterServer  string
 	Username       string
 	Password       string
 	ClientCreator  Vim25ClientCreator
 	FinderCreator  FinderCreator
 	RootCACertPath string
+}
+
+func (f *ManagerFactory) SetConfig(config FactoryConfig) {
+	f.Config = config
 }
 
 func (f *ManagerFactory) VCenterManager(ctx context.Context) (*vcenter_manager.VCenterManager, error) {
@@ -61,9 +69,9 @@ func (f *ManagerFactory) VCenterManager(ctx context.Context) (*vcenter_manager.V
 	}
 
 	//TODO: understand the "all" parameter to new finder
-	finder := f.FinderCreator.NewFinder(govmomiClient.Client, false)
+	finder := f.Config.FinderCreator.NewFinder(govmomiClient.Client, false)
 
-	return vcenter_manager.NewVCenterManager(govmomiClient, govmomiClient.Client, finder, f.Username, f.Password)
+	return vcenter_manager.NewVCenterManager(govmomiClient, govmomiClient.Client, finder, f.Config.Username, f.Config.Password)
 
 }
 
@@ -87,17 +95,17 @@ func (f *ManagerFactory) govmomiClient(ctx context.Context) (*govmomi.Client, er
 }
 
 func (f *ManagerFactory) soapClient() (*soap.Client, error) {
-	vCenterURL, err := soap.ParseURL(f.VCenterServer)
+	vCenterURL, err := soap.ParseURL(f.Config.VCenterServer)
 	if err != nil {
 		return nil, err
 	}
-	credentials := url.UserPassword(f.Username, f.Password)
+	credentials := url.UserPassword(f.Config.Username, f.Config.Password)
 	vCenterURL.User = credentials
 
 	soapClient := soap.NewClient(vCenterURL, false)
 
-	if f.RootCACertPath != "" {
-		err = soapClient.SetRootCAs(f.RootCACertPath)
+	if f.Config.RootCACertPath != "" {
+		err = soapClient.SetRootCAs(f.Config.RootCACertPath)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +115,7 @@ func (f *ManagerFactory) soapClient() (*soap.Client, error) {
 }
 
 func (f *ManagerFactory) vimClient(ctx context.Context, soapClient *soap.Client) (*vim25.Client, error) {
-	vimClient, err := f.ClientCreator.NewClient(ctx, soapClient)
+	vimClient, err := f.Config.ClientCreator.NewClient(ctx, soapClient)
 	if err != nil {
 		return nil, err
 	}

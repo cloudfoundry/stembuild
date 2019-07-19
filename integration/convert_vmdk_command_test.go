@@ -31,8 +31,6 @@ var _ = Describe("Convert VMDK", func() {
 				It("of 1709 returns an error", func() {
 					version = "1709.0"
 					expectedOSVersionInNameANdManifest := "2016"
-					// TODO: probable bug below: BuildStembuild returns the path to the new stembuild, if we don't capture, line 40 will use an old one
-					// at least i think?
 					var err error
 					stembuildExecutable, err = helpers.BuildStembuild("9999.1.0")
 					Expect(err).ToNot(HaveOccurred())

@@ -25,8 +25,10 @@ func envMustExist(variableName string) string {
 var _ = Describe("VcenterClient", func() {
 	Describe("StartProgram", func() {
 
-		var managerFactory *vcenter_client_factory.ManagerFactory
-
+		var (
+			managerFactory *vcenter_client_factory.ManagerFactory
+			factoryConfig  *vcenter_client_factory.FactoryConfig
+		)
 		ExpectProgramToStartAndExitSuccessfully := func() {
 
 			ctx := context.TODO()
@@ -54,13 +56,16 @@ var _ = Describe("VcenterClient", func() {
 		}
 
 		BeforeEach(func() {
-			managerFactory = &vcenter_client_factory.ManagerFactory{
+
+			factoryConfig = &vcenter_client_factory.FactoryConfig{
 				VCenterServer: envMustExist(VcenterUrl),
 				Username:      envMustExist(VcenterUsername),
 				Password:      envMustExist(VcenterPassword),
 				ClientCreator: &vcenter_client_factory.ClientCreator{},
 				FinderCreator: &vcenter_client_factory.GovmomiFinderCreator{},
 			}
+
+			managerFactory = &vcenter_client_factory.ManagerFactory{}
 		})
 
 		AfterEach(func() {
@@ -70,7 +75,8 @@ var _ = Describe("VcenterClient", func() {
 		Context("Use root cert implicitly", func() {
 			It("Starts a program and returns its exit code", func() {
 
-				managerFactory.RootCACertPath = ""
+				factoryConfig.RootCACertPath = ""
+				managerFactory.SetConfig(*factoryConfig)
 				ExpectProgramToStartAndExitSuccessfully()
 			})
 		})
@@ -96,7 +102,8 @@ var _ = Describe("VcenterClient", func() {
 				err = f.Close()
 				Expect(err).ToNot(HaveOccurred())
 
-				managerFactory.RootCACertPath = f.Name()
+				factoryConfig.RootCACertPath = f.Name()
+				managerFactory.SetConfig(*factoryConfig)
 
 				ExpectProgramToStartAndExitSuccessfully()
 			})
@@ -111,7 +118,8 @@ var _ = Describe("VcenterClient", func() {
 				Expect(err).NotTo(HaveOccurred())
 				fakeCertPath := filepath.Join(workingDir, "fixtures", "fakecert")
 
-				managerFactory.RootCACertPath = fakeCertPath
+				factoryConfig.RootCACertPath = fakeCertPath
+				managerFactory.SetConfig(*factoryConfig)
 
 				ctx := context.TODO()
 				_, err = managerFactory.VCenterManager(ctx)

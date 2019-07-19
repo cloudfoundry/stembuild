@@ -114,7 +114,7 @@ func (v *VCenterManager) CloneVM(ctx context.Context, vm *object.VirtualMachine,
 	return nil
 }
 
-func (v *VCenterManager) OperationsManager(ctx context.Context, vm *object.VirtualMachine) OpsManager {
+func (v *VCenterManager) OperationsManager(ctx context.Context, vm *object.VirtualMachine) *guest.OperationsManager {
 	return guest.NewOperationsManager(v.vimClient, vm.Reference())
 }
 

@@ -4,14 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/assets"
-	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/construct/factory"
-	"github.com/cloudfoundry-incubator/stembuild/version"
-	. "github.com/google/subcommands"
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/cloudfoundry-incubator/stembuild/assets"
+	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
+	"github.com/cloudfoundry-incubator/stembuild/construct/factory"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	"github.com/cloudfoundry-incubator/stembuild/version"
+	. "github.com/google/subcommands"
 )
 
 func main() {
@@ -30,7 +32,7 @@ func main() {
 	var gf GlobalFlags
 	packageCmd := PackageCmd{}
 	packageCmd.GlobalFlags = &gf
-	constructCmd := NewConstructCmd(&vmconstruct_factory.VMConstructFactory{}, &ConstructValidator{}, &ConstructCmdMessenger{OutputChannel: os.Stderr})
+	constructCmd := NewConstructCmd(context.Background(), &vmconstruct_factory.VMConstructFactory{}, &vcenter_client_factory.ManagerFactory{}, &ConstructValidator{}, &ConstructCmdMessenger{OutputChannel: os.Stderr})
 	constructCmd.GlobalFlags = &gf
 
 	var commands = make([]Command, 0)
