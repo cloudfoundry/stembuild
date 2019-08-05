@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -18,9 +19,12 @@ type VcenterClient struct {
 	Runner        iaas_cli.CliRunner
 }
 
-func NewVcenterClient(username string, password string, url string, caCertFile string, runner iaas_cli.CliRunner) *VcenterClient {
-	urlWithCredentials := fmt.Sprintf("%s:%s@%s", username, password, url)
-	return &VcenterClient{Url: url, credentialUrl: urlWithCredentials, caCertFile: caCertFile, Runner: runner}
+func NewVcenterClient(username string, password string, u string, caCertFile string, runner iaas_cli.CliRunner) *VcenterClient {
+
+	encodedUser := url.QueryEscape(username)
+	encodedPassword := url.QueryEscape(password)
+	urlWithCredentials := fmt.Sprintf("%s:%s@%s", encodedUser, encodedPassword, u)
+	return &VcenterClient{Url: u, credentialUrl: urlWithCredentials, caCertFile: caCertFile, Runner: runner}
 }
 
 func (c *VcenterClient) ValidateUrl() error {
@@ -42,7 +46,7 @@ func (c *VcenterClient) ValidateCredentials() error {
 	args := c.buildGovcCommand("about")
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
-		return errors.New(fmt.Sprintf("vcenter_client - invalid credentials for: %s", c.Url))
+		return errors.New(fmt.Sprintf("vcenter_client - invalid credentials for: %s", c.credentialUrl))
 	}
 
 	return nil

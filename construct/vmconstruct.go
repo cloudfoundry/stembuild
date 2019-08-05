@@ -101,7 +101,6 @@ func (c *VMConstruct) PrepareVM() error {
 	if err != nil {
 		return err
 	}
-
 	c.messenger.UploadArtifactsStarted()
 	err = c.uploadArtifacts()
 	if err != nil {

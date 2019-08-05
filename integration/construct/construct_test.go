@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 
@@ -45,6 +46,22 @@ var _ = Describe("stembuild construct", func() {
 			Eventually(session, 20).Should(Exit(0))
 			Eventually(session.Out).Should(Say(`Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM`))
 
+		})
+
+		It("handles special characters", func() {
+			isAlphaNumeric, err := regexp.Compile("[a-zA-Z0-9]+")
+			Expect(err).ToNot(HaveOccurred())
+
+			if isAlphaNumeric.MatchString(conf.VCenterUsername) && isAlphaNumeric.MatchString(conf.VCenterPassword) {
+				Skip("vCenter username or password must contain special characters")
+			}
+			err = CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
+			Expect(err).ToNot(HaveOccurred())
+
+			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
+
+			Eventually(session, 20).Should(Exit(0))
+			Eventually(session.Out).Should(Say(`mock stemcell automation script executed`))
 		})
 
 		AfterEach(func() {

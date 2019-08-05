@@ -251,6 +251,7 @@ func createVMWithIP(targetIP, vmNamePrefix, vcenterFolder string) {
 	templateFile, err := filepath.Abs("assets/ova_options.json.template")
 	Expect(err).NotTo(HaveOccurred())
 	tmpl, err := template.New("ova_options.json.template").ParseFiles(templateFile)
+	Expect(err).ToNot(HaveOccurred())
 
 	tmpDir, err := ioutil.TempDir("", "construct-test")
 	Expect(err).NotTo(HaveOccurred())

@@ -27,6 +27,23 @@ var _ = Describe("VcenterClient", func() {
 		credentialUrl = fmt.Sprintf("%s:%s@%s", username, password, url)
 	})
 
+	Context("NewVcenterClient", func() {
+		It("url encodes credentials with special characters", func() {
+			client := NewVcenterClient(`special\chars!user#`, `special^chars*pass`, url, caCertFile, runner)
+
+			urlEncodedCredentials := `special%5Cchars%21user%23:special%5Echars%2Apass@url`
+			expectedArgs := []string{"about", "-u", urlEncodedCredentials}
+
+			runner.RunReturns(0)
+			err := client.ValidateCredentials()
+			argsForRun := runner.RunArgsForCall(0)
+
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(runner.RunCallCount()).To(Equal(1))
+			Expect(argsForRun).To(Equal(expectedArgs))
+		})
+	})
+
 	Context("A ca cert file is specified", func() {
 		It("Passes the ca cert to govc", func() {
 			vcenterClient = NewVcenterClient(username, password, url, "somefile.txt", runner)
@@ -65,7 +82,7 @@ var _ = Describe("VcenterClient", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(runner.RunCallCount()).To(Equal(1))
 			Expect(argsForRun).To(Equal(expectedArgs))
-			Expect(err).To(MatchError("vcenter_client - invalid credentials for: url"))
+			Expect(err).To(MatchError("vcenter_client - invalid credentials for: username:password@url"))
 		})
 	})
 
