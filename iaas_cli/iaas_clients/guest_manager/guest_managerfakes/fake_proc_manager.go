@@ -2,14 +2,25 @@
 package guest_managerfakes
 
 import (
-	context "context"
-	sync "sync"
+	"context"
+	"sync"
 
-	guest_manager "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
-	types "github.com/vmware/govmomi/vim25/types"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/vmware/govmomi/vim25"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 type FakeProcManager struct {
+	ClientStub        func() *vim25.Client
+	clientMutex       sync.RWMutex
+	clientArgsForCall []struct {
+	}
+	clientReturns struct {
+		result1 *vim25.Client
+	}
+	clientReturnsOnCall map[int]struct {
+		result1 *vim25.Client
+	}
 	ListProcessesStub        func(context.Context, types.BaseGuestAuthentication, []int64) ([]types.GuestProcessInfo, error)
 	listProcessesMutex       sync.RWMutex
 	listProcessesArgsForCall []struct {
@@ -42,6 +53,58 @@ type FakeProcManager struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeProcManager) Client() *vim25.Client {
+	fake.clientMutex.Lock()
+	ret, specificReturn := fake.clientReturnsOnCall[len(fake.clientArgsForCall)]
+	fake.clientArgsForCall = append(fake.clientArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Client", []interface{}{})
+	fake.clientMutex.Unlock()
+	if fake.ClientStub != nil {
+		return fake.ClientStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.clientReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeProcManager) ClientCallCount() int {
+	fake.clientMutex.RLock()
+	defer fake.clientMutex.RUnlock()
+	return len(fake.clientArgsForCall)
+}
+
+func (fake *FakeProcManager) ClientCalls(stub func() *vim25.Client) {
+	fake.clientMutex.Lock()
+	defer fake.clientMutex.Unlock()
+	fake.ClientStub = stub
+}
+
+func (fake *FakeProcManager) ClientReturns(result1 *vim25.Client) {
+	fake.clientMutex.Lock()
+	defer fake.clientMutex.Unlock()
+	fake.ClientStub = nil
+	fake.clientReturns = struct {
+		result1 *vim25.Client
+	}{result1}
+}
+
+func (fake *FakeProcManager) ClientReturnsOnCall(i int, result1 *vim25.Client) {
+	fake.clientMutex.Lock()
+	defer fake.clientMutex.Unlock()
+	fake.ClientStub = nil
+	if fake.clientReturnsOnCall == nil {
+		fake.clientReturnsOnCall = make(map[int]struct {
+			result1 *vim25.Client
+		})
+	}
+	fake.clientReturnsOnCall[i] = struct {
+		result1 *vim25.Client
+	}{result1}
 }
 
 func (fake *FakeProcManager) ListProcesses(arg1 context.Context, arg2 types.BaseGuestAuthentication, arg3 []int64) ([]types.GuestProcessInfo, error) {
@@ -182,6 +245,8 @@ func (fake *FakeProcManager) StartProgramReturnsOnCall(i int, result1 int64, res
 func (fake *FakeProcManager) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.clientMutex.RLock()
+	defer fake.clientMutex.RUnlock()
 	fake.listProcessesMutex.RLock()
 	defer fake.listProcessesMutex.RUnlock()
 	fake.startProgramMutex.RLock()

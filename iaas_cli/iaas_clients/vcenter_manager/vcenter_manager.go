@@ -35,6 +35,7 @@ type Finder interface {
 //go:generate counterfeiter . OpsManager
 type OpsManager interface {
 	ProcessManager(ctx context.Context) (*guest.ProcessManager, error)
+	FileManager(ctx context.Context) (*guest.FileManager, error)
 }
 
 type VCenterManager struct {
@@ -124,9 +125,14 @@ func (v *VCenterManager) GuestManager(ctx context.Context, opsManager OpsManager
 	if err != nil {
 		return nil, err
 	}
+
+	fileManager, err := opsManager.FileManager(ctx)
+	if err != nil {
+		return nil, err
+	}
 	auth := types.NamePasswordAuthentication{
 		Username: username,
 		Password: password,
 	}
-	return guest_manager.NewGuestManager(auth, processManager), nil
+	return guest_manager.NewGuestManager(auth, processManager, fileManager, v.vimClient), nil
 }

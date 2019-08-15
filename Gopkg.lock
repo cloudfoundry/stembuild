@@ -185,11 +185,12 @@
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
-  digest = "1:f4cbb10407f60c0263738e7b219b80ba99516aa9da187f44680d5b29360b3c9f"
+  digest = "1:1c1e79e20c4ce412d85fca555dac9602ae0053dda99062bace6cac2741f2a303"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
     "config",
+    "extensions/table",
     "internal/codelocation",
     "internal/containernode",
     "internal/failer",
@@ -370,12 +371,15 @@
     "github.com/concourse/pool-resource/out",
     "github.com/golang/mock/gomock",
     "github.com/google/subcommands",
+    "github.com/google/uuid",
     "github.com/masterzen/winrm",
     "github.com/onsi/ginkgo",
+    "github.com/onsi/ginkgo/extensions/table",
     "github.com/onsi/gomega",
     "github.com/onsi/gomega/gbytes",
     "github.com/onsi/gomega/gexec",
     "github.com/vmware/govmomi",
+    "github.com/vmware/govmomi/find",
     "github.com/vmware/govmomi/govc/about",
     "github.com/vmware/govmomi/govc/cli",
     "github.com/vmware/govmomi/govc/device",
@@ -386,9 +390,9 @@
     "github.com/vmware/govmomi/govc/vm",
     "github.com/vmware/govmomi/govc/vm/guest",
     "github.com/vmware/govmomi/guest",
+    "github.com/vmware/govmomi/object",
     "github.com/vmware/govmomi/session",
     "github.com/vmware/govmomi/vim25",
-    "github.com/vmware/govmomi/vim25/methods",
     "github.com/vmware/govmomi/vim25/soap",
     "github.com/vmware/govmomi/vim25/types",
     "github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp",

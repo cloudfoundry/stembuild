@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/cloudfoundry-incubator/stembuild/version"
+
 	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/construct"
 	"github.com/cloudfoundry-incubator/stembuild/construct/archive"
@@ -20,8 +22,6 @@ type VMConstructFactory struct {
 func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManager commandparser.VCenterManager) (commandparser.VmConstruct, error) {
 	runner := &iaas_cli.GovcRunner{}
 	client := iaas_clients.NewVcenterClient(config.VCenterUsername, config.VCenterPassword, config.VCenterUrl, config.CaCertFile, runner)
-
-	zip := &archive.Zip{}
 
 	messenger := construct.NewMessenger(os.Stdout)
 
@@ -43,6 +43,17 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		return nil, err
 	}
 
+	winRMManager := &construct.WinRMManager{
+		GuestManager: guestManager,
+		Unarchiver:   &archive.Zip{},
+	}
+	versionGetter := &version.VersionGetter{}
+	osValidator := &construct.OSVersionValidator{
+		GuestManager:  guestManager,
+		Messenger:     messenger,
+		VersionGetter: versionGetter,
+	}
+
 	return construct.NewVMConstruct(
 		ctx,
 		NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword),
@@ -51,7 +62,8 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		config.VmInventoryPath,
 		client,
 		guestManager,
-		zip,
+		winRMManager,
+		osValidator,
 		messenger,
 	), nil
 }

@@ -2,12 +2,12 @@
 package vcenter_managerfakes
 
 import (
-	context "context"
-	sync "sync"
+	"context"
+	"sync"
 
-	vcenter_manager "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
-	find "github.com/vmware/govmomi/find"
-	object "github.com/vmware/govmomi/object"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/vmware/govmomi/find"
+	"github.com/vmware/govmomi/object"
 )
 
 type FakeFinder struct {

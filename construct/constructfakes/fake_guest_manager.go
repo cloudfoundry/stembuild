@@ -3,12 +3,29 @@ package constructfakes
 
 import (
 	"context"
+	"io"
 	"sync"
 
 	"github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeGuestManager struct {
+	DownloadFileInGuestStub        func(context.Context, string) (io.Reader, int64, error)
+	downloadFileInGuestMutex       sync.RWMutex
+	downloadFileInGuestArgsForCall []struct {
+		arg1 context.Context
+		arg2 string
+	}
+	downloadFileInGuestReturns struct {
+		result1 io.Reader
+		result2 int64
+		result3 error
+	}
+	downloadFileInGuestReturnsOnCall map[int]struct {
+		result1 io.Reader
+		result2 int64
+		result3 error
+	}
 	ExitCodeForProgramInGuestStub        func(context.Context, int64) (int32, error)
 	exitCodeForProgramInGuestMutex       sync.RWMutex
 	exitCodeForProgramInGuestArgsForCall []struct {
@@ -40,6 +57,73 @@ type FakeGuestManager struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeGuestManager) DownloadFileInGuest(arg1 context.Context, arg2 string) (io.Reader, int64, error) {
+	fake.downloadFileInGuestMutex.Lock()
+	ret, specificReturn := fake.downloadFileInGuestReturnsOnCall[len(fake.downloadFileInGuestArgsForCall)]
+	fake.downloadFileInGuestArgsForCall = append(fake.downloadFileInGuestArgsForCall, struct {
+		arg1 context.Context
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("DownloadFileInGuest", []interface{}{arg1, arg2})
+	fake.downloadFileInGuestMutex.Unlock()
+	if fake.DownloadFileInGuestStub != nil {
+		return fake.DownloadFileInGuestStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	fakeReturns := fake.downloadFileInGuestReturns
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *FakeGuestManager) DownloadFileInGuestCallCount() int {
+	fake.downloadFileInGuestMutex.RLock()
+	defer fake.downloadFileInGuestMutex.RUnlock()
+	return len(fake.downloadFileInGuestArgsForCall)
+}
+
+func (fake *FakeGuestManager) DownloadFileInGuestCalls(stub func(context.Context, string) (io.Reader, int64, error)) {
+	fake.downloadFileInGuestMutex.Lock()
+	defer fake.downloadFileInGuestMutex.Unlock()
+	fake.DownloadFileInGuestStub = stub
+}
+
+func (fake *FakeGuestManager) DownloadFileInGuestArgsForCall(i int) (context.Context, string) {
+	fake.downloadFileInGuestMutex.RLock()
+	defer fake.downloadFileInGuestMutex.RUnlock()
+	argsForCall := fake.downloadFileInGuestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakeGuestManager) DownloadFileInGuestReturns(result1 io.Reader, result2 int64, result3 error) {
+	fake.downloadFileInGuestMutex.Lock()
+	defer fake.downloadFileInGuestMutex.Unlock()
+	fake.DownloadFileInGuestStub = nil
+	fake.downloadFileInGuestReturns = struct {
+		result1 io.Reader
+		result2 int64
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeGuestManager) DownloadFileInGuestReturnsOnCall(i int, result1 io.Reader, result2 int64, result3 error) {
+	fake.downloadFileInGuestMutex.Lock()
+	defer fake.downloadFileInGuestMutex.Unlock()
+	fake.DownloadFileInGuestStub = nil
+	if fake.downloadFileInGuestReturnsOnCall == nil {
+		fake.downloadFileInGuestReturnsOnCall = make(map[int]struct {
+			result1 io.Reader
+			result2 int64
+			result3 error
+		})
+	}
+	fake.downloadFileInGuestReturnsOnCall[i] = struct {
+		result1 io.Reader
+		result2 int64
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeGuestManager) ExitCodeForProgramInGuest(arg1 context.Context, arg2 int64) (int32, error) {
@@ -174,6 +258,8 @@ func (fake *FakeGuestManager) StartProgramInGuestReturnsOnCall(i int, result1 in
 func (fake *FakeGuestManager) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.downloadFileInGuestMutex.RLock()
+	defer fake.downloadFileInGuestMutex.RUnlock()
 	fake.exitCodeForProgramInGuestMutex.RLock()
 	defer fake.exitCodeForProgramInGuestMutex.RUnlock()
 	fake.startProgramInGuestMutex.RLock()

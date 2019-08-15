@@ -3,9 +3,8 @@ package construct_test
 import (
 	"context"
 	"errors"
-	"strings"
 
-	"github.com/cloudfoundry-incubator/stembuild/assets"
+	"github.com/onsi/gomega/gbytes"
 
 	. "github.com/cloudfoundry-incubator/stembuild/construct"
 	"github.com/cloudfoundry-incubator/stembuild/construct/constructfakes"
@@ -20,7 +19,8 @@ var _ = Describe("construct_helpers", func() {
 		vmConstruct       *VMConstruct
 		fakeVcenterClient *constructfakes.FakeIaasClient
 		fakeGuestManager  *constructfakes.FakeGuestManager
-		fakeZipUnarchiver *constructfakes.FakeZipUnarchiver
+		fakeWinRMEnabler  *constructfakes.FakeWinRMEnabler
+		fakeOSValidator   *constructfakes.FakeOSValidator
 		fakeMessenger     *constructfakes.FakeConstructMessenger
 	)
 
@@ -28,7 +28,8 @@ var _ = Describe("construct_helpers", func() {
 		fakeRemoteManager = &remotemanagerfakes.FakeRemoteManager{}
 		fakeVcenterClient = &constructfakes.FakeIaasClient{}
 		fakeGuestManager = &constructfakes.FakeGuestManager{}
-		fakeZipUnarchiver = &constructfakes.FakeZipUnarchiver{}
+		fakeWinRMEnabler = &constructfakes.FakeWinRMEnabler{}
+		fakeOSValidator = &constructfakes.FakeOSValidator{}
 		fakeMessenger = &constructfakes.FakeConstructMessenger{}
 
 		vmConstruct = NewVMConstruct(
@@ -39,11 +40,43 @@ var _ = Describe("construct_helpers", func() {
 			"fakeVmPath",
 			fakeVcenterClient,
 			fakeGuestManager,
-			fakeZipUnarchiver,
-			fakeMessenger)
+			fakeWinRMEnabler,
+			fakeOSValidator,
+			fakeMessenger,
+		)
+
+		fakeGuestManager.StartProgramInGuestReturnsOnCall(0, 0, nil)
+		fakeGuestManager.ExitCodeForProgramInGuestReturnsOnCall(0, 0, nil)
+		versionBuffer := gbytes.NewBuffer()
+		_, err := versionBuffer.Write([]byte("dev"))
+		Expect(err).NotTo(HaveOccurred())
+
+		fakeGuestManager.DownloadFileInGuestReturns(versionBuffer, 3, nil)
+		fakeGuestManager.StartProgramInGuestReturns(0, nil)
 	})
 
 	Describe("PrepareVM", func() {
+		Context("Validates the OS version of the target machine", func() {
+			It("returns failure if the OS Validator returns an error", func() {
+				validationError := errors.New("the OS is wrong")
+				fakeOSValidator.ValidateReturns(validationError)
+
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).To(MatchError(validationError))
+				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(0))
+
+				Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(0))
+			})
+
+			It("prepares the VM if the OS version is correct", func() {
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(1))
+			})
+		})
+
 		Context("can create provision directory", func() {
 			It("creates it successfully", func() {
 				err := vmConstruct.PrepareVM()
@@ -69,164 +102,18 @@ var _ = Describe("construct_helpers", func() {
 		})
 
 		Context("enable WinRM", func() {
-			var saByteData []byte
-
-			BeforeEach(func() {
-				var err error
-				saByteData, err = assets.Asset("StemcellAutomation.zip")
-				Expect(err).ToNot(HaveOccurred())
-			})
-
 			It("returns failure when it fails to enable winrm", func() {
-				execError := errors.New("failed to execute setup script")
-				fakeGuestManager.StartProgramInGuestStub = func(ctx context.Context, command, args string) (int64, error) {
-
-					if strings.Contains(args, "-EncodedCommand") {
-						return 0, execError
-					}
-					return 0, nil
-				}
+				execError := errors.New("failed to enable winRM")
+				fakeWinRMEnabler.EnableReturns(execError)
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("failed to enable WinRM: failed to execute setup script"))
+				Expect(err.Error()).To(Equal("failed to enable winRM"))
 
-				Expect(fakeGuestManager.StartProgramInGuestCallCount()).To(Equal(1))
+				Expect(fakeWinRMEnabler.EnableCallCount()).To(Equal(1))
 			})
 
-			It("returns failure when it fails to poll for enable WinRM process on guest vm", func() {
-				fakeGuestManager.StartProgramInGuestStub = func(ctx context.Context, command, args string) (int64, error) {
-
-					if strings.Contains(args, "-EncodedCommand") {
-						return 1456, nil
-					}
-					return 0, nil
-				}
-
-				execError := errors.New("failed to find PID")
-
-				fakeGuestManager.ExitCodeForProgramInGuestStub = func(ctx context.Context, pid int64) (int32, error) {
-					if pid == 1456 {
-						return 1, execError
-					}
-					return 0, nil
-				}
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("failed to enable WinRM: failed to find PID"))
-
-				Expect(fakeGuestManager.StartProgramInGuestCallCount()).To(Equal(1))
-				Expect(fakeGuestManager.ExitCodeForProgramInGuestCallCount()).To(Equal(1))
-				_, pid := fakeGuestManager.ExitCodeForProgramInGuestArgsForCall(0)
-
-				Expect(pid).To(Equal(int64(1456)))
-			})
-
-			It("returns failure when WinRM process on guest VM exited with non zero exit code", func() {
-
-				fakeGuestManager.StartProgramInGuestStub = func(ctx context.Context, command, args string) (int64, error) {
-
-					if strings.Contains(args, "-EncodedCommand") {
-						return 1456, nil
-					}
-					return 0, nil
-				}
-
-				fakeGuestManager.ExitCodeForProgramInGuestStub = func(ctx context.Context, pid int64) (int32, error) {
-					if pid == 1456 {
-						return 120, nil
-					}
-					return 0, nil
-				}
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("failed to enable WinRM: WinRM process on guest VM exited with code 120"))
-
-				Expect(fakeGuestManager.ExitCodeForProgramInGuestCallCount()).To(Equal(1))
-				Expect(fakeGuestManager.StartProgramInGuestCallCount()).To(Equal(1))
-			})
-
-			It("returns a failure when it fails to find bosh-psmodules.zip in the achive artifact", func() {
-				execError := errors.New("failed to find bosh-psmodules.zip")
-				fakeZipUnarchiver.UnzipReturnsOnCall(0, nil, execError)
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError("failed to enable WinRM: failed to find bosh-psmodules.zip"))
-				Expect(fakeZipUnarchiver.UnzipCallCount()).To(Equal(1))
-
-				archive, fileName := fakeZipUnarchiver.UnzipArgsForCall(0)
-
-				Expect(fileName).To(Equal("bosh-psmodules.zip"))
-				Expect(archive).To(Equal(saByteData))
-
-				Expect(fakeGuestManager.StartProgramInGuestCallCount()).To(Equal(0))
-				Expect(fakeGuestManager.ExitCodeForProgramInGuestCallCount()).To(Equal(0))
-
-			})
-
-			It("returns a failure when fails to find BOSH.WinRM.psm1 in bosh-psmodules.zip", func() {
-				execError := errors.New("failed to find BOSH.WinRM.psm1")
-				fakeZipUnarchiver.UnzipReturnsOnCall(0, []byte("bosh-psmodules.zip extracted byte array"), nil)
-				fakeZipUnarchiver.UnzipReturnsOnCall(1, nil, execError)
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError("failed to enable WinRM: failed to find BOSH.WinRM.psm1"))
-				Expect(fakeZipUnarchiver.UnzipCallCount()).To(Equal(2))
-
-				archive, fileName := fakeZipUnarchiver.UnzipArgsForCall(0)
-				Expect(fileName).To(Equal("bosh-psmodules.zip"))
-				Expect(archive).To(Equal(saByteData))
-
-				archive, fileName = fakeZipUnarchiver.UnzipArgsForCall(1)
-				Expect(fileName).To(Equal("BOSH.WinRM.psm1"))
-				Expect(archive).To(Equal([]byte("bosh-psmodules.zip extracted byte array")))
-
-				Expect(fakeGuestManager.StartProgramInGuestCallCount()).To(Equal(0))
-				Expect(fakeGuestManager.ExitCodeForProgramInGuestCallCount()).To(Equal(0))
-			})
-
-			It("returns success when it enables WinRM on the guest VM", func() {
-				fakeGuestManager.StartProgramInGuestStub = func(ctx context.Context, command, args string) (int64, error) {
-
-					if strings.Contains(args, "-EncodedCommand") {
-						return 65535, nil
-					}
-					return 0, nil
-				}
-
-				fakeZipUnarchiver.UnzipReturnsOnCall(0, []byte("bosh-psmodules.zip extracted byte array"), nil)
-				fakeZipUnarchiver.UnzipReturnsOnCall(1, []byte("BOSH.WinRM.psm1 extracted byte array"), nil)
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(fakeZipUnarchiver.UnzipCallCount()).To(Equal(2))
-				Expect(fakeGuestManager.StartProgramInGuestCallCount()).To(Equal(1))
-				Expect(fakeGuestManager.ExitCodeForProgramInGuestCallCount()).To(Equal(1))
-
-				archive, fileName := fakeZipUnarchiver.UnzipArgsForCall(0)
-				Expect(fileName).To(Equal("bosh-psmodules.zip"))
-				Expect(archive).To(Equal(saByteData))
-
-				archive, fileName = fakeZipUnarchiver.UnzipArgsForCall(1)
-				Expect(fileName).To(Equal("BOSH.WinRM.psm1"))
-				Expect(archive).To(Equal([]byte("bosh-psmodules.zip extracted byte array")))
-
-				_, command, args := fakeGuestManager.StartProgramInGuestArgsForCall(0)
-				// Though the directory uses v1.0, this is also valid for Powershell 5 that we require
-				Expect(command).To(Equal("C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"))
-				// The encoded string was created by running the following in terminal `printf "BOSH.WinRM.psm1 extracted byte array\nEnable-WinRM" | iconv -t UTF-16LE | openssl base64 | tr -d '\n'`
-				Expect(args).To(Equal("-EncodedCommand QgBPAFMASAAuAFcAaQBuAFIATQAuAHAAcwBtADEAIABlAHgAdAByAGEAYwB0AGUAZAAgAGIAeQB0AGUAIABhAHIAcgBhAHkACgBFAG4AYQBiAGwAZQAtAFcAaQBuAFIATQAKAA=="))
-
-				_, pid := fakeGuestManager.ExitCodeForProgramInGuestArgsForCall(0)
-				Expect(pid).To(Equal(int64(65535)))
-			})
-
-			It("logs that winrm was succesfully enabled", func() {
+			It("logs that winrm was successfully enabled", func() {
 				err := vmConstruct.PrepareVM()
 
 				Expect(err).NotTo(HaveOccurred())
@@ -276,10 +163,6 @@ var _ = Describe("construct_helpers", func() {
 		})
 
 		Context("can upload artifacts", func() {
-			BeforeEach(func() {
-				fakeZipUnarchiver.UnzipReturns([]byte("extracted archive"), nil)
-			})
-
 			Context("Upload all artifacts correctly", func() {
 				It("passes successfully", func() {
 
@@ -348,10 +231,6 @@ var _ = Describe("construct_helpers", func() {
 		})
 
 		Context("can extract archives", func() {
-			BeforeEach(func() {
-				fakeZipUnarchiver.UnzipReturns([]byte("extracted archive"), nil)
-			})
-
 			It("returns failure when it fails to extract archive", func() {
 				extractError := errors.New("failed to extract archive")
 				fakeRemoteManager.ExtractArchiveReturns(extractError)
@@ -381,9 +260,6 @@ var _ = Describe("construct_helpers", func() {
 		})
 
 		Context("can execute scripts", func() {
-			BeforeEach(func() {
-				fakeZipUnarchiver.UnzipReturns([]byte("extracted archive"), nil)
-			})
 			It("returns failure when it fails to execute setup script", func() {
 				execError := errors.New("failed to execute setup script")
 				fakeRemoteManager.ExecuteCommandReturns(execError)

@@ -6,9 +6,9 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"unicode/utf16"
 
-	"github.com/cloudfoundry-incubator/stembuild/assets"
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
 
@@ -20,7 +20,8 @@ type VMConstruct struct {
 	vmInventoryPath string
 	vmUsername      string
 	vmPassword      string
-	unarchiver      zipUnarchiver
+	winRMEnabler    WinRMEnabler
+	osValidator     OSValidator
 	messenger       ConstructMessenger
 }
 
@@ -41,7 +42,8 @@ func NewVMConstruct(
 	vmInventoryPath string,
 	client IaasClient,
 	guestManager GuestManager,
-	unarchiver zipUnarchiver,
+	winRMEnabler WinRMEnabler,
+	osValidator OSValidator,
 	messenger ConstructMessenger,
 ) *VMConstruct {
 
@@ -53,7 +55,8 @@ func NewVMConstruct(
 		vmInventoryPath,
 		vmUsername,
 		vmPassword,
-		unarchiver,
+		winRMEnabler,
+		osValidator,
 		messenger,
 	}
 }
@@ -62,6 +65,7 @@ func NewVMConstruct(
 type GuestManager interface {
 	ExitCodeForProgramInGuest(ctx context.Context, pid int64) (int32, error)
 	StartProgramInGuest(ctx context.Context, command, args string) (int64, error)
+	DownloadFileInGuest(ctx context.Context, path string) (io.Reader, int64, error)
 }
 
 //go:generate counterfeiter . IaasClient
@@ -72,9 +76,14 @@ type IaasClient interface {
 	WaitForExit(vmInventoryPath, username, password, pid string) (int, error)
 }
 
-//go:generate counterfeiter . zipUnarchiver
-type zipUnarchiver interface {
-	Unzip(fileArchive []byte, file string) ([]byte, error)
+//go:generate counterfeiter . WinRMEnabler
+type WinRMEnabler interface {
+	Enable() error
+}
+
+//go:generate counterfeiter . OSValidator
+type OSValidator interface {
+	Validate() error
 }
 
 //go:generate counterfeiter . ConstructMessenger
@@ -97,7 +106,12 @@ type ConstructMessenger interface {
 
 func (c *VMConstruct) PrepareVM() error {
 
-	err := c.createProvisionDirectory()
+	err := c.osValidator.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = c.createProvisionDirectory()
 	if err != nil {
 		return err
 	}
@@ -109,7 +123,7 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.UploadArtifactsSucceeded()
 
 	c.messenger.EnableWinRMStarted()
-	err = c.enableWinRM()
+	err = c.winRMEnabler.Enable()
 	if err != nil {
 		return err
 	}
@@ -189,46 +203,6 @@ func (c *VMConstruct) extractArchive() error {
 func (c *VMConstruct) executeSetupScript() error {
 	err := c.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationScript)
 	return err
-}
-
-func (c *VMConstruct) enableWinRM() error {
-	failureString := "failed to enable WinRM: %s"
-
-	saZip, err := assets.Asset(stemcellAutomationName)
-	if err != nil {
-		return fmt.Errorf(failureString, err)
-	}
-
-	bmZip, err := c.unarchiver.Unzip(saZip, boshPsModules)
-	if err != nil {
-		return fmt.Errorf(failureString, err)
-	}
-
-	rawWinRM, err := c.unarchiver.Unzip(bmZip, winRMPsScript)
-	if err != nil {
-		return fmt.Errorf(failureString, err)
-	}
-
-	// because we are streaming the contents of BOSH.WinRM.ps1 directly as the command, we must append Enable-WinRM
-	//	so it gets invoked, and we must base64 encode so the contents are safely executed on the command line.
-	rawWinRMwtCmd := append(rawWinRM, []byte("\nEnable-WinRM\n")...)
-
-	base64WinRM := encodePowershellCommand(rawWinRMwtCmd)
-
-	pid, err := c.guestManager.StartProgramInGuest(c.ctx, powershell, fmt.Sprintf("-EncodedCommand %s", base64WinRM))
-	if err != nil {
-		return fmt.Errorf(failureString, err)
-	}
-
-	exitCode, err := c.guestManager.ExitCodeForProgramInGuest(c.ctx, pid)
-	if err != nil {
-		return fmt.Errorf(failureString, err)
-	}
-	if exitCode != 0 {
-		return fmt.Errorf(failureString, fmt.Sprintf("WinRM process on guest VM exited with code %d", exitCode))
-	}
-
-	return nil
 }
 
 func encodePowershellCommand(command []byte) string {

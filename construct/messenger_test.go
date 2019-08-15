@@ -1,6 +1,7 @@
 package construct_test
 
 import (
+	"fmt"
 	"github.com/cloudfoundry-incubator/stembuild/construct"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -163,6 +164,31 @@ var _ = Describe("Messenger", func() {
 			m.UploadFileSucceeded()
 
 			Expect(buf).To(gbytes.Say("Uploading some third artifact to target VM...succeed."))
+		})
+	})
+
+	Describe("validate OS", func() {
+		var matchingVersionWarning = "Ensure the version of the stemcell you're trying to build matches the corresponding base ISO you're using.\n" +
+			"For example: If you're building 2019.x, then you should be using 'Windows Server 2019' only"
+		It("writes the OS version file creation failed message to the writer", func() {
+			errorMessage := "some error message"
+			m := construct.NewMessenger(buf)
+			m.OSVersionFileCreationFailed(errorMessage)
+			Expect(buf).To(gbytes.Say(fmt.Sprintf("Warning: OS Version file creation failed:\n%s\n%s", matchingVersionWarning, errorMessage)))
+		})
+
+		It("writes the exit code retrieval failed message to the writer", func() {
+			errorMessage := "some error message"
+			m := construct.NewMessenger(buf)
+			m.ExitCodeRetrievalFailed(errorMessage)
+			Expect(buf).To(gbytes.Say(fmt.Sprintf("Warning: Failed to retrieve exit code for process to create OS Version file:\n%s\n%s", matchingVersionWarning, errorMessage)))
+		})
+
+		It("writes the download file failed message to the writer", func() {
+			errorMessage := "some error message"
+			m := construct.NewMessenger(buf)
+			m.DownloadFileFailed(errorMessage)
+			Expect(buf).To(gbytes.Say(fmt.Sprintf("Warning: Failed to download OS Version file:\n%s\n%s", matchingVersionWarning, errorMessage)))
 		})
 	})
 })

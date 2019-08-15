@@ -4,10 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
-	"github.com/cloudfoundry-incubator/stembuild/version"
 	"os"
 	"path/filepath"
+
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+	"github.com/cloudfoundry-incubator/stembuild/version"
 
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/factory"
 

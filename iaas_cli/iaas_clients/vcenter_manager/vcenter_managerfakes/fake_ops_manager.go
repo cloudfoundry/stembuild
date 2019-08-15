@@ -2,14 +2,27 @@
 package vcenter_managerfakes
 
 import (
-	context "context"
-	sync "sync"
+	"context"
+	"sync"
 
-	vcenter_manager "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
-	guest "github.com/vmware/govmomi/guest"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/vmware/govmomi/guest"
 )
 
 type FakeOpsManager struct {
+	FileManagerStub        func(context.Context) (*guest.FileManager, error)
+	fileManagerMutex       sync.RWMutex
+	fileManagerArgsForCall []struct {
+		arg1 context.Context
+	}
+	fileManagerReturns struct {
+		result1 *guest.FileManager
+		result2 error
+	}
+	fileManagerReturnsOnCall map[int]struct {
+		result1 *guest.FileManager
+		result2 error
+	}
 	ProcessManagerStub        func(context.Context) (*guest.ProcessManager, error)
 	processManagerMutex       sync.RWMutex
 	processManagerArgsForCall []struct {
@@ -25,6 +38,69 @@ type FakeOpsManager struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeOpsManager) FileManager(arg1 context.Context) (*guest.FileManager, error) {
+	fake.fileManagerMutex.Lock()
+	ret, specificReturn := fake.fileManagerReturnsOnCall[len(fake.fileManagerArgsForCall)]
+	fake.fileManagerArgsForCall = append(fake.fileManagerArgsForCall, struct {
+		arg1 context.Context
+	}{arg1})
+	fake.recordInvocation("FileManager", []interface{}{arg1})
+	fake.fileManagerMutex.Unlock()
+	if fake.FileManagerStub != nil {
+		return fake.FileManagerStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.fileManagerReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeOpsManager) FileManagerCallCount() int {
+	fake.fileManagerMutex.RLock()
+	defer fake.fileManagerMutex.RUnlock()
+	return len(fake.fileManagerArgsForCall)
+}
+
+func (fake *FakeOpsManager) FileManagerCalls(stub func(context.Context) (*guest.FileManager, error)) {
+	fake.fileManagerMutex.Lock()
+	defer fake.fileManagerMutex.Unlock()
+	fake.FileManagerStub = stub
+}
+
+func (fake *FakeOpsManager) FileManagerArgsForCall(i int) context.Context {
+	fake.fileManagerMutex.RLock()
+	defer fake.fileManagerMutex.RUnlock()
+	argsForCall := fake.fileManagerArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeOpsManager) FileManagerReturns(result1 *guest.FileManager, result2 error) {
+	fake.fileManagerMutex.Lock()
+	defer fake.fileManagerMutex.Unlock()
+	fake.FileManagerStub = nil
+	fake.fileManagerReturns = struct {
+		result1 *guest.FileManager
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeOpsManager) FileManagerReturnsOnCall(i int, result1 *guest.FileManager, result2 error) {
+	fake.fileManagerMutex.Lock()
+	defer fake.fileManagerMutex.Unlock()
+	fake.FileManagerStub = nil
+	if fake.fileManagerReturnsOnCall == nil {
+		fake.fileManagerReturnsOnCall = make(map[int]struct {
+			result1 *guest.FileManager
+			result2 error
+		})
+	}
+	fake.fileManagerReturnsOnCall[i] = struct {
+		result1 *guest.FileManager
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeOpsManager) ProcessManager(arg1 context.Context) (*guest.ProcessManager, error) {
@@ -93,6 +169,8 @@ func (fake *FakeOpsManager) ProcessManagerReturnsOnCall(i int, result1 *guest.Pr
 func (fake *FakeOpsManager) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.fileManagerMutex.RLock()
+	defer fake.fileManagerMutex.RUnlock()
 	fake.processManagerMutex.RLock()
 	defer fake.processManagerMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

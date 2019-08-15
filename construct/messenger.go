@@ -68,3 +68,21 @@ func (m *Messenger) UploadFileStarted(artifact string) {
 func (m *Messenger) UploadFileSucceeded() {
 	m.out.Write([]byte("succeeded.\n"))
 }
+
+func (m *Messenger) OSVersionFileCreationFailed(errorMessage string) {
+	m.logValidateOSWarning("OS Version file creation failed", errorMessage)
+}
+
+func (m *Messenger) ExitCodeRetrievalFailed(errorMessage string) {
+	m.logValidateOSWarning("Failed to retrieve exit code for process to create OS Version file", errorMessage)
+}
+
+func (m *Messenger) DownloadFileFailed(errorMessage string) {
+	m.logValidateOSWarning("Failed to download OS Version file", errorMessage)
+}
+
+func (m *Messenger) logValidateOSWarning(log string, errorMessage string) {
+	matchingVersionWarning := "Ensure the version of the stemcell you're trying to build matches the corresponding base ISO you're using.\n" +
+		"For example: If you're building 2019.x, then you should be using 'Windows Server 2019' only"
+	m.out.Write([]byte(fmt.Sprintf("Warning: %s:\n%s\n%s", log, matchingVersionWarning, errorMessage)))
+}

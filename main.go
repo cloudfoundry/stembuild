@@ -10,8 +10,8 @@ import (
 
 	"github.com/cloudfoundry-incubator/stembuild/assets"
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/construct/factory"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	vmconstruct_factory "github.com/cloudfoundry-incubator/stembuild/construct/factory"
+	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry-incubator/stembuild/version"
 	. "github.com/google/subcommands"
 )

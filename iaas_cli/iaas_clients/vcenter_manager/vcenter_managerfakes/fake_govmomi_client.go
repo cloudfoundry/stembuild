@@ -2,11 +2,11 @@
 package vcenter_managerfakes
 
 import (
-	context "context"
-	url "net/url"
-	sync "sync"
+	"context"
+	"net/url"
+	"sync"
 
-	vcenter_manager "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
 
 type FakeGovmomiClient struct {
