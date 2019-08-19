@@ -187,7 +187,7 @@ dep sync
 The output should be nothing if there no out-of-sync dependencies.
 
 
-## stembuild for MacOS
+## Compile stembuild for MacOS
 
 You can use stembuild on MacOS, but following the below steps. 
 
