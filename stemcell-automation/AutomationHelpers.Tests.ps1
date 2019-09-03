@@ -724,6 +724,11 @@ Describe "Set-RegKeys" {
 }
 
 Describe "Install-SecurityPoliciesAndRegistries" {
+
+    BeforeEach {
+        function Set-InternetExplorerRegistries{ }
+    }
+
     It "executes the Set-InternetExplorerRegistries powershell cmdlet if the os verison is 2019" {
         $osVersion2019 = "10.0.17763.0"
         Mock Set-InternetExplorerRegistries { }
