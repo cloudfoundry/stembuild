@@ -405,4 +405,26 @@ SeAssignPrimaryTokenPrivilege=*S-1-5-19,*S-1-5-20,*S-1-5-80-3847866527-469524349
     Remove-SSHKeys
 }
 
+function Install-SecurityPoliciesAndRegistries
+{
+    try
+    {
+        $osVersion2019Regex = "10\.0\.17763\..+"
+        $osVersion = Get-OSVersionString
+        Write-Log "osVersion: $osVersion"
+        if ($osVersion -match $osVersion2019Regex) {
+            Set-InternetExplorerRegistries
+            Write-Log "Succesfully ran Set-InternetExplorerRegistries"
+        } else {
+            Write-Log "Did not run Set-InternetExplorerRegistries because OS version was not 2019"
+        }
+    }
+    catch [Exception]
+    {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to execute Set-InternetExplorerRegistries powershell cmdlet. See 'c:\provisions\log.log' for mor info."
+        throw $_.Exception
+    }
+}
+
 

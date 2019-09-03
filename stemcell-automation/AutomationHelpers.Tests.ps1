@@ -594,7 +594,7 @@ Describe "Validate-OSVersion" {
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Found correct OS version: Windows Server 2016, Version 1709" }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
-    }
+}
 
     It "successfully validates the OS when it is Windows Server 1803" {
         Mock Get-OSVersionString { "10.0.17134.2761" }
@@ -721,6 +721,45 @@ Describe "Set-RegKeys" {
         Assert-MockCalled New-ItemProperty -ParameterFilter{ $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -and $Value -eq 3 -and $Name -eq 'FeatureSettingsOverrideMask' }
         Assert-MockCalled New-ItemProperty -ParameterFilter{ $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management' -and $Value -eq 72 -and $Name -eq 'FeatureSettingsOverride' }
     }
+}
+
+Describe "Install-SecurityPoliciesAndRegistries" {
+    It "executes the Set-InternetExplorerRegistries powershell cmdlet if the os verison is 2019" {
+        $osVersion2019 = "10.0.17763.0"
+        Mock Set-InternetExplorerRegistries { }
+        Mock Write-Log { }
+        Mock Get-OSVersionString { $osVersion2019 }
+
+        { Install-SecurityPoliciesAndRegistries } | Should -Not -Throw
+
+        Assert-MockCalled Set-InternetExplorerRegistries -Times 1 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Succesfully ran Set-InternetExplorerRegistries" }
+    }
+
+    It "does not execute the Set-InternetExplorerRegistries powershell cmdlet if the os version is not 2019" {
+        Mock Set-InternetExplorerRegistries { }
+        Mock Write-Log { }
+        Mock Get-OSVersionString { "NOT_2019" }
+
+        { Install-SecurityPoliciesAndRegistries } | Should -Not -Throw
+
+        Assert-MockCalled Set-InternetExplorerRegistries -Times 0 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Did not run Set-InternetExplorerRegistries because OS version was not 2019" }
+
+    }
+
+    It "fails gracefully when Set-InternetExplorerRegistries powershell cmdlet fails" {
+        $osVersion2019 = "10.0.17763.0"
+        Mock Get-OSVersionString { $osVersion2019 }
+        Mock Set-InternetExplorerRegistries { throw "Something terrible happened while attempting to execute Set-InternetExplorerRegistries" }
+        Mock Write-Log { }
+
+        { Install-SecurityPoliciesAndRegistries  } | Should -Throw "Something terrible happened while attempting to execute Set-InternetExplorerRegistries"
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Set-InternetExplorerRegistries" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Set-InternetExplorerRegistries powershell cmdlet. See 'c:\provisions\log.log' for mor info." }
+    }
+
 }
 
 function CreateFakeOpenSSHZip
