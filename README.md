@@ -191,7 +191,17 @@ The output should be nothing if there no out-of-sync dependencies.
 
 You can use stembuild on MacOS, but following the below steps. 
 
-- Download or clone the stembuild repository locally on your MacOS
+- Download or clone the stembuild repository locally on your MacOS inside your `go` directory 
+```
+cd $HOME/go/src/github.com/cloudfoundry-incubator
+git clone https://github.com/cloudfoundry-incubator/stembuild.git
+```
 - Download the latest released artifact in [Stemcell Automation Github Repo](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-automation/releases)
-- Use the command with providing the corresponding values for the Stemcell Version you would like to build and the Stemcell Automation package you downloaded from the previous step -  `make STEMCELL_VERSION=STEMCELL-VERSION AUTOMATION_PATH=PathToStemcellAutomationZip build` to build stembuild for MacOS. 
-
+- Install the [greenhouse-dotfiles](https://github.com/pivotal-cf/greenhouse-dotfiles#greenhouse-dotfiles). Ensure your `./bash_profile` is pointing to the `bash_profile` file downloaded from greenhouse by running `ls -al $HOME`. Repoint it if necessary and then install again.
+- Manually download the `ginkgo` and `go-bindata` libraries
+```
+go get -u github.com/jteeuwen/go-bindata/...
+go get github.com/onsi/ginkgo/ginkgo
+go get github.com/onsi/gomega/...
+```
+- Use the command with providing the corresponding values for the Stemcell Version you would like to build and the Stemcell Automation package you downloaded from the previous step -  `make STEMCELL_VERSION=StemcellVersion AUTOMATION_PATH=PathToStemcellAutomationZip build` to build stembuild for MacOS. 
