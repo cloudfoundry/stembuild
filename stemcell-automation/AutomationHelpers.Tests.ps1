@@ -18,7 +18,7 @@ Describe "CopyPSModules" {
         { CopyPSModules } | Should -Throw "Expand-Archive failed because something went wrong"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Expand-Archive failed because something went wrong" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to copy Bosh Powershell Modules into destination dir. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to copy Bosh Powershell Modules into destination dir. See 'c:\provision\log.log' for more info." }
     }
 }
 
@@ -43,8 +43,30 @@ Describe "InstallCFFeatures" {
         { InstallCFFeatures } | Should -Throw "Something terrible happened while attempting to install a CF feature"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to install a CF feature" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to install the CF features. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to install the CF features. See 'c:\provision\log.log' for more info." }
         Assert-MockCalled Restart-Computer -Times 0 -Scope It
+    }
+}
+
+Describe "Enable-HyperV" {
+    It "executes the Enable-Hyper-V powershell cmdlet" {
+        Mock Enable-Hyper-V { }
+        Mock Write-Log { }
+
+        { Enable-HyperV } | Should -Not -Throw
+
+        Assert-MockCalled Enable-Hyper-V -Times 1 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Successfully enabled HyperV" }
+    }
+
+    It "fails gracefully when enabling Hyper-V" {
+        Mock Enable-Hyper-V { throw "unable to comply" }
+        Mock Write-Log { }
+
+        { Enable-HyperV } | Should -Throw "unable to comply"
+
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "unable to comply" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to enable HyperV. See 'c:\provision\log.log' for more info." }
     }
 }
 
@@ -66,9 +88,8 @@ Describe "InstallCFCell" {
         { InstallCFCell } | Should -Throw "Something terrible happened while attempting to execute Protect-CFCell"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Protect-CFCell" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provision\log.log' for more info." }
     }
-
 }
 
 Describe "InstallBoshAgent" {
@@ -90,7 +111,7 @@ Describe "InstallBoshAgent" {
         { InstallBoshAgent } | Should -Throw "Something terrible happened while attempting to execute Install-Agent"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Install-Agent" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Install-Agent powershell cmdlet. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Install-Agent powershell cmdlet. See 'c:\provision\log.log' for more info." }
     }
 }
 
@@ -113,7 +134,7 @@ Describe "InstallOpenSSH" {
         { InstallOpenSSH } | Should -Throw "Something terrible happened while attempting to execute Install-SSHD"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Install-SSHD" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Install-SSHD powershell cmdlet. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Install-SSHD powershell cmdlet. See 'c:\provision\log.log' for more info." }
     }
 }
 
@@ -141,7 +162,7 @@ Describe "CleanUpVM" {
         Assert-MockCalled Compress-Disk -Times 0 -Scope It
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Optimize-Disk" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to clean up the VM's disk. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to clean up the VM's disk. See 'c:\provision\log.log' for more info." }
     }
 
     It "fails gracefully when Compress-Disk powershell cmdlet fails" {
@@ -155,7 +176,7 @@ Describe "CleanUpVM" {
         Assert-MockCalled Compress-Disk -Times 1 -Scope It
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Compress-Disk" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to clean up the VM's disk. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to clean up the VM's disk. See 'c:\provision\log.log' for more info." }
     }
 }
 
@@ -232,7 +253,7 @@ Describe "SysprepVM" {
         Assert-MockCalled Invoke-Sysprep -Times 0 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" }
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Expand-Archive failed because something went wrong" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provision\log.log' for more info." }
     }
 
     It "fails gracefully when Invoke-Sysprep powershell cmdlet fails" {
@@ -248,7 +269,7 @@ Describe "SysprepVM" {
         Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" }
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Invoke-Sysprep failed because something went wrong" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provision\log.log' for more info." }
     }
 
     It "fails gracefully when GenerateRandomPassword function fails" {
@@ -264,7 +285,7 @@ Describe "SysprepVM" {
         Assert-MockCalled Invoke-Sysprep -Times 0 -Scope It
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "GenerateRandomPassword failed because something went wrong" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provision\log.log' for more info." }
     }
 
     It "doesn't generate a new password when -SkipRandomPassword set to true" {
@@ -446,7 +467,7 @@ Describe "Check-Dependencies" {
 
             Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "File not found" }
-            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provision\log.log' for more info." }
 
         }
 
@@ -457,7 +478,7 @@ Describe "Check-Dependencies" {
 
             Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Dependency file is empty" }
-            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provision\log.log' for more info." }
         }
 
         It "contains an empty json object" {
@@ -467,7 +488,7 @@ Describe "Check-Dependencies" {
 
             Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Dependency file is empty" }
-            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provision\log.log' for more info." }
         }
 
         It "content is badly formatted" {
@@ -477,7 +498,7 @@ Describe "Check-Dependencies" {
 
             Assert-MockCalled Get-Content -Times 1 -Scope It -ParameterFilter { $Path -cmatch "$PSScriptRoot/deps.json" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Invalid JSON primitive: bad-json-format" }
-            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provision\log.log' for more info." }
 
         }
     }
@@ -503,7 +524,7 @@ Describe "Check-Dependencies" {
             Assert-MockCalled Write-Log -Times 0 -Scope It -ParameterFilter { $Message -like "$PSScriptRoot/file1.zip *" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file2.zip is required but was not found" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file3.exe is required but was not found" }
-            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provision\log.log' for more info." }
         }
 
         It "when one or more file hashes do not match" {
@@ -524,7 +545,7 @@ Describe "Check-Dependencies" {
             Assert-MockCalled Write-Log -Times 0 -Scope It -ParameterFilter { $Message -like "$PSScriptRoot/file1.zip *" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file2.zip does not have the correct hash" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file3.exe does not have the correct hash" }
-            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provision\log.log' for more info." }
         }
 
         It "when one file hash does not match and another file is missing " {
@@ -546,7 +567,7 @@ Describe "Check-Dependencies" {
             Assert-MockCalled Write-Log -Times 0 -Scope It -ParameterFilter { $Message -like "$PSScriptRoot/file1.zip *" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file2.zip does not have the correct hash" }
             Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "$PSScriptRoot/file3.exe is required but was not found" }
-            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info." }
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate required dependencies. See 'c:\provision\log.log' for more info." }
         }
     }
 }
@@ -562,7 +583,7 @@ Describe "Validate-OSVersion" {
         { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019 or Windows Server 2016, Version 1709 or 1803"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019 or Windows Server 2016, Version 1709 or 1803" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
     }
 
@@ -572,7 +593,7 @@ Describe "Validate-OSVersion" {
         { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019 or Windows Server 2016, Version 1709"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019 or Windows Server 2016, Version 1709 or 1803" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
 
     }
@@ -583,7 +604,7 @@ Describe "Validate-OSVersion" {
         { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019 or Windows Server 2016, Version 1709"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019 or Windows Server 2016, Version 1709 or 1803" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
     }
 
@@ -623,7 +644,7 @@ Describe "Validate-OSVersion" {
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Could not fetch OS version" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
     }
 }
 
@@ -672,7 +693,7 @@ Describe "DeleteScheduledTask" {
         { DeleteScheduledTask } | Should -Throw "Could not unregister task"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Could not unregister task" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provisions\log.log' for more info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provision\log.log' for more info." }
 
         Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
         Assert-MockCalled Unregister-ScheduledTask -Times 1 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
@@ -762,7 +783,7 @@ Describe "Install-SecurityPoliciesAndRegistries" {
         { Install-SecurityPoliciesAndRegistries  } | Should -Throw "Something terrible happened while attempting to execute Set-InternetExplorerRegistries"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to execute Set-InternetExplorerRegistries" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Set-InternetExplorerRegistries powershell cmdlet. See 'c:\provisions\log.log' for mor info." }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to execute Set-InternetExplorerRegistries powershell cmdlet. See 'c:\provision\log.log' for more info." }
     }
 
 }

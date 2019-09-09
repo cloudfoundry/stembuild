@@ -8,7 +8,7 @@ function CopyPSModules
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to copy Bosh Powershell Modules into destination dir. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to copy Bosh Powershell Modules into destination dir. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -24,8 +24,22 @@ function InstallCFFeatures
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        #TODO: Fix spelling!
-        Write-Log "Failed to install the CF features. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to install the CF features. See 'c:\provision\log.log' for more info."
+        throw $_.Exception
+    }
+}
+
+function Enable-HyperV
+{
+    try
+    {
+        Enable-Hyper-V
+        Write-Log "Successfully enabled HyperV"
+    }
+    catch [Exception]
+    {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to enable HyperV. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -40,7 +54,7 @@ function InstallCFCell
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to execute Protect-CFCell powershell cmdlet. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -55,7 +69,7 @@ function InstallBoshAgent
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to execute Install-Agent powershell cmdlet. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to execute Install-Agent powershell cmdlet. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -70,7 +84,7 @@ function InstallOpenSSH
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to execute Install-SSHD powershell cmdlet. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to execute Install-SSHD powershell cmdlet. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -95,7 +109,7 @@ function Set-RegKeys
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to set meltdown/zombieload registry keys. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to set meltdown/zombieload registry keys. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -111,7 +125,7 @@ function CleanUpVM
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to clean up the VM's disk. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to clean up the VM's disk. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -208,7 +222,7 @@ function SysprepVM
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to Sysprep the VM's. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to Sysprep the VM's. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -252,7 +266,7 @@ function Check-Dependencies
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to validate required dependencies. See 'c:\provisions\log.log' for more info."
+        Write-Log "Failed to validate required dependencies. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 
@@ -288,7 +302,7 @@ function Validate-OSVersion
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to validate the OS version. See 'c:\provisions\log.log' for more info."
+        Write-Log "Failed to validate the OS version. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -305,7 +319,7 @@ function DeleteScheduledTask {
     }
     catch [Exception] {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provisions\log.log' for more info."
+        Write-Log "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }
@@ -422,7 +436,7 @@ function Install-SecurityPoliciesAndRegistries
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to execute Set-InternetExplorerRegistries powershell cmdlet. See 'c:\provisions\log.log' for mor info."
+        Write-Log "Failed to execute Set-InternetExplorerRegistries powershell cmdlet. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
 }

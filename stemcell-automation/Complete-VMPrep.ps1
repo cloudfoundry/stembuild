@@ -11,6 +11,7 @@ Push-Location $PSScriptRoot
 try {
     DeleteScheduledTask
 
+    Enable-HyperV
     InstallCFCell
     CleanUpVM
     SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
