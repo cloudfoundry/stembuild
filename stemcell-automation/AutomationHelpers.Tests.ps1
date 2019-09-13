@@ -824,7 +824,7 @@ Describe "Enable-SSHD" {
   }
 
     AfterEach {
-        rmdir $TMP_DIR -Recurse -ErrorAction Ignore
+        Remove-Item $TMP_DIR -Recurse -ErrorAction Ignore
         $env:WINDIR = $ORIGINAL_WINDIR
         $env:PROGRAMDATA = $ORIGINAL_PROGRAMDATA
     }

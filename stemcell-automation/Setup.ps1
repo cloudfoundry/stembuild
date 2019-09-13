@@ -7,6 +7,7 @@ param(
 Push-Location $PSScriptRoot
 
 . ./AutomationHelpers.ps1
+. ./ProvisionVM.ps1
 
 function Write-Log
 {
@@ -41,14 +42,9 @@ try {
     Register-ScheduledTask BoshCompleteVMPrep -Action $Sta -Trigger $Stt -Principal $STPrin -Description "Bosh Stemcell Automation task to complete the vm preparation"
     Write-Log "Successfully registered the Bosh Stemcell Automation scheduled task"
 
-    CopyPSModules
-    InstallBoshAgent
-    InstallOpenSSH
-    Enable-SSHD
-    InstallCFFeatures
-    Install-SecurityPoliciesAndRegistries
+    ProvisionVM
 } catch [Exception] {
-    Write-Log "Failed to install Bosh dependencies. See 'c:\provisions\log.log' for more info."
+    Write-Log "Failed to install Bosh dependencies. See 'c:\provision\log.log' for more info."
     DeleteScheduledTask
     Exit 1
 }
