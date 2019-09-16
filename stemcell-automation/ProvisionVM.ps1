@@ -6,4 +6,5 @@ function ProvisionVM() {
     InstallOpenSSH
     Enable-SSHD
     InstallCFFeatures
+    Enable-HyperV
 }

@@ -49,9 +49,11 @@ Describe "InstallCFFeatures" {
 }
 
 Describe "Enable-HyperV" {
-    It "executes the Enable-Hyper-V powershell cmdlet" {
+    It "executes the Enable-Hyper-V powershell cmdlet when the os version is 2019" {
         Mock Enable-Hyper-V { }
         Mock Write-Log { }
+        $osVersion2019 = "10.0.17763.2761"
+        Mock Get-OSVersionString { $osVersion2019 }
 
         { Enable-HyperV } | Should -Not -Throw
 
@@ -59,9 +61,23 @@ Describe "Enable-HyperV" {
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Successfully enabled HyperV" }
     }
 
+    It "does not execute the Enable-Hyper-V powershell cmdlet when the os version is not 2019" {
+        Mock Enable-Hyper-V { }
+        Mock Write-Log { }
+        $osVersion1803 = "10.0.17134.2761"
+        Mock Get-OSVersionString { $osVersion1803 }
+
+        { Enable-HyperV } | Should -Not -Throw
+
+        Assert-MockCalled Enable-Hyper-V -Times 0 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Did not enable HyperV because OS Version is not 2019" }
+    }
+
     It "fails gracefully when enabling Hyper-V" {
         Mock Enable-Hyper-V { throw "unable to comply" }
         Mock Write-Log { }
+        $osVersion2019 = "10.0.17763.2761"
+        Mock Get-OSVersionString { $osVersion2019 }
 
         { Enable-HyperV } | Should -Throw "unable to comply"
 

@@ -33,8 +33,16 @@ function Enable-HyperV
 {
     try
     {
-        Enable-Hyper-V
-        Write-Log "Successfully enabled HyperV"
+        $osVersion2019Regex = "10\.0\.17763\..+"
+        $osVersion = Get-OSVersionString
+        if ($osVersion -match $osVersion2019Regex) {
+            Enable-Hyper-V
+            Write-Log "Successfully enabled HyperV"
+        }
+        else {
+            Write-Log "Did not enable HyperV because OS Version is not 2019"
+        }
+
     }
     catch [Exception]
     {

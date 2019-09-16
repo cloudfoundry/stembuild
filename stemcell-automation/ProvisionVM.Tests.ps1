@@ -8,6 +8,7 @@ Describe "ProvisionVM" {
         Mock InstallBoshAgent
         Mock Enable-SSHD
         Mock Install-SecurityPoliciesAndRegistries
+        Mock Enable-HyperV
     }
 
     It "installs CFFeatures" {
@@ -15,6 +16,12 @@ Describe "ProvisionVM" {
 
         Assert-MockCalled -CommandName InstallCFFeatures
     }
+    It "enables Hyper-V when possible" {
+        ProvisionVM
+
+        Assert-MockCalled -CommandName Enable-HyperV
+    }
+
     It "copy PSModules" {
         ProvisionVM
 
