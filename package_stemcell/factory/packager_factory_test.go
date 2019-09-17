@@ -16,6 +16,12 @@ var _ = Describe("Factory", func() {
 		OutputDir:       "/tmp/outputDir",
 	}
 
+	var packagerFactory *factory.PackagerFactory
+
+	BeforeEach(func() {
+		packagerFactory = &factory.PackagerFactory{}
+	})
+
 	Describe("GetPackager", func() {
 		Context("When VMDK is specified and no vCenter credentials are given", func() {
 			It("returns a VMDK packager with no error", func() {
@@ -23,7 +29,7 @@ var _ = Describe("Factory", func() {
 					Vmdk: "path/to/a/vmdk",
 				}
 
-				actualPackager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
+				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VmdkPackager{}))
@@ -40,7 +46,7 @@ var _ = Describe("Factory", func() {
 					VmInventoryPath: "some-vm-inventory-path",
 				}
 
-				actualPackager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
+				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VCenterPackager{}))
@@ -55,7 +61,7 @@ var _ = Describe("Factory", func() {
 					VmInventoryPath: "some-vm",
 				}
 
-				packager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
+				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("configuration provided for VMDK & vCenter sources"))
 				Expect(packager).To(BeNil())
@@ -70,7 +76,7 @@ var _ = Describe("Factory", func() {
 					URL:             "some-url",
 				}
 
-				packager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
+				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("missing vCenter configurations"))
 				Expect(packager).To(BeNil())
@@ -81,7 +87,7 @@ var _ = Describe("Factory", func() {
 			It("returns an error", func() {
 				sourceConfig := config.SourceConfig{}
 
-				packager, err := factory.GetPackager(sourceConfig, outputConfig, 0, false)
+				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("no configuration was provided"))
 				Expect(packager).To(BeNil())

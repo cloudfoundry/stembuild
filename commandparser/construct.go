@@ -4,13 +4,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	"os"
+	"path/filepath"
+
+	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/object"
-	"os"
-	"path/filepath"
 
 	"github.com/cloudfoundry-incubator/stembuild/construct/config"
 	"github.com/google/subcommands"
@@ -64,8 +65,8 @@ type ConstructCmd struct {
 	GlobalFlags    *GlobalFlags
 }
 
-func NewConstructCmd(ctx context.Context, prepFactory VMPreparerFactory, managerFactory ManagerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) ConstructCmd {
-	return ConstructCmd{ctx: ctx, prepFactory: prepFactory, managerFactory: managerFactory, validator: validator, messenger: messenger}
+func NewConstructCmd(ctx context.Context, prepFactory VMPreparerFactory, managerFactory ManagerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) *ConstructCmd {
+	return &ConstructCmd{ctx: ctx, prepFactory: prepFactory, managerFactory: managerFactory, validator: validator, messenger: messenger}
 }
 
 func (*ConstructCmd) Name() string { return "construct" }

@@ -7,21 +7,60 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
-	"github.com/cloudfoundry-incubator/stembuild/version"
-
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/factory"
-
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
+
+	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
 	"github.com/google/subcommands"
 )
 
-type PackageCmd struct {
-	GlobalFlags  *GlobalFlags
-	sourceConfig config.SourceConfig
-	outputConfig config.OutputConfig
+//go:generate counterfeiter . OSAndVersionGetter
+type OSAndVersionGetter interface {
+	GetVersion() string
+	GetVersionWithPatchNumber(string) string
+	GetOs() string
 }
+
+//go:generate counterfeiter . PackagerFactory
+type PackagerFactory interface {
+	Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logLevel int, color bool) (Packager, error)
+}
+
+//go:generate counterfeiter . Packager
+type Packager interface {
+	Package() error
+	ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error
+	ValidateSourceParameters() error
+}
+
+//go:generate counterfeiter . PackagerMessenger
+type PackagerMessenger interface {
+	InvalidOutputConfig(error)
+	CannotCreatePackager(error)
+	DoesNotHaveEnoughSpace(error)
+	SourceParametersAreInvalid(error)
+	PackageFailed(error)
+}
+
+type PackageCmd struct {
+	GlobalFlags        *GlobalFlags
+	sourceConfig       config.SourceConfig
+	outputConfig       config.OutputConfig
+	osAndVersionGetter OSAndVersionGetter
+	packagerFactory    PackagerFactory
+	packagerMessenger  PackagerMessenger
+}
+
+func NewPackageCommand(o OSAndVersionGetter, p PackagerFactory, m PackagerMessenger) *PackageCmd {
+	return &PackageCmd{
+		osAndVersionGetter: o,
+		packagerFactory:    p,
+		packagerMessenger:  m,
+	}
+}
+
+var patchVersion string
 
 func (*PackageCmd) Name() string { return "package" }
 func (*PackageCmd) Synopsis() string {
@@ -69,9 +108,11 @@ func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.Username, "vcenter-username", "", "vCenter username")
 	f.StringVar(&p.sourceConfig.Password, "vcenter-password", "", "vCenter password")
 	f.StringVar(&p.sourceConfig.URL, "vcenter-url", "", "vCenter url")
+	f.StringVar(&p.sourceConfig.CaCertFile, "vcenter-ca-certs", "", "filepath for custom ca certs")
+
 	f.StringVar(&p.outputConfig.OutputDir, "outputDir", "", "Output directory, default is the current working directory.")
 	f.StringVar(&p.outputConfig.OutputDir, "o", "", "Output directory (shorthand)")
-	f.StringVar(&p.sourceConfig.CaCertFile, "vcenter-ca-certs", "", "filepath for custom ca certs")
+	f.StringVar(&patchVersion, "patch-version", "", "Optional. Patch version.")
 }
 
 func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
@@ -84,34 +125,31 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 	p.setOSandStemcellVersions()
 
 	err := p.outputConfig.ValidateConfig()
-
 	if err != nil {
-		_, _ = fmt.Fprint(os.Stderr, err)
+		p.packagerMessenger.InvalidOutputConfig(err)
 		return subcommands.ExitFailure
 	}
 
-	packager, err := factory.GetPackager(p.sourceConfig, p.outputConfig, logLevel, p.GlobalFlags.Color)
+	packager, err := p.packagerFactory.Packager(p.sourceConfig, p.outputConfig, logLevel, p.GlobalFlags.Color)
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err.Error())
+		p.packagerMessenger.CannotCreatePackager(err)
 		return subcommands.ExitFailure
 	}
 
 	err = packager.ValidateFreeSpaceForPackage(&filesystem.OSFileSystem{})
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err.Error())
+		p.packagerMessenger.DoesNotHaveEnoughSpace(err)
 		return subcommands.ExitFailure
 	}
 
 	err = packager.ValidateSourceParameters()
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err.Error())
+		p.packagerMessenger.SourceParametersAreInvalid(err)
 		return subcommands.ExitFailure
 	}
 
 	if err := packager.Package(); err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err.Error())
-		_, _ = fmt.Fprintln(os.Stderr, "Please provide the error logs to bosh-windows-eng@pivotal.io")
-
+		p.packagerMessenger.PackageFailed(err)
 		return subcommands.ExitFailure
 	}
 
@@ -119,7 +157,11 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 }
 
 func (p *PackageCmd) setOSandStemcellVersions() {
-	defaultOs, defaultStemcellVersion := version.GetVersions(version.Version)
-	p.outputConfig.Os = defaultOs
-	p.outputConfig.StemcellVersion = defaultStemcellVersion
+	p.outputConfig.Os = p.osAndVersionGetter.GetOs()
+
+	if patchVersion == "" {
+		p.outputConfig.StemcellVersion = p.osAndVersionGetter.GetVersion()
+	} else {
+		p.outputConfig.StemcellVersion = p.osAndVersionGetter.GetVersionWithPatchNumber(patchVersion)
+	}
 }

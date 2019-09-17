@@ -71,8 +71,8 @@ var _ = Describe("OutputConfig", func() {
 			})
 		})
 	})
-	Describe("validateOutputDir", func() {
 
+	Describe("validateOutputDir", func() {
 		Context("no dir given", func() {
 			It("should be an error", func() {
 				err := ValidateOrCreateOutputDir("")

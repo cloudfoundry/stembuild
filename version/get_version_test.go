@@ -6,24 +6,53 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+type VModifier struct {
+	newVersionNumber string
+}
+
+func (m *VModifier) Modify(v *version.VersionGetter) {
+	v.Version = m.newVersionNumber
+}
+
 var _ = Describe("Version Utilities", func() {
-	Describe("GetVersions", func() {
+	Describe("GetVersion", func() {
 		It("should return a properly formatted version number", func() {
-			os, stemcellVersion := version.GetVersions("1803.123.13")
-			Expect(os).To(Equal("1803"))
+			versionGetter := version.NewVersionGetter(&VModifier{"1803.123.13"})
+
+			stemcellVersion := versionGetter.GetVersion()
 			Expect(stemcellVersion).To(Equal("1803.123"))
 		})
+	})
 
-		It("should return 2016 as OS if given version is 1709", func() {
-			os, stemcellVersion := version.GetVersions("1709.123.13")
-			Expect(os).To(Equal("2016"))
-			Expect(stemcellVersion).To(Equal("1709.123"))
+	Describe("GetVersionWithPatchNumber", func() {
+		It("returns a version number with a patch number when provided", func() {
+			versionGetter := version.NewVersionGetter(&VModifier{"2019.5.13"})
+
+			stemcellVersion := versionGetter.GetVersionWithPatchNumber("2")
+			Expect(stemcellVersion).To(Equal("2019.5.2"))
+		})
+	})
+
+	Describe("GetOs", func() {
+		It("should return 1803 as OS if given version is 1803", func() {
+			versionGetter := version.NewVersionGetter(&VModifier{"1803.5.13"})
+
+			os := versionGetter.GetOs()
+			Expect(os).To(Equal("1803"))
+		})
+
+		It("should return 2019 as OS if given version is 2019", func() {
+			versionGetter := version.NewVersionGetter(&VModifier{"2019.5.13"})
+
+			os := versionGetter.GetOs()
+			Expect(os).To(Equal("2019"))
 		})
 
 		It("should return 2012R2 as OS if given version is 1200", func() {
-			os, stemcellVersion := version.GetVersions("1200.123.13")
+			versionGetter := version.NewVersionGetter(&VModifier{"1200.5.13"})
+
+			os := versionGetter.GetOs()
 			Expect(os).To(Equal("2012R2"))
-			Expect(stemcellVersion).To(Equal("1200.123"))
 		})
 	})
 

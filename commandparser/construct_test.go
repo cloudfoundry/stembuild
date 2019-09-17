@@ -23,7 +23,7 @@ var _ = Describe("construct", func() {
 		var ConstrCmd *ConstructCmd
 
 		BeforeEach(func() {
-			f = flag.NewFlagSet("test", flag.ExitOnError)
+			f = flag.NewFlagSet("test", flag.ContinueOnError)
 			ConstrCmd = &ConstructCmd{}
 			ConstrCmd.SetFlags(f)
 		})
@@ -98,7 +98,7 @@ var _ = Describe("construct", func() {
 
 		var f *flag.FlagSet
 		var gf *GlobalFlags
-		var ConstrCmd ConstructCmd
+		var ConstrCmd *ConstructCmd
 		var emptyContext context.Context
 
 		var fakeFactory *commandparserfakes.FakeVMPreparerFactory
@@ -118,8 +118,8 @@ var _ = Describe("construct", func() {
 			fakeManagerFactory = &commandparserfakes.FakeManagerFactory{}
 			fakeFactory.VMPreparerReturns(fakeVmConstruct, nil)
 
-			ConstrCmd.SetFlags(f)
 			ConstrCmd = NewConstructCmd(context.Background(), fakeFactory, fakeManagerFactory, fakeValidator, fakeMessenger)
+			ConstrCmd.SetFlags(f)
 			ConstrCmd.GlobalFlags = gf
 			emptyContext = context.Background()
 		})

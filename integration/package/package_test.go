@@ -136,6 +136,42 @@ var _ = Describe("Package", func() {
 
 	})
 
+	It("generates a stemcell with a patch number when specified", func() {
+		session := helpers.RunCommandInDir(
+			workingDir,
+			executable, "package",
+			"-vcenter-url", vcenterURL,
+			"-vcenter-username", vcenterStembuildUsername,
+			"-vcenter-password", vcenterStembuildPassword,
+			"-vm-inventory-path", vmPath,
+			"-patch-version", "5",
+		)
+
+		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
+		var out []byte
+		session.Out.Write(out)
+		fmt.Print(string(out))
+
+		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
+		expectedStemcellVersion := strings.Split(stembuildVersion, ".")[:2]
+		expectedStemcellVersion = append(expectedStemcellVersion, "5")
+
+		expectedFilename := fmt.Sprintf(
+			"bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", strings.Join(expectedStemcellVersion, "."), expectedOSVersion)
+
+		stemcellPath := filepath.Join(workingDir, expectedFilename)
+		Expect(stemcellPath).To(BeAnExistingFile())
+
+		stemcellManifestPath, err := os.Create(filepath.Join(workingDir, "stemcell.MF"))
+		Expect(err).NotTo(HaveOccurred())
+
+		copyFileFromTar(stemcellPath, "stemcell.MF", stemcellManifestPath)
+
+		stemcellManifest, err := helpers.ReadFile(stemcellManifestPath.Name())
+		Expect(err).NotTo(HaveOccurred())
+		Expect(stemcellManifest).To(ContainSubstring(strings.Join(expectedStemcellVersion, ".")))
+	})
+
 	AfterEach(func() {
 		os.RemoveAll(workingDir)
 		if vmPath != "" {

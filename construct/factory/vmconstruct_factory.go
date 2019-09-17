@@ -47,7 +47,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		GuestManager: guestManager,
 		Unarchiver:   &archive.Zip{},
 	}
-	versionGetter := &version.VersionGetter{}
+	versionGetter := version.NewVersionGetter()
 	osValidator := &construct.OSVersionValidator{
 		GuestManager:  guestManager,
 		Messenger:     messenger,

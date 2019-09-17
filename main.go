@@ -12,6 +12,7 @@ import (
 	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
 	vmconstruct_factory "github.com/cloudfoundry-incubator/stembuild/construct/factory"
 	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	packager_factory "github.com/cloudfoundry-incubator/stembuild/package_stemcell/factory"
 	"github.com/cloudfoundry-incubator/stembuild/version"
 	. "github.com/google/subcommands"
 )
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	var gf GlobalFlags
-	packageCmd := PackageCmd{}
+	packageCmd := NewPackageCommand(version.NewVersionGetter(), &packager_factory.PackagerFactory{}, &PackageMessenger{os.Stderr})
 	packageCmd.GlobalFlags = &gf
 	constructCmd := NewConstructCmd(context.Background(), &vmconstruct_factory.VMConstructFactory{}, &vcenter_client_factory.ManagerFactory{}, &ConstructValidator{}, &ConstructCmdMessenger{OutputChannel: os.Stderr})
 	constructCmd.GlobalFlags = &gf
@@ -49,11 +50,11 @@ func main() {
 	commander.Register(sh, "")
 	commands = append(commands, sh)
 
-	commander.Register(&packageCmd, "")
-	commander.Register(&constructCmd, "")
+	commander.Register(packageCmd, "")
+	commander.Register(constructCmd, "")
 
-	commands = append(commands, &packageCmd)
-	commands = append(commands, &constructCmd)
+	commands = append(commands, packageCmd)
+	commands = append(commands, constructCmd)
 
 	// Override the default usage text of Google's Subcommand with our own
 	fs.Usage = func() { sh.Explain(commander.Error) }

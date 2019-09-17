@@ -1,13 +1,50 @@
 package version
 
 import (
+	"fmt"
 	"strings"
 )
 
-type VersionGetter struct{}
+type VersionGetterModifier interface {
+	Modify(*VersionGetter)
+}
+
+func NewVersionGetter(modifiers ...VersionGetterModifier) *VersionGetter {
+	v := &VersionGetter{
+		Version: Version,
+	}
+
+	for _, modifier := range modifiers {
+		modifier.Modify(v)
+	}
+
+	return v
+}
+
+type VersionGetter struct {
+	Version string
+}
 
 func (v *VersionGetter) GetVersion() string {
-	return Version
+	stringArr := strings.Split(v.Version, ".")
+	stringArr = stringArr[0:2]
+
+	return strings.Join(stringArr, ".")
+}
+
+func (v *VersionGetter) GetVersionWithPatchNumber(patchNumber string) string {
+	return fmt.Sprintf("%s.%s", v.GetVersion(), patchNumber)
+}
+
+func (v *VersionGetter) GetOs() string {
+	stringArr := strings.Split(v.Version, ".")
+	os := stringArr[0]
+
+	if os == "1200" {
+		return "2012R2"
+	}
+
+	return os
 }
 
 type WindowsVersion struct {
@@ -23,23 +60,6 @@ var (
 
 	AllVersions = []WindowsVersion{Version2019, Version1803, VersionDev}
 )
-
-func GetVersions(mainVersion string) (string, string) {
-	stringArr := strings.Split(mainVersion, ".")
-
-	// TODO remove special-case handling when we stop building 2012 stemcells
-	os := stringArr[0]
-	switch os {
-	case "1709":
-		os = "2016"
-	case "1200":
-		os = "2012R2"
-	}
-
-	stemcellVersion := strings.Join(stringArr[0:2], ".")
-
-	return os, stemcellVersion
-}
 
 func GetOSVersionFromBuildNumber(build string) string {
 	for _, version := range AllVersions {

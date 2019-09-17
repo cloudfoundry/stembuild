@@ -60,7 +60,6 @@ var _ = Describe("SourceConfig", func() {
 			source, err := config.GetSource()
 			Expect(err).To(MatchError("missing vCenter configurations"))
 			Expect(source).To(Equal(NIL))
-
 		})
 
 	})

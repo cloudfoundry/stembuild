@@ -5,11 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/cloudfoundry-incubator/stembuild/commandparser"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
 
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
-
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
 
 	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
@@ -17,13 +16,9 @@ import (
 	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
 )
 
-type Packager interface {
-	Package() error
-	ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error
-	ValidateSourceParameters() error
-}
+type PackagerFactory struct{}
 
-func GetPackager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logLevel int, color bool) (Packager, error) {
+func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logLevel int, color bool) (commandparser.Packager, error) {
 	source, err := sourceConfig.GetSource()
 	if err != nil {
 		return nil, err
