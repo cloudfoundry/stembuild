@@ -112,7 +112,7 @@ func (p *PackageCmd) SetFlags(f *flag.FlagSet) {
 
 	f.StringVar(&p.outputConfig.OutputDir, "outputDir", "", "Output directory, default is the current working directory.")
 	f.StringVar(&p.outputConfig.OutputDir, "o", "", "Output directory (shorthand)")
-	f.StringVar(&patchVersion, "patch-version", "", "Optional. Patch version.")
+	f.StringVar(&patchVersion, "patch-version", "", "String appended at end of stemcell version as a patch version. (Optional)")
 }
 
 func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
