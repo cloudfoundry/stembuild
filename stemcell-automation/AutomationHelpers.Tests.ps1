@@ -197,25 +197,20 @@ Describe "CleanUpVM" {
 }
 
 Describe "SysprepVM" {
-    It "copies LGPO to the correct destination and executes the Invoke-Sysprep powershell cmdlet" {
-        Mock Expand-Archive { }
+    BeforeEach {
         Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { "SomeRandomPassword" }
         Mock Write-Log { }
+    }
+    It "copies LGPO to the correct destination and executes the Invoke-Sysprep powershell cmdlet" {
 
         { SysprepVM } | Should -Not -Throw
 
-        Assert-MockCalled Expand-Archive -Times 1 -Scope It -ParameterFilter { $LiteralPath -eq ".\LGPO.zip" -and $DestinationPath -eq "C:\Windows\" }
         Assert-MockCalled GenerateRandomPassword -Times 1 -Scope It
         Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Successfully migrated LGPO to destination dir" }
     }
 
     It "executes the Invoke-Sysprep powershell cmdlet with owner parameter set when an owner string is provided" {
-        Mock Expand-Archive { }
-        Mock Invoke-Sysprep { }
-        Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log { }
 
         { SysprepVM -Owner "some owner" } | Should -Not -Throw
 
@@ -223,10 +218,6 @@ Describe "SysprepVM" {
     }
 
     It "executes the Invoke-Sysprep powershell cmdlet with organization parameter set when an organization string is provided" {
-        Mock Expand-Archive { }
-        Mock Invoke-Sysprep { }
-        Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log { }
 
         { SysprepVM -Organization "some org" } | Should -Not -Throw
 
@@ -234,10 +225,6 @@ Describe "SysprepVM" {
     }
 
     It "executes the Invoke-Sysprep powershell cmdlet with owner parameter set when an organization string has line breaks" {
-        Mock Expand-Archive { }
-        Mock Invoke-Sysprep { }
-        Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log { }
 
         { SysprepVM -Owner "some `r`n org" } | Should -Not -Throw
 
@@ -245,42 +232,17 @@ Describe "SysprepVM" {
     }
 
     It "executes the Invoke-Sysprep powershell cmdlet with owner & organization parameter set when an owner & organization string is provided" {
-        Mock Expand-Archive { }
-        Mock Invoke-Sysprep { }
-        Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log { }
 
         { SysprepVM -Owner "some owner" -Organization "some org" } | Should -Not -Throw
 
         Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" -and $Owner -eq "some owner" -and $Organization -eq "some org" }
     }
 
-
-    It "fails gracefully when Expand-Archive powershell cmdlet fails" {
-        Mock Expand-Archive { throw "Expand-Archive failed because something went wrong" }
-        Mock Invoke-Sysprep { }
-        Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log { }
-
-        { SysprepVM } | Should -Throw "Expand-Archive failed because something went wrong"
-
-        Assert-MockCalled Expand-Archive -Times 1 -Scope It -ParameterFilter { $LiteralPath -eq ".\LGPO.zip" -and $DestinationPath -eq "C:\Windows\" }
-        Assert-MockCalled GenerateRandomPassword -Times 0 -Scope It
-        Assert-MockCalled Invoke-Sysprep -Times 0 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" }
-
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Expand-Archive failed because something went wrong" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to Sysprep the VM's. See 'c:\provision\log.log' for more info." }
-    }
-
     It "fails gracefully when Invoke-Sysprep powershell cmdlet fails" {
-        Mock Expand-Archive { }
         Mock Invoke-Sysprep { throw "Invoke-Sysprep failed because something went wrong" }
-        Mock GenerateRandomPassword { "SomeRandomPassword" }
-        Mock Write-Log { }
 
         { SysprepVM } | Should -Throw "Invoke-Sysprep failed because something went wrong"
 
-        Assert-MockCalled Expand-Archive -Times 1 -Scope It -ParameterFilter { $LiteralPath -eq ".\LGPO.zip" -and $DestinationPath -eq "C:\Windows\" }
         Assert-MockCalled GenerateRandomPassword -Times 1 -Scope It
         Assert-MockCalled Invoke-Sysprep -Times 1 -Scope It -ParameterFilter { $IaaS -eq "vsphere" -and $NewPassword -eq "SomeRandomPassword" }
 
@@ -289,14 +251,10 @@ Describe "SysprepVM" {
     }
 
     It "fails gracefully when GenerateRandomPassword function fails" {
-        Mock Expand-Archive { }
-        Mock Invoke-Sysprep { }
         Mock GenerateRandomPassword { throw "GenerateRandomPassword failed because something went wrong" }
-        Mock Write-Log { }
 
         { SysprepVM } | Should -Throw "GenerateRandomPassword failed because something went wrong"
 
-        Assert-MockCalled Expand-Archive -Times 1 -Scope It -ParameterFilter { $LiteralPath -eq ".\LGPO.zip" -and $DestinationPath -eq "C:\Windows\" }
         Assert-MockCalled GenerateRandomPassword -Times 1 -Scope It
         Assert-MockCalled Invoke-Sysprep -Times 0 -Scope It
 
@@ -305,9 +263,6 @@ Describe "SysprepVM" {
     }
 
     It "doesn't generate a new password when -SkipRandomPassword set to true" {
-        Mock Expand-Archive { }
-        Mock Write-Log { }
-        Mock Invoke-Sysprep { }
 
         { SysprepVM -SkipRandomPassword $True} | Should -Not -Throw
 
@@ -816,6 +771,16 @@ function CreateFakeOpenSSHZip
     Compress-Archive -Force -Path "$dir\OpenSSH-Win64" -DestinationPath $fakeZipPath
 }
 
+function CreateFakeLGPOZip
+{
+    param([string]$dir, [string]$fakeZipPath)
+
+    New-Item -ItemType Directory "$dir\LGPO"
+    echo "fake lgpo" > "$dir\LGPO\LGPO.exe"
+
+    Compress-Archive -Force -Path "$dir\LGPO\*" -DestinationPath $fakeZipPath
+}
+
 Describe "Enable-SSHD" {
     BeforeEach {
         Mock Set-Service { }
@@ -960,5 +925,35 @@ Describe "Enable-SSHD" {
     It "creates empty ssh program dir if it doesn't exist" {
         Enable-SSHD -SSHZipFile $FAKE_ZIP
         { Test-Path "$TMP_DIR\ProgramData\ssh" } | Should -eq $True
+    }
+}
+
+Describe "Extract-LGPO" {
+    BeforeEach {
+        $guid = $( New-Guid ).Guid
+        $TMP_DIR = "$env:TMPDIR/BOSH.SSH.Tests-$guid"
+
+        New-Item -ItemType Directory $TMP_DIR
+
+        $ORIGINAL_WINDIR = $env:WINDIR
+        $env:WINDIR = "$TMP_DIR\Windows"
+        New-Item -ItemType Directory $env:WINDIR
+
+        Push-Location $TMP_DIR
+    }
+
+    AfterEach {
+        Pop-Location
+        Remove-Item -Recurse -Force $TMP_DIR
+        $env:WINDIR = $ORIGINAL_WINDIR
+    }
+
+    It "extracts executable from zip" {
+        CreateFakeLGPOZip -dir $TMP_DIR -fakeZipPath "$TMP_DIR/LGPO.zip"
+
+        Extract-LGPO
+
+        $lgpoexepath = "$env:WINDIR\LGPO.exe"
+        Test-Path -Path $lgpoexepath
     }
 }

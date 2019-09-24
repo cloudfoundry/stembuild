@@ -217,9 +217,6 @@ function SysprepVM
 
     try
     {
-        Expand-Archive -LiteralPath ".\LGPO.zip" -DestinationPath "C:\Windows\"
-        Write-Log "Successfully migrated LGPO to destination dir"
-
         if ($SkipRandomPassword) {
             Invoke-Sysprep -IaaS "vsphere" -Organization $Organization -Owner $Owner
         }else {
@@ -449,4 +446,12 @@ function Install-SecurityPoliciesAndRegistries
     }
 }
 
-
+function Extract-LGPO
+{
+    process
+    {
+        $LGPOPath="./LGPO.zip"
+        Expand-Archive -LiteralPath $LGPOPath -DestinationPath "$env:WINDIR\"
+        Write-Log "Successfully migrated LGPO to destination dir"
+    }
+}
