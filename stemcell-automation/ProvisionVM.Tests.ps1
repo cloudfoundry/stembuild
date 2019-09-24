@@ -48,10 +48,13 @@ Describe "ProvisionVM" {
 
         Assert-MockCalled -CommandName Enable-SSHD
     }
-    It "does not install SecurityPoliciesAndRegistries" {
+    It "installs SecurityPoliciesAndRegistries after extracting LGPO" {
         ProvisionVM
 
-        Assert-MockCalled -Times 0 -CommandName Install-SecurityPoliciesAndRegistries
+        Assert-MockCalled -CommandName Install-SecurityPoliciesAndRegistries
+
+        $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeGreaterOrEqual 0
+        $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeLessThan $provisionerCalls.IndexOf("Install-SecurityPoliciesAndRegistries")
     }
 
     It "extracts LGPO before enabling SSH" {

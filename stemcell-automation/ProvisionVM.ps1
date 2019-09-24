@@ -5,6 +5,7 @@ function ProvisionVM() {
     InstallBoshAgent
     InstallOpenSSH
     Extract-LGPO
+    Install-SecurityPoliciesAndRegistries
     Enable-SSHD
     InstallCFFeatures
     Enable-HyperV
