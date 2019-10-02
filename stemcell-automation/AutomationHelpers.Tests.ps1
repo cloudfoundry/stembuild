@@ -26,25 +26,21 @@ Describe "InstallCFFeatures" {
     It "executes the Install-CFFeatures2016 powershell cmdlet" {
         Mock Install-CFFeatures2016 { }
         Mock Write-Log { }
-        Mock Restart-Computer { }
 
         { InstallCFFeatures } | Should -Not -Throw
 
         Assert-MockCalled Install-CFFeatures2016 -Times 1 -Scope It
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Successfully installed CF features" }
-        Assert-MockCalled Restart-Computer -Times 1 -Scope It
     }
 
     It "fails gracefully when installing CF Features" {
         Mock Install-CFFeatures2016 { throw "Something terrible happened while attempting to install a CF feature" }
         Mock Write-Log { }
-        Mock Restart-Computer { }
 
         { InstallCFFeatures } | Should -Throw "Something terrible happened while attempting to install a CF feature"
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Something terrible happened while attempting to install a CF feature" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to install the CF features. See 'c:\provision\log.log' for more info." }
-        Assert-MockCalled Restart-Computer -Times 0 -Scope It
     }
 }
 

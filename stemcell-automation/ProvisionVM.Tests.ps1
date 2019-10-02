@@ -11,7 +11,16 @@ Describe "ProvisionVM" {
         Mock Enable-SSHD { $provisionerCalls.Add("Enable-SSHD") }
         Mock Install-SecurityPoliciesAndRegistries { $provisionerCalls.Add("Install-SecurityPoliciesAndRegistries") }
         Mock Extract-LGPO { $provisionerCalls.Add("Extract-LGPO") }
-        Mock Enable-HyperV { $provisionerCalls.Add("Extract-LGPO") }
+        Mock Enable-HyperV { $provisionerCalls.Add("Enable-HyperV") }
+
+        if (!(Get-Command "Restart-Computer" -errorAction SilentlyContinue))
+        {
+            function Restart-Computer() {
+                throw "what is happening I should never be invoked"
+            }
+        }
+
+        Mock Restart-Computer { $provisionerCalls.Add("Restart-Computer") }
     }
 
     It "installs CFFeatures" {
@@ -64,6 +73,14 @@ Describe "ProvisionVM" {
 
         $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeGreaterOrEqual 0
         $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeLessThan $provisionerCalls.IndexOf("Enable-SSHD")
+    }
+
+    It "restarts as the last command" {
+        ProvisionVM
+
+        Assert-MockCalled -CommandName Restart-Computer
+        $lastIndex = $provisionerCalls.Count - 1
+        $provisionerCalls.IndexOf("Restart-Computer") | Should -Be $lastIndex
     }
 
 }

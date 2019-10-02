@@ -9,4 +9,5 @@ function ProvisionVM() {
     Enable-SSHD
     InstallCFFeatures
     Enable-HyperV
+    Restart-Computer
 }
