@@ -8,6 +8,19 @@ import (
 )
 
 type FakeIaasClient struct {
+	IsPoweredOffStub        func(string) (bool, error)
+	isPoweredOffMutex       sync.RWMutex
+	isPoweredOffArgsForCall []struct {
+		arg1 string
+	}
+	isPoweredOffReturns struct {
+		result1 bool
+		result2 error
+	}
+	isPoweredOffReturnsOnCall map[int]struct {
+		result1 bool
+		result2 error
+	}
 	MakeDirectoryStub        func(string, string, string, string) error
 	makeDirectoryMutex       sync.RWMutex
 	makeDirectoryArgsForCall []struct {
@@ -72,6 +85,69 @@ type FakeIaasClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeIaasClient) IsPoweredOff(arg1 string) (bool, error) {
+	fake.isPoweredOffMutex.Lock()
+	ret, specificReturn := fake.isPoweredOffReturnsOnCall[len(fake.isPoweredOffArgsForCall)]
+	fake.isPoweredOffArgsForCall = append(fake.isPoweredOffArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("IsPoweredOff", []interface{}{arg1})
+	fake.isPoweredOffMutex.Unlock()
+	if fake.IsPoweredOffStub != nil {
+		return fake.IsPoweredOffStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.isPoweredOffReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeIaasClient) IsPoweredOffCallCount() int {
+	fake.isPoweredOffMutex.RLock()
+	defer fake.isPoweredOffMutex.RUnlock()
+	return len(fake.isPoweredOffArgsForCall)
+}
+
+func (fake *FakeIaasClient) IsPoweredOffCalls(stub func(string) (bool, error)) {
+	fake.isPoweredOffMutex.Lock()
+	defer fake.isPoweredOffMutex.Unlock()
+	fake.IsPoweredOffStub = stub
+}
+
+func (fake *FakeIaasClient) IsPoweredOffArgsForCall(i int) string {
+	fake.isPoweredOffMutex.RLock()
+	defer fake.isPoweredOffMutex.RUnlock()
+	argsForCall := fake.isPoweredOffArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeIaasClient) IsPoweredOffReturns(result1 bool, result2 error) {
+	fake.isPoweredOffMutex.Lock()
+	defer fake.isPoweredOffMutex.Unlock()
+	fake.IsPoweredOffStub = nil
+	fake.isPoweredOffReturns = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeIaasClient) IsPoweredOffReturnsOnCall(i int, result1 bool, result2 error) {
+	fake.isPoweredOffMutex.Lock()
+	defer fake.isPoweredOffMutex.Unlock()
+	fake.IsPoweredOffStub = nil
+	if fake.isPoweredOffReturnsOnCall == nil {
+		fake.isPoweredOffReturnsOnCall = make(map[int]struct {
+			result1 bool
+			result2 error
+		})
+	}
+	fake.isPoweredOffReturnsOnCall[i] = struct {
+		result1 bool
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeIaasClient) MakeDirectory(arg1 string, arg2 string, arg3 string, arg4 string) error {
@@ -337,6 +413,8 @@ func (fake *FakeIaasClient) WaitForExitReturnsOnCall(i int, result1 int, result2
 func (fake *FakeIaasClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.isPoweredOffMutex.RLock()
+	defer fake.isPoweredOffMutex.RUnlock()
 	fake.makeDirectoryMutex.RLock()
 	defer fake.makeDirectoryMutex.RUnlock()
 	fake.startMutex.RLock()

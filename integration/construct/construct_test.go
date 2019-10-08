@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"time"
 
 	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
@@ -32,7 +33,7 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			Eventually(session, 20).Should(Exit(0))
+			Eventually(session, 20*time.Minute).Should(Exit(0))
 			Eventually(session.Out).Should(Say(`mock stemcell automation script executed`))
 		})
 
@@ -42,7 +43,7 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			Eventually(session, 20).Should(Exit(0))
+			Eventually(session, 20*time.Minute).Should(Exit(0))
 			Eventually(session.Out).Should(Say(`Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM`))
 
 		})

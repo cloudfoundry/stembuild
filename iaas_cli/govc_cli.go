@@ -11,6 +11,7 @@ import (
 	_ "github.com/vmware/govmomi/govc/device/cdrom"
 	_ "github.com/vmware/govmomi/govc/export"
 	_ "github.com/vmware/govmomi/govc/object"
+	_ "github.com/vmware/govmomi/govc/vm"
 	_ "github.com/vmware/govmomi/govc/vm/guest"
 )
 

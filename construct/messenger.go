@@ -86,3 +86,11 @@ func (m *Messenger) logValidateOSWarning(log string, errorMessage string) {
 		"For example: If you're building 2019.x, then you should be using 'Windows Server 2019' only"
 	m.out.Write([]byte(fmt.Sprintf("Warning: %s:\n%s\n%s", log, matchingVersionWarning, errorMessage)))
 }
+
+func (m *Messenger) RestartInProgress() {
+	m.out.Write([]byte("still configuring the VM...\n"))
+}
+
+func (m *Messenger) ShutdownCompleted() {
+	m.out.Write([]byte("Stembuild construct has finished running and the VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
+}

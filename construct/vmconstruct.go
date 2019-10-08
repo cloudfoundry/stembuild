@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"time"
 	"unicode/utf16"
 
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
@@ -23,6 +24,7 @@ type VMConstruct struct {
 	winRMEnabler    WinRMEnabler
 	osValidator     OSValidator
 	messenger       ConstructMessenger
+	poller          Poller
 }
 
 const provisionDir = "C:\\provision\\"
@@ -45,6 +47,7 @@ func NewVMConstruct(
 	winRMEnabler WinRMEnabler,
 	osValidator OSValidator,
 	messenger ConstructMessenger,
+	poller Poller,
 ) *VMConstruct {
 
 	return &VMConstruct{
@@ -58,6 +61,7 @@ func NewVMConstruct(
 		winRMEnabler,
 		osValidator,
 		messenger,
+		poller,
 	}
 }
 
@@ -74,6 +78,7 @@ type IaasClient interface {
 	MakeDirectory(vmInventoryPath, path, username, password string) error
 	Start(vmInventoryPath, username, password, command string, args ...string) (string, error)
 	WaitForExit(vmInventoryPath, username, password, pid string) (int, error)
+	IsPoweredOff(vmInventoryPath string) (bool, error)
 }
 
 //go:generate counterfeiter . WinRMEnabler
@@ -102,6 +107,13 @@ type ConstructMessenger interface {
 	ExecuteScriptSucceeded()
 	UploadFileStarted(artifact string)
 	UploadFileSucceeded()
+	RestartInProgress()
+	ShutdownCompleted()
+}
+
+//go:generate counterfeiter . Poller
+type Poller interface {
+	Poll(duration time.Duration, loopFunc func() (bool, error)) error
 }
 
 func (c *VMConstruct) PrepareVM() error {
@@ -149,6 +161,11 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 	c.messenger.ExecuteScriptSucceeded()
+
+	err = c.isPoweredOff(time.Minute)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -203,6 +220,27 @@ func (c *VMConstruct) extractArchive() error {
 func (c *VMConstruct) executeSetupScript() error {
 	err := c.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationScript)
 	return err
+}
+
+func (c *VMConstruct) isPoweredOff(duration time.Duration) error {
+	err := c.poller.Poll(1*time.Minute, func() (bool, error) {
+		isPoweredOff, err := c.Client.IsPoweredOff(c.vmInventoryPath)
+
+		if err != nil {
+			return false, err
+		}
+
+		c.messenger.RestartInProgress()
+
+		return isPoweredOff, nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	c.messenger.ShutdownCompleted()
+	return nil
 }
 
 func encodePowershellCommand(command []byte) string {

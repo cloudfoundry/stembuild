@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/cloudfoundry-incubator/stembuild/construct/poller"
+
 	"github.com/cloudfoundry-incubator/stembuild/version"
 
 	"github.com/cloudfoundry-incubator/stembuild/commandparser"
@@ -65,5 +67,6 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		winRMManager,
 		osValidator,
 		messenger,
+		&poller.Poller{},
 	), nil
 }

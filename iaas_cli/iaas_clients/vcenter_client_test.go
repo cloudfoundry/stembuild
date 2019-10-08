@@ -412,4 +412,67 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 		})
 	})
 
+	Describe("IsPoweredOff", func() {
+		It("Gets the power state of the vm and returns false when vm is not powered off", func() {
+			expectedArgs := []string{"vm.info", "-u", credentialUrl, "-vm.ipath", "validVMPath"}
+			runner.RunWithOutputReturns("Power state:  poweredOn", 0, nil)
+			out, err := vcenterClient.IsPoweredOff("validVMPath")
+
+			argsForRun := runner.RunWithOutputArgsForCall(0)
+
+			Expect(out).To(BeFalse())
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(runner.RunWithOutputCallCount()).To(Equal(1))
+			Expect(argsForRun).To(Equal(expectedArgs))
+		})
+		It("Gets the power state of the vm and returns true when the vm is powered off", func() {
+			expectedArgs := []string{"vm.info", "-u", credentialUrl, "-vm.ipath", "validVMPath"}
+			runner.RunWithOutputReturns("Power state:  poweredOff", 0, nil)
+			out, err := vcenterClient.IsPoweredOff("validVMPath")
+
+			argsForRun := runner.RunWithOutputArgsForCall(0)
+
+			Expect(out).To(BeTrue())
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(runner.RunWithOutputCallCount()).To(Equal(1))
+			Expect(argsForRun).To(Equal(expectedArgs))
+		})
+
+		It("Returns an exit code error if the runner returns a non zero exit code", func() {
+			expectedArgs := []string{"vm.info", "-u", credentialUrl, "-vm.ipath", "validVMPath"}
+			runner.RunWithOutputReturns("", 1, nil)
+			_, err := vcenterClient.IsPoweredOff("validVMPath")
+
+			Expect(err).To(HaveOccurred())
+
+			Expect(runner.RunWithOutputArgsForCall(0)).To(Equal(expectedArgs))
+
+			Expect(err).To(MatchError("vcenter_client - failed to get vm info, govc exit code: 1"))
+		})
+
+		It("Returns an error if VCenter reports a failure getting the power state", func() {
+			expectedArgs := []string{"vm.info", "-u", credentialUrl, "-vm.ipath", "validVMPath"}
+			runner.RunWithOutputReturns("", 0, errors.New("some power state issue"))
+			_, err := vcenterClient.IsPoweredOff("validVMPath")
+
+			Expect(err).To(HaveOccurred())
+
+			Expect(runner.RunWithOutputArgsForCall(0)).To(Equal(expectedArgs))
+
+			Expect(err).To(MatchError("vcenter_client - failed to determine vm power state: some power state issue"))
+		})
+
+		It("Returns an exit code error if the runner returns a non zero exit code and VCenter reports a failure getting the power state", func() {
+			expectedArgs := []string{"vm.info", "-u", credentialUrl, "-vm.ipath", "validVMPath"}
+			runner.RunWithOutputReturns("", 1, errors.New("some power state issue"))
+			_, err := vcenterClient.IsPoweredOff("validVMPath")
+
+			Expect(err).To(HaveOccurred())
+
+			Expect(runner.RunWithOutputArgsForCall(0)).To(Equal(expectedArgs))
+
+			Expect(err).To(MatchError("vcenter_client - failed to get vm info, govc exit code: 1"))
+		})
+	})
+
 })

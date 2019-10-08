@@ -191,4 +191,21 @@ var _ = Describe("Messenger", func() {
 			Expect(buf).To(gbytes.Say(fmt.Sprintf("Warning: Failed to download OS Version file:\n%s\n%s", matchingVersionWarning, errorMessage)))
 		})
 	})
+
+	Describe("Power state messages", func() {
+		It("writes the still running message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.RestartInProgress()
+
+			Expect(buf).To(gbytes.Say("still configuring the VM...\n"))
+		})
+
+		It("writes the shutdown message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ShutdownCompleted()
+
+			Expect(buf).To(gbytes.Say("Stembuild construct has finished running and the VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
+		})
+
+	})
 })

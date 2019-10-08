@@ -3,6 +3,7 @@ package construct_test
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/onsi/gomega/gbytes"
 
@@ -22,6 +23,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeWinRMEnabler  *constructfakes.FakeWinRMEnabler
 		fakeOSValidator   *constructfakes.FakeOSValidator
 		fakeMessenger     *constructfakes.FakeConstructMessenger
+		fakePoller        *constructfakes.FakePoller
 	)
 
 	BeforeEach(func() {
@@ -31,6 +33,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeWinRMEnabler = &constructfakes.FakeWinRMEnabler{}
 		fakeOSValidator = &constructfakes.FakeOSValidator{}
 		fakeMessenger = &constructfakes.FakeConstructMessenger{}
+		fakePoller = &constructfakes.FakePoller{}
 
 		vmConstruct = NewVMConstruct(
 			context.TODO(),
@@ -43,6 +46,7 @@ var _ = Describe("construct_helpers", func() {
 			fakeWinRMEnabler,
 			fakeOSValidator,
 			fakeMessenger,
+			fakePoller,
 		)
 
 		fakeGuestManager.StartProgramInGuestReturnsOnCall(0, 0, nil)
@@ -284,6 +288,51 @@ var _ = Describe("construct_helpers", func() {
 
 				Expect(fakeMessenger.ExecuteScriptStartedCallCount()).To(Equal(1))
 				Expect(fakeMessenger.ExecuteScriptSucceededCallCount()).To(Equal(1))
+			})
+
+		})
+		Context("can check if vm is rebooting", func() {
+			It("runs every minute and returns successfully if polling succeeds", func() {
+				fakePoller.PollReturns(nil)
+
+				fakeVcenterClient.IsPoweredOffReturnsOnCall(0, false, nil)
+				fakeVcenterClient.IsPoweredOffReturnsOnCall(1, true, nil)
+				fakeVcenterClient.IsPoweredOffReturnsOnCall(2, false, errors.New("checking for powered off is hard"))
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fakeMessenger.ShutdownCompletedCallCount()).To(Equal(1))
+
+				Expect(fakePoller.PollCallCount()).To(Equal(1))
+				pollDuration, pollFunc := fakePoller.PollArgsForCall(0)
+
+				Expect(pollDuration).To(Equal(1 * time.Minute))
+
+				Expect(fakeVcenterClient.IsPoweredOffCallCount()).To(Equal(0))
+				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(0))
+
+				isPoweredOff, err := pollFunc()
+				Expect(isPoweredOff).To(BeFalse())
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(1))
+
+				isPoweredOff, err = pollFunc()
+				Expect(isPoweredOff).To(BeTrue())
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(2))
+
+				isPoweredOff, err = pollFunc()
+				Expect(err).To(MatchError("checking for powered off is hard"))
+				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(2))
+
+				Expect(fakeVcenterClient.IsPoweredOffCallCount()).To(Equal(3))
+			})
+
+			It("returns failure when it cannot determine vm power state", func() {
+				fakePoller.PollReturns(errors.New("polling is hard"))
+
+				Expect(vmConstruct.PrepareVM()).To(MatchError("polling is hard"))
+				Expect(fakeMessenger.ShutdownCompletedCallCount()).To(Equal(0))
 			})
 
 		})

@@ -16,11 +16,6 @@ type FakeConstructMessenger struct {
 	createProvisionDirSucceededMutex       sync.RWMutex
 	createProvisionDirSucceededArgsForCall []struct {
 	}
-	DownloadFileFailedStub        func(string)
-	downloadFileFailedMutex       sync.RWMutex
-	downloadFileFailedArgsForCall []struct {
-		arg1 string
-	}
 	EnableWinRMStartedStub        func()
 	enableWinRMStartedMutex       sync.RWMutex
 	enableWinRMStartedArgsForCall []struct {
@@ -37,11 +32,6 @@ type FakeConstructMessenger struct {
 	executeScriptSucceededMutex       sync.RWMutex
 	executeScriptSucceededArgsForCall []struct {
 	}
-	ExitCodeRetrievalFailedStub        func(string)
-	exitCodeRetrievalFailedMutex       sync.RWMutex
-	exitCodeRetrievalFailedArgsForCall []struct {
-		arg1 string
-	}
 	ExtractArtifactsStartedStub        func()
 	extractArtifactsStartedMutex       sync.RWMutex
 	extractArtifactsStartedArgsForCall []struct {
@@ -50,10 +40,13 @@ type FakeConstructMessenger struct {
 	extractArtifactsSucceededMutex       sync.RWMutex
 	extractArtifactsSucceededArgsForCall []struct {
 	}
-	OSVersionFileCreationFailedStub        func(string)
-	oSVersionFileCreationFailedMutex       sync.RWMutex
-	oSVersionFileCreationFailedArgsForCall []struct {
-		arg1 string
+	RestartInProgressStub        func()
+	restartInProgressMutex       sync.RWMutex
+	restartInProgressArgsForCall []struct {
+	}
+	ShutdownCompletedStub        func()
+	shutdownCompletedMutex       sync.RWMutex
+	shutdownCompletedArgsForCall []struct {
 	}
 	UploadArtifactsStartedStub        func()
 	uploadArtifactsStartedMutex       sync.RWMutex
@@ -128,37 +121,6 @@ func (fake *FakeConstructMessenger) CreateProvisionDirSucceededCalls(stub func()
 	fake.createProvisionDirSucceededMutex.Lock()
 	defer fake.createProvisionDirSucceededMutex.Unlock()
 	fake.CreateProvisionDirSucceededStub = stub
-}
-
-func (fake *FakeConstructMessenger) DownloadFileFailed(arg1 string) {
-	fake.downloadFileFailedMutex.Lock()
-	fake.downloadFileFailedArgsForCall = append(fake.downloadFileFailedArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("DownloadFileFailed", []interface{}{arg1})
-	fake.downloadFileFailedMutex.Unlock()
-	if fake.DownloadFileFailedStub != nil {
-		fake.DownloadFileFailedStub(arg1)
-	}
-}
-
-func (fake *FakeConstructMessenger) DownloadFileFailedCallCount() int {
-	fake.downloadFileFailedMutex.RLock()
-	defer fake.downloadFileFailedMutex.RUnlock()
-	return len(fake.downloadFileFailedArgsForCall)
-}
-
-func (fake *FakeConstructMessenger) DownloadFileFailedCalls(stub func(string)) {
-	fake.downloadFileFailedMutex.Lock()
-	defer fake.downloadFileFailedMutex.Unlock()
-	fake.DownloadFileFailedStub = stub
-}
-
-func (fake *FakeConstructMessenger) DownloadFileFailedArgsForCall(i int) string {
-	fake.downloadFileFailedMutex.RLock()
-	defer fake.downloadFileFailedMutex.RUnlock()
-	argsForCall := fake.downloadFileFailedArgsForCall[i]
-	return argsForCall.arg1
 }
 
 func (fake *FakeConstructMessenger) EnableWinRMStarted() {
@@ -253,37 +215,6 @@ func (fake *FakeConstructMessenger) ExecuteScriptSucceededCalls(stub func()) {
 	fake.ExecuteScriptSucceededStub = stub
 }
 
-func (fake *FakeConstructMessenger) ExitCodeRetrievalFailed(arg1 string) {
-	fake.exitCodeRetrievalFailedMutex.Lock()
-	fake.exitCodeRetrievalFailedArgsForCall = append(fake.exitCodeRetrievalFailedArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("ExitCodeRetrievalFailed", []interface{}{arg1})
-	fake.exitCodeRetrievalFailedMutex.Unlock()
-	if fake.ExitCodeRetrievalFailedStub != nil {
-		fake.ExitCodeRetrievalFailedStub(arg1)
-	}
-}
-
-func (fake *FakeConstructMessenger) ExitCodeRetrievalFailedCallCount() int {
-	fake.exitCodeRetrievalFailedMutex.RLock()
-	defer fake.exitCodeRetrievalFailedMutex.RUnlock()
-	return len(fake.exitCodeRetrievalFailedArgsForCall)
-}
-
-func (fake *FakeConstructMessenger) ExitCodeRetrievalFailedCalls(stub func(string)) {
-	fake.exitCodeRetrievalFailedMutex.Lock()
-	defer fake.exitCodeRetrievalFailedMutex.Unlock()
-	fake.ExitCodeRetrievalFailedStub = stub
-}
-
-func (fake *FakeConstructMessenger) ExitCodeRetrievalFailedArgsForCall(i int) string {
-	fake.exitCodeRetrievalFailedMutex.RLock()
-	defer fake.exitCodeRetrievalFailedMutex.RUnlock()
-	argsForCall := fake.exitCodeRetrievalFailedArgsForCall[i]
-	return argsForCall.arg1
-}
-
 func (fake *FakeConstructMessenger) ExtractArtifactsStarted() {
 	fake.extractArtifactsStartedMutex.Lock()
 	fake.extractArtifactsStartedArgsForCall = append(fake.extractArtifactsStartedArgsForCall, struct {
@@ -330,35 +261,50 @@ func (fake *FakeConstructMessenger) ExtractArtifactsSucceededCalls(stub func()) 
 	fake.ExtractArtifactsSucceededStub = stub
 }
 
-func (fake *FakeConstructMessenger) OSVersionFileCreationFailed(arg1 string) {
-	fake.oSVersionFileCreationFailedMutex.Lock()
-	fake.oSVersionFileCreationFailedArgsForCall = append(fake.oSVersionFileCreationFailedArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("OSVersionFileCreationFailed", []interface{}{arg1})
-	fake.oSVersionFileCreationFailedMutex.Unlock()
-	if fake.OSVersionFileCreationFailedStub != nil {
-		fake.OSVersionFileCreationFailedStub(arg1)
+func (fake *FakeConstructMessenger) RestartInProgress() {
+	fake.restartInProgressMutex.Lock()
+	fake.restartInProgressArgsForCall = append(fake.restartInProgressArgsForCall, struct {
+	}{})
+	fake.recordInvocation("RestartInProgress", []interface{}{})
+	fake.restartInProgressMutex.Unlock()
+	if fake.RestartInProgressStub != nil {
+		fake.RestartInProgressStub()
 	}
 }
 
-func (fake *FakeConstructMessenger) OSVersionFileCreationFailedCallCount() int {
-	fake.oSVersionFileCreationFailedMutex.RLock()
-	defer fake.oSVersionFileCreationFailedMutex.RUnlock()
-	return len(fake.oSVersionFileCreationFailedArgsForCall)
+func (fake *FakeConstructMessenger) RestartInProgressCallCount() int {
+	fake.restartInProgressMutex.RLock()
+	defer fake.restartInProgressMutex.RUnlock()
+	return len(fake.restartInProgressArgsForCall)
 }
 
-func (fake *FakeConstructMessenger) OSVersionFileCreationFailedCalls(stub func(string)) {
-	fake.oSVersionFileCreationFailedMutex.Lock()
-	defer fake.oSVersionFileCreationFailedMutex.Unlock()
-	fake.OSVersionFileCreationFailedStub = stub
+func (fake *FakeConstructMessenger) RestartInProgressCalls(stub func()) {
+	fake.restartInProgressMutex.Lock()
+	defer fake.restartInProgressMutex.Unlock()
+	fake.RestartInProgressStub = stub
 }
 
-func (fake *FakeConstructMessenger) OSVersionFileCreationFailedArgsForCall(i int) string {
-	fake.oSVersionFileCreationFailedMutex.RLock()
-	defer fake.oSVersionFileCreationFailedMutex.RUnlock()
-	argsForCall := fake.oSVersionFileCreationFailedArgsForCall[i]
-	return argsForCall.arg1
+func (fake *FakeConstructMessenger) ShutdownCompleted() {
+	fake.shutdownCompletedMutex.Lock()
+	fake.shutdownCompletedArgsForCall = append(fake.shutdownCompletedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ShutdownCompleted", []interface{}{})
+	fake.shutdownCompletedMutex.Unlock()
+	if fake.ShutdownCompletedStub != nil {
+		fake.ShutdownCompletedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ShutdownCompletedCallCount() int {
+	fake.shutdownCompletedMutex.RLock()
+	defer fake.shutdownCompletedMutex.RUnlock()
+	return len(fake.shutdownCompletedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ShutdownCompletedCalls(stub func()) {
+	fake.shutdownCompletedMutex.Lock()
+	defer fake.shutdownCompletedMutex.Unlock()
+	fake.ShutdownCompletedStub = stub
 }
 
 func (fake *FakeConstructMessenger) UploadArtifactsStarted() {
@@ -514,8 +460,6 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.createProvisionDirStartedMutex.RUnlock()
 	fake.createProvisionDirSucceededMutex.RLock()
 	defer fake.createProvisionDirSucceededMutex.RUnlock()
-	fake.downloadFileFailedMutex.RLock()
-	defer fake.downloadFileFailedMutex.RUnlock()
 	fake.enableWinRMStartedMutex.RLock()
 	defer fake.enableWinRMStartedMutex.RUnlock()
 	fake.enableWinRMSucceededMutex.RLock()
@@ -524,14 +468,14 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.executeScriptStartedMutex.RUnlock()
 	fake.executeScriptSucceededMutex.RLock()
 	defer fake.executeScriptSucceededMutex.RUnlock()
-	fake.exitCodeRetrievalFailedMutex.RLock()
-	defer fake.exitCodeRetrievalFailedMutex.RUnlock()
 	fake.extractArtifactsStartedMutex.RLock()
 	defer fake.extractArtifactsStartedMutex.RUnlock()
 	fake.extractArtifactsSucceededMutex.RLock()
 	defer fake.extractArtifactsSucceededMutex.RUnlock()
-	fake.oSVersionFileCreationFailedMutex.RLock()
-	defer fake.oSVersionFileCreationFailedMutex.RUnlock()
+	fake.restartInProgressMutex.RLock()
+	defer fake.restartInProgressMutex.RUnlock()
+	fake.shutdownCompletedMutex.RLock()
+	defer fake.shutdownCompletedMutex.RUnlock()
 	fake.uploadArtifactsStartedMutex.RLock()
 	defer fake.uploadArtifactsStartedMutex.RUnlock()
 	fake.uploadArtifactsSucceededMutex.RLock()
