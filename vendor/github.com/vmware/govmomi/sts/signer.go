@@ -265,11 +265,8 @@ func (s *Signer) SignRequest(req *http.Request) error {
 		}
 		bhash := sha256.New().Sum(body)
 
-		port := req.URL.Port()
-		if port == "" {
-			port = "80" // Default port for the "Host" header on the server side
-		}
-
+		// Port in the signature must be that of the reverse proxy port, vCenter's default is port 80
+		port := "80" // TODO: get from lookup service
 		var buf bytes.Buffer
 		msg := []string{
 			nonce,
