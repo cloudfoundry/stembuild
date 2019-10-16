@@ -80,7 +80,7 @@ After running `stembuild construct`, you may find yourself with a connection iss
 This command creates a BOSH Stemcell from a provisioned vCenter VM 
 
 ```
-  stembuild package -vcenter-url <vCenter URL> -vcenter-username <vCenter username> -vcenter-password <vCenter password> -vm-inventory-path <vCenter VM inventory path>
+  stembuild package -vcenter-url <vCenter URL> -vcenter-username <vCenter username> -vcenter-password <vCenter password> -vm-inventory-path <vCenter VM inventory path> [-patch-version <patch version string>]
 ```
 
 *Requirements*:
@@ -108,6 +108,8 @@ Flags:
     	vCenter username
   -vm-inventory-path string
     	vCenter VM inventory path. (e.g: /<datacenter>/vm/<vm-folder>/<vm-name>)
+  -patch-version string
+  	String appended at end of stemcell version as a patch version. (Optional)
 ```
 
 ## [DEPRECATED] Package a Windows Stemcell from a VMDK using `stembuild package`
