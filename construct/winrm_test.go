@@ -2,6 +2,7 @@ package construct_test
 
 import (
 	"errors"
+
 	"github.com/cloudfoundry-incubator/stembuild/assets"
 	"github.com/cloudfoundry-incubator/stembuild/construct"
 	"github.com/cloudfoundry-incubator/stembuild/construct/constructfakes"

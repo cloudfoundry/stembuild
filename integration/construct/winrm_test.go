@@ -29,7 +29,7 @@ var _ = Describe("WinRM Remote Manager", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		It("fails when Extract-Acrhive powershell function returns non-zero exit code", func() {
+		It("fails when Extract-Archive powershell function returns non-zero exit code", func() {
 			err := rm.ExtractArchive("C:\\provision\\NonExistingFile.zip", "C:\\provision")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(HavePrefix("powershell encountered an issue: "))

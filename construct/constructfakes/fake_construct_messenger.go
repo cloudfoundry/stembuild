@@ -2,9 +2,9 @@
 package constructfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	construct "github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeConstructMessenger struct {
@@ -72,6 +72,10 @@ type FakeConstructMessenger struct {
 	ValidateVMConnectionSucceededStub        func()
 	validateVMConnectionSucceededMutex       sync.RWMutex
 	validateVMConnectionSucceededArgsForCall []struct {
+	}
+	WinRMDisconnectedForRebootStub        func()
+	winRMDisconnectedForRebootMutex       sync.RWMutex
+	winRMDisconnectedForRebootArgsForCall []struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -453,6 +457,29 @@ func (fake *FakeConstructMessenger) ValidateVMConnectionSucceededCalls(stub func
 	fake.ValidateVMConnectionSucceededStub = stub
 }
 
+func (fake *FakeConstructMessenger) WinRMDisconnectedForReboot() {
+	fake.winRMDisconnectedForRebootMutex.Lock()
+	fake.winRMDisconnectedForRebootArgsForCall = append(fake.winRMDisconnectedForRebootArgsForCall, struct {
+	}{})
+	fake.recordInvocation("WinRMDisconnectedForReboot", []interface{}{})
+	fake.winRMDisconnectedForRebootMutex.Unlock()
+	if fake.WinRMDisconnectedForRebootStub != nil {
+		fake.WinRMDisconnectedForRebootStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) WinRMDisconnectedForRebootCallCount() int {
+	fake.winRMDisconnectedForRebootMutex.RLock()
+	defer fake.winRMDisconnectedForRebootMutex.RUnlock()
+	return len(fake.winRMDisconnectedForRebootArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) WinRMDisconnectedForRebootCalls(stub func()) {
+	fake.winRMDisconnectedForRebootMutex.Lock()
+	defer fake.winRMDisconnectedForRebootMutex.Unlock()
+	fake.WinRMDisconnectedForRebootStub = stub
+}
+
 func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -488,6 +515,8 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.validateVMConnectionStartedMutex.RUnlock()
 	fake.validateVMConnectionSucceededMutex.RLock()
 	defer fake.validateVMConnectionSucceededMutex.RUnlock()
+	fake.winRMDisconnectedForRebootMutex.RLock()
+	defer fake.winRMDisconnectedForRebootMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -2,6 +2,7 @@ package construct_test
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry-incubator/stembuild/construct"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -141,6 +142,14 @@ var _ = Describe("Messenger", func() {
 
 			Expect(buf).To(gbytes.Say("\nFinished executing setup script.\n"))
 		})
+
+		It("writes the restarting message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.WinRMDisconnectedForReboot()
+
+			Expect(buf).To(gbytes.Say("WinRM has been disconnected so the VM can reboot. Preparing the VM to be shutdown."))
+
+		})
 	})
 
 	Describe("Upload file messages", func() {
@@ -193,18 +202,23 @@ var _ = Describe("Messenger", func() {
 	})
 
 	Describe("Power state messages", func() {
-		It("writes the still running message to the writer", func() {
+		It("writes still running message with timestamp", func() {
 			m := construct.NewMessenger(buf)
 			m.RestartInProgress()
 
-			Expect(buf).To(gbytes.Say("still configuring the VM...\n"))
+			dateRegexString := "[0-9-]*"
+			timeRegexString := "[0-9:.]*"
+			messageString := "still preparing VM...\n"
+			logLineRegex := fmt.Sprintf("\\[.*%s\\s*%s.*\\]\\s*%s", dateRegexString, timeRegexString, messageString)
+
+			Expect(buf).To(gbytes.Say(logLineRegex))
 		})
 
 		It("writes the shutdown message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ShutdownCompleted()
 
-			Expect(buf).To(gbytes.Say("Stembuild construct has finished running and the VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
+			Expect(buf).To(gbytes.Say("VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
 		})
 
 	})

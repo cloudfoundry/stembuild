@@ -25,6 +25,7 @@ import (
 	"github.com/vmware/govmomi/govc/cli"
 	_ "github.com/vmware/govmomi/govc/importx"
 	_ "github.com/vmware/govmomi/govc/vm"
+	_ "github.com/vmware/govmomi/govc/vm/snapshot"
 
 	"syscall"
 
@@ -91,6 +92,20 @@ type config struct {
 	VCenterPassword string
 	VMInventoryPath string
 }
+
+var _ = BeforeEach(func() {
+	//revert snapshot
+	vmSnapshotName := "integration-test-snapshot"
+	snapshotCommand := []string{
+		"snapshot.revert",
+		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		vmSnapshotName,
+	}
+	fmt.Printf("Reverting VM Snapshot: %s", vmSnapshotName)
+	runIgnoringOutput(snapshotCommand)
+	time.Sleep(30 * time.Second)
+})
 
 func envMustExist(variableName string) string {
 	result := os.Getenv(variableName)
@@ -189,12 +204,19 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		VCenterPassword: vCenterStembuildPassword,
 	}
 
-	if userProvidedIP != "" && existingVMIP == "" {
-		targetIP = userProvidedIP
-		fmt.Printf("Creating VM with IP: %s\n", targetIP)
+	if existingVMIP == "" {
+		if userProvidedIP != "" {
+			targetIP = userProvidedIP
+			fmt.Printf("Creating VM with IP: %s\n", targetIP)
+		} else {
+			fmt.Println("Finding available IP...")
+			targetIP = claimAvailableIP()
+		}
 		createVMWithIP(targetIP, vmNamePrefix, vcenterFolder)
-	}
-	if existingVMIP != "" {
+
+		vmSnapshotName := "integration-test-snapshot"
+		createVMSnapshot(vmSnapshotName)
+	} else {
 		existingVM = true
 		targetIP = existingVMIP
 		fmt.Printf("Using existing VM with IP: %s\n", targetIP)
@@ -205,13 +227,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		vmInventoryPath := strings.Join([]string{vcenterFolder, vmName}, "/")
 		conf.VMInventoryPath = vmInventoryPath
 
+		powerOnVM()
 	}
-	if targetIP == "" {
-		fmt.Println("Finding available IP...")
-		targetIP = claimAvailableIP()
-		createVMWithIP(targetIP, vmNamePrefix, vcenterFolder)
-	}
-
 	fmt.Println("Attempting to connect to VM")
 	endpoint := winrm.NewEndpoint(targetIP, 5985, false, true, nil, nil, nil, 0)
 	client, err := winrm.NewClient(endpoint, vmUsername, vmPassword)
@@ -228,6 +245,28 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	return nil
 }, func(_ []byte) {
 })
+
+func createVMSnapshot(snapshotName string) {
+	snapshotCommand := []string{
+		"snapshot.create",
+		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		snapshotName,
+	}
+	fmt.Printf("Creating VM Snapshot: %s", snapshotName)
+	runIgnoringOutput(snapshotCommand)
+	time.Sleep(30 * time.Second)
+}
+
+func powerOnVM() {
+	powerOnCommand := []string{
+		"vm.power",
+		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		fmt.Sprintf("-on"),
+	}
+	runIgnoringOutput(powerOnCommand)
+}
 
 func createVMWithIP(targetIP, vmNamePrefix, vcenterFolder string) {
 	failureDescription := fmt.Sprintf("when creating a VM, because %s isn't set", ExistingVmIPVariable)

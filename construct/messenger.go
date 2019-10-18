@@ -3,6 +3,7 @@ package construct
 import (
 	"fmt"
 	"io"
+	"time"
 )
 
 type Messenger struct {
@@ -88,9 +89,14 @@ func (m *Messenger) logValidateOSWarning(log string, errorMessage string) {
 }
 
 func (m *Messenger) RestartInProgress() {
-	m.out.Write([]byte("still configuring the VM...\n"))
+	m.out.Write([]byte(fmt.Sprintf("[%s] still preparing VM...\n", time.Now())))
 }
 
 func (m *Messenger) ShutdownCompleted() {
-	m.out.Write([]byte("Stembuild construct has finished running and the VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
+	m.out.Write([]byte("VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
+}
+
+func (m *Messenger) WinRMDisconnectedForReboot() {
+	m.out.Write([]byte("\nWinRM has been disconnected so the VM can reboot. Preparing the VM to be shutdown.\n"))
+
 }

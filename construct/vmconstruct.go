@@ -109,6 +109,7 @@ type ConstructMessenger interface {
 	UploadFileSucceeded()
 	RestartInProgress()
 	ShutdownCompleted()
+	WinRMDisconnectedForReboot()
 }
 
 //go:generate counterfeiter . Poller
@@ -161,6 +162,7 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 	c.messenger.ExecuteScriptSucceeded()
+	c.messenger.WinRMDisconnectedForReboot()
 
 	err = c.isPoweredOff(time.Minute)
 	if err != nil {
@@ -223,7 +225,7 @@ func (c *VMConstruct) executeSetupScript() error {
 }
 
 func (c *VMConstruct) isPoweredOff(duration time.Duration) error {
-	err := c.poller.Poll(1*time.Minute, func() (bool, error) {
+	err := c.poller.Poll(duration, func() (bool, error) {
 		isPoweredOff, err := c.Client.IsPoweredOff(c.vmInventoryPath)
 
 		if err != nil {
