@@ -236,7 +236,7 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:e1abd926c000e69df42383bd53bda1eb1148a78a6258c762f53975f153634ec1"
+  digest = "1:e85aa181d59228dad43dc9b62f29fe32d12d7a26802037b21a642ec37e83615d"
   name = "github.com/vmware/govmomi"
   packages = [
     ".",
@@ -252,6 +252,7 @@
     "govc/object",
     "govc/vm",
     "govc/vm/guest",
+    "govc/vm/snapshot",
     "guest",
     "guest/toolbox",
     "internal",
@@ -389,6 +390,7 @@
     "github.com/vmware/govmomi/govc/object",
     "github.com/vmware/govmomi/govc/vm",
     "github.com/vmware/govmomi/govc/vm/guest",
+    "github.com/vmware/govmomi/govc/vm/snapshot",
     "github.com/vmware/govmomi/guest",
     "github.com/vmware/govmomi/object",
     "github.com/vmware/govmomi/session",
