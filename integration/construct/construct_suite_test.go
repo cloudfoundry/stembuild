@@ -13,6 +13,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
+
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 
 	"github.com/masterzen/winrm"
@@ -94,7 +96,6 @@ type config struct {
 }
 
 var _ = BeforeEach(func() {
-	//revert snapshot
 	vmSnapshotName := "integration-test-snapshot"
 	snapshotCommand := []string{
 		"snapshot.revert",
@@ -104,7 +105,15 @@ var _ = BeforeEach(func() {
 	}
 	fmt.Printf("Reverting VM Snapshot: %s", vmSnapshotName)
 	runIgnoringOutput(snapshotCommand)
-	time.Sleep(30 * time.Second)
+
+	rm := remotemanager.NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword)
+	Expect(rm).ToNot(BeNil())
+
+	vmReady := false
+	for !vmReady {
+		err := rm.ExecuteCommand("powershell.exe ls c:\\windows")
+		vmReady = err == nil
+	}
 })
 
 func envMustExist(variableName string) string {
@@ -254,6 +263,7 @@ func createVMSnapshot(snapshotName string) {
 		snapshotName,
 	}
 	fmt.Printf("Creating VM Snapshot: %s", snapshotName)
+	// is blocking
 	runIgnoringOutput(snapshotCommand)
 	time.Sleep(30 * time.Second)
 }
