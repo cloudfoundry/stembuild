@@ -25,6 +25,7 @@ var _ = Describe("stembuild construct", func() {
 
 	})
 
+	const constructOutputTimeout = 60 * time.Second
 	Context("run successfully", func() {
 
 		It("successfully exits when vm becomes powered off", func() {
@@ -33,7 +34,8 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			Eventually(session, 3*time.Minute).Should(Exit(0)) // blocks until success
+			shutdownTimeout := 3 * time.Minute
+			Eventually(session, shutdownTimeout).Should(Exit(0))
 		})
 
 		It("transfers LGPO and StemcellAutomation archives, unarchive them and execute automation script", func() {
@@ -42,7 +44,7 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			Eventually(session.Out, 20*time.Second).Should(Say(`mock stemcell automation script executed`))
+			Eventually(session.Out, constructOutputTimeout).Should(Say(`mock stemcell automation script executed`))
 		})
 
 		It("extracts the WinRM BOSH powershell script and executes it successfully on the guest VM", func() {
@@ -51,7 +53,7 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			Eventually(session.Out, 20*time.Second).Should(Say(`Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM`))
+			Eventually(session.Out, constructOutputTimeout).Should(Say(`Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM`))
 
 		})
 
@@ -67,7 +69,7 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			Eventually(session, 20).Should(Exit(0))
+			Eventually(session, constructOutputTimeout).Should(Exit(0))
 			Eventually(session.Out).Should(Say(`mock stemcell automation script executed`))
 		})
 	})
@@ -75,7 +77,7 @@ var _ = Describe("stembuild construct", func() {
 	It("fails with an appropriate error when LGPO is missing", func() {
 		session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-		Eventually(session, 20).Should(Exit(1))
+		Eventually(session, constructOutputTimeout).Should(Exit(1))
 		Eventually(session.Err).Should(Say(`Could not find LGPO.zip in the current directory`))
 	})
 	It("fails with the appropriate error when the Stembuild Version does not match the Guest OS Version", func() {
@@ -87,7 +89,7 @@ var _ = Describe("stembuild construct", func() {
 
 		session := helpers.Stembuild(wrongVersionStembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-		Eventually(session, 20).Should(Exit(1))
+		Eventually(session, constructOutputTimeout).Should(Exit(1))
 		Eventually(session.Err).Should(Say("OS version of stembuild and guest OS VM do not match"))
 	})
 

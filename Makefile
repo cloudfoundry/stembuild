@@ -20,6 +20,9 @@ format :
 integration : generate
 	ginkgo -r -v -randomizeAllSpecs integration
 
+integration-badger : generate
+	ginkgo -r -v -randomizeAllSpecs -untilItFails integration
+
 generate: $(GOSRC) $(AUTOMATION_PATH)
 	go get -u github.com/jteeuwen/go-bindata/...
 	go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)

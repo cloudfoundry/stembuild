@@ -68,6 +68,7 @@ const (
 	vcenterStembuildUsernameVariable  = "VCENTER_STEMBUILD_USER"
 	vcenterStembuildPasswordVariable  = "VCENTER_STEMBUILD_PASSWORD"
 	StembuildVersionVariable          = "STEMBUILD_VERSION"
+	VmSnapshotName                    = "integration-test-snapshot"
 )
 
 var (
@@ -95,17 +96,18 @@ type config struct {
 	VMInventoryPath string
 }
 
-var _ = BeforeEach(func() {
-	vmSnapshotName := "integration-test-snapshot"
+func restoreSnapshot(snapshotName string) {
 	snapshotCommand := []string{
 		"snapshot.revert",
 		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
-		vmSnapshotName,
+		snapshotName,
 	}
-	fmt.Printf("Reverting VM Snapshot: %s", vmSnapshotName)
+	fmt.Printf("Reverting VM Snapshot: %s", snapshotName)
 	runIgnoringOutput(snapshotCommand)
+}
 
+func waitForVmToBeReady() {
 	rm := remotemanager.NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 	Expect(rm).ToNot(BeNil())
 
@@ -114,6 +116,12 @@ var _ = BeforeEach(func() {
 		err := rm.ExecuteCommand("powershell.exe ls c:\\windows")
 		vmReady = err == nil
 	}
+}
+
+var _ = BeforeEach(func() {
+	restoreSnapshot(VmSnapshotName)
+
+	waitForVmToBeReady()
 })
 
 func envMustExist(variableName string) string {
@@ -223,8 +231,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		}
 		createVMWithIP(targetIP, vmNamePrefix, vcenterFolder)
 
-		vmSnapshotName := "integration-test-snapshot"
-		createVMSnapshot(vmSnapshotName)
+		createVMSnapshot(VmSnapshotName)
 	} else {
 		existingVM = true
 		targetIP = existingVMIP
