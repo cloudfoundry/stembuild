@@ -444,5 +444,4 @@ var _ = SynchronizedAfterSuite(func() {
 
 	_ = os.RemoveAll(tmpDir)
 }, func() {
-	Expect(os.RemoveAll(stembuildExecutable)).To(Succeed())
 })
