@@ -80,7 +80,7 @@ var _ = Describe("stembuild construct", func() {
 		Eventually(session, constructOutputTimeout).Should(Exit(1))
 		Eventually(session.Err).Should(Say(`Could not find LGPO.zip in the current directory`))
 	})
-	FIt("fails with the appropriate error when the Stembuild Version does not match the Guest OS Version", func() {
+	It("fails with the appropriate error when the Stembuild Version does not match the Guest OS Version", func() {
 		err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 		Expect(err).ToNot(HaveOccurred())
 
