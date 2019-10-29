@@ -122,6 +122,7 @@ var _ = BeforeEach(func() {
 	restoreSnapshot(VmSnapshotName)
 
 	waitForVmToBeReady()
+	time.Sleep(30 * time.Second)
 })
 
 func envMustExist(variableName string) string {
