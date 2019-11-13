@@ -205,11 +205,11 @@ var _ = Describe("Messenger", func() {
 		It("writes still running message with timestamp", func() {
 			m := construct.NewMessenger(buf)
 			m.RestartInProgress()
+			//to match timestamp format 2006-01-02T15:04:05.999999-07:00
+			dateTimeRegex:= "\\d{4}\\-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}\\-\\d{2}:\\d{2}"
 
-			dateRegexString := "[0-9-]*"
-			timeRegexString := "[0-9:.]*"
-			messageString := "still preparing VM...\n"
-			logLineRegex := fmt.Sprintf("\\[.*%s\\s*%s.*\\]\\s*%s", dateRegexString, timeRegexString, messageString)
+			messageString := "Still preparing VM...\n"
+			logLineRegex := fmt.Sprintf("%s\\s*%s", dateTimeRegex, messageString)
 
 			Expect(buf).To(gbytes.Say(logLineRegex))
 		})
