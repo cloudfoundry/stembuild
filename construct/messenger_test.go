@@ -206,7 +206,7 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.RestartInProgress()
 			//to match timestamp format 2006-01-02T15:04:05.999999-07:00
-			dateTimeRegex:= "\\d{4}\\-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}\\-\\d{2}:\\d{2}"
+			dateTimeRegex:= "\\d{4}\\-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}(\\-|\\+)\\d{2}:\\d{2}"
 
 			messageString := "Still preparing VM...\n"
 			logLineRegex := fmt.Sprintf("%s\\s*%s", dateTimeRegex, messageString)
