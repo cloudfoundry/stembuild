@@ -417,6 +417,16 @@ func runIgnoringOutput(args []string) int {
 var _ = SynchronizedAfterSuite(func() {
 	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
 
+	fmt.Sprintf("TargetIP is: %s", conf.TargetIP)
+	fmt.Sprintf("NetworkGateway is: %s", conf.NetworkGateway)
+	fmt.Sprintf("SubnetMask is: %s", conf.SubnetMask)
+	fmt.Sprintf("VMUsername is: %s", conf.VMUsername)
+	fmt.Sprintf("VMName is: %s", conf.VMName)
+	fmt.Sprintf("VMNetwork is: %s", conf.VMNetwork)
+	fmt.Sprintf("VCenterURL is: %s", conf.VCenterURL)
+	fmt.Sprintf("VCenterUsername is: %s", conf.VCenterUsername)
+	fmt.Sprintf("VMInventoryPath is: %s", conf.VMInventoryPath)
+
 	if !existingVM && skipCleanup != "TRUE" {
 		deleteCommand := []string{
 			"vm.destroy",
@@ -425,7 +435,7 @@ var _ = SynchronizedAfterSuite(func() {
 		}
 		Eventually(func() int {
 			return runIgnoringOutput(deleteCommand)
-		}, 3*time.Minute, 10*time.Second).Should(BeZero())
+		}, 10*time.Minute, 10*time.Second).Should(BeZero())
 		fmt.Println("VM destroyed")
 		if lockDir != "" {
 			_, _, err := lockPool.ReleaseLock(lockDir)
