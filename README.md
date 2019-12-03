@@ -109,7 +109,8 @@ Flags:
   -vm-inventory-path string
     	vCenter VM inventory path. (e.g: /<datacenter>/vm/<vm-folder>/<vm-name>)
   -patch-version string
-  	String appended at end of stemcell version as a patch version. (Optional)
+  	Number or name of the patch version for the stemcell being built (e.g: for 2019.12.3 the string would be “3”)
+
 ```
 
 ## [DEPRECATED] Package a Windows Stemcell from a VMDK using `stembuild package`
