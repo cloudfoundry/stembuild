@@ -9,5 +9,6 @@ function ProvisionVM() {
     Enable-SSHD
     InstallCFFeatures
     Enable-HyperV
+    Install-WUCerts
     Restart-Computer
 }

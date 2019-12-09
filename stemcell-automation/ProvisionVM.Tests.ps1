@@ -12,6 +12,7 @@ Describe "ProvisionVM" {
         Mock Install-SecurityPoliciesAndRegistries { $provisionerCalls.Add("Install-SecurityPoliciesAndRegistries") }
         Mock Extract-LGPO { $provisionerCalls.Add("Extract-LGPO") }
         Mock Enable-HyperV { $provisionerCalls.Add("Enable-HyperV") }
+        Mock Install-WUCerts { $provisionerCalls.Add("Install-WUCerts") }
 
         if (!(Get-Command "Restart-Computer" -errorAction SilentlyContinue))
         {
@@ -73,6 +74,13 @@ Describe "ProvisionVM" {
 
         $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeGreaterOrEqual 0
         $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeLessThan $provisionerCalls.IndexOf("Enable-SSHD")
+    }
+
+    It "installs WU certs" {
+        ProvisionVM
+
+        Assert-MockCalled -CommandName Install-WUCerts
+
     }
 
     It "restarts as the last command" {

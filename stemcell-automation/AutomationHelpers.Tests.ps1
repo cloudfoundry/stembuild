@@ -953,3 +953,26 @@ Describe "Extract-LGPO" {
         Test-Path -Path $lgpoexepath
     }
 }
+
+Describe "Install-WUCerts" {
+    It "executes the Get-WUCerts powershell cmdlet" {
+        Mock Get-WUCerts { }
+        Mock Write-Log { }
+
+        { Install-WUCerts } | Should -Not -Throw
+
+        Assert-MockCalled Get-WUCerts -Times 1 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Successfully retrieved Windows Update certs" }
+    }
+
+    It "fails gracefully when Get-WUCerts powershell cmdlet fails" {
+        Mock Get-WUCerts { throw "Something went wrong trying to Get-WUCerts" }
+        Mock Write-Log { }
+
+        { Install-WUCerts } | Should -Throw "Something went wrong trying to Get-WUCerts"
+
+        Assert-MockCalled Get-WUCerts -Times 1 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Get-WUCerts" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to execute Get-WUCerts powershell cmdlet" }
+    }
+}

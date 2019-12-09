@@ -208,7 +208,7 @@ function GenerateRandomPassword
 
 function SysprepVM
 {
-    Param (
+    param (
         [string]$Organization = "",
         [string]$Owner = "",
         [bool]$SkipRandomPassword = $false
@@ -402,11 +402,11 @@ SeAssignPrimaryTokenPrivilege=*S-1-5-19,*S-1-5-20,*S-1-5-80-3847866527-469524349
     if (Test-Path $LGPOPath)
     {
         Out-File -FilePath $InfFilePath -Encoding unicode -InputObject $InfFileContents -Force
-        Try
+        try
         {
             Run-LGPO -LGPOPath $LGPOPath -InfFilePath $InfFilePath
         }
-        Catch
+        catch
         {
             throw "LGPO.exe failed with: $_.Exception.Message"
         }
@@ -452,5 +452,20 @@ function Extract-LGPO
         $LGPOPath="./LGPO.zip"
         Expand-Archive -LiteralPath $LGPOPath -DestinationPath "$env:WINDIR\"
         Write-Log "Successfully migrated LGPO to destination dir"
+    }
+}
+
+function Install-WUCerts
+{
+    try
+    {
+        Get-WUCerts
+        Write-Log "Successfully retrieved Windows Update certs"
+    }
+    catch [Exception]
+    {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to execute Get-WUCerts powershell cmdlet"
+        throw $_.Exception
     }
 }
