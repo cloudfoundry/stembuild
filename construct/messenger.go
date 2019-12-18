@@ -89,7 +89,7 @@ func (m *Messenger) logValidateOSWarning(log string, errorMessage string) {
 }
 
 func (m *Messenger) RestartInProgress() {
-	t:= time.Now()
+	t := time.Now()
 	timeStampFormat := "2006-01-02T15:04:05.999999-07:00"
 	m.out.Write([]byte(fmt.Sprintf("%s Still preparing VM...\n", t.Format(timeStampFormat))))
 }
