@@ -85,6 +85,7 @@ var _ bool = Describe("Packager Utility", func() {
 			expectedManifest := `---
 name: bosh-vsphere-esxi-windows1-go_agent
 version: 'version'
+api_version: 3
 sha1: sha1sum
 operating_system: windows1
 cloud_properties:

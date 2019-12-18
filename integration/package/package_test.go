@@ -134,6 +134,15 @@ var _ = Describe("Package", func() {
 		Expect(imageMFFile).To(ContainSubstring(fmt.Sprintf("%x", vmdkSha.Sum(nil))))
 		Expect(imageMFFile).To(ContainSubstring(fmt.Sprintf("%x", ovfSha.Sum(nil))))
 
+		By("and the stemcell manifest specifies agent api_version 3", func() {
+			stemcellManifestPath, err := os.Create(filepath.Join(workingDir, "stemcell.MF"))
+			Expect(err).NotTo(HaveOccurred())
+			copyFileFromTar(stemcellPath, "stemcell.MF", stemcellManifestPath)
+
+			stemcellManifest, err := helpers.ReadFile(stemcellManifestPath.Name())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(stemcellManifest).To(ContainSubstring("api_version: 3"))
+		})
 	})
 
 	It("generates a stemcell with a patch number when specified", func() {

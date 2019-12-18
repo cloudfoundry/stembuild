@@ -126,6 +126,7 @@ var _ = Describe("VcenterPackager", func() {
 			expectedManifestContent := `---
 name: bosh-vsphere-esxi-windows2012R2-go_agent
 version: '1200.2'
+api_version: 3
 sha1: %x
 operating_system: windows2012R2
 cloud_properties:

@@ -32,6 +32,7 @@ func CreateManifest(osVersion, version, sha1sum string) string {
 	const format = `---
 name: bosh-vsphere-esxi-windows%[1]s-go_agent
 version: '%[2]s'
+api_version: 3
 sha1: %[3]s
 operating_system: windows%[1]s
 cloud_properties:
