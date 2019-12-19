@@ -15,6 +15,7 @@ import (
 type VcenterClient struct {
 	Url           string
 	credentialUrl string
+	redactedUrl string
 	caCertFile    string
 	Runner        iaas_cli.CliRunner
 }
@@ -24,7 +25,8 @@ func NewVcenterClient(username string, password string, u string, caCertFile str
 	encodedUser := url.QueryEscape(username)
 	encodedPassword := url.QueryEscape(password)
 	urlWithCredentials := fmt.Sprintf("%s:%s@%s", encodedUser, encodedPassword, u)
-	return &VcenterClient{Url: u, credentialUrl: urlWithCredentials, caCertFile: caCertFile, Runner: runner}
+	urlWithRedactedPassword := fmt.Sprintf("%s:REDACTED@%s", encodedUser, u)
+	return &VcenterClient{Url: u, credentialUrl: urlWithCredentials, redactedUrl: urlWithRedactedPassword, caCertFile: caCertFile, Runner: runner}
 }
 
 func (c *VcenterClient) ValidateUrl() error {
@@ -46,7 +48,7 @@ func (c *VcenterClient) ValidateCredentials() error {
 	args := c.buildGovcCommand("about")
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
-		return errors.New(fmt.Sprintf("vcenter_client - invalid credentials for: %s", c.credentialUrl))
+		return errors.New(fmt.Sprintf("vcenter_client - invalid credentials for: %s", c.redactedUrl))
 	}
 
 	return nil

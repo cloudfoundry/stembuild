@@ -82,7 +82,7 @@ var _ = Describe("VcenterClient", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(runner.RunCallCount()).To(Equal(1))
 			Expect(argsForRun).To(Equal(expectedArgs))
-			Expect(err).To(MatchError("vcenter_client - invalid credentials for: username:password@url"))
+			Expect(err).To(MatchError("vcenter_client - invalid credentials for: username:REDACTED@url"))
 		})
 	})
 
