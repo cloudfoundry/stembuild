@@ -24,12 +24,11 @@ type VersionGetter interface {
 }
 
 type OSVersionValidator struct {
-	GuestManager  GuestManager
-	Messenger     OSValidatorMessenger
-	VersionGetter VersionGetter
+	GuestManager GuestManager
+	Messenger    OSValidatorMessenger
 }
 
-func (v *OSVersionValidator) Validate() error {
+func (v *OSVersionValidator) Validate(stembuildVersion string) error {
 	pid, err := v.GuestManager.StartProgramInGuest(
 		context.Background(),
 		powershell,
@@ -67,7 +66,6 @@ func (v *OSVersionValidator) Validate() error {
 	}
 
 	guestOSVersion := version.GetOSVersionFromBuildNumber(reg.ReplaceAllString(string(buf), ""))
-	stembuildVersion := v.VersionGetter.GetVersion()
 
 	if !strings.Contains(stembuildVersion, guestOSVersion) {
 		return fmt.Errorf("OS version of stembuild and guest OS VM do not match. Guest OS Version:'%s', Stembuild Version:'%s'", guestOSVersion, stembuildVersion)

@@ -51,9 +51,8 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 	}
 	versionGetter := version.NewVersionGetter()
 	osValidator := &construct.OSVersionValidator{
-		GuestManager:  guestManager,
-		Messenger:     messenger,
-		VersionGetter: versionGetter,
+		GuestManager: guestManager,
+		Messenger:    messenger,
 	}
 
 	return construct.NewVMConstruct(
@@ -68,5 +67,6 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		osValidator,
 		messenger,
 		&poller.Poller{},
+		versionGetter,
 	), nil
 }

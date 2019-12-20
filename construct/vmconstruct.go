@@ -25,6 +25,7 @@ type VMConstruct struct {
 	osValidator     OSValidator
 	messenger       ConstructMessenger
 	poller          Poller
+	versionGetter   VersionGetter
 }
 
 const provisionDir = "C:\\provision\\"
@@ -48,6 +49,7 @@ func NewVMConstruct(
 	osValidator OSValidator,
 	messenger ConstructMessenger,
 	poller Poller,
+	versionGetter VersionGetter,
 ) *VMConstruct {
 
 	return &VMConstruct{
@@ -62,6 +64,7 @@ func NewVMConstruct(
 		osValidator,
 		messenger,
 		poller,
+		versionGetter,
 	}
 }
 
@@ -88,7 +91,7 @@ type WinRMEnabler interface {
 
 //go:generate counterfeiter . OSValidator
 type OSValidator interface {
-	Validate() error
+	Validate(stembuildVersion string) error
 }
 
 //go:generate counterfeiter . ConstructMessenger
@@ -119,7 +122,8 @@ type Poller interface {
 
 func (c *VMConstruct) PrepareVM() error {
 
-	err := c.osValidator.Validate()
+	stembuildVersion := c.versionGetter.GetVersion()
+	err := c.osValidator.Validate(stembuildVersion)
 	if err != nil {
 		return err
 	}
@@ -157,7 +161,7 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.ExtractArtifactsSucceeded()
 
 	c.messenger.ExecuteScriptStarted()
-	err = c.executeSetupScript()
+	err = c.executeSetupScript(stembuildVersion)
 	if err != nil {
 		return err
 	}
@@ -219,8 +223,9 @@ func (c *VMConstruct) extractArchive() error {
 	return err
 }
 
-func (c *VMConstruct) executeSetupScript() error {
-	err := c.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationScript)
+func (c *VMConstruct) executeSetupScript(stembuildVersion string) error {
+	versionArg := " -Version " + stembuildVersion
+	err := c.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationScript + versionArg)
 	return err
 }
 

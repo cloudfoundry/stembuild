@@ -24,6 +24,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeOSValidator   *constructfakes.FakeOSValidator
 		fakeMessenger     *constructfakes.FakeConstructMessenger
 		fakePoller        *constructfakes.FakePoller
+		fakeVersionGetter *constructfakes.FakeVersionGetter
 	)
 
 	BeforeEach(func() {
@@ -34,6 +35,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeOSValidator = &constructfakes.FakeOSValidator{}
 		fakeMessenger = &constructfakes.FakeConstructMessenger{}
 		fakePoller = &constructfakes.FakePoller{}
+		fakeVersionGetter = &constructfakes.FakeVersionGetter{}
 
 		vmConstruct = NewVMConstruct(
 			context.TODO(),
@@ -47,6 +49,7 @@ var _ = Describe("construct_helpers", func() {
 			fakeOSValidator,
 			fakeMessenger,
 			fakePoller,
+			fakeVersionGetter,
 		)
 
 		fakeGuestManager.StartProgramInGuestReturnsOnCall(0, 0, nil)
@@ -57,6 +60,7 @@ var _ = Describe("construct_helpers", func() {
 
 		fakeGuestManager.DownloadFileInGuestReturns(versionBuffer, 3, nil)
 		fakeGuestManager.StartProgramInGuestReturns(0, nil)
+
 	})
 
 	Describe("PrepareVM", func() {
@@ -278,13 +282,14 @@ var _ = Describe("construct_helpers", func() {
 			})
 
 			It("returns success when it properly executes the setup script", func() {
+				fakeVersionGetter.GetVersionReturns("2019.123.456")
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
 				command := fakeRemoteManager.ExecuteCommandArgsForCall(0)
-				Expect(command).To(Equal("powershell.exe C:\\provision\\Setup.ps1"))
+				Expect(command).To(Equal("powershell.exe C:\\provision\\Setup.ps1 -Version 2019.123.456"))
 
 				Expect(fakeMessenger.ExecuteScriptStartedCallCount()).To(Equal(1))
 				Expect(fakeMessenger.ExecuteScriptSucceededCallCount()).To(Equal(1))

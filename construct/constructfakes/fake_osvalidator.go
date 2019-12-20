@@ -8,9 +8,10 @@ import (
 )
 
 type FakeOSValidator struct {
-	ValidateStub        func() error
+	ValidateStub        func(string) error
 	validateMutex       sync.RWMutex
 	validateArgsForCall []struct {
+		arg1 string
 	}
 	validateReturns struct {
 		result1 error
@@ -22,15 +23,16 @@ type FakeOSValidator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeOSValidator) Validate() error {
+func (fake *FakeOSValidator) Validate(arg1 string) error {
 	fake.validateMutex.Lock()
 	ret, specificReturn := fake.validateReturnsOnCall[len(fake.validateArgsForCall)]
 	fake.validateArgsForCall = append(fake.validateArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Validate", []interface{}{})
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("Validate", []interface{}{arg1})
 	fake.validateMutex.Unlock()
 	if fake.ValidateStub != nil {
-		return fake.ValidateStub()
+		return fake.ValidateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
@@ -45,10 +47,17 @@ func (fake *FakeOSValidator) ValidateCallCount() int {
 	return len(fake.validateArgsForCall)
 }
 
-func (fake *FakeOSValidator) ValidateCalls(stub func() error) {
+func (fake *FakeOSValidator) ValidateCalls(stub func(string) error) {
 	fake.validateMutex.Lock()
 	defer fake.validateMutex.Unlock()
 	fake.ValidateStub = stub
+}
+
+func (fake *FakeOSValidator) ValidateArgsForCall(i int) string {
+	fake.validateMutex.RLock()
+	defer fake.validateMutex.RUnlock()
+	argsForCall := fake.validateArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeOSValidator) ValidateReturns(result1 error) {

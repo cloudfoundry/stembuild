@@ -16,21 +16,18 @@ import (
 
 var _ = Describe("OsVersionValidator", func() {
 	var (
-		validator         *construct.OSVersionValidator
-		fakeGuestManager  *constructfakes.FakeGuestManager
-		fakeMessenger     *constructfakes.FakeOSValidatorMessenger
-		fakeVersionGetter *constructfakes.FakeVersionGetter
+		validator        *construct.OSVersionValidator
+		fakeGuestManager *constructfakes.FakeGuestManager
+		fakeMessenger    *constructfakes.FakeOSValidatorMessenger
 	)
 
 	BeforeEach(func() {
 		fakeGuestManager = &constructfakes.FakeGuestManager{}
 		fakeMessenger = &constructfakes.FakeOSValidatorMessenger{}
-		fakeVersionGetter = &constructfakes.FakeVersionGetter{}
 
 		validator = &construct.OSVersionValidator{
-			GuestManager:  fakeGuestManager,
-			Messenger:     fakeMessenger,
-			VersionGetter: fakeVersionGetter,
+			GuestManager: fakeGuestManager,
+			Messenger:    fakeMessenger,
 		}
 
 		buildBuffer := gbytes.NewBuffer()
@@ -50,9 +47,7 @@ var _ = Describe("OsVersionValidator", func() {
 
 				fakeGuestManager.DownloadFileInGuestReturns(buildBuffer, int64(len(guestOSVersion)), nil)
 
-				fakeVersionGetter.GetVersionReturns(stembuildVersion)
-
-				err = validator.Validate()
+				err = validator.Validate(stembuildVersion)
 				if expectedMatch {
 					Expect(err).ToNot(HaveOccurred())
 				} else {
@@ -82,7 +77,7 @@ var _ = Describe("OsVersionValidator", func() {
 			fakePid := 123
 			fakeGuestManager.StartProgramInGuestReturnsOnCall(0, int64(fakePid), errors.New("failed to create blah"))
 
-			err := validator.Validate()
+			err := validator.Validate("fakeVersion")
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fakeGuestManager.DownloadFileInGuestCallCount()).To(Equal(0))
@@ -93,7 +88,7 @@ var _ = Describe("OsVersionValidator", func() {
 			fakeExitCode := 123
 			fakeGuestManager.ExitCodeForProgramInGuestReturnsOnCall(0, int32(fakeExitCode), errors.New("failed to get exit code for process"))
 
-			err := validator.Validate()
+			err := validator.Validate("fakeVersion")
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fakeGuestManager.DownloadFileInGuestCallCount()).To(Equal(0))
@@ -105,7 +100,7 @@ var _ = Describe("OsVersionValidator", func() {
 			fakeGuestManager.StartProgramInGuestReturns(123, nil)
 			fakeGuestManager.ExitCodeForProgramInGuestReturnsOnCall(0, int32(fakeExitCode), nil)
 
-			err := validator.Validate()
+			err := validator.Validate("fakeVersion")
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fakeGuestManager.DownloadFileInGuestCallCount()).To(Equal(0))
@@ -115,7 +110,7 @@ var _ = Describe("OsVersionValidator", func() {
 		It("returns nil if the os version file that was created cannot be downloaded", func() {
 			fakeGuestManager.DownloadFileInGuestReturnsOnCall(0, nil, 0, errors.New("could not download"))
 
-			err := validator.Validate()
+			err := validator.Validate("fakeVersion")
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(fakeMessenger.DownloadFileFailedCallCount()).To(Equal(1))
@@ -129,9 +124,7 @@ var _ = Describe("OsVersionValidator", func() {
 
 			fakeGuestManager.DownloadFileInGuestReturns(buildBuffer, 50, nil)
 
-			fakeVersionGetter.GetVersionReturns(version.Version2019.Name)
-
-			err = validator.Validate()
+			err = validator.Validate(version.Version2019.Name)
 			Expect(err).NotTo(HaveOccurred())
 
 		})
@@ -143,9 +136,7 @@ var _ = Describe("OsVersionValidator", func() {
 
 			fakeGuestManager.DownloadFileInGuestReturns(buildBuffer, 50, nil)
 
-			fakeVersionGetter.GetVersionReturns(version.VersionDev.Name)
-
-			err = validator.Validate()
+			err = validator.Validate(version.VersionDev.Name)
 			Expect(err).NotTo(HaveOccurred())
 
 		})
