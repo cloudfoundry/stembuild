@@ -469,3 +469,23 @@ function Install-WUCerts
         throw $_.Exception
     }
 }
+
+function Create-VersionFile
+{
+    param(
+        [string]$Version
+    )
+
+    try
+    {
+        New-VersionFile -Version $Version
+        Write-Log "Successfully created stemcell version file"
+    }
+    catch [Exception]
+    {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to execute Create-VersionFile command"
+        throw $_.Exception
+    }
+
+}

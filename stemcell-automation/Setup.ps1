@@ -1,7 +1,8 @@
 param(
     [string]$Organization = "",
     [string]$Owner = "",
-    [switch]$SkipRandomPassword
+    [switch]$SkipRandomPassword,
+    [String]$Version
 )
 
 Push-Location $PSScriptRoot
@@ -42,7 +43,7 @@ try {
     Register-ScheduledTask BoshCompleteVMPrep -Action $Sta -Trigger $Stt -Principal $STPrin -Description "Bosh Stemcell Automation task to complete the vm preparation"
     Write-Log "Successfully registered the Bosh Stemcell Automation scheduled task"
 
-    ProvisionVM
+    ProvisionVM -Version $Version
 } catch [Exception] {
     Write-Log "Failed to install Bosh dependencies. See 'c:\provision\log.log' for more info."
     DeleteScheduledTask

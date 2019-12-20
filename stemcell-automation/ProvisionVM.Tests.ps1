@@ -13,6 +13,7 @@ Describe "ProvisionVM" {
         Mock Extract-LGPO { $provisionerCalls.Add("Extract-LGPO") }
         Mock Enable-HyperV { $provisionerCalls.Add("Enable-HyperV") }
         Mock Install-WUCerts { $provisionerCalls.Add("Install-WUCerts") }
+        Mock Create-VersionFile { $provisionerCalls.Add("Create-VersionFile") }
 
         if (!(Get-Command "Restart-Computer" -errorAction SilentlyContinue))
         {
@@ -80,7 +81,12 @@ Describe "ProvisionVM" {
         ProvisionVM
 
         Assert-MockCalled -CommandName Install-WUCerts
+    }
 
+    It "creates a version file" {
+        ProvisionVM
+
+        Assert-MockCalled -CommandName Create-VersionFile
     }
 
     It "restarts as the last command" {

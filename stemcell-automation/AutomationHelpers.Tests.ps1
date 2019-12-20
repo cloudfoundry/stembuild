@@ -976,3 +976,27 @@ Describe "Install-WUCerts" {
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to execute Get-WUCerts powershell cmdlet" }
     }
 }
+
+Describe "Create-VersionFile" {
+    It "creates a file with the stembuild version" {
+        Mock New-VersionFile { }
+        Mock Write-Log { }
+
+        { Create-VersionFile -Version '1803.456.17-build.2'} | Should -Not -Throw
+
+        Assert-MockCalled New-VersionFile -Times 1 -Scope It -ParameterFilter {$version -eq '1803.456.17-build.2'}
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Successfully created stemcell version file" }
+    }
+
+    It "fails gracefully when New-VersionFile command fails" {
+        Mock New-VersionFile { throw "Something went wrong trying to create the version file" }
+        Mock Write-Log { }
+
+        { Create-VersionFile -Version '1803.456.17-build.2'} | Should -Throw "Something went wrong trying to create the version file"
+
+        Assert-MockCalled New-VersionFile -Times 1 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to create the version file" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to execute Create-VersionFile command" }
+    }
+
+}
