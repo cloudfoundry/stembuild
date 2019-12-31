@@ -417,15 +417,15 @@ func runIgnoringOutput(args []string) int {
 var _ = SynchronizedAfterSuite(func() {
 	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
 
-	fmt.Sprintf("TargetIP is: %s", conf.TargetIP)
-	fmt.Sprintf("NetworkGateway is: %s", conf.NetworkGateway)
-	fmt.Sprintf("SubnetMask is: %s", conf.SubnetMask)
-	fmt.Sprintf("VMUsername is: %s", conf.VMUsername)
-	fmt.Sprintf("VMName is: %s", conf.VMName)
-	fmt.Sprintf("VMNetwork is: %s", conf.VMNetwork)
-	fmt.Sprintf("VCenterURL is: %s", conf.VCenterURL)
-	fmt.Sprintf("VCenterUsername is: %s", conf.VCenterUsername)
-	fmt.Sprintf("VMInventoryPath is: %s", conf.VMInventoryPath)
+	fmt.Printf("TargetIP is: %s", conf.TargetIP)
+	fmt.Printf("NetworkGateway is: %s", conf.NetworkGateway)
+	fmt.Printf("SubnetMask is: %s", conf.SubnetMask)
+	fmt.Printf("VMUsername is: %s", conf.VMUsername)
+	fmt.Printf("VMName is: %s", conf.VMName)
+	fmt.Printf("VMNetwork is: %s", conf.VMNetwork)
+	fmt.Printf("VCenterURL is: %s", conf.VCenterURL)
+	fmt.Printf("VCenterUsername is: %s", conf.VCenterUsername)
+	fmt.Printf("VMInventoryPath is: %s", conf.VMInventoryPath)
 
 	if !existingVM && skipCleanup != "TRUE" {
 		deleteCommand := []string{
@@ -434,7 +434,7 @@ var _ = SynchronizedAfterSuite(func() {
 			fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
 		}
 		Eventually(func() int {
-			return runIgnoringOutput(deleteCommand)
+			return cli.Run(deleteCommand)
 		}, 10*time.Minute, 10*time.Second).Should(BeZero())
 		fmt.Println("VM destroyed")
 		if lockDir != "" {
