@@ -417,16 +417,6 @@ func runIgnoringOutput(args []string) int {
 var _ = SynchronizedAfterSuite(func() {
 	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
 
-	fmt.Printf("TargetIP is: %s\n", conf.TargetIP)
-	fmt.Printf("NetworkGateway is: %s\n", conf.NetworkGateway)
-	fmt.Printf("SubnetMask is: %s\n", conf.SubnetMask)
-	fmt.Printf("VMUsername is: %s\n", conf.VMUsername)
-	fmt.Printf("VMName is: %s\n", conf.VMName)
-	fmt.Printf("VMNetwork is: %s\n", conf.VMNetwork)
-	fmt.Printf("VCenterURL is: %s\n", conf.VCenterURL)
-	fmt.Printf("VCenterUsername is: %s\n", conf.VCenterUsername)
-	fmt.Printf("VMInventoryPath is: %s\n", conf.VMInventoryPath)
-
 	if !existingVM && skipCleanup != "TRUE" {
 		deleteCommand := []string{
 			"vm.destroy",
