@@ -425,7 +425,7 @@ var _ = SynchronizedAfterSuite(func() {
 		}
 		Eventually(func() int {
 			return cli.Run(deleteCommand)
-		}, 10*time.Minute, 10*time.Second).Should(BeZero())
+		}, 3*time.Minute, 10*time.Second).Should(BeZero())
 		fmt.Println("VM destroyed")
 		if lockDir != "" {
 			_, _, err := lockPool.ReleaseLock(lockDir)
