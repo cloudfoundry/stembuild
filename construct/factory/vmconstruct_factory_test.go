@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry-incubator/stembuild/construct/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/pkg/errors"
 )
 
 var _ = Describe("Factory", func() {
@@ -34,6 +35,21 @@ var _ = Describe("Factory", func() {
 			vmPreparer, err := factory.VMPreparer(sourceConfig, fakeVCenterManager)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(vmPreparer).To(BeAssignableToTypeOf(&construct.VMConstruct{}))
+		})
+
+		It("should return a login error when login incorrect to VCenter", func() {
+			// setup
+			fakeVCenterManager := &commandparserfakes.FakeVCenterManager{}
+			loginFailure := errors.New("could not log in")
+			fakeVCenterManager.LoginReturns(loginFailure)
+			sourceConfig := config.SourceConfig{}
+
+			vmPreparer, err := factory.VMPreparer(sourceConfig, fakeVCenterManager)
+
+			Expect(vmPreparer).To(BeNil())
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Cannot complete login due to an incorrect vCenter user name or password"))
+			Expect(err.Error()).To(ContainSubstring(loginFailure.Error()))
 		})
 	})
 })

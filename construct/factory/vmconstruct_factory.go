@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry-incubator/stembuild/construct/config"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
+	"github.com/pkg/errors"
 
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
@@ -30,7 +31,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 	ctx := context.Background()
 	err := vCenterManager.Login(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Cannot complete login due to an incorrect vCenter user name or password")
 	}
 
 	vm, err := vCenterManager.FindVM(ctx, config.VmInventoryPath)
