@@ -465,8 +465,7 @@ function Install-WUCerts
     catch [Exception]
     {
         Write-Log $_.Exception.Message
-        Write-Log "Failed to execute Get-WUCerts powershell cmdlet"
-        throw $_.Exception
+        Write-Warning "Unable to retrieve root certificates for Windows Update Server"
     }
 }
 
