@@ -56,9 +56,15 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		Messenger:    messenger,
 	}
 
+	remoteManager := NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
+
+	vmConnectionValidator := &construct.VMConnectionValidator{
+		RemoteManager: remoteManager,
+	}
+
 	return construct.NewVMConstruct(
 		ctx,
-		NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword),
+		remoteManager,
 		config.GuestVMUsername,
 		config.GuestVMPassword,
 		config.VmInventoryPath,
@@ -66,6 +72,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		guestManager,
 		winRMManager,
 		osValidator,
+		vmConnectionValidator,
 		messenger,
 		&poller.Poller{},
 		versionGetter,

@@ -16,15 +16,16 @@ import (
 
 var _ = Describe("construct_helpers", func() {
 	var (
-		fakeRemoteManager *remotemanagerfakes.FakeRemoteManager
-		vmConstruct       *VMConstruct
-		fakeVcenterClient *constructfakes.FakeIaasClient
-		fakeGuestManager  *constructfakes.FakeGuestManager
-		fakeWinRMEnabler  *constructfakes.FakeWinRMEnabler
-		fakeOSValidator   *constructfakes.FakeOSValidator
-		fakeMessenger     *constructfakes.FakeConstructMessenger
-		fakePoller        *constructfakes.FakePoller
-		fakeVersionGetter *constructfakes.FakeVersionGetter
+		fakeRemoteManager         *remotemanagerfakes.FakeRemoteManager
+		vmConstruct               *VMConstruct
+		fakeVcenterClient         *constructfakes.FakeIaasClient
+		fakeGuestManager          *constructfakes.FakeGuestManager
+		fakeWinRMEnabler          *constructfakes.FakeWinRMEnabler
+		fakeOSValidator           *constructfakes.FakeOSValidator
+		fakeMessenger             *constructfakes.FakeConstructMessenger
+		fakePoller                *constructfakes.FakePoller
+		fakeVersionGetter         *constructfakes.FakeVersionGetter
+		fakeVMConnectionValidator *constructfakes.FakeVMConnectionValidator
 	)
 
 	BeforeEach(func() {
@@ -36,6 +37,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeMessenger = &constructfakes.FakeConstructMessenger{}
 		fakePoller = &constructfakes.FakePoller{}
 		fakeVersionGetter = &constructfakes.FakeVersionGetter{}
+		fakeVMConnectionValidator = &constructfakes.FakeVMConnectionValidator{}
 
 		vmConstruct = NewVMConstruct(
 			context.TODO(),
@@ -47,6 +49,7 @@ var _ = Describe("construct_helpers", func() {
 			fakeGuestManager,
 			fakeWinRMEnabler,
 			fakeOSValidator,
+			fakeVMConnectionValidator,
 			fakeMessenger,
 			fakePoller,
 			fakeVersionGetter,
@@ -64,7 +67,8 @@ var _ = Describe("construct_helpers", func() {
 	})
 
 	Describe("PrepareVM", func() {
-		Context("Validates the OS version of the target machine", func() {
+
+		Describe("Validates the OS version of the target machine", func() {
 			It("returns failure if the OS Validator returns an error", func() {
 				validationError := errors.New("the OS is wrong")
 				fakeOSValidator.ValidateReturns(validationError)
@@ -85,7 +89,7 @@ var _ = Describe("construct_helpers", func() {
 			})
 		})
 
-		Context("can create provision directory", func() {
+		Describe("can create provision directory", func() {
 			It("creates it successfully", func() {
 				err := vmConstruct.PrepareVM()
 
@@ -109,7 +113,7 @@ var _ = Describe("construct_helpers", func() {
 			})
 		})
 
-		Context("enable WinRM", func() {
+		Describe("enable WinRM", func() {
 			It("returns failure when it fails to enable winrm", func() {
 				execError := errors.New("failed to enable winRM")
 				fakeWinRMEnabler.EnableReturns(execError)
@@ -130,34 +134,26 @@ var _ = Describe("construct_helpers", func() {
 			})
 		})
 
-		Context("can connect to VM", func() {
-			It("can reach VM and can login to VM", func() {
-				err := vmConstruct.PrepareVM()
+		Describe("connect to VM", func() {
 
-				Expect(err).To(BeNil())
-				Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
-				Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
-			})
-			It("returns an error if it cannot reach the VM", func() {
-				fakeRemoteManager.CanReachVMReturns(errors.New("can't reach VM"))
+			It("checks for connectivity first", func() {
+				var calls []string
 
-				err := vmConstruct.PrepareVM()
-				Expect(err).NotTo(BeNil())
-				Expect(err).To(MatchError("can't reach VM"))
-				Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
-				Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(0))
-			})
+				fakeVersionGetter.GetVersionCalls(func() string {
+					calls = append(calls, "getVersionCall")
+					return ""
+				})
 
-			It("should return an error when login fails", func() {
-				invalidPwdError := errors.New("login error")
-				fakeRemoteManager.CanLoginVMReturns(invalidPwdError)
+				fakeVMConnectionValidator.ValidateCalls(func() error {
+					calls = append(calls, "validateVMConnCall")
+					return nil
+				})
 
 				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-				Expect(err).To(MatchError(invalidPwdError))
+				Expect(err).NotTo(HaveOccurred())
 
-				Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
-				Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))
+				Expect(calls[0]).To(Equal("validateVMConnCall"))
+				Expect(calls[1]).To(Equal("getVersionCall"))
 			})
 
 			It("logs that it successfully validated the vm connection", func() {
@@ -170,7 +166,7 @@ var _ = Describe("construct_helpers", func() {
 
 		})
 
-		Context("can upload artifacts", func() {
+		Describe("can upload artifacts", func() {
 			Context("Upload all artifacts correctly", func() {
 				It("passes successfully", func() {
 
@@ -238,7 +234,7 @@ var _ = Describe("construct_helpers", func() {
 			})
 		})
 
-		Context("can extract archives", func() {
+		Describe("can extract archives", func() {
 			It("returns failure when it fails to extract archive", func() {
 				extractError := errors.New("failed to extract archive")
 				fakeRemoteManager.ExtractArchiveReturns(extractError)
@@ -267,7 +263,7 @@ var _ = Describe("construct_helpers", func() {
 
 		})
 
-		Context("can execute scripts", func() {
+		Describe("can execute scripts", func() {
 			It("returns failure when it fails to execute setup script", func() {
 				execError := errors.New("failed to execute setup script")
 				fakeRemoteManager.ExecuteCommandReturns(execError)
@@ -296,7 +292,7 @@ var _ = Describe("construct_helpers", func() {
 			})
 
 		})
-		Context("can check if vm is rebooting", func() {
+		Describe("can check if vm is rebooting", func() {
 			It("runs every minute and returns successfully if polling succeeds", func() {
 				fakePoller.PollReturns(nil)
 

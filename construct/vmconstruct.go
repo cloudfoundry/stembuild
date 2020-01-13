@@ -14,18 +14,19 @@ import (
 )
 
 type VMConstruct struct {
-	ctx             context.Context
-	remoteManager   RemoteManager
-	Client          IaasClient
-	guestManager    GuestManager
-	vmInventoryPath string
-	vmUsername      string
-	vmPassword      string
-	winRMEnabler    WinRMEnabler
-	osValidator     OSValidator
-	messenger       ConstructMessenger
-	poller          Poller
-	versionGetter   VersionGetter
+	ctx                       context.Context
+	remoteManager             RemoteManager
+	Client                    IaasClient
+	guestManager              GuestManager
+	vmInventoryPath           string
+	vmUsername                string
+	vmPassword                string
+	winRMEnabler              WinRMEnabler
+	osValidator               OSValidator
+	vmAuthenticationValidator VMAuthenticationValidator
+	messenger                 ConstructMessenger
+	poller                    Poller
+	versionGetter             VersionGetter
 }
 
 const provisionDir = "C:\\provision\\"
@@ -47,6 +48,7 @@ func NewVMConstruct(
 	guestManager GuestManager,
 	winRMEnabler WinRMEnabler,
 	osValidator OSValidator,
+	vmAuthenticationValidator VMAuthenticationValidator,
 	messenger ConstructMessenger,
 	poller Poller,
 	versionGetter VersionGetter,
@@ -62,6 +64,7 @@ func NewVMConstruct(
 		vmPassword,
 		winRMEnabler,
 		osValidator,
+		vmAuthenticationValidator,
 		messenger,
 		poller,
 		versionGetter,
@@ -94,6 +97,11 @@ type OSValidator interface {
 	Validate(stembuildVersion string) error
 }
 
+//go:generate counterfeiter . VMAuthenticationValidator
+type VMAuthenticationValidator interface {
+	Validate() error
+}
+
 //go:generate counterfeiter . ConstructMessenger
 type ConstructMessenger interface {
 	CreateProvisionDirStarted()
@@ -121,9 +129,15 @@ type Poller interface {
 }
 
 func (c *VMConstruct) PrepareVM() error {
+	c.messenger.ValidateVMConnectionStarted()
+	err := c.vmAuthenticationValidator.Validate()
+	if err != nil {
+		return err
+	}
+	c.messenger.ValidateVMConnectionSucceeded()
 
 	stembuildVersion := c.versionGetter.GetVersion()
-	err := c.osValidator.Validate(stembuildVersion)
+	err = c.osValidator.Validate(stembuildVersion)
 	if err != nil {
 		return err
 	}
@@ -146,13 +160,6 @@ func (c *VMConstruct) PrepareVM() error {
 	}
 	c.messenger.EnableWinRMSucceeded()
 
-	c.messenger.ValidateVMConnectionStarted()
-	err = c.canConnectToVM()
-	if err != nil {
-		return err
-	}
-	c.messenger.ValidateVMConnectionSucceeded()
-
 	c.messenger.ExtractArtifactsStarted()
 	err = c.extractArchive()
 	if err != nil {
@@ -169,20 +176,6 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.WinRMDisconnectedForReboot()
 
 	err = c.isPoweredOff(time.Minute)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *VMConstruct) canConnectToVM() error {
-	err := c.remoteManager.CanReachVM()
-	if err != nil {
-		return err
-	}
-
-	err = c.remoteManager.CanLoginVM()
 	if err != nil {
 		return err
 	}
