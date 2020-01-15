@@ -58,7 +58,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 
 	remoteManager := NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
 
-	vmConnectionValidator := &construct.VMConnectionValidator{
+	vmConnectionValidator := &construct.WinRMConnectionValidator{
 		RemoteManager: remoteManager,
 	}
 

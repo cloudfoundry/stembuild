@@ -15,7 +15,7 @@ import (
 type VcenterClient struct {
 	Url           string
 	credentialUrl string
-	redactedUrl string
+	redactedUrl   string
 	caCertFile    string
 	Runner        iaas_cli.CliRunner
 }

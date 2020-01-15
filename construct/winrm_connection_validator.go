@@ -5,11 +5,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-type VMConnectionValidator struct {
+type WinRMConnectionValidator struct {
 	RemoteManager RemoteManager
 }
 
-func (v *VMConnectionValidator) Validate() error {
+func (v *WinRMConnectionValidator) Validate() error {
 	err := v.RemoteManager.CanReachVM()
 	if err != nil {
 		return err

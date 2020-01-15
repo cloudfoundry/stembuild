@@ -12,14 +12,14 @@ import (
 
 var _ = Describe("VMConnectionValidator", func() {
 	var (
-		validator         *construct.VMConnectionValidator
+		validator         *construct.WinRMConnectionValidator
 		fakeRemoteManager *remotemanagerfakes.FakeRemoteManager
 	)
 
 	BeforeEach(func() {
 		fakeRemoteManager = &remotemanagerfakes.FakeRemoteManager{}
 
-		validator = &construct.VMConnectionValidator{
+		validator = &construct.WinRMConnectionValidator{
 			RemoteManager: fakeRemoteManager,
 		}
 	})

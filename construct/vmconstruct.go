@@ -14,19 +14,19 @@ import (
 )
 
 type VMConstruct struct {
-	ctx                       context.Context
-	remoteManager             RemoteManager
-	Client                    IaasClient
-	guestManager              GuestManager
-	vmInventoryPath           string
-	vmUsername                string
-	vmPassword                string
-	winRMEnabler              WinRMEnabler
-	osValidator               OSValidator
-	vmAuthenticationValidator VMAuthenticationValidator
-	messenger                 ConstructMessenger
-	poller                    Poller
-	versionGetter             VersionGetter
+	ctx                   context.Context
+	remoteManager         RemoteManager
+	Client                IaasClient
+	guestManager          GuestManager
+	vmInventoryPath       string
+	vmUsername            string
+	vmPassword            string
+	winRMEnabler          WinRMEnabler
+	osValidator           OSValidator
+	vmConnectionValidator VMConnectionValidator
+	messenger             ConstructMessenger
+	poller                Poller
+	versionGetter         VersionGetter
 }
 
 const provisionDir = "C:\\provision\\"
@@ -48,7 +48,7 @@ func NewVMConstruct(
 	guestManager GuestManager,
 	winRMEnabler WinRMEnabler,
 	osValidator OSValidator,
-	vmAuthenticationValidator VMAuthenticationValidator,
+	vmConnectionValidator VMConnectionValidator,
 	messenger ConstructMessenger,
 	poller Poller,
 	versionGetter VersionGetter,
@@ -64,7 +64,7 @@ func NewVMConstruct(
 		vmPassword,
 		winRMEnabler,
 		osValidator,
-		vmAuthenticationValidator,
+		vmConnectionValidator,
 		messenger,
 		poller,
 		versionGetter,
@@ -97,8 +97,8 @@ type OSValidator interface {
 	Validate(stembuildVersion string) error
 }
 
-//go:generate counterfeiter . VMAuthenticationValidator
-type VMAuthenticationValidator interface {
+//go:generate counterfeiter . VMConnectionValidator
+type VMConnectionValidator interface {
 	Validate() error
 }
 
@@ -130,7 +130,7 @@ type Poller interface {
 
 func (c *VMConstruct) PrepareVM() error {
 	c.messenger.ValidateVMConnectionStarted()
-	err := c.vmAuthenticationValidator.Validate()
+	err := c.vmConnectionValidator.Validate()
 	if err != nil {
 		return err
 	}
