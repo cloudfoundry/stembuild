@@ -129,13 +129,6 @@ type Poller interface {
 }
 
 func (c *VMConstruct) PrepareVM() error {
-	c.messenger.ValidateVMConnectionStarted()
-	err := c.vmConnectionValidator.Validate()
-	if err != nil {
-		return err
-	}
-	c.messenger.ValidateVMConnectionSucceeded()
-
 	stembuildVersion := c.versionGetter.GetVersion()
 	err = c.osValidator.Validate(stembuildVersion)
 	if err != nil {
@@ -159,6 +152,13 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 	c.messenger.EnableWinRMSucceeded()
+
+	c.messenger.ValidateVMConnectionStarted()
+	err = c.vmConnectionValidator.Validate()
+	if err != nil {
+		return err
+	}
+	c.messenger.ValidateVMConnectionSucceeded()
 
 	c.messenger.ExtractArtifactsStarted()
 	err = c.extractArchive()
