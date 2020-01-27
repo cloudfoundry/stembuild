@@ -43,13 +43,11 @@ var _ = Describe("VMConnectionValidator", func() {
 		})
 
 		It("return an error when it cannot log into the VM", func() {
-			invalidLoginError := errors.New("Cannot complete login due to an incorrect VM user name or password")
 			fakeRemoteManager.CanLoginVMReturns(errors.New("login error"))
 
 			err := validator.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(errors.New("login error").Error()))
-			Expect(err.Error()).To(ContainSubstring(invalidLoginError.Error()))
 
 			Expect(fakeRemoteManager.CanReachVMCallCount()).To(Equal(1))
 			Expect(fakeRemoteManager.CanLoginVMCallCount()).To(Equal(1))

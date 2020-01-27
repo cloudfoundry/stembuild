@@ -130,7 +130,7 @@ type Poller interface {
 
 func (c *VMConstruct) PrepareVM() error {
 	stembuildVersion := c.versionGetter.GetVersion()
-	err = c.osValidator.Validate(stembuildVersion)
+	err := c.osValidator.Validate(stembuildVersion)
 	if err != nil {
 		return err
 	}

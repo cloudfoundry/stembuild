@@ -136,12 +136,12 @@ var _ = Describe("construct_helpers", func() {
 
 		Describe("connect to VM", func() {
 
-			It("checks for connectivity first", func() {
+			It("checks for WinRM connectivity after WinRM enabled", func() {
 				var calls []string
 
-				fakeVersionGetter.GetVersionCalls(func() string {
-					calls = append(calls, "getVersionCall")
-					return ""
+				fakeWinRMEnabler.EnableCalls(func() error {
+					calls = append(calls, "enableWinRMCall")
+					return nil
 				})
 
 				fakeVMConnectionValidator.ValidateCalls(func() error {
@@ -152,8 +152,8 @@ var _ = Describe("construct_helpers", func() {
 				err := vmConstruct.PrepareVM()
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(calls[0]).To(Equal("validateVMConnCall"))
-				Expect(calls[1]).To(Equal("getVersionCall"))
+				Expect(calls[0]).To(Equal("enableWinRMCall"))
+				Expect(calls[1]).To(Equal("validateVMConnCall"))
 			})
 
 			It("logs that it successfully validated the vm connection", func() {
