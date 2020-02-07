@@ -77,6 +77,19 @@ Describe "ProvisionVM" {
         $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeLessThan $provisionerCalls.IndexOf("Enable-SSHD")
     }
 
+    It "fails gracefully when Install-WUCerts helper fails" {
+        Mock Install-WUCerts { throw "Something went wrong trying to Install-WUCerts" }
+        Mock Write-Log { }
+        Mock Write-Warning { }
+
+        { ProvisionVM } | Should -Not -Throw
+
+        Assert-MockCalled Install-WUCerts -Times 1 -Scope It
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Install-WUCerts" }
+        Assert-MockCalled Write-Warning -Times 1 -Scope It -ParameterFilter {$Message -eq "This should not impact the successful execution of stembuild construct. If the root certificates are out of date, Diego cells running on VMs built off of this stemcell may not be able to make outbound network connections." }
+
+    }
+
     It "installs WU certs" {
         ProvisionVM
 

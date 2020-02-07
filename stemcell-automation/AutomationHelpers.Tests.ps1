@@ -943,7 +943,6 @@ Describe "Install-WUCerts" {
     It "executes the Get-WUCerts powershell cmdlet" {
         Mock Get-WUCerts { }
         Mock Write-Log { }
-        Mock Write-Warning { }
 
         { Install-WUCerts } | Should -Not -Throw
 
@@ -955,11 +954,11 @@ Describe "Install-WUCerts" {
         Mock Get-WUCerts { throw "Something went wrong trying to Get-WUCerts" }
         Mock Write-Log { }
 
-        { Install-WUCerts } | Should -Not -Throw
+        { Install-WUCerts } | Should -Throw "Something went wrong trying to Get-WUCerts"
 
         Assert-MockCalled Get-WUCerts -Times 1 -Scope It
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Get-WUCerts" }
-        Assert-MockCalled Write-Warning -Times 1 -Scope It -ParameterFilter {$Message -eq "Unable to retrieve root certificates for Windows Update Server" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to retrieve updated root certificates from the public Windows Update Server." }
     }
 }
 
