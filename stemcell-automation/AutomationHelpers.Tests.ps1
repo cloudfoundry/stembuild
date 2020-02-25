@@ -542,41 +542,46 @@ Describe "Check-Dependencies" {
 Describe "Validate-OSVersion" {
     BeforeEach {
         Mock Write-Log { }
+
+        $major2019 = 10
+        $minor2019 = 0
+        $build2019 = 17763
+        $revision2019 = "IGNORED_REVISION_VALUE"
     }
 
     It "fails gracefully when the OS major version doesn't match" {
-        Mock Get-OSVersionString { "14.0.16299.0" }
+        Mock Get-OSVersionString { "$($major2019 + 1).$minor2019.$build2019.$revision2019" }
 
-        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019"
+        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM"
 
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
     }
 
     It "fails gracefully when the OS minor version doesn't match" {
-        Mock Get-OSVersionString { "10.5.16299.0" }
+        Mock Get-OSVersionString { "$major2019.$($minor2019 + 1).$build2019.$revision2019" }
 
-        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019"
+        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM"
 
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
 
     }
 
     It "fails gracefully when the OS build version doesn't match" {
-        Mock Get-OSVersionString { "10.0.12345.0" }
+        Mock Get-OSVersionString { "$major2019.$minor2019.$($build2019 + 1).$revision2019" }
 
-        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019"
+        { Validate-OSVersion } | Should -Throw "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM"
 
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
         Assert-MockCalled Get-OSVersionString -Times 1 -Scope It
     }
 
     It "successfully validates the OS when it is Windows Server 2019" {
-        Mock Get-OSVersionString { "10.0.17763.2761" }
+        Mock Get-OSVersionString { "$major2019.$minor2019.$build2019.$revision2019" }
 
         { Validate-OSVersion } | Should -Not -Throw
 

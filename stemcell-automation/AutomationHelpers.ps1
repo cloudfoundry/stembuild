@@ -292,7 +292,7 @@ function Validate-OSVersion
             Write-Log "Found correct OS version: Windows Server 2019"
         }
         else {
-            throw "OS Version Mismatch: Please use Windows Server 2019"
+            throw "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM"
         }
     }
     catch [Exception]
