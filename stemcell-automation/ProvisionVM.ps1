@@ -6,6 +6,7 @@ function ProvisionVM() {
     )
 
     CopyPSModules
+    Set-RegKeys
     InstallBoshAgent
     InstallOpenSSH
     Extract-LGPO

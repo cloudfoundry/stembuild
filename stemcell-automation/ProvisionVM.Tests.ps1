@@ -4,6 +4,7 @@ Describe "ProvisionVM" {
     BeforeEach {
         [System.Collections.ArrayList]$provisionerCalls = @()
 
+        Mock Set-RegKeys { $provisionerCalls.Add("Set-RegKeys") }
         Mock InstallCFFeatures { $provisionerCalls.Add("InstallCFFeatures") }
         Mock CopyPSModules { $provisionerCalls.Add("CopyPSModules") }
         Mock InstallOpenSSH { $provisionerCalls.Add("InstallOpenSSH") }
@@ -25,6 +26,11 @@ Describe "ProvisionVM" {
         Mock Restart-Computer { $provisionerCalls.Add("Restart-Computer") }
     }
 
+    It "sets registry keys to stop zombie load and meltdown exploits" {
+        ProvisionVM
+
+        Assert-MockCalled -CommandName Set-RegKeys
+    }
     It "installs CFFeatures" {
         ProvisionVM
 

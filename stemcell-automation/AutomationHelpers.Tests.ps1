@@ -1,4 +1,57 @@
 . ./AutomationHelpers.ps1
+. ./ProvisionVM.ps1
+
+Describe "Setup" {
+    BeforeEach {
+        [System.Collections.ArrayList]$provisionerCalls = @()
+        Mock Validate-OSVersion {
+            $provisionerCalls.Add("Validate-OSVersion")
+        }
+        Mock Check-Dependencies {
+            $provisionerCalls.Add("Check-Dependencies")
+        }
+        Mock Schedule-VmPrepTask {
+            $provisionerCalls.Add("Schedule-VmPrepTask")
+        }
+        Mock ProvisionVM {
+            $provisionerCalls.Add("ProvisionVM")
+        }
+    }
+
+    It "validates OS version first" {
+        Setup
+
+        Assert-MockCalled -CommandName Validate-OSVersion
+        $provisionerCalls.IndexOf("Validate-OSVersion") | Should -Be 0
+    }
+
+    It "checks dependencies" {
+        Setup
+
+        Assert-MockCalled -CommandName Check-Dependencies
+    }
+
+    It "schedules a task to continue provisioning VM on restart with the params passed from Setup" {
+        Setup -Organization "abc" -Owner "def" -SkipRandomPassword:$false
+
+        Assert-MockCalled -CommandName Schedule-VmPrepTask -ParameterFilter {
+            $Organization -eq "abc" -and
+                    $Owner -eq "def" -and
+                    $SkipRandomPassword -eq $false
+        }
+    }
+
+    It "provisions the VM last" {
+        Setup -Version "123"
+
+        Assert-MockCalled -CommandName ProvisionVM -ParameterFilter {
+            $Version -eq "123"
+        }
+        $lastIndex = $provisionerCalls.Count - 1
+        $provisionerCalls.IndexOf("ProvisionVM") | Should -Be $lastIndex
+    }
+
+}
 
 Describe "CopyPSModules" {
     It "can copy PS Modules to target directory" {
