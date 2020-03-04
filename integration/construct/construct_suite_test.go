@@ -27,6 +27,7 @@ import (
 	"github.com/vmware/govmomi/govc/cli"
 	_ "github.com/vmware/govmomi/govc/importx"
 	_ "github.com/vmware/govmomi/govc/vm"
+	_ "github.com/vmware/govmomi/govc/vm/guest"
 	_ "github.com/vmware/govmomi/govc/vm/snapshot"
 
 	"syscall"
@@ -232,6 +233,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		}
 		createVMWithIP(targetIP, vmNamePrefix, vcenterFolder)
 
+		upgradeVMwareTools(targetIP, vmNamePrefix, vcenterFolder)
+
 		createVMSnapshot(VmSnapshotName)
 	} else {
 		existingVM = true
@@ -333,6 +336,28 @@ func createVMWithIP(targetIP, vmNamePrefix, vcenterFolder string) {
 	exitCode := cli.Run(opts)
 	Expect(exitCode).To(BeZero())
 
+}
+
+func upgradeVMwareTools(targetIP, vmNamePrefix, vcenterFolder string) {
+
+	vmNameSuffix := strings.Split(targetIP, ".")[3]
+	vmName := fmt.Sprintf("%s%s", vmNamePrefix, vmNameSuffix)
+
+	opts := []string{
+		"vm.guest.tools",
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		"-upgrade",
+		strings.Join([]string{vcenterFolder, vmName}, "/"),
+	}
+
+	fmt.Printf("Opts are %s", opts)
+
+	exitCode := 1
+
+	for exitCode != 0 {
+		time.Sleep(5 * time.Second)
+		exitCode = cli.Run(opts)
+	}
 }
 
 func validatedOVALocation() string {
