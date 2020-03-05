@@ -148,6 +148,8 @@ Process can take between 10 and 20 minutes. See Progress with `-debug` flag.
 
 ## Testing
 
+### Testing stembuild itself
+
 Older tests were written using the default testing framework.  However, more recent code
 has been test-driven with Ginkgo.  We recommend that any new code be test-driven using Ginkgo.
 Below are steps to run the tests:
@@ -165,6 +167,15 @@ To run integration tests:
 make integration
 ```
 
+### Testing stemcell-automation
+
+`stemcell-automation` contains powershell scripts which stembuild runs on the target VM. This directory also contains tests
+for the scripts, which are written with the Pester test framework. These require running in powershell on a Windows environment.
+
+```
+cd stemcell-automation
+invoke-pester
+```
 
 ## Vendoring
 
