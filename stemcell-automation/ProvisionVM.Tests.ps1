@@ -92,7 +92,7 @@ Describe "ProvisionVM" {
 
         Assert-MockCalled Install-WUCerts -Times 1 -Scope It
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Install-WUCerts" }
-        Assert-MockCalled Write-Warning -Times 1 -Scope It -ParameterFilter {$Message -eq "This should not impact the successful execution of stembuild construct. If the root certificates are out of date, Diego cells running on VMs built off of this stemcell may not be able to make outbound network connections." }
+        Assert-MockCalled Write-Warning -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to retrieve updated root certificates from the public Windows Update Server. This should not impact the successful execution of stembuild construct. If your root certificates are out of date, Diego cells running on VMs built from this stemcell may not be able to make outbound network connections." }
 
     }
 

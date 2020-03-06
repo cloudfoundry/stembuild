@@ -1010,13 +1010,10 @@ Describe "Install-WUCerts" {
 
     It "fails gracefully when Get-WUCerts powershell cmdlet fails" {
         Mock Get-WUCerts { throw "Something went wrong trying to Get-WUCerts" }
-        Mock Write-Log { }
 
         { Install-WUCerts } | Should -Throw "Something went wrong trying to Get-WUCerts"
 
         Assert-MockCalled Get-WUCerts -Times 1 -Scope It
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Get-WUCerts" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to retrieve updated root certificates from the public Windows Update Server." }
     }
 }
 
