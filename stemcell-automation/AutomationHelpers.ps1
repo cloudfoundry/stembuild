@@ -499,17 +499,8 @@ function Extract-LGPO
 
 function Install-WUCerts
 {
-    try
-    {
         Get-WUCerts
         Write-Log "Successfully retrieved Windows Update certs"
-    }
-    catch [Exception]
-    {
-        Write-Log $_.Exception.Message
-        Write-Log "Failed to retrieve updated root certificates from the public Windows Update Server."
-        throw $_.Exception
-    }
 }
 
 function Create-VersionFile
