@@ -55,16 +55,4 @@ var _ = Describe("Version Utilities", func() {
 			Expect(os).To(Equal("2012R2"))
 		})
 	})
-
-	Describe("GetOSVersionFromBuildNumber", func() {
-		It("returns 2019 given build number 17763", func() {
-			Expect(version.GetOSVersionFromBuildNumber("17763")).To(Equal("2019"))
-		})
-		It("returns 1803 given build number 17134", func() {
-			Expect(version.GetOSVersionFromBuildNumber("17134")).To(Equal("1803"))
-		})
-		It("returns empty string if given build number is wrong", func() {
-			Expect(version.GetOSVersionFromBuildNumber("random")).To(Equal(""))
-		})
-	})
 })

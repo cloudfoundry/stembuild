@@ -13,6 +13,11 @@ import (
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
 
+//go:generate counterfeiter . VersionGetter
+type VersionGetter interface {
+	GetVersion() string
+}
+
 type VMConstruct struct {
 	ctx                   context.Context
 	remoteManager         RemoteManager
@@ -22,7 +27,6 @@ type VMConstruct struct {
 	vmUsername            string
 	vmPassword            string
 	winRMEnabler          WinRMEnabler
-	osValidator           OSValidator
 	vmConnectionValidator VMConnectionValidator
 	messenger             ConstructMessenger
 	poller                Poller
@@ -47,7 +51,6 @@ func NewVMConstruct(
 	client IaasClient,
 	guestManager GuestManager,
 	winRMEnabler WinRMEnabler,
-	osValidator OSValidator,
 	vmConnectionValidator VMConnectionValidator,
 	messenger ConstructMessenger,
 	poller Poller,
@@ -63,7 +66,6 @@ func NewVMConstruct(
 		vmUsername,
 		vmPassword,
 		winRMEnabler,
-		osValidator,
 		vmConnectionValidator,
 		messenger,
 		poller,
@@ -90,11 +92,6 @@ type IaasClient interface {
 //go:generate counterfeiter . WinRMEnabler
 type WinRMEnabler interface {
 	Enable() error
-}
-
-//go:generate counterfeiter . OSValidator
-type OSValidator interface {
-	Validate(stembuildVersion string) error
 }
 
 //go:generate counterfeiter . VMConnectionValidator
@@ -130,12 +127,8 @@ type Poller interface {
 
 func (c *VMConstruct) PrepareVM() error {
 	stembuildVersion := c.versionGetter.GetVersion()
-	err := c.osValidator.Validate(stembuildVersion)
-	if err != nil {
-		return err
-	}
 
-	err = c.createProvisionDirectory()
+	err := c.createProvisionDirectory()
 	if err != nil {
 		return err
 	}

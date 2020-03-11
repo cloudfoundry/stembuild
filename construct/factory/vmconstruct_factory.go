@@ -51,10 +51,6 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		Unarchiver:   &archive.Zip{},
 	}
 	versionGetter := version.NewVersionGetter()
-	osValidator := &construct.OSVersionValidator{
-		GuestManager: guestManager,
-		Messenger:    messenger,
-	}
 
 	remoteManager := NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
 
@@ -71,7 +67,6 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		client,
 		guestManager,
 		winRMManager,
-		osValidator,
 		vmConnectionValidator,
 		messenger,
 		&poller.Poller{},

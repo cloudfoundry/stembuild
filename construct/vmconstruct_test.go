@@ -21,7 +21,6 @@ var _ = Describe("construct_helpers", func() {
 		fakeVcenterClient         *constructfakes.FakeIaasClient
 		fakeGuestManager          *constructfakes.FakeGuestManager
 		fakeWinRMEnabler          *constructfakes.FakeWinRMEnabler
-		fakeOSValidator           *constructfakes.FakeOSValidator
 		fakeMessenger             *constructfakes.FakeConstructMessenger
 		fakePoller                *constructfakes.FakePoller
 		fakeVersionGetter         *constructfakes.FakeVersionGetter
@@ -33,7 +32,6 @@ var _ = Describe("construct_helpers", func() {
 		fakeVcenterClient = &constructfakes.FakeIaasClient{}
 		fakeGuestManager = &constructfakes.FakeGuestManager{}
 		fakeWinRMEnabler = &constructfakes.FakeWinRMEnabler{}
-		fakeOSValidator = &constructfakes.FakeOSValidator{}
 		fakeMessenger = &constructfakes.FakeConstructMessenger{}
 		fakePoller = &constructfakes.FakePoller{}
 		fakeVersionGetter = &constructfakes.FakeVersionGetter{}
@@ -48,7 +46,6 @@ var _ = Describe("construct_helpers", func() {
 			fakeVcenterClient,
 			fakeGuestManager,
 			fakeWinRMEnabler,
-			fakeOSValidator,
 			fakeVMConnectionValidator,
 			fakeMessenger,
 			fakePoller,
@@ -67,28 +64,6 @@ var _ = Describe("construct_helpers", func() {
 	})
 
 	Describe("PrepareVM", func() {
-
-		Describe("Validates the OS version of the target machine", func() {
-			It("returns failure if the OS Validator returns an error", func() {
-				validationError := errors.New("the OS is wrong")
-				fakeOSValidator.ValidateReturns(validationError)
-
-				err := vmConstruct.PrepareVM()
-
-				Expect(err).To(MatchError(validationError))
-				Expect(fakeVcenterClient.MakeDirectoryCallCount()).To(Equal(0))
-
-				Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(0))
-			})
-
-			It("prepares the VM if the OS version is correct", func() {
-				err := vmConstruct.PrepareVM()
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(1))
-			})
-		})
-
 		Describe("can create provision directory", func() {
 			It("creates it successfully", func() {
 				err := vmConstruct.PrepareVM()

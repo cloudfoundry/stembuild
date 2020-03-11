@@ -80,18 +80,6 @@ var _ = Describe("stembuild construct", func() {
 		Eventually(session, constructOutputTimeout).Should(Exit(1))
 		Eventually(session.Err).Should(Say(`Could not find LGPO.zip in the current directory`))
 	})
-	It("fails with the appropriate error when the Stembuild Version does not match the Guest OS Version", func() {
-		err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
-		Expect(err).ToNot(HaveOccurred())
-
-		wrongVersionStembuildExecutable, err := helpers.BuildStembuild("dev.1")
-		Expect(err).ToNot(HaveOccurred())
-
-		session := helpers.Stembuild(wrongVersionStembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
-
-		Eventually(session, 3*time.Minute).Should(Exit(1))
-		Eventually(session.Err).Should(Say("OS version of stembuild and guest OS VM do not match"))
-	})
 
 	It("does not exit when the target VM has not powered off", func() {
 		err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
