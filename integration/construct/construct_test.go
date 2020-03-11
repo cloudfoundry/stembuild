@@ -34,7 +34,7 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			shutdownTimeout := 3 * time.Minute
+			shutdownTimeout := 5 * time.Minute
 			Eventually(session, shutdownTimeout).Should(Exit(0))
 		})
 
