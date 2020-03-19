@@ -3,9 +3,9 @@ package construct_test
 import (
 	"context"
 	"errors"
-	"time"
-
+	"github.com/cloudfoundry-incubator/stembuild/poller/pollerfakes"
 	"github.com/onsi/gomega/gbytes"
+	"time"
 
 	. "github.com/cloudfoundry-incubator/stembuild/construct"
 	"github.com/cloudfoundry-incubator/stembuild/construct/constructfakes"
@@ -22,9 +22,11 @@ var _ = Describe("construct_helpers", func() {
 		fakeGuestManager          *constructfakes.FakeGuestManager
 		fakeWinRMEnabler          *constructfakes.FakeWinRMEnabler
 		fakeMessenger             *constructfakes.FakeConstructMessenger
-		fakePoller                *constructfakes.FakePoller
+		fakePoller                *pollerfakes.FakePollerI
 		fakeVersionGetter         *constructfakes.FakeVersionGetter
 		fakeVMConnectionValidator *constructfakes.FakeVMConnectionValidator
+		fakeRebootWaiter          *constructfakes.FakeRebootWaiterI
+		fakeScriptExecutor        *constructfakes.FakeScriptExecutorI
 	)
 
 	BeforeEach(func() {
@@ -33,9 +35,11 @@ var _ = Describe("construct_helpers", func() {
 		fakeGuestManager = &constructfakes.FakeGuestManager{}
 		fakeWinRMEnabler = &constructfakes.FakeWinRMEnabler{}
 		fakeMessenger = &constructfakes.FakeConstructMessenger{}
-		fakePoller = &constructfakes.FakePoller{}
+		fakePoller = &pollerfakes.FakePollerI{}
 		fakeVersionGetter = &constructfakes.FakeVersionGetter{}
 		fakeVMConnectionValidator = &constructfakes.FakeVMConnectionValidator{}
+		fakeRebootWaiter = &constructfakes.FakeRebootWaiterI{}
+		fakeScriptExecutor = &constructfakes.FakeScriptExecutorI{}
 
 		vmConstruct = NewVMConstruct(
 			context.TODO(),
@@ -50,6 +54,8 @@ var _ = Describe("construct_helpers", func() {
 			fakeMessenger,
 			fakePoller,
 			fakeVersionGetter,
+			fakeRebootWaiter,
+			fakeScriptExecutor,
 		)
 
 		fakeGuestManager.StartProgramInGuestReturnsOnCall(0, 0, nil)
@@ -61,6 +67,31 @@ var _ = Describe("construct_helpers", func() {
 		fakeGuestManager.DownloadFileInGuestReturns(versionBuffer, 3, nil)
 		fakeGuestManager.StartProgramInGuestReturns(0, nil)
 
+	})
+
+	Describe("ScriptExecutor", func() {
+		It("executes setup script with correct arguments", func() {
+
+			e := NewScriptExecutor(fakeRemoteManager)
+			version := "11.11.11"
+			err := e.ExecuteSetupScript(version)
+			executeCommandCallArg := fakeRemoteManager.ExecuteCommandArgsForCall(0)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(executeCommandCallArg).To(ContainSubstring("powershell"))
+			Expect(executeCommandCallArg).To(ContainSubstring("Setup.ps1"))
+			Expect(executeCommandCallArg).To(ContainSubstring(" -Version " + version))
+		})
+
+		It("executes post-reboot script with correct arguments", func() {
+			e := NewScriptExecutor(fakeRemoteManager)
+			err := e.ExecutePostRebootScript()
+			executeCommandCallArg := fakeRemoteManager.ExecuteCommandArgsForCall(0)
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(executeCommandCallArg).To(ContainSubstring("powershell"))
+			Expect(executeCommandCallArg).To(ContainSubstring("PostReboot.ps1"))
+		})
 	})
 
 	Describe("PrepareVM", func() {
@@ -238,36 +269,137 @@ var _ = Describe("construct_helpers", func() {
 
 		})
 
-		Describe("can execute scripts", func() {
+		Describe("can execute setup scripts", func() {
 			It("returns failure when it fails to execute setup script", func() {
 				execError := errors.New("failed to execute setup script")
-				fakeRemoteManager.ExecuteCommandReturns(execError)
+				fakeScriptExecutor.ExecuteSetupScriptReturnsOnCall(0, execError)
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("failed to execute setup script"))
 
-				Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
-				Expect(fakeMessenger.ExecuteScriptStartedCallCount()).To(Equal(1))
-				Expect(fakeMessenger.ExecuteScriptSucceededCallCount()).To(Equal(0))
+				Expect(fakeScriptExecutor.ExecuteSetupScriptCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecuteSetupScriptStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecuteSetupScriptSucceededCallCount()).To(Equal(0))
 			})
 
 			It("returns success when it properly executes the setup script", func() {
-				fakeVersionGetter.GetVersionReturns("2019.123.456")
+				stembuildVersion := "2019.123.456"
+				fakeVersionGetter.GetVersionReturns(stembuildVersion)
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(1))
-				command := fakeRemoteManager.ExecuteCommandArgsForCall(0)
-				Expect(command).To(Equal("powershell.exe C:\\provision\\Setup.ps1 -Version 2019.123.456"))
+				Expect(fakeScriptExecutor.ExecuteSetupScriptCallCount()).To(Equal(1))
 
-				Expect(fakeMessenger.ExecuteScriptStartedCallCount()).To(Equal(1))
-				Expect(fakeMessenger.ExecuteScriptSucceededCallCount()).To(Equal(1))
+				version := fakeScriptExecutor.ExecuteSetupScriptArgsForCall(0)
+				Expect(version).To(Equal(stembuildVersion))
+
+				Expect(fakeMessenger.ExecuteSetupScriptStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecuteSetupScriptSucceededCallCount()).To(Equal(1))
 			})
 
 		})
 		Describe("can check if vm is rebooting", func() {
+			It("waits for reboot finished after the setup script has been executed", func() {
+				var calls []string
+
+				fakeRebootWaiter.WaitForRebootFinishedCalls(func() error {
+					calls = append(calls, "waitForRebootFinishedCall")
+					return nil
+				})
+
+				fakeScriptExecutor.ExecuteSetupScriptCalls(func(version string) error {
+					calls = append(calls, "executeSetupScriptCalls")
+					return nil
+				})
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(calls[0]).To(Equal("executeSetupScriptCalls"))
+				Expect(calls[1]).To(Equal("waitForRebootFinishedCall"))
+
+				Expect(fakeMessenger.RebootHasStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.RebootHasFinishedCallCount()).To(Equal(1))
+			})
+
+			It("returns failure when it cannot determine if VM is rebooting", func() {
+				fakeRebootWaiter.WaitForRebootFinishedReturnsOnCall(0, errors.New("polling is hard"))
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("polling is hard"))
+
+				Expect(fakeMessenger.RebootHasStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.RebootHasFinishedCallCount()).To(Equal(0))
+			})
+
+		})
+
+		Describe("can execute post-reboot script", func() {
+			It("checks that the reboot has completed before the post reboot script is executed", func() {
+				var calls []string
+
+				fakeRebootWaiter.WaitForRebootFinishedCalls(func() error {
+					calls = append(calls, "waitForRebootFinishedCall")
+					return nil
+				})
+
+				fakeScriptExecutor.ExecutePostRebootScriptCalls(func() error {
+					calls = append(calls, "executePostRebootScriptCalls")
+					return nil
+				})
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(calls[0]).To(Equal("waitForRebootFinishedCall"))
+				Expect(calls[1]).To(Equal("executePostRebootScriptCalls"))
+			})
+
+			It("waits for reboot", func() {
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeRebootWaiter.WaitForRebootFinishedCallCount()).To(Equal(1))
+			})
+
+			It("returns error if waiting for reboot fails", func() {
+				rebootWaitError := errors.New("reboot waiting failed :(")
+				fakeRebootWaiter.WaitForRebootFinishedReturns(rebootWaitError)
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).To(MatchError(rebootWaitError))
+
+				Expect(fakeMessenger.RebootHasStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.RebootHasFinishedCallCount()).To(Equal(0))
+			})
+
+			It("runs post-reboot command", func() {
+
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeScriptExecutor.ExecutePostRebootScriptCallCount()).To(Equal(1))
+
+				Expect(fakeMessenger.ExecutePostRebootScriptStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecutePostRebootScriptSucceededCallCount()).To(Equal(1))
+			})
+
+			It("returns error if running post-reboot command fails", func() {
+				postRebootError := errors.New("failed to execute command")
+				fakeScriptExecutor.ExecutePostRebootScriptReturnsOnCall(0, postRebootError)
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).To(MatchError(postRebootError))
+				Expect(fakeMessenger.ExecutePostRebootScriptStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.ExecutePostRebootScriptSucceededCallCount()).To(Equal(0))
+
+			})
+		})
+
+		Describe("can check that the VM is powered off", func() {
 			It("runs every minute and returns successfully if polling succeeds", func() {
 				fakePoller.PollReturns(nil)
 
@@ -304,13 +436,16 @@ var _ = Describe("construct_helpers", func() {
 				Expect(fakeVcenterClient.IsPoweredOffCallCount()).To(Equal(3))
 			})
 
-			It("returns failure when it cannot determine vm power state", func() {
-				fakePoller.PollReturns(errors.New("polling is hard"))
+			It("returns failure when it cannot determine VM power state", func() {
+				error := "cannot determine VM state"
+				fakePoller.PollReturnsOnCall(0, errors.New(error))
 
-				Expect(vmConstruct.PrepareVM()).To(MatchError("polling is hard"))
+				err := vmConstruct.PrepareVM()
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal(error))
+
 				Expect(fakeMessenger.ShutdownCompletedCallCount()).To(Equal(0))
 			})
-
 		})
 	})
 })

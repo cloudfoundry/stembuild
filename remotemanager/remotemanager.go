@@ -5,7 +5,7 @@ package remotemanager
 type RemoteManager interface {
 	UploadArtifact(source, destination string) error
 	ExtractArchive(source, destination string) error
-	ExecuteCommand(file string) error
+	ExecuteCommand(command string) (int, error)
 	CanReachVM() error
 	CanLoginVM() error
 }

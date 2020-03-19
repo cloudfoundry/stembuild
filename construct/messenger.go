@@ -54,12 +54,29 @@ func (m *Messenger) ExtractArtifactsSucceeded() {
 	m.out.Write([]byte("succeeded.\n"))
 }
 
-func (m *Messenger) ExecuteScriptStarted() {
+func (m *Messenger) ExecuteSetupScriptStarted() {
 	m.out.Write([]byte("\nExecuting setup script...\n"))
 }
 
-func (m *Messenger) ExecuteScriptSucceeded() {
+func (m *Messenger) ExecuteSetupScriptSucceeded() {
 	m.out.Write([]byte("\nFinished executing setup script.\n"))
+}
+
+func (m *Messenger) RebootHasStarted() {
+	m.out.Write([]byte("\nThe reboot has started...\n"))
+}
+
+func (m *Messenger) RebootHasFinished() {
+	m.out.Write([]byte("\nThe reboot has finished.\n"))
+}
+
+func (m *Messenger) ExecutePostRebootScriptStarted() {
+	m.out.Write([]byte("\nCompleting VM prep...\n"))
+}
+
+func (m *Messenger) ExecutePostRebootScriptSucceeded() {
+	m.out.Write([]byte("\nFinished VM prep.\n"))
+
 }
 
 func (m *Messenger) UploadFileStarted(artifact string) {
@@ -99,6 +116,6 @@ func (m *Messenger) ShutdownCompleted() {
 }
 
 func (m *Messenger) WinRMDisconnectedForReboot() {
-	m.out.Write([]byte("\nWinRM has been disconnected so the VM can reboot. Preparing the VM to be shutdown.\n"))
+	m.out.Write([]byte("\nWinRM has been disconnected so the VM can reboot.\n"))
 
 }

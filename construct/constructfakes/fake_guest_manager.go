@@ -2,11 +2,11 @@
 package constructfakes
 
 import (
-	"context"
-	"io"
-	"sync"
+	context "context"
+	io "io"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	construct "github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeGuestManager struct {

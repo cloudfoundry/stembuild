@@ -2,9 +2,9 @@
 package constructfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	construct "github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeWinRMEnabler struct {

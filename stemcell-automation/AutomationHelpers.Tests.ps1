@@ -10,9 +10,6 @@ Describe "Setup" {
         Mock Check-Dependencies {
             $provisionerCalls.Add("Check-Dependencies")
         }
-        Mock Schedule-VmPrepTask {
-            $provisionerCalls.Add("Schedule-VmPrepTask")
-        }
         Mock ProvisionVM {
             $provisionerCalls.Add("ProvisionVM")
         }
@@ -31,16 +28,6 @@ Describe "Setup" {
         Assert-MockCalled -CommandName Check-Dependencies
     }
 
-    It "schedules a task to continue provisioning VM on restart with the params passed from Setup" {
-        Setup -Organization "abc" -Owner "def" -SkipRandomPassword:$false
-
-        Assert-MockCalled -CommandName Schedule-VmPrepTask -ParameterFilter {
-            $Organization -eq "abc" -and
-                    $Owner -eq "def" -and
-                    $SkipRandomPassword -eq $false
-        }
-    }
-
     It "provisions the VM last" {
         Setup -Version "123"
 
@@ -51,6 +38,39 @@ Describe "Setup" {
         $provisionerCalls.IndexOf("ProvisionVM") | Should -Be $lastIndex
     }
 
+}
+
+Describe "PostReboot" {
+    BeforeEach {
+        [System.Collections.ArrayList]$postRebootCalls = @()
+        Mock InstallCFCell { $postRebootCalls.Add("InstallCFCell")}
+        Mock CleanUpVM { $postRebootCalls.Add("CleanUpVM")}
+        Mock SysprepVM { $postRebootCalls.Add("SysprepVM")}
+    }
+
+    It "installs cf cell before cleaning up the VM" {
+        PostReboot
+        Assert-MockCalled -CommandName InstallCFCell
+        $postRebootCalls.IndexOf("InstallCFCell") | Should -BeLessThan $postRebootCalls.IndexOf("CleanUpVM")
+    }
+
+    It "cleans up vm before sysprep" {
+        PostReboot
+        Assert-MockCalled -CommandName CleanUpVM
+        $postRebootCalls.IndexOf("CleanUpVM") | Should -BeLessThan $postRebootCalls.IndexOf("SysprepVM")
+    }
+
+    It "syspreps vm last" {
+        PostReboot -Organization "org" -Owner "owner" -SkipRandomPassword:$false
+        Assert-MockCalled -CommandName SysprepVM
+        Assert-MockCalled -CommandName SysprepVM -ParameterFilter {
+            $Organization -eq "org" -and
+                    $Owner -eq "owner" -and
+                    $SkipRandomPassword -eq $false
+        }
+        $lastIndex = $postRebootCalls.Count - 1
+        $postRebootCalls.IndexOf("SysprepVM") | Should -Be $lastIndex
+    }
 }
 
 Describe "CopyPSModules" {
@@ -652,78 +672,6 @@ Describe "Validate-OSVersion" {
 
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Could not fetch OS version" }
         Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to validate the OS version. See 'c:\provision\log.log' for more info." }
-    }
-}
-
-
-Describe "DeleteScheduledTask" {
-    BeforeEach {
-        $scheduledTask1 = New-Object PSObject -Property @{
-            TaskName = "Task01"
-        }
-        $boshScheduledTask = New-Object PSObject -Property @{
-            TaskName = "BoshCompleteVMPrep"
-        }
-        $scheduledtask2 = New-Object PSObject -Property @{
-            TaskName = "Unknown task"
-        }
-        $scheduledtask3 = New-Object PSObject -Property @{
-            TaskName = "Another task"
-        }
-        Mock Write-Log { }
-        Mock Unregister-ScheduledTask { }
-        Mock Get-ScheduledTask { @($scheduledTask1,$boshScheduledTask,$scheduledTask2,$scheduledTask3) }
-
-    }
-    It "successfully delete the Bosh scheduled task, when the task has been registered" {
-        { DeleteScheduledTask } | Should -Not -Throw
-
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Successfully deleted the 'BoshCompleteVMPrep' scheduled task" }
-
-        Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
-        Assert-MockCalled Unregister-ScheduledTask -Times 1 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
-    }
-
-    It "does nothing if the Bosh scheduled task has not been registered" {
-        Mock Get-ScheduledTask { @($scheduledTask1,$scheduledTask2,$scheduledTask3) }
-        { DeleteScheduledTask } | Should -Not -Throw
-
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "BoshCompleteVMPrep schedule task was not registered" }
-
-        Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
-        Assert-MockCalled Unregister-ScheduledTask -Times 0 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
-    }
-
-    It "fails gracefully if the registered Bosh scheduled task was not unregistered" {
-        Mock Unregister-ScheduledTask { throw "Could not unregister task" }
-
-        { DeleteScheduledTask } | Should -Throw "Could not unregister task"
-
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -cmatch "Could not unregister task" }
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provision\log.log' for more info." }
-
-        Assert-MockCalled Get-ScheduledTask -Times 1 -Scope It
-        Assert-MockCalled Unregister-ScheduledTask -Times 1 -Scope It -ParameterFilter { $TaskName -cmatch "BoshCompleteVMPrep" -and $PSBoundParameters['Confirm'] -eq $false }
-    }
-}
-
-Describe "Create-VMPrepTaskAction" {
-    It "Sucessfully creates a TaskAction with owner and organization arguments" {
-        $taskAction = $null
-        $goldenArguments = "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"" -Organization ""Pivotal Cloud Foundry"" -Owner ""Pivotal User"""
-
-        { Create-VMPrepTaskAction -Owner "Pivotal User" -Organization "Pivotal Cloud Foundry" | Set-Variable -Name "taskAction" -Scope 1 } | Should -Not -Throw
-
-        $taskAction.Arguments | Should -eq $goldenArguments
-    }
-
-    It "Sucessfully creates a TaskAction with SkipRandomPassword" {
-        $taskAction = $null
-        $goldenArguments = "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"" -SkipRandomPassword"
-
-        { Create-VMPrepTaskAction -SkipRandomPassword | Set-Variable -Name "taskAction" -Scope 1 } | Should -Not -Throw
-
-        $taskAction.Arguments | Should -eq $goldenArguments
     }
 }
 
