@@ -354,10 +354,12 @@ func upgradeVMwareTools(targetIP, vmNamePrefix, vcenterFolder string) {
 
 	exitCode := 1
 
+	fmt.Println("Going to attempt to upgrade VMware Guest Tools. This will go through several error cycles before succeeding...")
 	for exitCode != 0 {
 		time.Sleep(5 * time.Second)
 		exitCode = cli.Run(opts)
 	}
+	fmt.Println("\nSuccessfully upgraded VMware Guest Tools. The 'Error' and 'Cannot complete operations' lines can be ignored")
 }
 
 func validatedOVALocation() string {
