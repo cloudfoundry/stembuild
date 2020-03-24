@@ -35,7 +35,7 @@ func (w *WinRMManager) Enable() error {
 
 	rawWinRMwtCmd := append(rawWinRM, []byte("\nEnable-WinRM\n")...)
 
-	base64WinRM := encodePowershellCommand(rawWinRMwtCmd)
+	base64WinRM := EncodePowershellCommand(rawWinRMwtCmd)
 
 	pid, err := w.GuestManager.StartProgramInGuest(context.Background(), powershell, fmt.Sprintf("-EncodedCommand %s", base64WinRM))
 	if err != nil {

@@ -146,6 +146,8 @@ type ConstructMessenger interface {
 	WaitingForShutdown()
 	ShutdownCompleted()
 	WinRMDisconnectedForReboot()
+	LogOutUsersStarted()
+	LogOutUsersSucceeded()
 }
 
 func (c *VMConstruct) PrepareVM() error {
@@ -182,6 +184,13 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 	c.messenger.ExtractArtifactsSucceeded()
+
+	c.messenger.LogOutUsersStarted()
+	err = c.logOutUsers()
+	if err != nil {
+		return err
+	}
+	c.messenger.LogOutUsersSucceeded()
 
 	c.messenger.ExecuteSetupScriptStarted()
 	err = c.scriptExecutor.ExecuteSetupScript(stembuildVersion)
@@ -253,6 +262,20 @@ func (c *VMConstruct) extractArchive() error {
 	return err
 }
 
+func (c *VMConstruct) logOutUsers() error {
+	failureString := "log out remote user failed with exit code %d: %s"
+	rawLogoffCommand := `&{If([string]::IsNullOrEmpty($(Get-WmiObject win32_computersystem).username)) {Write-Host "No users logged in." } Else {Write-Host "Logging out user."; $(Get-WmiObject win32_operatingsystem).Win32Shutdown(0) 1> $null}}`
+	logoffCommand := EncodePowershellCommand([]byte(rawLogoffCommand))
+
+	exitCode, err := c.remoteManager.ExecuteCommand("powershell.exe -EncodedCommand " + logoffCommand)
+
+	if err != nil {
+		return fmt.Errorf(failureString, exitCode, err)
+	}
+
+	return nil
+}
+
 type ScriptExecutor struct {
 	remoteManager RemoteManager
 }
@@ -299,7 +322,7 @@ func (c *VMConstruct) isPoweredOff(duration time.Duration) error {
 	return err
 }
 
-func encodePowershellCommand(command []byte) string {
+func EncodePowershellCommand(command []byte) string {
 	runeCommand := []rune(string(command))
 	utf16Command := utf16.Encode(runeCommand)
 	byteCommand := &bytes.Buffer{}

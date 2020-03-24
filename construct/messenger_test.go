@@ -128,6 +128,23 @@ var _ = Describe("Messenger", func() {
 		})
 	})
 
+	Describe("Log out users successfully", func() {
+		It("writes the started message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.LogOutUsersStarted()
+
+			Expect(buf).To(gbytes.Say("\nAttempting to logout any remote users...\n"))
+		})
+
+		It("writes the succeeded message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.LogOutUsersSucceeded()
+
+			Expect(buf).To(gbytes.Say("\nLogged out remote users\n"))
+		})
+
+	})
+
 	Describe("Execute setup script messages", func() {
 		It("writes the started message to the writer", func() {
 			m := construct.NewMessenger(buf)

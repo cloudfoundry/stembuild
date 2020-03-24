@@ -30,7 +30,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeRebootWaiter          *constructfakes.FakeRebootWaiterI
 		fakeScriptExecutor        *constructfakes.FakeScriptExecutorI
 	)
-
+	const rawLogoffCommand = `&{If([string]::IsNullOrEmpty($(Get-WmiObject win32_computersystem).username)) {Write-Host "No users logged in." } Else {Write-Host "Logging out user."; $(Get-WmiObject win32_operatingsystem).Win32Shutdown(0) 1> $null}}`
 	BeforeEach(func() {
 		fakeRemoteManager = &remotemanagerfakes.FakeRemoteManager{}
 		fakeVcenterClient = &constructfakes.FakeIaasClient{}
@@ -268,6 +268,35 @@ var _ = Describe("construct_helpers", func() {
 					Expect(fakeMessenger.UploadArtifactsStartedCallCount()).To(Equal(1))
 					Expect(fakeMessenger.UploadArtifactsSucceededCallCount()).To(Equal(0))
 				})
+			})
+		})
+
+		Describe("logs out users", func() {
+			It("returns success when active user is logged out", func() {
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(0, 0, nil)
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).ToNot(HaveOccurred())
+				command := fakeRemoteManager.ExecuteCommandArgsForCall(0)
+
+				encodedCommand := EncodePowershellCommand([]byte(rawLogoffCommand))
+				Expect(command).To(ContainSubstring(encodedCommand))
+				Expect(command).To(ContainSubstring("powershell.exe -EncodedCommand "))
+
+				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(1))
+			})
+			It("returns failure when it fails to execute a logout", func() {
+				errorMessage := "Unable to execute command"
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(0, 1, errors.New(errorMessage))
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(errorMessage))
+				Expect(err.Error()).To(ContainSubstring("log out remote user failed with exit code 1"))
+
+				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(0))
 			})
 		})
 
