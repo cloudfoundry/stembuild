@@ -146,6 +146,8 @@ type ConstructMessenger interface {
 	WaitingForShutdown()
 	ShutdownCompleted()
 	WinRMDisconnectedForReboot()
+	LogOutUsersStarted()
+	LogOutUsersSucceeded()
 }
 
 func (c *VMConstruct) PrepareVM() error {
@@ -182,6 +184,13 @@ func (c *VMConstruct) PrepareVM() error {
 		return err
 	}
 	c.messenger.ExtractArtifactsSucceeded()
+
+	c.messenger.LogOutUsersStarted()
+	err = c.logOutUsers()
+	if err != nil {
+		return err
+	}
+	c.messenger.LogOutUsersSucceeded()
 
 	c.messenger.ExecuteSetupScriptStarted()
 	err = c.scriptExecutor.ExecuteSetupScript(stembuildVersion)
@@ -251,6 +260,23 @@ func (c *VMConstruct) uploadArtifacts() error {
 func (c *VMConstruct) extractArchive() error {
 	err := c.remoteManager.ExtractArchive(stemcellAutomationDest, provisionDir)
 	return err
+}
+
+func (c *VMConstruct) logOutUsers() error {
+	failureString := "failed to log out remote user: %s"
+	pid, err := c.Client.Start(c.vmInventoryPath, c.vmUsername, c.vmPassword, powershell, "logoff")
+	if err != nil {
+		return fmt.Errorf(failureString, err)
+	}
+
+	exitCode, err := c.Client.WaitForExit(c.vmInventoryPath, c.vmUsername, c.vmPassword, pid)
+	if err != nil {
+		return fmt.Errorf(failureString, err)
+	}
+	if exitCode != 0 {
+		return fmt.Errorf(failureString, fmt.Sprintf("WinRM process on guest VM exited with code %d", exitCode))
+	}
+	return nil
 }
 
 type ScriptExecutor struct {

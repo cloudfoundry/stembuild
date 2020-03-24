@@ -61,6 +61,18 @@ type FakeConstructMessenger struct {
 	rebootHasStartedMutex       sync.RWMutex
 	rebootHasStartedArgsForCall []struct {
 	}
+	LogOutUsersStartedStub        func()
+	logOutUsersStartedMutex       sync.RWMutex
+	logOutUsersStartedArgsForCall []struct {
+	}
+	LogOutUsersSucceededStub        func()
+	logOutUsersSucceededMutex       sync.RWMutex
+	logOutUsersSucceededArgsForCall []struct {
+	}
+	RestartInProgressStub        func()
+	restartInProgressMutex       sync.RWMutex
+	restartInProgressArgsForCall []struct {
+	}
 	ShutdownCompletedStub        func()
 	shutdownCompletedMutex       sync.RWMutex
 	shutdownCompletedArgsForCall []struct {
@@ -363,6 +375,55 @@ func (fake *FakeConstructMessenger) ExtractArtifactsSucceededCalls(stub func()) 
 	fake.ExtractArtifactsSucceededStub = stub
 }
 
+func (fake *FakeConstructMessenger) LogOutUsersStarted() {
+	fake.logOutUsersStartedMutex.Lock()
+	fake.logOutUsersStartedArgsForCall = append(fake.logOutUsersStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("LogOutUsersStarted", []interface{}{})
+	fake.logOutUsersStartedMutex.Unlock()
+	if fake.LogOutUsersStartedStub != nil {
+		fake.LogOutUsersStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) LogOutUsersStartedCallCount() int {
+	fake.logOutUsersStartedMutex.RLock()
+	defer fake.logOutUsersStartedMutex.RUnlock()
+	return len(fake.logOutUsersStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) LogOutUsersStartedCalls(stub func()) {
+	fake.logOutUsersStartedMutex.Lock()
+	defer fake.logOutUsersStartedMutex.Unlock()
+	fake.LogOutUsersStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) LogOutUsersSucceeded() {
+	fake.logOutUsersSucceededMutex.Lock()
+	fake.logOutUsersSucceededArgsForCall = append(fake.logOutUsersSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("LogOutUsersSucceeded", []interface{}{})
+	fake.logOutUsersSucceededMutex.Unlock()
+	if fake.LogOutUsersSucceededStub != nil {
+		fake.LogOutUsersSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) LogOutUsersSucceededCallCount() int {
+	fake.logOutUsersSucceededMutex.RLock()
+	defer fake.logOutUsersSucceededMutex.RUnlock()
+	return len(fake.logOutUsersSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) LogOutUsersSucceededCalls(stub func()) {
+	fake.logOutUsersSucceededMutex.Lock()
+	defer fake.logOutUsersSucceededMutex.Unlock()
+	fake.LogOutUsersSucceededStub = stub
+}
+
+func (fake *FakeConstructMessenger) RestartInProgress() {
+	fake.restartInProgressMutex.Lock()
+	fake.restartInProgressArgsForCall = append(fake.restartInProgressArgsForCall, struct {
 func (fake *FakeConstructMessenger) RebootHasFinished() {
 	fake.rebootHasFinishedMutex.Lock()
 	fake.rebootHasFinishedArgsForCall = append(fake.rebootHasFinishedArgsForCall, struct {
@@ -649,6 +710,12 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.extractArtifactsStartedMutex.RUnlock()
 	fake.extractArtifactsSucceededMutex.RLock()
 	defer fake.extractArtifactsSucceededMutex.RUnlock()
+	fake.logOutUsersStartedMutex.RLock()
+	defer fake.logOutUsersStartedMutex.RUnlock()
+	fake.logOutUsersSucceededMutex.RLock()
+	defer fake.logOutUsersSucceededMutex.RUnlock()
+	fake.restartInProgressMutex.RLock()
+	defer fake.restartInProgressMutex.RUnlock()
 	fake.rebootHasFinishedMutex.RLock()
 	defer fake.rebootHasFinishedMutex.RUnlock()
 	fake.rebootHasStartedMutex.RLock()
