@@ -13,8 +13,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
-
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 
 	"github.com/masterzen/winrm"
