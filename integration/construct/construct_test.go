@@ -191,7 +191,6 @@ var _ = Describe("stembuild construct", func() {
 
 			instantCloneVm("", "")
 
-
 			// run normal stembuild construct command, like we do in prev. test
 			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 			Expect(err).ToNot(HaveOccurred())

@@ -264,17 +264,22 @@ func (c *VMConstruct) extractArchive() error {
 
 func (c *VMConstruct) logOutUsers() error {
 	failureString := "failed to log out remote user: %s"
-	pid, err := c.Client.Start(c.vmInventoryPath, c.vmUsername, c.vmPassword, powershell, "logoff")
+	rawLogoffCommand := []byte("$(Get-WmiObject win32_operatingsystem).Win32Shutdown(0)")
+	logoffCommand := encodePowershellCommand(rawLogoffCommand)
+
+	pid, err := c.Client.Start(c.vmInventoryPath, c.vmUsername, c.vmPassword, powershell, "-EncodedCommand", logoffCommand)
+
 	if err != nil {
 		return fmt.Errorf(failureString, err)
 	}
 
 	exitCode, err := c.Client.WaitForExit(c.vmInventoryPath, c.vmUsername, c.vmPassword, pid)
+
 	if err != nil {
 		return fmt.Errorf(failureString, err)
 	}
 	if exitCode != 0 {
-		return fmt.Errorf(failureString, fmt.Sprintf("WinRM process on guest VM exited with code %d", exitCode))
+		return fmt.Errorf(failureString, fmt.Sprintf("logout process on VM exited with code %d", exitCode))
 	}
 	return nil
 }
