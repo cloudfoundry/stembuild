@@ -16,9 +16,9 @@ func NewWinRmClientFactory(host, username, password string) *WinRMClientFactory 
 	return &WinRMClientFactory{host: host, username: username, password: password}
 }
 
-func (f *WinRMClientFactory) Build() (WinRMClient, error) {
+func (f *WinRMClientFactory) Build(timeout time.Duration) (WinRMClient, error) {
 	// todo run integration tests, then move endpoint creation out
-	endpoint := winrm.NewEndpoint(f.host, 5985, false, true, nil, nil, nil, time.Second*60)
+	endpoint := winrm.NewEndpoint(f.host, 5985, false, true, nil, nil, nil, timeout)
 	client, err := winrm.NewClient(endpoint, f.username, f.password)
 	return client, err
 }

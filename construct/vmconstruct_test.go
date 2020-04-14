@@ -85,12 +85,14 @@ var _ = Describe("construct_helpers", func() {
 
 		It("executes post-reboot script with correct arguments", func() {
 			e := NewScriptExecutor(fakeRemoteManager)
-			err := e.ExecutePostRebootScript()
-			executeCommandCallArg := fakeRemoteManager.ExecuteCommandArgsForCall(0)
+			superLongTimeout := 24 * time.Hour
+			err := e.ExecutePostRebootScript(superLongTimeout)
+			executeCommandCallArg, timeout := fakeRemoteManager.ExecuteCommandWithTimeoutArgsForCall(0)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(executeCommandCallArg).To(ContainSubstring("powershell"))
 			Expect(executeCommandCallArg).To(ContainSubstring("PostReboot.ps1"))
+			Expect(timeout).To(Equal(superLongTimeout))
 		})
 	})
 
@@ -346,7 +348,7 @@ var _ = Describe("construct_helpers", func() {
 					return nil
 				})
 
-				fakeScriptExecutor.ExecutePostRebootScriptCalls(func() error {
+				fakeScriptExecutor.ExecutePostRebootScriptCalls(func(duration time.Duration) error {
 					calls = append(calls, "executePostRebootScriptCalls")
 					return nil
 				})

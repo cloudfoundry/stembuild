@@ -3,14 +3,16 @@ package remotemanagerfakes
 
 import (
 	sync "sync"
+	time "time"
 
 	remotemanager "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
 
 type FakeWinRMClientFactoryI struct {
-	BuildStub        func() (remotemanager.WinRMClient, error)
+	BuildStub        func(time.Duration) (remotemanager.WinRMClient, error)
 	buildMutex       sync.RWMutex
 	buildArgsForCall []struct {
+		arg1 time.Duration
 	}
 	buildReturns struct {
 		result1 remotemanager.WinRMClient
@@ -24,15 +26,16 @@ type FakeWinRMClientFactoryI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeWinRMClientFactoryI) Build() (remotemanager.WinRMClient, error) {
+func (fake *FakeWinRMClientFactoryI) Build(arg1 time.Duration) (remotemanager.WinRMClient, error) {
 	fake.buildMutex.Lock()
 	ret, specificReturn := fake.buildReturnsOnCall[len(fake.buildArgsForCall)]
 	fake.buildArgsForCall = append(fake.buildArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Build", []interface{}{})
+		arg1 time.Duration
+	}{arg1})
+	fake.recordInvocation("Build", []interface{}{arg1})
 	fake.buildMutex.Unlock()
 	if fake.BuildStub != nil {
-		return fake.BuildStub()
+		return fake.BuildStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -47,10 +50,17 @@ func (fake *FakeWinRMClientFactoryI) BuildCallCount() int {
 	return len(fake.buildArgsForCall)
 }
 
-func (fake *FakeWinRMClientFactoryI) BuildCalls(stub func() (remotemanager.WinRMClient, error)) {
+func (fake *FakeWinRMClientFactoryI) BuildCalls(stub func(time.Duration) (remotemanager.WinRMClient, error)) {
 	fake.buildMutex.Lock()
 	defer fake.buildMutex.Unlock()
 	fake.BuildStub = stub
+}
+
+func (fake *FakeWinRMClientFactoryI) BuildArgsForCall(i int) time.Duration {
+	fake.buildMutex.RLock()
+	defer fake.buildMutex.RUnlock()
+	argsForCall := fake.buildArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeWinRMClientFactoryI) BuildReturns(result1 remotemanager.WinRMClient, result2 error) {

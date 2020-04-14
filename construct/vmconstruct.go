@@ -84,7 +84,7 @@ func NewVMConstruct(
 //go:generate counterfeiter . ScriptExecutorI
 type ScriptExecutorI interface {
 	ExecuteSetupScript(stembuildVersion string) error
-	ExecutePostRebootScript() error
+	ExecutePostRebootScript(timeout time.Duration) error
 }
 
 //go:generate counterfeiter . RebootWaiterI
@@ -194,7 +194,7 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.RebootHasFinished()
 
 	c.messenger.ExecutePostRebootScriptStarted()
-	err = c.scriptExecutor.ExecutePostRebootScript()
+	err = c.scriptExecutor.ExecutePostRebootScript(24 * time.Hour)
 	if err != nil {
 		return err
 	}
@@ -258,8 +258,8 @@ func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string) error {
 	return err
 }
 
-func (e *ScriptExecutor) ExecutePostRebootScript() error {
-	_, err := e.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationPostRebootScript)
+func (e *ScriptExecutor) ExecutePostRebootScript(timeout time.Duration) error {
+	_, err := e.remoteManager.ExecuteCommandWithTimeout("powershell.exe "+stemcellAutomationPostRebootScript, timeout)
 	return err
 }
 

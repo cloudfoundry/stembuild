@@ -3,14 +3,16 @@ package constructfakes
 
 import (
 	sync "sync"
+	time "time"
 
 	construct "github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeScriptExecutorI struct {
-	ExecutePostRebootScriptStub        func() error
+	ExecutePostRebootScriptStub        func(time.Duration) error
 	executePostRebootScriptMutex       sync.RWMutex
 	executePostRebootScriptArgsForCall []struct {
+		arg1 time.Duration
 	}
 	executePostRebootScriptReturns struct {
 		result1 error
@@ -33,15 +35,16 @@ type FakeScriptExecutorI struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeScriptExecutorI) ExecutePostRebootScript() error {
+func (fake *FakeScriptExecutorI) ExecutePostRebootScript(arg1 time.Duration) error {
 	fake.executePostRebootScriptMutex.Lock()
 	ret, specificReturn := fake.executePostRebootScriptReturnsOnCall[len(fake.executePostRebootScriptArgsForCall)]
 	fake.executePostRebootScriptArgsForCall = append(fake.executePostRebootScriptArgsForCall, struct {
-	}{})
-	fake.recordInvocation("ExecutePostRebootScript", []interface{}{})
+		arg1 time.Duration
+	}{arg1})
+	fake.recordInvocation("ExecutePostRebootScript", []interface{}{arg1})
 	fake.executePostRebootScriptMutex.Unlock()
 	if fake.ExecutePostRebootScriptStub != nil {
-		return fake.ExecutePostRebootScriptStub()
+		return fake.ExecutePostRebootScriptStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
@@ -56,10 +59,17 @@ func (fake *FakeScriptExecutorI) ExecutePostRebootScriptCallCount() int {
 	return len(fake.executePostRebootScriptArgsForCall)
 }
 
-func (fake *FakeScriptExecutorI) ExecutePostRebootScriptCalls(stub func() error) {
+func (fake *FakeScriptExecutorI) ExecutePostRebootScriptCalls(stub func(time.Duration) error) {
 	fake.executePostRebootScriptMutex.Lock()
 	defer fake.executePostRebootScriptMutex.Unlock()
 	fake.ExecutePostRebootScriptStub = stub
+}
+
+func (fake *FakeScriptExecutorI) ExecutePostRebootScriptArgsForCall(i int) time.Duration {
+	fake.executePostRebootScriptMutex.RLock()
+	defer fake.executePostRebootScriptMutex.RUnlock()
+	argsForCall := fake.executePostRebootScriptArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeScriptExecutorI) ExecutePostRebootScriptReturns(result1 error) {

@@ -29,7 +29,7 @@ type WinRMClient interface {
 
 //go:generate counterfeiter . WinRMClientFactoryI
 type WinRMClientFactoryI interface {
-	Build() (WinRMClient, error)
+	Build(timeout time.Duration) (WinRMClient, error)
 }
 
 func NewWinRM(host string, username string, password string, clientFactory WinRMClientFactoryI) RemoteManager {
@@ -46,7 +46,8 @@ func (w *WinRM) CanReachVM() error {
 }
 
 func (w *WinRM) CanLoginVM() error {
-	winrmClient, err := w.clientFactory.Build()
+	shortTimeout := 60 * time.Second
+	winrmClient, err := w.clientFactory.Build(shortTimeout)
 
 	if err != nil {
 		return fmt.Errorf("failed to create winrm client: %s", err)
@@ -96,8 +97,8 @@ func (w *WinRM) ExtractArchive(source, destination string) error {
 	return err
 }
 
-func (w *WinRM) ExecuteCommand(command string) (int, error) {
-	client, err := w.clientFactory.Build()
+func (w *WinRM) ExecuteCommandWithTimeout(command string, timeout time.Duration) (int, error) {
+	client, err := w.clientFactory.Build(timeout)
 	if err != nil {
 		return -1, err
 	}
@@ -106,5 +107,11 @@ func (w *WinRM) ExecuteCommand(command string) (int, error) {
 	if err == nil && exitCode != 0 {
 		err = fmt.Errorf("powershell encountered an issue: %s", errBuffer.String())
 	}
+	return exitCode, err
+}
+
+func (w *WinRM) ExecuteCommand(command string) (int, error) {
+	defaultTimeout := 60 * time.Second
+	exitCode, err := w.ExecuteCommandWithTimeout(command, defaultTimeout)
 	return exitCode, err
 }
