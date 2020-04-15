@@ -51,15 +51,26 @@ func (rc *RebootChecker) RebootHasFinished() (bool, error) {
 		return false, nil
 	}
 	if exitCode == 0 {
-		abortExitCode, abortErr := rc.remoteManager.ExecuteCommand(abortReboot)
+		var abortExitCode int
+		var abortErr error
+		for i := 0; i < 5; i++ {
+			abortExitCode, abortErr = rc.remoteManager.ExecuteCommand(abortReboot)
+
+			if abortErr == nil{
+				break
+			}
+		}
+
 		if abortErr != nil {
 			return false, fmt.Errorf("unable to abort reboot: %s", abortErr)
 		}
+
 		if abortExitCode == 0 {
-			return true, err
-		} else {
+			return true, nil
+		} else  {
 			return false, errors.New("unable to abort reboot.")
 		}
+
 	}
 	return false, err
 }

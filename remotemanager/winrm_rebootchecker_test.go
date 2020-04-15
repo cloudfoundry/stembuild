@@ -148,12 +148,17 @@ var _ = Describe("WinRM RebootChecker", func() {
 			It("returns an error when abort command could not be issued", func() {
 				ErrorExitCode := 0
 				fakeRemoteManager.ExecuteCommandReturnsOnCall(1, ErrorExitCode, errors.New("unable to issue abort command"))
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(2, ErrorExitCode, errors.New("unable to issue abort command"))
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(3, ErrorExitCode, errors.New("unable to issue abort command"))
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(4, ErrorExitCode, errors.New("unable to issue abort command"))
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(5, ErrorExitCode, errors.New("unable to issue abort command"))
 
 				hasFinished, err := rc.RebootHasFinished()
 
+				Expect(fakeRemoteManager.ExecuteCommandCallCount()).To(Equal(6))
+
 				Expect(hasFinished).To(BeFalse())
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("unable to issue abort command"))
+				Expect(err).To(MatchError(ContainSubstring("unable to issue abort command")))
 			})
 
 			It("returns an error when abort command failed", func() {
