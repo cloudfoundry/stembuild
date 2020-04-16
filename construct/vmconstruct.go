@@ -6,10 +6,12 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/poller"
 	"io"
+	"strings"
 	"time"
 	"unicode/utf16"
+
+	"github.com/cloudfoundry-incubator/stembuild/poller"
 
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
@@ -187,6 +189,7 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.WinRMDisconnectedForReboot()
 
 	c.messenger.RebootHasStarted()
+	time.Sleep(60 * time.Second)
 	err = c.rebootWaiter.WaitForRebootFinished()
 	if err != nil {
 		return err
@@ -260,6 +263,14 @@ func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string) error {
 
 func (e *ScriptExecutor) ExecutePostRebootScript(timeout time.Duration) error {
 	_, err := e.remoteManager.ExecuteCommandWithTimeout("powershell.exe "+stemcellAutomationPostRebootScript, timeout)
+	if err != nil && strings.Contains(err.Error(), "EOF") {
+		return nil
+	}
+	return err
+}
+
+func (e *ScriptExecutor) ExecuteRestart() error {
+	_, err := e.remoteManager.ExecuteCommand("powershell.exe " + "Restart-Computer -Wait -Timeout 120")
 	return err
 }
 

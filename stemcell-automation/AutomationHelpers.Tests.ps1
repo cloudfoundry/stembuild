@@ -46,6 +46,7 @@ Describe "PostReboot" {
         Mock InstallCFCell { $postRebootCalls.Add("InstallCFCell")}
         Mock CleanUpVM { $postRebootCalls.Add("CleanUpVM")}
         Mock SysprepVM { $postRebootCalls.Add("SysprepVM")}
+        Mock Stop-Computer {$postRebootCalls.Add("Stop-Computer")}
     }
 
     It "installs cf cell before cleaning up the VM" {
@@ -60,7 +61,7 @@ Describe "PostReboot" {
         $postRebootCalls.IndexOf("CleanUpVM") | Should -BeLessThan $postRebootCalls.IndexOf("SysprepVM")
     }
 
-    It "syspreps vm last" {
+    It "syspreps right before shutting the VM down" {
         PostReboot -Organization "org" -Owner "owner" -SkipRandomPassword:$false
         Assert-MockCalled -CommandName SysprepVM
         Assert-MockCalled -CommandName SysprepVM -ParameterFilter {
@@ -68,8 +69,15 @@ Describe "PostReboot" {
                     $Owner -eq "owner" -and
                     $SkipRandomPassword -eq $false
         }
+        $postRebootCalls.IndexOf("SysprepVM") | Should -BeLessThan $postRebootCalls.IndexOf("Stop-Computer")
+    }
+
+    It "powers off VM last" {
+        PostReboot
+
+        Assert-MockCalled -CommandName Stop-Computer
         $lastIndex = $postRebootCalls.Count - 1
-        $postRebootCalls.IndexOf("SysprepVM") | Should -Be $lastIndex
+        $postRebootCalls.IndexOf("Stop-Computer") | Should -Be $lastIndex
     }
 }
 
