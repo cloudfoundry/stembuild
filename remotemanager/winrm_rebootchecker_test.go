@@ -29,43 +29,6 @@ var _ = Describe("WinRM RebootChecker", func() {
 
 		rc = NewRebootChecker(fakeRemoteManager)
 	})
-
-	// todo: do we want to bring WaitForWinrmConnection back? Decision: probably not? We test log output @ integration level
-	//Describe("WaitForWinrmConnection", func() {
-	//	It("runs every 10 seconds and returns successfully once we can login to the VM", func() {
-	//		fakePoller.PollReturnsOnCall(0, nil)
-	//		fakeRemoteManager.CanLoginVMReturnsOnCall(0, nil)
-	//		fakeRemoteManager.CanLoginVMReturnsOnCall(1, errors.New("can't login VM"))
-	//		err := rc.WaitForWinrmConnection()
-	//		duration, pollFunc := fakePoller.PollArgsForCall(0)
-	//
-	//		Expect(err).NotTo(HaveOccurred())
-	//
-	//		Expect(duration).To(Equal(10 * time.Second))
-	//		bool, funcErr := pollFunc()
-	//		Expect(bool).To(BeTrue())
-	//		Expect(funcErr).NotTo(HaveOccurred())
-	//
-	//		bool, funcErr = pollFunc()
-	//		Expect(bool).To(BeFalse())
-	//		// Even though canloginVM returned error, Poll should not return error
-	//		// because we want the looping to continue
-	//		Expect(funcErr).NotTo(HaveOccurred())
-	//	})
-	//
-	//	It("returns an error if polling fails", func() {
-	//		// keeps trying to see if reboot is done,
-	//		// if it's been a really long time, then we're claiming that reboot
-	//		// is not and will not be successful
-	//		fakePoller.PollReturns(errors.New("some issue polling"))
-	//		err := rc.WaitForWinrmConnection()
-	//		Expect(err).To(HaveOccurred())
-	//		Expect(err.Error()).Should(Equal("wait for reboot error: some issue polling"))
-	//		//Eventually(err.Error()).Should(Equal("wait for reboot error: failed to create winrm client"))
-	//	})
-	//
-	//})
-
 	Describe("WaitForRebootFinished", func() {
 		It("calls the hasFinished func using the Poller", func() {
 			numberOfPollCalls := 8

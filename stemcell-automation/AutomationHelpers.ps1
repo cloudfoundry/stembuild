@@ -37,6 +37,7 @@ function PostReboot
     InstallCFCell
     CleanUpVM
     SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
+    Write-Log "Completed Sysprep. About to poweroff VM..."
     Stop-Computer
 }
 
