@@ -36,6 +36,7 @@ type VMConstruct struct {
 	versionGetter         VersionGetter
 	rebootWaiter          RebootWaiterI
 	scriptExecutor        ScriptExecutorI
+	RebootWaitTime        time.Duration
 }
 
 const provisionDir = "C:\\provision\\"
@@ -80,6 +81,7 @@ func NewVMConstruct(
 		versionGetter,
 		rebootWaiter,
 		scriptExecutor,
+		time.Second * 60,
 	}
 }
 
@@ -189,7 +191,7 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.WinRMDisconnectedForReboot()
 
 	c.messenger.RebootHasStarted()
-	time.Sleep(60 * time.Second)
+	time.Sleep(c.RebootWaitTime)
 	err = c.rebootWaiter.WaitForRebootFinished()
 	if err != nil {
 		return err

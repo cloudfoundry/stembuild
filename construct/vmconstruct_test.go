@@ -57,6 +57,7 @@ var _ = Describe("construct_helpers", func() {
 			fakeRebootWaiter,
 			fakeScriptExecutor,
 		)
+		vmConstruct.RebootWaitTime = 0
 
 		fakeGuestManager.StartProgramInGuestReturnsOnCall(0, 0, nil)
 		fakeGuestManager.ExitCodeForProgramInGuestReturnsOnCall(0, 0, nil)
