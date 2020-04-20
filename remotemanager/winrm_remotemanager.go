@@ -3,37 +3,25 @@ package remotemanager
 import (
 	"bytes"
 	"fmt"
-	"github.com/masterzen/winrm"
 	"io"
 	"net"
 	"os"
 	"time"
 
 	"github.com/cloudfoundry-incubator/winrmcp/winrmcp"
+	"github.com/masterzen/winrm"
 )
 
 const WinrmPort = 5985
 
 type WinRM struct {
-	host          string // todo: host, username & password feel redundant here b/c of the factory
-	username      string
-	password      string
-	clientFactory WinRMClientFactoryI
+	host     string
+	username string
+	password string
 }
 
-//go:generate counterfeiter . WinRMClient
-type WinRMClient interface {
-	Run(command string, stdout io.Writer, stderr io.Writer) (int, error)
-	CreateShell() (*winrm.Shell, error)
-}
-
-//go:generate counterfeiter . WinRMClientFactoryI
-type WinRMClientFactoryI interface {
-	Build(timeout time.Duration) (WinRMClient, error)
-}
-
-func NewWinRM(host string, username string, password string, clientFactory WinRMClientFactoryI) RemoteManager {
-	return &WinRM{host, username, password, clientFactory}
+func NewWinRM(host, username, password string) RemoteManager {
+	return &WinRM{host, username, password}
 }
 
 func (w *WinRM) CanReachVM() error {
@@ -46,9 +34,8 @@ func (w *WinRM) CanReachVM() error {
 }
 
 func (w *WinRM) CanLoginVM() error {
-	shortTimeout := 60 * time.Second
-	winrmClient, err := w.clientFactory.Build(shortTimeout)
-
+	endpoint := winrm.NewEndpoint(w.host, WinrmPort, false, true, nil, nil, nil, time.Second*60)
+	winrmClient, err := winrm.NewClient(endpoint, w.username, w.password)
 	if err != nil {
 		return fmt.Errorf("failed to create winrm client: %s", err)
 	}
@@ -93,25 +80,20 @@ func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error
 
 func (w *WinRM) ExtractArchive(source, destination string) error {
 	command := fmt.Sprintf("powershell.exe Expand-Archive %s %s -Force", source, destination)
-	_, err := w.ExecuteCommand(command)
+	err := w.ExecuteCommand(command)
 	return err
 }
 
-func (w *WinRM) ExecuteCommandWithTimeout(command string, timeout time.Duration) (int, error) {
-	client, err := w.clientFactory.Build(timeout)
+func (w *WinRM) ExecuteCommand(command string) error {
+	endpoint := winrm.NewEndpoint(w.host, 5985, false, true, nil, nil, nil, time.Second*60)
+	client, err := winrm.NewClient(endpoint, w.username, w.password)
 	if err != nil {
-		return -1, err
+		return err
 	}
 	errBuffer := new(bytes.Buffer)
 	exitCode, err := client.Run(command, os.Stdout, io.MultiWriter(errBuffer, os.Stderr))
 	if err == nil && exitCode != 0 {
 		err = fmt.Errorf("powershell encountered an issue: %s", errBuffer.String())
 	}
-	return exitCode, err
-}
-
-func (w *WinRM) ExecuteCommand(command string) (int, error) {
-	defaultTimeout := 60 * time.Second
-	exitCode, err := w.ExecuteCommandWithTimeout(command, defaultTimeout)
-	return exitCode, err
+	return err
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	p "github.com/cloudfoundry-incubator/stembuild/poller"
+	"github.com/cloudfoundry-incubator/stembuild/construct/poller"
 
 	"github.com/cloudfoundry-incubator/stembuild/version"
 
@@ -52,20 +52,11 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 	}
 	versionGetter := version.NewVersionGetter()
 
-	winRmClientFactory := NewWinRmClientFactory(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
-	remoteManager := NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, winRmClientFactory)
+	remoteManager := NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
 
 	vmConnectionValidator := &construct.WinRMConnectionValidator{
 		RemoteManager: remoteManager,
 	}
-
-	poller := &p.Poller{}
-
-	rebootChecker := NewRebootChecker(remoteManager)
-
-	rebootWaiter := NewRebootWaiter(poller, rebootChecker)
-
-	scriptExecutor := construct.NewScriptExecutor(remoteManager)
 
 	return construct.NewVMConstruct(
 		ctx,
@@ -78,9 +69,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		winRMManager,
 		vmConnectionValidator,
 		messenger,
-		poller,
+		&poller.Poller{},
 		versionGetter,
-		rebootWaiter,
-		scriptExecutor,
 	), nil
 }

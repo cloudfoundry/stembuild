@@ -16,29 +16,36 @@ function Write-Log
     Write-Host $msg
 }
 
-function Setup()
-{
-    param(
-        [String]$Version
-    )
-
-    Validate-OSVersion
-    Check-Dependencies
-    ProvisionVM -Version $Version
-}
-
-function PostReboot
-{
+function Schedule-VmPrepTask() {
     param(
         [string]$Organization = "",
         [string]$Owner = "",
         [switch]$SkipRandomPassword
     )
-    InstallCFCell
-    CleanUpVM
-    SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
-    Write-Log "Completed Sysprep. About to poweroff VM..."
-    Stop-Computer
+
+    $Sta = Create-VMPrepTaskAction -Organization $Organization -Owner $Owner
+    if($SkipRandomPassword) {
+        $Sta = Create-VMPrepTaskAction -Organization $Organization -Owner $Owner -SkipRandomPassword
+    }
+    $STPrin = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+    $Stt = New-ScheduledTaskTrigger -AtStartup
+    Register-ScheduledTask BoshCompleteVMPrep -Action $Sta -Trigger $Stt -Principal $STPrin -Description "Bosh Stemcell Automation task to complete the vm preparation"
+    Write-Log "Successfully registered the Bosh Stemcell Automation scheduled task"
+}
+
+function Setup()
+{
+    param(
+        [string]$Organization = "",
+        [string]$Owner = "",
+        [switch]$SkipRandomPassword,
+        [String]$Version
+    )
+
+    Validate-OSVersion
+    Check-Dependencies
+    Schedule-VmPrepTask -Organization $Organization -Owner $Owner -SkipRandomPassword:$SkipRandomPassword
+    ProvisionVM -Version $Version
 }
 
 function CopyPSModules
@@ -265,7 +272,6 @@ function SysprepVM
             $randomPassword = GenerateRandomPassword
             Invoke-Sysprep -IaaS "vsphere" -NewPassword $randomPassword -Organization $Organization -Owner $Owner
         }
-        Write-Log "Successfully invoked Sysprep."
     }
     catch [Exception]
     {
@@ -345,6 +351,46 @@ function Validate-OSVersion
         Write-Log "Failed to validate the OS version. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
+}
+
+function DeleteScheduledTask {
+    try {
+        if ((Get-ScheduledTask | ForEach { $_.TaskName }) -ccontains "BoshCompleteVMPrep") {
+            Unregister-ScheduledTask -TaskName BoshCompleteVMPrep -Confirm:$false
+            Write-Log "Successfully deleted the 'BoshCompleteVMPrep' scheduled task"
+        }
+        else {
+            Write-Log "BoshCompleteVMPrep schedule task was not registered"
+        }
+    }
+    catch [Exception] {
+        Write-Log $_.Exception.Message
+        Write-Log "Failed to unregister the BoshCompleteVMPrep scheduled task. See 'c:\provision\log.log' for more info."
+        throw $_.Exception
+    }
+}
+
+function Create-VMPrepTaskAction {
+    param(
+        [string]$Organization="",
+        [string]$Owner="",
+        [switch]$SkipRandomPassword
+    )
+
+    $arguments = "-NoExit -File ""$PSScriptRoot\Complete-VMPrep.ps1"""
+    if ($Organization -ne "") {
+        $arguments += " -Organization ""$Organization"""
+    }
+
+    if ($Owner -ne "") {
+        $arguments += " -Owner ""$Owner"""
+    }
+
+    if ($SkipRandomPassword) {
+        $arguments += " -SkipRandomPassword"
+    }
+
+    New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arguments
 }
 
 function Remove-SSHKeys

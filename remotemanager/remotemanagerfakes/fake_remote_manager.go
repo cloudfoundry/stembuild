@@ -3,7 +3,6 @@ package remotemanagerfakes
 
 import (
 	sync "sync"
-	time "time"
 
 	remotemanager "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
@@ -29,32 +28,16 @@ type FakeRemoteManager struct {
 	canReachVMReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ExecuteCommandStub        func(string) (int, error)
+	ExecuteCommandStub        func(string) error
 	executeCommandMutex       sync.RWMutex
 	executeCommandArgsForCall []struct {
 		arg1 string
 	}
 	executeCommandReturns struct {
-		result1 int
-		result2 error
+		result1 error
 	}
 	executeCommandReturnsOnCall map[int]struct {
-		result1 int
-		result2 error
-	}
-	ExecuteCommandWithTimeoutStub        func(string, time.Duration) (int, error)
-	executeCommandWithTimeoutMutex       sync.RWMutex
-	executeCommandWithTimeoutArgsForCall []struct {
-		arg1 string
-		arg2 time.Duration
-	}
-	executeCommandWithTimeoutReturns struct {
-		result1 int
-		result2 error
-	}
-	executeCommandWithTimeoutReturnsOnCall map[int]struct {
-		result1 int
-		result2 error
+		result1 error
 	}
 	ExtractArchiveStub        func(string, string) error
 	extractArchiveMutex       sync.RWMutex
@@ -188,7 +171,7 @@ func (fake *FakeRemoteManager) CanReachVMReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeRemoteManager) ExecuteCommand(arg1 string) (int, error) {
+func (fake *FakeRemoteManager) ExecuteCommand(arg1 string) error {
 	fake.executeCommandMutex.Lock()
 	ret, specificReturn := fake.executeCommandReturnsOnCall[len(fake.executeCommandArgsForCall)]
 	fake.executeCommandArgsForCall = append(fake.executeCommandArgsForCall, struct {
@@ -200,10 +183,10 @@ func (fake *FakeRemoteManager) ExecuteCommand(arg1 string) (int, error) {
 		return fake.ExecuteCommandStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
 	fakeReturns := fake.executeCommandReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *FakeRemoteManager) ExecuteCommandCallCount() int {
@@ -212,7 +195,7 @@ func (fake *FakeRemoteManager) ExecuteCommandCallCount() int {
 	return len(fake.executeCommandArgsForCall)
 }
 
-func (fake *FakeRemoteManager) ExecuteCommandCalls(stub func(string) (int, error)) {
+func (fake *FakeRemoteManager) ExecuteCommandCalls(stub func(string) error) {
 	fake.executeCommandMutex.Lock()
 	defer fake.executeCommandMutex.Unlock()
 	fake.ExecuteCommandStub = stub
@@ -225,94 +208,27 @@ func (fake *FakeRemoteManager) ExecuteCommandArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeRemoteManager) ExecuteCommandReturns(result1 int, result2 error) {
+func (fake *FakeRemoteManager) ExecuteCommandReturns(result1 error) {
 	fake.executeCommandMutex.Lock()
 	defer fake.executeCommandMutex.Unlock()
 	fake.ExecuteCommandStub = nil
 	fake.executeCommandReturns = struct {
-		result1 int
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
-func (fake *FakeRemoteManager) ExecuteCommandReturnsOnCall(i int, result1 int, result2 error) {
+func (fake *FakeRemoteManager) ExecuteCommandReturnsOnCall(i int, result1 error) {
 	fake.executeCommandMutex.Lock()
 	defer fake.executeCommandMutex.Unlock()
 	fake.ExecuteCommandStub = nil
 	if fake.executeCommandReturnsOnCall == nil {
 		fake.executeCommandReturnsOnCall = make(map[int]struct {
-			result1 int
-			result2 error
+			result1 error
 		})
 	}
 	fake.executeCommandReturnsOnCall[i] = struct {
-		result1 int
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeRemoteManager) ExecuteCommandWithTimeout(arg1 string, arg2 time.Duration) (int, error) {
-	fake.executeCommandWithTimeoutMutex.Lock()
-	ret, specificReturn := fake.executeCommandWithTimeoutReturnsOnCall[len(fake.executeCommandWithTimeoutArgsForCall)]
-	fake.executeCommandWithTimeoutArgsForCall = append(fake.executeCommandWithTimeoutArgsForCall, struct {
-		arg1 string
-		arg2 time.Duration
-	}{arg1, arg2})
-	fake.recordInvocation("ExecuteCommandWithTimeout", []interface{}{arg1, arg2})
-	fake.executeCommandWithTimeoutMutex.Unlock()
-	if fake.ExecuteCommandWithTimeoutStub != nil {
-		return fake.ExecuteCommandWithTimeoutStub(arg1, arg2)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.executeCommandWithTimeoutReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeRemoteManager) ExecuteCommandWithTimeoutCallCount() int {
-	fake.executeCommandWithTimeoutMutex.RLock()
-	defer fake.executeCommandWithTimeoutMutex.RUnlock()
-	return len(fake.executeCommandWithTimeoutArgsForCall)
-}
-
-func (fake *FakeRemoteManager) ExecuteCommandWithTimeoutCalls(stub func(string, time.Duration) (int, error)) {
-	fake.executeCommandWithTimeoutMutex.Lock()
-	defer fake.executeCommandWithTimeoutMutex.Unlock()
-	fake.ExecuteCommandWithTimeoutStub = stub
-}
-
-func (fake *FakeRemoteManager) ExecuteCommandWithTimeoutArgsForCall(i int) (string, time.Duration) {
-	fake.executeCommandWithTimeoutMutex.RLock()
-	defer fake.executeCommandWithTimeoutMutex.RUnlock()
-	argsForCall := fake.executeCommandWithTimeoutArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeRemoteManager) ExecuteCommandWithTimeoutReturns(result1 int, result2 error) {
-	fake.executeCommandWithTimeoutMutex.Lock()
-	defer fake.executeCommandWithTimeoutMutex.Unlock()
-	fake.ExecuteCommandWithTimeoutStub = nil
-	fake.executeCommandWithTimeoutReturns = struct {
-		result1 int
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeRemoteManager) ExecuteCommandWithTimeoutReturnsOnCall(i int, result1 int, result2 error) {
-	fake.executeCommandWithTimeoutMutex.Lock()
-	defer fake.executeCommandWithTimeoutMutex.Unlock()
-	fake.ExecuteCommandWithTimeoutStub = nil
-	if fake.executeCommandWithTimeoutReturnsOnCall == nil {
-		fake.executeCommandWithTimeoutReturnsOnCall = make(map[int]struct {
-			result1 int
-			result2 error
-		})
-	}
-	fake.executeCommandWithTimeoutReturnsOnCall[i] = struct {
-		result1 int
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeRemoteManager) ExtractArchive(arg1 string, arg2 string) error {
@@ -446,8 +362,6 @@ func (fake *FakeRemoteManager) Invocations() map[string][][]interface{} {
 	defer fake.canReachVMMutex.RUnlock()
 	fake.executeCommandMutex.RLock()
 	defer fake.executeCommandMutex.RUnlock()
-	fake.executeCommandWithTimeoutMutex.RLock()
-	defer fake.executeCommandWithTimeoutMutex.RUnlock()
 	fake.extractArchiveMutex.RLock()
 	defer fake.extractArchiveMutex.RUnlock()
 	fake.uploadArtifactMutex.RLock()

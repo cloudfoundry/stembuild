@@ -23,9 +23,6 @@ update :
 integration : generate
 	ginkgo -r -v -randomizeAllSpecs integration
 
-integration/construct : generate
-	ginkgo -r -v -randomizeAllSpecs integration/construct
-
 integration-badger : generate
 	ginkgo -r -v -randomizeAllSpecs -untilItFails integration
 

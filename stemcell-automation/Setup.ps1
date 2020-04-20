@@ -1,4 +1,7 @@
 param(
+    [string]$Organization = "",
+    [string]$Owner = "",
+    [switch]$SkipRandomPassword,
     [String]$Version
 )
 
@@ -9,11 +12,12 @@ Push-Location $PSScriptRoot
 
 try
 {
-    Setup -Version $Version
+    Setup -Organization $Organization -Owner $Owner -SkipRandomPassword:$SkipRandomPassword -Version $Version
 }
 catch [Exception]
 {
     Write-Log "Failed to install Bosh dependencies. See 'c:\provision\log.log' for more info."
+    DeleteScheduledTask
     Exit 1
 }
 

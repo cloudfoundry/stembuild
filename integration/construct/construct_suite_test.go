@@ -109,13 +109,12 @@ func restoreSnapshot(snapshotName string) {
 }
 
 func waitForVmToBeReady() {
-	clientFactory := remotemanager.NewWinRmClientFactory(conf.TargetIP, conf.VMUsername, conf.VMPassword)
-	rm := remotemanager.NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword, clientFactory)
+	rm := remotemanager.NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 	Expect(rm).ToNot(BeNil())
 
 	vmReady := false
 	for !vmReady {
-		_, err := rm.ExecuteCommand("powershell.exe ls c:\\windows")
+		err := rm.ExecuteCommand("powershell.exe ls c:\\windows")
 		vmReady = err == nil
 	}
 }
@@ -272,7 +271,7 @@ func createVMSnapshot(snapshotName string) {
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
 		snapshotName,
 	}
-	fmt.Printf("Creating VM Snapshot: %s\n", snapshotName)
+	fmt.Printf("Creating VM Snapshot: %s", snapshotName)
 	// is blocking
 	runIgnoringOutput(snapshotCommand)
 	time.Sleep(30 * time.Second)

@@ -13,5 +13,3 @@ version/version.go
 version/version
 **.ova
 **/.envrc
-integration/construct/construct-integration*/**
-

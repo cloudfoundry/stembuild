@@ -7,11 +7,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"strings"
 	"time"
 	"unicode/utf16"
-
-	"github.com/cloudfoundry-incubator/stembuild/poller"
 
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
@@ -32,18 +29,15 @@ type VMConstruct struct {
 	winRMEnabler          WinRMEnabler
 	vmConnectionValidator VMConnectionValidator
 	messenger             ConstructMessenger
-	poller                poller.PollerI
+	poller                Poller
 	versionGetter         VersionGetter
-	rebootWaiter          RebootWaiterI
-	scriptExecutor        ScriptExecutorI
 }
 
 const provisionDir = "C:\\provision\\"
 const stemcellAutomationName = "StemcellAutomation.zip"
 const stemcellAutomationDest = provisionDir + stemcellAutomationName
 const lgpoDest = provisionDir + "LGPO.zip"
-const stemcellAutomationSetupScript = provisionDir + "Setup.ps1"
-const stemcellAutomationPostRebootScript = provisionDir + "PostReboot.ps1"
+const stemcellAutomationScript = provisionDir + "Setup.ps1"
 const powershell = "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 const boshPsModules = "bosh-psmodules.zip"
 const winRMPsScript = "BOSH.WinRM.psm1"
@@ -59,10 +53,8 @@ func NewVMConstruct(
 	winRMEnabler WinRMEnabler,
 	vmConnectionValidator VMConnectionValidator,
 	messenger ConstructMessenger,
-	poller poller.PollerI,
+	poller Poller,
 	versionGetter VersionGetter,
-	rebootWaiter RebootWaiterI,
-	scriptExecutor ScriptExecutorI,
 ) *VMConstruct {
 
 	return &VMConstruct{
@@ -78,20 +70,7 @@ func NewVMConstruct(
 		messenger,
 		poller,
 		versionGetter,
-		rebootWaiter,
-		scriptExecutor,
 	}
-}
-
-//go:generate counterfeiter . ScriptExecutorI
-type ScriptExecutorI interface {
-	ExecuteSetupScript(stembuildVersion string) error
-	ExecutePostRebootScript(timeout time.Duration) error
-}
-
-//go:generate counterfeiter . RebootWaiterI
-type RebootWaiterI interface {
-	WaitForRebootFinished() error
 }
 
 //go:generate counterfeiter . GuestManager
@@ -132,17 +111,18 @@ type ConstructMessenger interface {
 	ValidateVMConnectionSucceeded()
 	ExtractArtifactsStarted()
 	ExtractArtifactsSucceeded()
-	ExecuteSetupScriptStarted()
-	ExecuteSetupScriptSucceeded()
-	RebootHasStarted()
-	RebootHasFinished()
-	ExecutePostRebootScriptStarted()
-	ExecutePostRebootScriptSucceeded()
+	ExecuteScriptStarted()
+	ExecuteScriptSucceeded()
 	UploadFileStarted(artifact string)
 	UploadFileSucceeded()
 	RestartInProgress()
 	ShutdownCompleted()
 	WinRMDisconnectedForReboot()
+}
+
+//go:generate counterfeiter . Poller
+type Poller interface {
+	Poll(duration time.Duration, loopFunc func() (bool, error)) error
 }
 
 func (c *VMConstruct) PrepareVM() error {
@@ -180,34 +160,18 @@ func (c *VMConstruct) PrepareVM() error {
 	}
 	c.messenger.ExtractArtifactsSucceeded()
 
-	c.messenger.ExecuteSetupScriptStarted()
-	err = c.scriptExecutor.ExecuteSetupScript(stembuildVersion)
+	c.messenger.ExecuteScriptStarted()
+	err = c.executeSetupScript(stembuildVersion)
 	if err != nil {
 		return err
 	}
-	c.messenger.ExecuteSetupScriptSucceeded()
+	c.messenger.ExecuteScriptSucceeded()
 	c.messenger.WinRMDisconnectedForReboot()
-
-	c.messenger.RebootHasStarted()
-	time.Sleep(60 * time.Second)
-	err = c.rebootWaiter.WaitForRebootFinished()
-	if err != nil {
-		return err
-	}
-	c.messenger.RebootHasFinished()
-
-	c.messenger.ExecutePostRebootScriptStarted()
-	err = c.scriptExecutor.ExecutePostRebootScript(24 * time.Hour)
-	if err != nil {
-		return err
-	}
-	c.messenger.ExecutePostRebootScriptSucceeded()
 
 	err = c.isPoweredOff(time.Minute)
 	if err != nil {
 		return err
 	}
-	c.messenger.ShutdownCompleted()
 
 	return nil
 }
@@ -245,32 +209,9 @@ func (c *VMConstruct) extractArchive() error {
 	return err
 }
 
-type ScriptExecutor struct {
-	remoteManager RemoteManager
-}
-
-func NewScriptExecutor(remoteManager RemoteManager) *ScriptExecutor {
-	return &ScriptExecutor{
-		remoteManager,
-	}
-}
-
-func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string) error {
+func (c *VMConstruct) executeSetupScript(stembuildVersion string) error {
 	versionArg := " -Version " + stembuildVersion
-	_, err := e.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationSetupScript + versionArg)
-	return err
-}
-
-func (e *ScriptExecutor) ExecutePostRebootScript(timeout time.Duration) error {
-	_, err := e.remoteManager.ExecuteCommandWithTimeout("powershell.exe "+stemcellAutomationPostRebootScript, timeout)
-	if err != nil && strings.Contains(err.Error(), "EOF") {
-		return nil
-	}
-	return err
-}
-
-func (e *ScriptExecutor) ExecuteRestart() error {
-	_, err := e.remoteManager.ExecuteCommand("powershell.exe " + "Restart-Computer -Wait -Timeout 120")
+	err := c.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationScript + versionArg)
 	return err
 }
 
@@ -286,7 +227,13 @@ func (c *VMConstruct) isPoweredOff(duration time.Duration) error {
 
 		return isPoweredOff, nil
 	})
-	return err
+
+	if err != nil {
+		return err
+	}
+
+	c.messenger.ShutdownCompleted()
+	return nil
 }
 
 func encodePowershellCommand(command []byte) string {

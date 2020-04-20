@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/poller"
+	"github.com/cloudfoundry-incubator/stembuild/construct/poller"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
