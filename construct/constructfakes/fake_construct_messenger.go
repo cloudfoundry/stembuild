@@ -32,6 +32,11 @@ type FakeConstructMessenger struct {
 	executePostRebootScriptSucceededMutex       sync.RWMutex
 	executePostRebootScriptSucceededArgsForCall []struct {
 	}
+	ExecutePostRebootWarningStub        func(string)
+	executePostRebootWarningMutex       sync.RWMutex
+	executePostRebootWarningArgsForCall []struct {
+		arg1 string
+	}
 	ExecuteSetupScriptStartedStub        func()
 	executeSetupScriptStartedMutex       sync.RWMutex
 	executeSetupScriptStartedArgsForCall []struct {
@@ -233,6 +238,37 @@ func (fake *FakeConstructMessenger) ExecutePostRebootScriptSucceededCalls(stub f
 	fake.executePostRebootScriptSucceededMutex.Lock()
 	defer fake.executePostRebootScriptSucceededMutex.Unlock()
 	fake.ExecutePostRebootScriptSucceededStub = stub
+}
+
+func (fake *FakeConstructMessenger) ExecutePostRebootWarning(arg1 string) {
+	fake.executePostRebootWarningMutex.Lock()
+	fake.executePostRebootWarningArgsForCall = append(fake.executePostRebootWarningArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("ExecutePostRebootWarning", []interface{}{arg1})
+	fake.executePostRebootWarningMutex.Unlock()
+	if fake.ExecutePostRebootWarningStub != nil {
+		fake.ExecutePostRebootWarningStub(arg1)
+	}
+}
+
+func (fake *FakeConstructMessenger) ExecutePostRebootWarningCallCount() int {
+	fake.executePostRebootWarningMutex.RLock()
+	defer fake.executePostRebootWarningMutex.RUnlock()
+	return len(fake.executePostRebootWarningArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ExecutePostRebootWarningCalls(stub func(string)) {
+	fake.executePostRebootWarningMutex.Lock()
+	defer fake.executePostRebootWarningMutex.Unlock()
+	fake.ExecutePostRebootWarningStub = stub
+}
+
+func (fake *FakeConstructMessenger) ExecutePostRebootWarningArgsForCall(i int) string {
+	fake.executePostRebootWarningMutex.RLock()
+	defer fake.executePostRebootWarningMutex.RUnlock()
+	argsForCall := fake.executePostRebootWarningArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeConstructMessenger) ExecuteSetupScriptStarted() {
@@ -603,6 +639,8 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.executePostRebootScriptStartedMutex.RUnlock()
 	fake.executePostRebootScriptSucceededMutex.RLock()
 	defer fake.executePostRebootScriptSucceededMutex.RUnlock()
+	fake.executePostRebootWarningMutex.RLock()
+	defer fake.executePostRebootWarningMutex.RUnlock()
 	fake.executeSetupScriptStartedMutex.RLock()
 	defer fake.executeSetupScriptStartedMutex.RUnlock()
 	fake.executeSetupScriptSucceededMutex.RLock()

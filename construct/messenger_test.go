@@ -183,6 +183,18 @@ var _ = Describe("Messenger", func() {
 
 			Expect(buf).To(gbytes.Say("\nFinished VM prep.\n"))
 		})
+
+		It("writes the warning message to the writer", func() {
+			m := construct.NewMessenger(buf)
+
+			warning := "winrm was sad"
+
+			m.ExecutePostRebootWarning(warning)
+
+			expectedMessage := "\n" + warning + "\n"
+			Expect(buf).To(gbytes.Say(expectedMessage))
+		})
+
 	})
 
 	Describe("Upload file messages", func() {

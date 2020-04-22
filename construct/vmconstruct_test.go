@@ -3,7 +3,9 @@ package construct_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/cloudfoundry-incubator/stembuild/poller/pollerfakes"
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 	"github.com/onsi/gomega/gbytes"
 	"time"
 
@@ -95,6 +97,32 @@ var _ = Describe("construct_helpers", func() {
 			Expect(executeCommandCallArg).To(ContainSubstring("PostReboot.ps1"))
 			Expect(timeout).To(Equal(superLongTimeout))
 		})
+
+		It("returns an error when there is a powershell script execution error", func() {
+			e := NewScriptExecutor(fakeRemoteManager)
+			superLongTimeout := 24 * time.Hour
+			powershellErrorPrefix := errors.New(remotemanager.PowershellExecutionErrorMessage)
+			powershellErr := fmt.Errorf("%s: %s", powershellErrorPrefix, "a command failed to run")
+			fakeRemoteManager.ExecuteCommandWithTimeoutReturns(2, powershellErr)
+
+			err := e.ExecutePostRebootScript(superLongTimeout)
+
+			Expect(err).To(MatchError(powershellErr))
+		})
+
+		It("wraps a non-powershell execution error", func() {
+			e := NewScriptExecutor(fakeRemoteManager)
+			superLongTimeout := 24 * time.Hour
+			winRMError := errors.New("some EOF thing")
+
+			fakeRemoteManager.ExecuteCommandWithTimeoutReturns(1, winRMError)
+
+			err := e.ExecutePostRebootScript(superLongTimeout)
+
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("winrm connection event"))
+		})
+
 	})
 
 	Describe("PrepareVM", func() {
@@ -395,11 +423,28 @@ var _ = Describe("construct_helpers", func() {
 				fakeScriptExecutor.ExecutePostRebootScriptReturnsOnCall(0, postRebootError)
 				err := vmConstruct.PrepareVM()
 
-				Expect(err).To(MatchError(postRebootError))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(postRebootError.Error()))
 				Expect(fakeMessenger.ExecutePostRebootScriptStartedCallCount()).To(Equal(1))
 				Expect(fakeMessenger.ExecutePostRebootScriptSucceededCallCount()).To(Equal(0))
 
 			})
+			It("logs but does not error on winrm, non-powershell errors", func() {
+				winrmError := errors.New("winrm connection event: some EOF error")
+
+				fakeScriptExecutor.ExecutePostRebootScriptReturnsOnCall(0, winrmError)
+				err := vmConstruct.PrepareVM()
+
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeMessenger.ExecutePostRebootScriptSucceededCallCount()).
+					To(BeNumerically(">", 0))
+
+				Expect(fakeMessenger.ExecutePostRebootWarningCallCount()).
+					To(BeNumerically(">", 0))
+				Expect(fakeMessenger.ExecutePostRebootWarningArgsForCall(0)).
+					To(ContainSubstring(winrmError.Error()))
+			})
+
 		})
 
 		Describe("can check that the VM is powered off", func() {

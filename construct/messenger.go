@@ -79,6 +79,12 @@ func (m *Messenger) ExecutePostRebootScriptSucceeded() {
 
 }
 
+func (m *Messenger) ExecutePostRebootWarning(warning string) {
+	m.out.Write([]byte("\n"))
+	m.out.Write([]byte(warning))
+	m.out.Write([]byte("\n"))
+}
+
 func (m *Messenger) UploadFileStarted(artifact string) {
 	m.out.Write([]byte(fmt.Sprintf("\tUploading %s to target VM...", artifact)))
 }

@@ -4,6 +4,8 @@ import "time"
 
 //go:generate counterfeiter . RemoteManager
 
+const PowershellExecutionErrorMessage = "powershell encountered an issue"
+
 type RemoteManager interface {
 	UploadArtifact(source, destination string) error
 	ExtractArchive(source, destination string) error

@@ -105,7 +105,7 @@ func (w *WinRM) ExecuteCommandWithTimeout(command string, timeout time.Duration)
 	errBuffer := new(bytes.Buffer)
 	exitCode, err := client.Run(command, os.Stdout, io.MultiWriter(errBuffer, os.Stderr))
 	if err == nil && exitCode != 0 {
-		err = fmt.Errorf("powershell encountered an issue: %s", errBuffer.String())
+		err = fmt.Errorf("%s: %s", PowershellExecutionErrorMessage, errBuffer.String())
 	}
 	return exitCode, err
 }

@@ -4,6 +4,8 @@ param(
     [switch]$SkipRandomPassword
 )
 
+$postRebootExceptionExitCode = 2
+
 Push-Location $PSScriptRoot
 
 . ./AutomationHelpers.ps1
@@ -12,7 +14,7 @@ try {
     PostReboot -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
 } catch [Exception] {
     Write-Log "Failed to prepare the VM. See 'c:\provisions\log.log' for more info."
-    Exit 1
+    Exit $postRebootExceptionExitCode
 }
 
 Pop-Location

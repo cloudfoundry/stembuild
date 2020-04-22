@@ -140,6 +140,7 @@ type ConstructMessenger interface {
 	RebootHasFinished()
 	ExecutePostRebootScriptStarted()
 	ExecutePostRebootScriptSucceeded()
+	ExecutePostRebootWarning(warning string)
 	UploadFileStarted(artifact string)
 	UploadFileSucceeded()
 	RestartInProgress()
@@ -201,8 +202,13 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.ExecutePostRebootScriptStarted()
 	err = c.scriptExecutor.ExecutePostRebootScript(24 * time.Hour)
 	if err != nil {
-		return err
+		if strings.Contains(err.Error(), "winrm connection event") {
+			c.messenger.ExecutePostRebootWarning(err.Error())
+		} else {
+			return fmt.Errorf("failure in post-reboot script: %s", err)
+		}
 	}
+
 	c.messenger.ExecutePostRebootScriptSucceeded()
 
 	err = c.isPoweredOff(time.Minute)
@@ -265,10 +271,17 @@ func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string) error {
 
 func (e *ScriptExecutor) ExecutePostRebootScript(timeout time.Duration) error {
 	_, err := e.remoteManager.ExecuteCommandWithTimeout("powershell.exe "+stemcellAutomationPostRebootScript, timeout)
-	if err != nil && strings.Contains(err.Error(), "EOF") {
-		return nil
+
+	if err != nil && strings.Contains(err.Error(), PowershellExecutionErrorMessage) {
+		return err
 	}
-	return err
+
+	if err != nil {
+		return fmt.Errorf("winrm connection event: %s", err)
+	}
+
+	return nil
+
 }
 
 func (e *ScriptExecutor) ExecuteRestart() error {
