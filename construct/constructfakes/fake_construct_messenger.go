@@ -61,10 +61,6 @@ type FakeConstructMessenger struct {
 	rebootHasStartedMutex       sync.RWMutex
 	rebootHasStartedArgsForCall []struct {
 	}
-	RestartInProgressStub        func()
-	restartInProgressMutex       sync.RWMutex
-	restartInProgressArgsForCall []struct {
-	}
 	ShutdownCompletedStub        func()
 	shutdownCompletedMutex       sync.RWMutex
 	shutdownCompletedArgsForCall []struct {
@@ -93,6 +89,10 @@ type FakeConstructMessenger struct {
 	ValidateVMConnectionSucceededStub        func()
 	validateVMConnectionSucceededMutex       sync.RWMutex
 	validateVMConnectionSucceededArgsForCall []struct {
+	}
+	WaitingForShutdownStub        func()
+	waitingForShutdownMutex       sync.RWMutex
+	waitingForShutdownArgsForCall []struct {
 	}
 	WinRMDisconnectedForRebootStub        func()
 	winRMDisconnectedForRebootMutex       sync.RWMutex
@@ -409,29 +409,6 @@ func (fake *FakeConstructMessenger) RebootHasStartedCalls(stub func()) {
 	fake.RebootHasStartedStub = stub
 }
 
-func (fake *FakeConstructMessenger) RestartInProgress() {
-	fake.restartInProgressMutex.Lock()
-	fake.restartInProgressArgsForCall = append(fake.restartInProgressArgsForCall, struct {
-	}{})
-	fake.recordInvocation("RestartInProgress", []interface{}{})
-	fake.restartInProgressMutex.Unlock()
-	if fake.RestartInProgressStub != nil {
-		fake.RestartInProgressStub()
-	}
-}
-
-func (fake *FakeConstructMessenger) RestartInProgressCallCount() int {
-	fake.restartInProgressMutex.RLock()
-	defer fake.restartInProgressMutex.RUnlock()
-	return len(fake.restartInProgressArgsForCall)
-}
-
-func (fake *FakeConstructMessenger) RestartInProgressCalls(stub func()) {
-	fake.restartInProgressMutex.Lock()
-	defer fake.restartInProgressMutex.Unlock()
-	fake.RestartInProgressStub = stub
-}
-
 func (fake *FakeConstructMessenger) ShutdownCompleted() {
 	fake.shutdownCompletedMutex.Lock()
 	fake.shutdownCompletedArgsForCall = append(fake.shutdownCompletedArgsForCall, struct {
@@ -601,6 +578,29 @@ func (fake *FakeConstructMessenger) ValidateVMConnectionSucceededCalls(stub func
 	fake.ValidateVMConnectionSucceededStub = stub
 }
 
+func (fake *FakeConstructMessenger) WaitingForShutdown() {
+	fake.waitingForShutdownMutex.Lock()
+	fake.waitingForShutdownArgsForCall = append(fake.waitingForShutdownArgsForCall, struct {
+	}{})
+	fake.recordInvocation("WaitingForShutdown", []interface{}{})
+	fake.waitingForShutdownMutex.Unlock()
+	if fake.WaitingForShutdownStub != nil {
+		fake.WaitingForShutdownStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) WaitingForShutdownCallCount() int {
+	fake.waitingForShutdownMutex.RLock()
+	defer fake.waitingForShutdownMutex.RUnlock()
+	return len(fake.waitingForShutdownArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) WaitingForShutdownCalls(stub func()) {
+	fake.waitingForShutdownMutex.Lock()
+	defer fake.waitingForShutdownMutex.Unlock()
+	fake.WaitingForShutdownStub = stub
+}
+
 func (fake *FakeConstructMessenger) WinRMDisconnectedForReboot() {
 	fake.winRMDisconnectedForRebootMutex.Lock()
 	fake.winRMDisconnectedForRebootArgsForCall = append(fake.winRMDisconnectedForRebootArgsForCall, struct {
@@ -653,8 +653,6 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.rebootHasFinishedMutex.RUnlock()
 	fake.rebootHasStartedMutex.RLock()
 	defer fake.rebootHasStartedMutex.RUnlock()
-	fake.restartInProgressMutex.RLock()
-	defer fake.restartInProgressMutex.RUnlock()
 	fake.shutdownCompletedMutex.RLock()
 	defer fake.shutdownCompletedMutex.RUnlock()
 	fake.uploadArtifactsStartedMutex.RLock()
@@ -669,6 +667,8 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.validateVMConnectionStartedMutex.RUnlock()
 	fake.validateVMConnectionSucceededMutex.RLock()
 	defer fake.validateVMConnectionSucceededMutex.RUnlock()
+	fake.waitingForShutdownMutex.RLock()
+	defer fake.waitingForShutdownMutex.RUnlock()
 	fake.winRMDisconnectedForRebootMutex.RLock()
 	defer fake.winRMDisconnectedForRebootMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

@@ -465,21 +465,21 @@ var _ = Describe("construct_helpers", func() {
 				Expect(pollDuration).To(Equal(1 * time.Minute))
 
 				Expect(fakeVcenterClient.IsPoweredOffCallCount()).To(Equal(0))
-				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(0))
+				Expect(fakeMessenger.WaitingForShutdownCallCount()).To(Equal(0))
 
 				isPoweredOff, err := pollFunc()
 				Expect(isPoweredOff).To(BeFalse())
 				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(1))
+				Expect(fakeMessenger.WaitingForShutdownCallCount()).To(Equal(1))
 
 				isPoweredOff, err = pollFunc()
 				Expect(isPoweredOff).To(BeTrue())
 				Expect(err).NotTo(HaveOccurred())
-				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(2))
+				Expect(fakeMessenger.WaitingForShutdownCallCount()).To(Equal(2))
 
 				isPoweredOff, err = pollFunc()
 				Expect(err).To(MatchError("checking for powered off is hard"))
-				Expect(fakeMessenger.RestartInProgressCallCount()).To(Equal(2))
+				Expect(fakeMessenger.WaitingForShutdownCallCount()).To(Equal(2))
 
 				Expect(fakeVcenterClient.IsPoweredOffCallCount()).To(Equal(3))
 			})

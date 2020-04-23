@@ -143,7 +143,7 @@ type ConstructMessenger interface {
 	ExecutePostRebootWarning(warning string)
 	UploadFileStarted(artifact string)
 	UploadFileSucceeded()
-	RestartInProgress()
+	WaitingForShutdown()
 	ShutdownCompleted()
 	WinRMDisconnectedForReboot()
 }
@@ -284,11 +284,6 @@ func (e *ScriptExecutor) ExecutePostRebootScript(timeout time.Duration) error {
 
 }
 
-func (e *ScriptExecutor) ExecuteRestart() error {
-	_, err := e.remoteManager.ExecuteCommand("powershell.exe " + "Restart-Computer -Wait -Timeout 120")
-	return err
-}
-
 func (c *VMConstruct) isPoweredOff(duration time.Duration) error {
 	err := c.poller.Poll(duration, func() (bool, error) {
 		isPoweredOff, err := c.Client.IsPoweredOff(c.vmInventoryPath)
@@ -297,7 +292,7 @@ func (c *VMConstruct) isPoweredOff(duration time.Duration) error {
 			return false, err
 		}
 
-		c.messenger.RestartInProgress()
+		c.messenger.WaitingForShutdown()
 
 		return isPoweredOff, nil
 	})

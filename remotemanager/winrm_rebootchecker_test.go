@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const expectedTryCheckRebootCommand = "shutdown /r /f /t 60 /c \"packer restart test\""
+const expectedTryCheckRebootCommand = "shutdown /r /f /t 60 /c \"stembuild reboot test\""
 
 const expectedAbortRebootCommand = "shutdown /a"
 

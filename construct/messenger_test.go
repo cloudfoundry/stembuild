@@ -146,7 +146,7 @@ var _ = Describe("Messenger", func() {
 	})
 
 	Describe("Wait for the reboot to have finished", func() {
-		It("writes the restarting message to the writer", func() {
+		It("writes the rebooting message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.WinRMDisconnectedForReboot()
 
@@ -249,7 +249,7 @@ var _ = Describe("Messenger", func() {
 	Describe("Power state messages", func() {
 		It("writes still running message with timestamp", func() {
 			m := construct.NewMessenger(buf)
-			m.RestartInProgress()
+			m.WaitingForShutdown()
 			//to match timestamp format 2006-01-02T15:04:05.99999-07:00
 			//        should also match 2006-01-02T15:04:05.1+07:00
 			dateTimeRegex := "\\d{4}\\-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d*(\\-|\\+)\\d{2}:\\d{2}"
@@ -268,4 +268,5 @@ var _ = Describe("Messenger", func() {
 		})
 
 	})
+
 })

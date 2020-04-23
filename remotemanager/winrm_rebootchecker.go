@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var tryCheckReboot = `shutdown /r /f /t 60 /c "packer restart test"`
+var tryCheckReboot = `shutdown /r /f /t 60 /c "stembuild reboot test"`
 var abortReboot = `shutdown /a`
 
 type RebootWaiter struct {
