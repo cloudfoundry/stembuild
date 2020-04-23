@@ -55,11 +55,11 @@ func (m *Messenger) ExtractArtifactsSucceeded() {
 }
 
 func (m *Messenger) ExecuteSetupScriptStarted() {
-	m.out.Write([]byte("\nExecuting setup script...\n"))
+	m.out.Write([]byte("\nExecuting setup script 1 of 2...\n"))
 }
 
 func (m *Messenger) ExecuteSetupScriptSucceeded() {
-	m.out.Write([]byte("\nFinished executing setup script.\n"))
+	m.out.Write([]byte("\nFinished executing setup script 1 of 2.\n"))
 }
 
 func (m *Messenger) RebootHasStarted() {
@@ -71,11 +71,11 @@ func (m *Messenger) RebootHasFinished() {
 }
 
 func (m *Messenger) ExecutePostRebootScriptStarted() {
-	m.out.Write([]byte("\nCompleting VM prep...\n"))
+	m.out.Write([]byte("\nExecuting setup script 2 of 2...\n"))
 }
 
 func (m *Messenger) ExecutePostRebootScriptSucceeded() {
-	m.out.Write([]byte("\nFinished VM prep.\n"))
+	m.out.Write([]byte("\nFinished executing setup script 2 of 2.\n"))
 
 }
 

@@ -133,14 +133,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecuteSetupScriptStarted()
 
-			Expect(buf).To(gbytes.Say("\nExecuting setup script...\n"))
+			Expect(buf).To(gbytes.Say("\nExecuting setup script 1 of 2...\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecuteSetupScriptSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nFinished executing setup script.\n"))
+			Expect(buf).To(gbytes.Say("\nFinished executing setup script 1 of 2.\n"))
 		})
 
 	})
@@ -174,14 +174,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecutePostRebootScriptStarted()
 
-			Expect(buf).To(gbytes.Say("\nCompleting VM prep...\n"))
+			Expect(buf).To(gbytes.Say("\nExecuting setup script 2 of 2...\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecutePostRebootScriptSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nFinished VM prep.\n"))
+			Expect(buf).To(gbytes.Say("\nFinished executing setup script 2 of 2.\n"))
 		})
 
 		It("writes the warning message to the writer", func() {
