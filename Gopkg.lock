@@ -110,6 +110,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:112b07cad4bd500e6e445cc0b9294ca310faa41199c19475c557daa2c7519549"
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  pruneopts = "UT"
+  revision = "1b794fe86dd6a0c7c52ae69b5c9cb0aeedc52afa"
+  version = "v1.4.0"
+
+[[projects]]
   branch = "master"
   digest = "1:df265b7f54410945dad5cf5979d91461b9fa7ff9b397ab58d2d577002a8a0e24"
   name = "github.com/google/subcommands"
@@ -212,13 +220,14 @@
   version = "v1.4.0"
 
 [[projects]]
-  digest = "1:f7972020aa715891374f50b4619442cbde533fa35f2ced3756a4f597c85ad191"
+  digest = "1:c1384e7d9aff41775cc85fe1b05465447690b39c55c86fd52840f27d43851c64"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
     "format",
     "gbytes",
     "gexec",
+    "ghttp",
     "internal/assertion",
     "internal/asyncassertion",
     "internal/oraclematcher",
@@ -360,6 +369,42 @@
   revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
+  digest = "1:f1865c7b6c5f85632ff40fd729aa3393e66a2db3de74d43ab7c594be7e9bfe25"
+  name = "google.golang.org/protobuf"
+  packages = [
+    "encoding/prototext",
+    "encoding/protowire",
+    "internal/descfmt",
+    "internal/descopts",
+    "internal/detrand",
+    "internal/encoding/defval",
+    "internal/encoding/messageset",
+    "internal/encoding/tag",
+    "internal/encoding/text",
+    "internal/errors",
+    "internal/fieldnum",
+    "internal/fieldsort",
+    "internal/filedesc",
+    "internal/filetype",
+    "internal/flags",
+    "internal/genname",
+    "internal/impl",
+    "internal/mapsort",
+    "internal/pragma",
+    "internal/set",
+    "internal/strs",
+    "internal/version",
+    "proto",
+    "reflect/protoreflect",
+    "reflect/protoregistry",
+    "runtime/protoiface",
+    "runtime/protoimpl",
+  ]
+  pruneopts = "UT"
+  revision = "3b9eee12916ce611400f93d6c2fed2fc2911b0ad"
+  version = "v1.21.0"
+
+[[projects]]
   digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -385,6 +430,7 @@
     "github.com/onsi/gomega",
     "github.com/onsi/gomega/gbytes",
     "github.com/onsi/gomega/gexec",
+    "github.com/onsi/gomega/ghttp",
     "github.com/pkg/errors",
     "github.com/vmware/govmomi",
     "github.com/vmware/govmomi/find",
