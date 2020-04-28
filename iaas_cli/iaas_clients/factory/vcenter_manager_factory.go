@@ -68,7 +68,6 @@ func (f *ManagerFactory) VCenterManager(ctx context.Context) (*vcenter_manager.V
 		return nil, err
 	}
 
-	//TODO: understand the "all" parameter to new finder
 	finder := f.Config.FinderCreator.NewFinder(govmomiClient.Client, false)
 
 	return vcenter_manager.NewVCenterManager(govmomiClient, govmomiClient.Client, finder, f.Config.Username, f.Config.Password)

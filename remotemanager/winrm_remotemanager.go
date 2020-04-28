@@ -12,10 +12,11 @@ import (
 	"github.com/cloudfoundry-incubator/winrmcp/winrmcp"
 )
 
-const WinrmPort = 5985
+const WinRmPort = 5985
+const WinRmTimeout = 60 * time.Second
 
 type WinRM struct {
-	host          string // todo: host, username & password feel redundant here b/c of the factory
+	host          string
 	username      string
 	password      string
 	clientFactory WinRMClientFactoryI
@@ -37,7 +38,7 @@ func NewWinRM(host string, username string, password string, clientFactory WinRM
 }
 
 func (w *WinRM) CanReachVM() error {
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", w.host, WinrmPort), time.Duration(time.Second*60))
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", w.host, WinRmPort), time.Duration(time.Second*60))
 	if err != nil {
 		return fmt.Errorf("host %s is unreachable. Please ensure WinRM is enabled and the IP is correct", w.host)
 	}
@@ -46,8 +47,7 @@ func (w *WinRM) CanReachVM() error {
 }
 
 func (w *WinRM) CanLoginVM() error {
-	shortTimeout := 60 * time.Second
-	winrmClient, err := w.clientFactory.Build(shortTimeout)
+	winrmClient, err := w.clientFactory.Build(WinRmTimeout)
 
 	if err != nil {
 		return fmt.Errorf("failed to create winrm client: %s", err)
@@ -111,7 +111,6 @@ func (w *WinRM) ExecuteCommandWithTimeout(command string, timeout time.Duration)
 }
 
 func (w *WinRM) ExecuteCommand(command string) (int, error) {
-	defaultTimeout := 60 * time.Second
-	exitCode, err := w.ExecuteCommandWithTimeout(command, defaultTimeout)
+	exitCode, err := w.ExecuteCommandWithTimeout(command, WinRmTimeout)
 	return exitCode, err
 }
