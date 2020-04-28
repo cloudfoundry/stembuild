@@ -159,11 +159,13 @@ func (cmd *ip) Run(ctx context.Context, f *flag.FlagSet) error {
 
 				var ips []string
 				for _, addrs := range macs {
-					ips = append(ips, addrs...)
+					for _, ip := range addrs {
+						ips = append(ips, ip)
+					}
 				}
 				return strings.Join(ips, ","), nil
 			}
-			return vm.WaitForIP(deadline, cmd.v4)
+			return vm.WaitForIP(deadline)
 		}
 	}
 

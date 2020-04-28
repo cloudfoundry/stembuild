@@ -19,10 +19,6 @@ package vim25
 import (
 	"context"
 	"encoding/json"
-	"encoding/xml"
-	"fmt"
-	"net/http"
-	"path"
 	"strings"
 
 	"github.com/vmware/govmomi/vim25/methods"
@@ -58,7 +54,7 @@ type Client struct {
 	RoundTripper soap.RoundTripper
 }
 
-// NewClient creates and returns a new client with the ServiceContent field
+// NewClient creates and returns a new client wirh the ServiceContent field
 // filled in.
 func NewClient(ctx context.Context, rt soap.RoundTripper) (*Client, error) {
 	c := Client{
@@ -71,7 +67,7 @@ func NewClient(ctx context.Context, rt soap.RoundTripper) (*Client, error) {
 
 		if c.Namespace == "" {
 			c.Namespace = "urn:" + Namespace
-		} else if !strings.Contains(c.Namespace, ":") {
+		} else if strings.Index(c.Namespace, ":") < 0 {
 			c.Namespace = "urn:" + c.Namespace // ensure valid URI format
 		}
 		if c.Version == "" {
@@ -86,33 +82,6 @@ func NewClient(ctx context.Context, rt soap.RoundTripper) (*Client, error) {
 	}
 
 	return &c, nil
-}
-
-// UseServiceVersion sets soap.Client.Version to the current version of the service endpoint via /sdk/vimServiceVersions.xml
-func (c *Client) UseServiceVersion() error {
-	u := c.URL()
-	u.Path = path.Join(Path, "vimServiceVersions.xml")
-
-	res, err := c.Get(u.String())
-	if err != nil {
-		return err
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("http.Get(%s): %s", u.Path, err)
-	}
-
-	v := struct {
-		Version *string `xml:"namespace>version"`
-	}{&c.Version}
-
-	err = xml.NewDecoder(res.Body).Decode(&v)
-	_ = res.Body.Close()
-	if err != nil {
-		return fmt.Errorf("xml.Decode(%s): %s", u.Path, err)
-	}
-
-	return nil
 }
 
 // RoundTrip dispatches to the RoundTripper field.

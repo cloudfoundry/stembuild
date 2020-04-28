@@ -64,16 +64,6 @@ func (f *ClusterFlag) Register(ctx context.Context, fs *flag.FlagSet) {
 	})
 }
 
-// RegisterPlacement registers the -cluster flag without using GOVC_CLUSTER env as the default value,
-// usage is specific to VM placement.
-func (f *ClusterFlag) RegisterPlacement(ctx context.Context, fs *flag.FlagSet) {
-	f.RegisterOnce(func() {
-		f.DatacenterFlag.Register(ctx, fs)
-
-		fs.StringVar(&f.Name, "cluster", "", "Use cluster for VM placement via DRS")
-	})
-}
-
 func (f *ClusterFlag) Process(ctx context.Context) error {
 	return f.ProcessOnce(func() error {
 		if err := f.DatacenterFlag.Process(ctx); err != nil {
@@ -143,10 +133,7 @@ func (f *ClusterFlag) objectMap(ctx context.Context, kind string, names []string
 	if err != nil {
 		return nil, err
 	}
-
-	defer func() {
-		_ = v.Destroy(ctx)
-	}()
+	defer v.Destroy(ctx)
 
 	var entities []mo.ManagedEntity
 

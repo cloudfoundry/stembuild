@@ -28,7 +28,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/vmware/govmomi/ovf"
@@ -77,15 +76,13 @@ type Archive interface {
 }
 
 type TapeArchive struct {
-	Path string
+	path string
 	Opener
 }
 
 type TapeArchiveEntry struct {
 	io.Reader
 	f io.Closer
-
-	Name string
 }
 
 func (t *TapeArchiveEntry) Close() error {
@@ -93,7 +90,7 @@ func (t *TapeArchiveEntry) Close() error {
 }
 
 func (t *TapeArchive) Open(name string) (io.ReadCloser, int64, error) {
-	f, _, err := t.OpenFile(t.Path)
+	f, _, err := t.OpenFile(t.path)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -115,7 +112,7 @@ func (t *TapeArchive) Open(name string) (io.ReadCloser, int64, error) {
 		}
 
 		if matched {
-			return &TapeArchiveEntry{r, f, h.Name}, h.Size, nil
+			return &TapeArchiveEntry{r, f}, h.Size, nil
 		}
 	}
 
@@ -125,16 +122,16 @@ func (t *TapeArchive) Open(name string) (io.ReadCloser, int64, error) {
 }
 
 type FileArchive struct {
-	Path string
+	path string
 	Opener
 }
 
 func (t *FileArchive) Open(name string) (io.ReadCloser, int64, error) {
 	fpath := name
-	if name != t.Path {
-		index := strings.LastIndex(t.Path, "/")
+	if name != t.path {
+		index := strings.LastIndex(t.path, "/")
 		if index != -1 {
-			fpath = t.Path[:index] + "/" + name
+			fpath = t.path[:index] + "/" + name
 		}
 	}
 
@@ -153,7 +150,7 @@ func isRemotePath(path string) bool {
 }
 
 func (o Opener) OpenLocal(path string) (io.ReadCloser, int64, error) {
-	f, err := os.Open(filepath.Clean(path))
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, 0, err
 	}

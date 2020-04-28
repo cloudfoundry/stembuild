@@ -68,11 +68,7 @@ func (flag *DebugFlag) Process(ctx context.Context) error {
 	return flag.ProcessOnce(func() error {
 		// Base path for storing debug logs.
 		r := os.Getenv("GOVC_DEBUG_PATH")
-		switch r {
-		case "-":
-			debug.SetProvider(&debug.LogProvider{})
-			return nil
-		case "":
+		if r == "" {
 			r = home
 		}
 		r = filepath.Join(r, "debug")

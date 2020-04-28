@@ -35,7 +35,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"strings"
 	"sync"
@@ -71,7 +70,6 @@ type Client struct {
 
 	Namespace string // Vim namespace
 	Version   string // Vim version
-	Types     types.Func
 	UserAgent string
 
 	cookie string
@@ -124,8 +122,6 @@ func NewClient(u *url.URL, insecure bool) *Client {
 		u: u,
 		k: insecure,
 		d: newDebug(),
-
-		Types: types.TypeFunc(),
 	}
 
 	// Initialize http.RoundTripper on client, so we can customize it below
@@ -173,7 +169,6 @@ func (c *Client) NewServiceClient(path string, namespace string) *Client {
 
 	client := NewClient(u, c.k)
 	client.Namespace = "urn:" + namespace
-	client.Transport.(*http.Transport).TLSClientConfig = c.Transport.(*http.Transport).TLSClientConfig
 	if cert := c.Certificate(); cert != nil {
 		client.SetCertificate(*cert)
 	}
@@ -199,19 +194,6 @@ func (c *Client) NewServiceClient(path string, namespace string) *Client {
 	// Copy any query params (e.g. GOVMOMI_TUNNEL_PROXY_PORT used in testing)
 	client.u.RawQuery = vc.RawQuery
 
-	client.UserAgent = c.UserAgent
-
-	vimTypes := c.Types
-	client.Types = func(name string) (reflect.Type, bool) {
-		kind, ok := vimTypes(name)
-		if ok {
-			return kind, ok
-		}
-		// vim25/xml typeToString() does not have an option to include namespace prefix.
-		// Workaround this by re-trying the lookup with the namespace prefix.
-		return vimTypes(namespace + ":" + name)
-	}
-
 	return client
 }
 
@@ -224,7 +206,7 @@ func (c *Client) SetRootCAs(file string) error {
 	pool := x509.NewCertPool()
 
 	for _, name := range filepath.SplitList(file) {
-		pem, err := ioutil.ReadFile(filepath.Clean(name))
+		pem, err := ioutil.ReadFile(name)
 		if err != nil {
 			return err
 		}
@@ -294,7 +276,7 @@ func (c *Client) LoadThumbprints(file string) error {
 }
 
 func (c *Client) loadThumbprints(name string) error {
-	f, err := os.Open(filepath.Clean(name))
+	f, err := os.Open(name)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -363,7 +345,7 @@ func (c *Client) dialTLS(network string, addr string) (net.Conn, error) {
 	if thumbprint != peer {
 		_ = conn.Close()
 
-		return nil, fmt.Errorf("host %q thumbprint does not match %q", addr, thumbprint)
+		return nil, fmt.Errorf("Host %q thumbprint does not match %q", addr, thumbprint)
 	}
 
 	return conn, nil
@@ -441,7 +423,6 @@ type marshaledClient struct {
 	Cookies  []*http.Cookie
 	URL      *url.URL
 	Insecure bool
-	Version  string
 }
 
 func (c *Client) MarshalJSON() ([]byte, error) {
@@ -449,7 +430,6 @@ func (c *Client) MarshalJSON() ([]byte, error) {
 		Cookies:  c.Jar.Cookies(c.u),
 		URL:      c.u,
 		Insecure: c.k,
-		Version:  c.Version,
 	}
 
 	return json.Marshal(m)
@@ -464,7 +444,6 @@ func (c *Client) UnmarshalJSON(b []byte) error {
 	}
 
 	*c = *NewClient(m.URL, m.Insecure)
-	c.Version = m.Version
 	c.Jar.SetCookies(m.URL, m.Cookies)
 
 	return nil
@@ -486,9 +465,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request, f func(*http.Respons
 		req.Header.Set(`User-Agent`, c.UserAgent)
 	}
 
-	ext := ""
 	if d.enabled() {
-		ext = d.debugRequest(req)
+		d.debugRequest(req)
 	}
 
 	tstart := time.Now()
@@ -512,7 +490,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, f func(*http.Respons
 	defer res.Body.Close()
 
 	if d.enabled() {
-		d.debugResponse(res, ext)
+		d.debugResponse(res)
 	}
 
 	return f(res)
@@ -530,32 +508,6 @@ type headerContext struct{}
 // WithHeader can be used to modify the outgoing request soap.Header fields.
 func (c *Client) WithHeader(ctx context.Context, header Header) context.Context {
 	return context.WithValue(ctx, headerContext{}, header)
-}
-
-type statusError struct {
-	res *http.Response
-}
-
-// Temporary returns true for HTTP response codes that can be retried
-// See vim25.TemporaryNetworkError
-func (e *statusError) Temporary() bool {
-	switch e.res.StatusCode {
-	case http.StatusBadGateway:
-		return true
-	}
-	return false
-}
-
-func (e *statusError) Error() string {
-	return e.res.Status
-}
-
-func newStatusError(res *http.Response) error {
-	return &url.Error{
-		Op:  res.Request.Method,
-		URL: res.Request.URL.Path,
-		Err: &statusError{res},
-	}
 }
 
 func (c *Client) RoundTrip(ctx context.Context, reqBody, resBody HasFault) error {
@@ -613,11 +565,11 @@ func (c *Client) RoundTrip(ctx context.Context, reqBody, resBody HasFault) error
 		case http.StatusInternalServerError:
 			// Error, but typically includes a body explaining the error
 		default:
-			return newStatusError(res)
+			return errors.New(res.Status)
 		}
 
 		dec := xml.NewDecoder(res.Body)
-		dec.TypeFunc = c.Types
+		dec.TypeFunc = types.TypeFunc()
 		err = dec.Decode(&resEnv)
 		if err != nil {
 			return err
@@ -728,7 +680,7 @@ func (c *Client) UploadFile(ctx context.Context, file string, u *url.URL, param 
 		return err
 	}
 
-	f, err := os.Open(filepath.Clean(file))
+	f, err := os.Open(file)
 	if err != nil {
 		return err
 	}
@@ -781,7 +733,7 @@ func (c *Client) Download(ctx context.Context, u *url.URL, param *Download) (io.
 	switch res.StatusCode {
 	case http.StatusOK:
 	default:
-		err = fmt.Errorf("download(%s): %s", u, res.Status)
+		err = errors.New(res.Status)
 	}
 
 	if err != nil {

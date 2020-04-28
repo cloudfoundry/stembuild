@@ -34,7 +34,7 @@ func init() {
 }
 
 func (cmd *kill) Register(ctx context.Context, f *flag.FlagSet) {
-	cmd.GuestFlag, ctx = newGuestProcessFlag(ctx)
+	cmd.GuestFlag, ctx = newGuestFlag(ctx)
 	cmd.GuestFlag.Register(ctx, f)
 
 	f.Var(&cmd.pids, "p", "Process ID")

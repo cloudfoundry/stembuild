@@ -4,7 +4,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/internal/s3err"
-	"github.com/aws/aws-sdk-go/service/s3/internal/arn"
 )
 
 func init() {
@@ -14,12 +13,11 @@ func init() {
 
 func defaultInitClientFn(c *client.Client) {
 	// Support building custom endpoints based on config
-	c.Handlers.Build.PushFront(endpointHandler)
+	c.Handlers.Build.PushFront(updateEndpointForS3Config)
 
 	// Require SSL when using SSE keys
 	c.Handlers.Validate.PushBack(validateSSERequiresSSL)
-	c.Handlers.Build.PushBack(computeSSEKeyMD5)
-	c.Handlers.Build.PushBack(computeCopySourceSSEKeyMD5)
+	c.Handlers.Build.PushBack(computeSSEKeys)
 
 	// S3 uses custom error unmarshaling logic
 	c.Handlers.UnmarshalError.Clear()
@@ -28,7 +26,7 @@ func defaultInitClientFn(c *client.Client) {
 }
 
 func defaultInitRequestFn(r *request.Request) {
-	// Add request handlers for specific platforms.
+	// Add reuest handlers for specific platforms.
 	// e.g. 100-continue support for PUT requests using Go 1.6
 	platformRequestHandlers(r)
 
@@ -73,9 +71,4 @@ type sseCustomerKeyGetter interface {
 // "CopySourceSSECustomerKey" field from an S3 type.
 type copySourceSSECustomerKeyGetter interface {
 	getCopySourceSSECustomerKey() string
-}
-
-type endpointARNGetter interface {
-	getEndpointARN() (arn.Resource, error)
-	hasEndpointARN() bool
 }

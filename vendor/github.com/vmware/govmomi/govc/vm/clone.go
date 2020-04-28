@@ -32,7 +32,6 @@ import (
 
 type clone struct {
 	*flags.ClientFlag
-	*flags.ClusterFlag
 	*flags.DatacenterFlag
 	*flags.DatastoreFlag
 	*flags.StoragePodFlag
@@ -55,7 +54,6 @@ type clone struct {
 	link          bool
 
 	Client         *vim25.Client
-	Cluster        *object.ClusterComputeResource
 	Datacenter     *object.Datacenter
 	Datastore      *object.Datastore
 	StoragePod     *object.StoragePod
@@ -72,9 +70,6 @@ func init() {
 func (cmd *clone) Register(ctx context.Context, f *flag.FlagSet) {
 	cmd.ClientFlag, ctx = flags.NewClientFlag(ctx)
 	cmd.ClientFlag.Register(ctx, f)
-
-	cmd.ClusterFlag, ctx = flags.NewClusterFlag(ctx)
-	cmd.ClusterFlag.RegisterPlacement(ctx, f)
 
 	cmd.DatacenterFlag, ctx = flags.NewDatacenterFlag(ctx)
 	cmd.DatacenterFlag.Register(ctx, f)
@@ -124,16 +119,11 @@ Examples:
   govc vm.clone -vm template-vm -link new-vm
   govc vm.clone -vm template-vm -snapshot s-name new-vm
   govc vm.clone -vm template-vm -link -snapshot s-name new-vm
-  govc vm.clone -vm template-vm -cluster cluster1 new-vm # use compute cluster placement
-  govc vm.clone -vm template-vm -datastore-cluster dscluster new-vm # use datastore cluster placement
   govc vm.clone -vm template-vm -snapshot $(govc snapshot.tree -vm template-vm -C) new-vm`
 }
 
 func (cmd *clone) Process(ctx context.Context) error {
 	if err := cmd.ClientFlag.Process(ctx); err != nil {
-		return err
-	}
-	if err := cmd.ClusterFlag.Process(ctx); err != nil {
 		return err
 	}
 	if err := cmd.DatacenterFlag.Process(ctx); err != nil {
@@ -181,11 +171,6 @@ func (cmd *clone) Run(ctx context.Context, f *flag.FlagSet) error {
 		return err
 	}
 
-	cmd.Cluster, err = cmd.ClusterFlag.ClusterIfSpecified()
-	if err != nil {
-		return err
-	}
-
 	cmd.Datacenter, err = cmd.DatacenterFlag.Datacenter()
 	if err != nil {
 		return err
@@ -196,7 +181,7 @@ func (cmd *clone) Run(ctx context.Context, f *flag.FlagSet) error {
 		if err != nil {
 			return err
 		}
-	} else if cmd.Cluster == nil {
+	} else {
 		cmd.Datastore, err = cmd.DatastoreFlag.Datastore()
 		if err != nil {
 			return err
@@ -213,15 +198,9 @@ func (cmd *clone) Run(ctx context.Context, f *flag.FlagSet) error {
 			return err
 		}
 	} else {
-		if cmd.Cluster == nil {
-			// -host is optional
-			if cmd.ResourcePool, err = cmd.ResourcePoolFlag.ResourcePool(); err != nil {
-				return err
-			}
-		} else {
-			if cmd.ResourcePool, err = cmd.Cluster.ResourcePool(ctx); err != nil {
-				return err
-			}
+		// -host is optional
+		if cmd.ResourcePool, err = cmd.ResourcePoolFlag.ResourcePool(); err != nil {
+			return err
 		}
 	}
 
@@ -352,7 +331,6 @@ func (cmd *clone) cloneVM(ctx context.Context) (*object.VirtualMachine, error) {
 	}
 
 	cloneSpec.Location = relocateSpec
-	vmref := cmd.VirtualMachine.Reference()
 
 	// clone to storage pod
 	datastoreref := types.ManagedObjectReference{}
@@ -363,6 +341,9 @@ func (cmd *clone) cloneVM(ctx context.Context) (*object.VirtualMachine, error) {
 		podSelectionSpec := types.StorageDrsPodSelectionSpec{
 			StoragePod: &storagePod,
 		}
+
+		// Get the virtual machine reference
+		vmref := cmd.VirtualMachine.Reference()
 
 		// Build the placement spec
 		storagePlacementSpec := types.StoragePlacementSpec{
@@ -384,37 +365,15 @@ func (cmd *clone) cloneVM(ctx context.Context) (*object.VirtualMachine, error) {
 		// Get the recommendations
 		recommendations := result.Recommendations
 		if len(recommendations) == 0 {
-			return nil, fmt.Errorf("no datastore-cluster recommendations")
+			return nil, fmt.Errorf("no recommendations")
 		}
 
 		// Get the first recommendation
 		datastoreref = recommendations[0].Action[0].(*types.StoragePlacementAction).Destination
 	} else if cmd.StoragePod == nil && cmd.Datastore != nil {
 		datastoreref = cmd.Datastore.Reference()
-	} else if cmd.Cluster != nil {
-		spec := types.PlacementSpec{
-			PlacementType: string(types.PlacementSpecPlacementTypeClone),
-			CloneName:     cmd.name,
-			CloneSpec:     cloneSpec,
-			RelocateSpec:  &cloneSpec.Location,
-			Vm:            &vmref,
-		}
-		result, err := cmd.Cluster.PlaceVm(ctx, spec)
-		if err != nil {
-			return nil, err
-		}
-
-		recs := result.Recommendations
-		if len(recs) == 0 {
-			return nil, fmt.Errorf("no cluster recommendations")
-		}
-
-		rspec := *recs[0].Action[0].(*types.PlacementAction).RelocateSpec
-		cloneSpec.Location.Host = rspec.Host
-		cloneSpec.Location.Datastore = rspec.Datastore
-		datastoreref = *rspec.Datastore
 	} else {
-		return nil, fmt.Errorf("please provide either a cluster, datastore or datastore-cluster")
+		return nil, fmt.Errorf("Please provide either a datastore or a storagepod")
 	}
 
 	// Set the destination datastore
@@ -436,7 +395,7 @@ func (cmd *clone) cloneVM(ctx context.Context) (*object.VirtualMachine, error) {
 		_, err := datastore.Stat(ctx, vmxPath)
 		if err == nil {
 			dsPath := cmd.Datastore.Path(vmxPath)
-			return nil, fmt.Errorf("file %s already exists", dsPath)
+			return nil, fmt.Errorf("File %s already exists", dsPath)
 		}
 	}
 
@@ -449,8 +408,8 @@ func (cmd *clone) cloneVM(ctx context.Context) (*object.VirtualMachine, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !exists {
-			return nil, fmt.Errorf("customization specification %s does not exists", cmd.customization)
+		if exists == false {
+			return nil, fmt.Errorf("Customization specification %s does not exists.", cmd.customization)
 		}
 		// get the customization specification
 		customSpecItem, err := customizationSpecManager.GetCustomizationSpec(ctx, cmd.customization)

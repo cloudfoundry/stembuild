@@ -127,7 +127,9 @@ func (m FileManager) TransferURL(ctx context.Context, u string) (*url.URL, error
 		return nil, err
 	}
 
-	if turl.Hostname() == "*" {
+	needsHostname := turl.Hostname() == "*"
+
+	if needsHostname {
 		turl.Host = m.c.URL().Host // Also use Client's port, to support port forwarding
 	}
 
@@ -142,7 +144,7 @@ func (m FileManager) TransferURL(ctx context.Context, u string) (*url.URL, error
 	mname, ok := m.hosts[name]
 	m.mu.Unlock()
 
-	if ok {
+	if ok && needsHostname {
 		turl.Host = net.JoinHostPort(mname, port)
 		return turl, nil
 	}
@@ -156,7 +158,7 @@ func (m FileManager) TransferURL(ctx context.Context, u string) (*url.URL, error
 	}
 
 	if vm.Runtime.Host == nil {
-		return turl, nil // won't matter if the VM was powered off since the call to InitiateFileTransfer will fail
+		return turl, nil // won't matter if the VM was powered off since the call to InitiateFileTransfer
 	}
 
 	props := []string{"summary.config.sslThumbprint", "config.virtualNicManagerInfo.netConfig"}
@@ -167,32 +169,26 @@ func (m FileManager) TransferURL(ctx context.Context, u string) (*url.URL, error
 		return nil, err
 	}
 
-	// prefer an ESX management IP, as the hostname used when adding to VC may not be valid for this client
-	// See also object.HostSystem.ManagementIPs which we can't use here due to import cycle
-	for _, nc := range host.Config.VirtualNicManagerInfo.NetConfig {
-		if nc.NicType != string(types.HostVirtualNicManagerNicTypeManagement) {
-			continue
-		}
-		for ix := range nc.CandidateVnic {
-			for _, selectedVnicKey := range nc.SelectedVnic {
-				if nc.CandidateVnic[ix].Key != selectedVnicKey {
-					continue
-				}
-				ip := net.ParseIP(nc.CandidateVnic[ix].Spec.Ip.IpAddress)
-				if ip != nil {
-					mname = ip.String()
-					m.mu.Lock()
-					m.hosts[name] = mname
-					m.mu.Unlock()
+	kind := string(types.HostVirtualNicManagerNicTypeManagement)
 
-					name = mname
-					break
-				}
+	// prefer an ESX management IP, as the hostname used when adding to VC may not be valid for this client
+	for _, nc := range host.Config.VirtualNicManagerInfo.NetConfig {
+		if len(nc.CandidateVnic) > 0 && nc.NicType == kind {
+			ip := net.ParseIP(nc.CandidateVnic[0].Spec.Ip.IpAddress)
+			if ip != nil {
+				mname = ip.String()
+				m.mu.Lock()
+				m.hosts[name] = mname
+				m.mu.Unlock()
+				name = mname
+				break
 			}
 		}
 	}
 
-	turl.Host = net.JoinHostPort(name, port)
+	if needsHostname {
+		turl.Host = net.JoinHostPort(name, port)
+	}
 
 	m.c.SetThumbprint(turl.Host, host.Summary.Config.SslThumbprint)
 

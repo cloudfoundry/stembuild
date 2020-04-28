@@ -50,8 +50,6 @@ func (cmd *boot) Register(ctx context.Context, f *flag.FlagSet) {
 
 	cmd.EnterBIOSSetup = types.NewBool(false)
 	f.BoolVar(cmd.EnterBIOSSetup, "setup", false, "If true, enter BIOS setup on next boot")
-
-	f.Var(flags.NewOptionalBool(&cmd.EfiSecureBootEnabled), "secure", "Enable EFI secure boot")
 }
 
 func (cmd *boot) Description() string {
@@ -59,8 +57,7 @@ func (cmd *boot) Description() string {
 
 Examples:
   govc device.boot -vm $vm -delay 1000 -order floppy,cdrom,ethernet,disk
-  govc device.boot -vm $vm -order - # reset boot order
-  govc device.boot -vm $vm -secure`
+  govc device.boot -vm $vm -order - # reset boot order`
 }
 
 func (cmd *boot) Process(ctx context.Context) error {

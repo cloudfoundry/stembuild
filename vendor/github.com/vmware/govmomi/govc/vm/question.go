@@ -65,7 +65,7 @@ func (cmd *question) Run(ctx context.Context, f *flag.FlagSet) error {
 	}
 
 	if vm == nil {
-		return errors.New("no VM specified")
+		return errors.New("No VM specified")
 	}
 
 	var mvm mo.VirtualMachine

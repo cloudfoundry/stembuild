@@ -20,8 +20,12 @@ import (
 	"bytes"
 	"context"
 	"flag"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/vmware/govmomi/govc/cli"
 )
@@ -29,9 +33,10 @@ import (
 type run struct {
 	*GuestFlag
 
-	data string
-	dir  string
-	vars env
+	data    string
+	verbose bool
+	dir     string
+	vars    env
 }
 
 func init() {
@@ -39,61 +44,113 @@ func init() {
 }
 
 func (cmd *run) Register(ctx context.Context, f *flag.FlagSet) {
-	cmd.GuestFlag, ctx = newGuestProcessFlag(ctx)
+	cmd.GuestFlag, ctx = newGuestFlag(ctx)
 	cmd.GuestFlag.Register(ctx, f)
 
-	f.StringVar(&cmd.data, "d", "", "Input data string. A value of '-' reads from OS stdin")
+	f.StringVar(&cmd.data, "d", "", "Input data")
+	f.BoolVar(&cmd.verbose, "v", false, "Verbose")
 	f.StringVar(&cmd.dir, "C", "", "The absolute path of the working directory for the program to start")
-	f.Var(&cmd.vars, "e", "Set environment variables")
+	f.Var(&cmd.vars, "e", "Set environment variable or HTTP header")
+}
+
+func (cmd *run) Process(ctx context.Context) error {
+	if err := cmd.GuestFlag.Process(ctx); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (cmd *run) Usage() string {
-	return "PATH [ARG]..."
+	return "NAME [ARG]..."
 }
 
 func (cmd *run) Description() string {
-	return `Run program PATH in VM and display output.
+	return `Run program NAME in VM and display output.
 
-The guest.run command starts a program in the VM with i/o redirected, waits for the process to exit and
-propagates the exit code to the govc process exit code.  Note that stdout and stderr are redirected by default,
-stdin is only redirected when the '-d' flag is specified.
+This command depends on govmomi/toolbox running in the VM guest and does not work with standard VMware tools.
+
+If the program NAME is an HTTP verb, the toolbox's http.RoundTripper will be used as the HTTP transport.
 
 Examples:
-  govc guest.run -vm $name ifconfig
-  govc guest.run -vm $name ifconfig eth0
-  cal | govc guest.run -vm $name -d - cat
-  govc guest.run -vm $name -d "hello $USER" cat
-  govc guest.run -vm $name curl -s :invalid: || echo $? # exit code 6
-  govc guest.run -vm $name -e FOO=bar -e BIZ=baz -C /tmp env`
+  govc guest.run -vm $name kubectl get pods
+  govc guest.run -vm $name -d - kubectl create -f - <svc.json
+  govc guest.run -vm $name kubectl delete pod,service my-service
+  govc guest.run -vm $name GET http://localhost:8080/api/v1/nodes
+  govc guest.run -vm $name -e Content-Type:application/json -d - POST http://localhost:8080/api/v1/namespaces/default/pods <svc.json
+  govc guest.run -vm $name DELETE http://localhost:8080/api/v1/namespaces/default/services/my-service`
 }
 
-func (cmd *run) Run(ctx context.Context, f *flag.FlagSet) error {
-	if f.NArg() == 0 {
-		return flag.ErrHelp
-	}
-	name := f.Arg(0)
+func (cmd *run) do(c *http.Client, req *http.Request) error {
+	for _, v := range cmd.vars {
+		h := strings.SplitN(v, ":", 2)
+		if len(h) != 2 {
+			return fmt.Errorf("invalid header: %q", v)
+		}
 
-	c, err := cmd.Toolbox()
+		req.Header.Set(strings.TrimSpace(h[0]), strings.TrimSpace(h[1]))
+	}
+
+	res, err := c.Do(req)
 	if err != nil {
 		return err
 	}
 
-	ecmd := &exec.Cmd{
-		Path:   name,
-		Args:   f.Args()[1:],
-		Env:    cmd.vars,
-		Dir:    cmd.dir,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
+	if cmd.verbose {
+		return res.Write(cmd.Out)
 	}
 
-	switch cmd.data {
-	case "":
-	case "-":
-		ecmd.Stdin = os.Stdin
+	_, err = io.Copy(cmd.Out, res.Body)
+
+	_ = res.Body.Close()
+
+	return err
+}
+
+func (cmd *run) Run(ctx context.Context, f *flag.FlagSet) error {
+	name := f.Arg(0)
+
+	tc, err := cmd.Toolbox()
+	if err != nil {
+		return err
+	}
+
+	hc := &http.Client{
+		Transport: tc,
+	}
+
+	switch name {
+	case "HEAD", "GET", "DELETE":
+		req, err := http.NewRequest(name, f.Arg(1), nil)
+		if err != nil {
+			return err
+		}
+
+		return cmd.do(hc, req)
+	case "POST", "PUT":
+		req, err := http.NewRequest(name, f.Arg(1), os.Stdin)
+		if err != nil {
+			return err
+		}
+
+		return cmd.do(hc, req)
 	default:
-		ecmd.Stdin = bytes.NewBuffer([]byte(cmd.data))
-	}
+		ecmd := &exec.Cmd{
+			Path:   name,
+			Args:   f.Args()[1:],
+			Env:    cmd.vars,
+			Dir:    cmd.dir,
+			Stdout: os.Stdout,
+			Stderr: os.Stderr,
+		}
 
-	return c.Run(ctx, ecmd)
+		switch cmd.data {
+		case "":
+		case "-":
+			ecmd.Stdin = os.Stdin
+		default:
+			ecmd.Stdin = bytes.NewBuffer([]byte(cmd.data))
+		}
+
+		return tc.Run(ctx, ecmd)
+	}
 }

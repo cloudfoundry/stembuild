@@ -25,7 +25,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/vmware/govmomi/vapi/internal"
 	"github.com/vmware/govmomi/vim25"
@@ -37,36 +36,11 @@ type Client struct {
 	*soap.Client
 }
 
-// Session information
-type Session struct {
-	User         string    `json:"user"`
-	Created      time.Time `json:"created_time"`
-	LastAccessed time.Time `json:"last_accessed_time"`
-}
-
-// LocalizableMessage represents a localizable error
-type LocalizableMessage struct {
-	Args           []string `json:"args,omitempty"`
-	DefaultMessage string   `json:"default_message,omitempty"`
-	ID             string   `json:"id,omitempty"`
-}
-
-func (m *LocalizableMessage) Error() string {
-	return m.DefaultMessage
-}
-
 // NewClient creates a new Client instance.
 func NewClient(c *vim25.Client) *Client {
-	sc := c.Client.NewServiceClient(Path, "")
+	sc := c.Client.NewServiceClient(internal.Path, "")
 
 	return &Client{sc}
-}
-
-// Resource helper for the given path.
-func (c *Client) Resource(path string) *Resource {
-	r := &Resource{u: c.URL()}
-	r.u.Path = Path + path
-	return r
 }
 
 type Signer interface {
@@ -77,14 +51,6 @@ type signerContext struct{}
 
 func (c *Client) WithSigner(ctx context.Context, s Signer) context.Context {
 	return context.WithValue(ctx, signerContext{}, s)
-}
-
-type statusError struct {
-	res *http.Response
-}
-
-func (e *statusError) Error() string {
-	return fmt.Sprintf("%s %s: %s", e.res.Request.Method, e.res.Request.URL, e.res.Status)
 }
 
 // Do sends the http.Request, decoding resBody if provided.
@@ -113,7 +79,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, resBody interface{})
 			}
 			return fmt.Errorf("%s: %s", res.Status, bytes.TrimSpace(detail))
 		default:
-			return &statusError{res}
+			return fmt.Errorf("%s %s: %s", req.Method, req.URL, res.Status)
 		}
 
 		if resBody == nil {
@@ -137,7 +103,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, resBody interface{})
 
 // Login creates a new session via Basic Authentication with the given url.Userinfo.
 func (c *Client) Login(ctx context.Context, user *url.Userinfo) error {
-	req := c.Resource(internal.SessionPath).Request(http.MethodPost)
+	req := internal.URL(c, internal.SessionPath).Request(http.MethodPost)
 
 	if user != nil {
 		if password, ok := user.Password(); ok {
@@ -152,25 +118,8 @@ func (c *Client) LoginByToken(ctx context.Context) error {
 	return c.Login(ctx, nil)
 }
 
-// Session returns the user's current session.
-// Nil is returned if the session is not authenticated.
-func (c *Client) Session(ctx context.Context) (*Session, error) {
-	var s Session
-	req := c.Resource(internal.SessionPath).WithAction("get").Request(http.MethodPost)
-	err := c.Do(ctx, req, &s)
-	if err != nil {
-		if e, ok := err.(*statusError); ok {
-			if e.res.StatusCode == http.StatusUnauthorized {
-				return nil, nil
-			}
-		}
-		return nil, err
-	}
-	return &s, nil
-}
-
 // Logout deletes the current session.
 func (c *Client) Logout(ctx context.Context) error {
-	req := c.Resource(internal.SessionPath).Request(http.MethodDelete)
+	req := internal.URL(c, internal.SessionPath).Request(http.MethodDelete)
 	return c.Do(ctx, req, nil)
 }

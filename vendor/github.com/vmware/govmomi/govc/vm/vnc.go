@@ -48,16 +48,8 @@ func (i *intRange) Set(s string) error {
 		return fmt.Errorf("invalid range: %s", s)
 	}
 
-	low, err := strconv.Atoi(m[1])
-	if err != nil {
-		return fmt.Errorf("couldn't convert to integer: %v", err)
-	}
-
-	high, err := strconv.Atoi(m[2])
-	if err != nil {
-		return fmt.Errorf("couldn't convert to integer: %v", err)
-	}
-
+	low, _ := strconv.Atoi(m[1])
+	high, _ := strconv.Atoi(m[2])
 	if low > high {
 		return fmt.Errorf("invalid range: low > high")
 	}
@@ -83,10 +75,7 @@ type vnc struct {
 
 func init() {
 	cmd := &vnc{}
-	err := cmd.PortRange.Set("5900-5999")
-	if err != nil {
-		fmt.Printf("Error setting port range %v", err)
-	}
+	cmd.PortRange.Set("5900-5999")
 	cli.Register("vm.vnc", cmd)
 }
 
@@ -138,15 +127,9 @@ func (cmd *vnc) Run(ctx context.Context, f *flag.FlagSet) error {
 	for _, vm := range vms {
 		switch {
 		case cmd.Enable:
-			err = vm.enable(cmd.Port, cmd.Password)
-			if err != nil {
-				return err
-			}
+			vm.enable(cmd.Port, cmd.Password)
 		case cmd.Disable:
-			err = vm.disable()
-			if err != nil {
-				return err
-			}
+			vm.disable()
 		}
 	}
 
@@ -479,7 +462,7 @@ func vncOptionsFromExtraConfig(ov []types.BaseOptionValue) vncOptions {
 }
 
 func (vo vncOptions) ToExtraConfig() []types.BaseOptionValue {
-	ov := make([]types.BaseOptionValue, 0)
+	ov := make([]types.BaseOptionValue, 0, 0)
 	for k, v := range vo {
 		key := vncPrefix + k
 		value := v

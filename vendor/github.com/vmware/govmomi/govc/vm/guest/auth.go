@@ -28,7 +28,6 @@ import (
 
 type AuthFlag struct {
 	auth types.NamePasswordAuthentication
-	proc bool
 }
 
 func newAuthFlag(ctx context.Context) (*AuthFlag, context.Context) {
@@ -54,15 +53,9 @@ func (flag *AuthFlag) Set(s string) error {
 func (flag *AuthFlag) Register(ctx context.Context, f *flag.FlagSet) {
 	env := "GOVC_GUEST_LOGIN"
 	value := os.Getenv(env)
-	err := flag.Set(value)
-	if err != nil {
-		fmt.Printf("couldn't set guest login values: %v", err)
-	}
+	flag.Set(value)
 	usage := fmt.Sprintf("Guest VM credentials [%s]", env)
 	f.Var(flag, "l", usage)
-	if flag.proc {
-		f.BoolVar(&flag.auth.GuestAuthentication.InteractiveSession, "i", false, "Interactive session")
-	}
 }
 
 func (flag *AuthFlag) Process(ctx context.Context) error {

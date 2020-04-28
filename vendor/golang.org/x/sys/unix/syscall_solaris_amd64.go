@@ -18,10 +18,11 @@ func (iov *Iovec) SetLen(length int) {
 	iov.Len = uint64(length)
 }
 
-func (msghdr *Msghdr) SetIovlen(length int) {
-	msghdr.Iovlen = int32(length)
-}
-
 func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint32(length)
+}
+
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
+	// TODO(aram): implement this, see issue 5847.
+	panic("unimplemented")
 }
