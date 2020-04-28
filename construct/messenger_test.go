@@ -131,24 +131,57 @@ var _ = Describe("Messenger", func() {
 	Describe("Execute setup script messages", func() {
 		It("writes the started message to the writer", func() {
 			m := construct.NewMessenger(buf)
-			m.ExecuteScriptStarted()
+			m.ExecuteSetupScriptStarted()
 
 			Expect(buf).To(gbytes.Say("\nExecuting setup script...\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
-			m.ExecuteScriptSucceeded()
+			m.ExecuteSetupScriptSucceeded()
 
 			Expect(buf).To(gbytes.Say("\nFinished executing setup script.\n"))
 		})
 
+	})
+
+	Describe("Wait for the reboot to have finished", func() {
 		It("writes the restarting message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.WinRMDisconnectedForReboot()
 
-			Expect(buf).To(gbytes.Say("WinRM has been disconnected so the VM can reboot. Preparing the VM to be shutdown."))
+			Expect(buf).To(gbytes.Say("WinRM has been disconnected so the VM can reboot.\n"))
 
+		})
+
+		It("writes the started message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.RebootHasStarted()
+
+			Expect(buf).To(gbytes.Say("\nThe reboot has started...\n"))
+		})
+
+		It("writes the succeeded message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.RebootHasFinished()
+
+			Expect(buf).To(gbytes.Say("\nThe reboot has finished.\n"))
+		})
+	})
+
+	Describe("Execute post-reboot script messages", func() {
+		It("writes the started message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ExecutePostRebootScriptStarted()
+
+			Expect(buf).To(gbytes.Say("\nCompleting VM prep...\n"))
+		})
+
+		It("writes the succeeded message to the writer", func() {
+			m := construct.NewMessenger(buf)
+			m.ExecutePostRebootScriptSucceeded()
+
+			Expect(buf).To(gbytes.Say("\nFinished VM prep.\n"))
 		})
 	})
 

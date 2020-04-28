@@ -13,7 +13,8 @@ var _ = Describe("WinRM Remote Manager", func() {
 	var rm RemoteManager
 
 	BeforeEach(func() {
-		rm = NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword)
+		clientFactory := NewWinRmClientFactory(conf.TargetIP, conf.VMUsername, conf.VMPassword)
+		rm = NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword, clientFactory)
 		Expect(rm).ToNot(BeNil())
 	})
 
@@ -36,7 +37,7 @@ var _ = Describe("WinRM Remote Manager", func() {
 		})
 
 		AfterEach(func() {
-			err := rm.ExecuteCommand("powershell.exe Remove-Item c:\\provision -recurse")
+			_, err := rm.ExecuteCommand("powershell.exe Remove-Item c:\\provision -recurse")
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -44,12 +45,12 @@ var _ = Describe("WinRM Remote Manager", func() {
 	Context("ExecuteCommand", func() {
 
 		It("succeeds when powershell command returns a zero exit code", func() {
-			err := rm.ExecuteCommand("powershell.exe ls c:\\windows")
+			_, err := rm.ExecuteCommand("powershell.exe ls c:\\windows")
 			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("fails when powershell command returns non-zero exit code", func() {
-			err := rm.ExecuteCommand("powershell.exe notRealCommand")
+			_, err := rm.ExecuteCommand("powershell.exe notRealCommand")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(HavePrefix("powershell encountered an issue: "))
 		})

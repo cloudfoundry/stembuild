@@ -2,9 +2,9 @@
 package constructfakes
 
 import (
-	"sync"
+	sync "sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	construct "github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeConstructMessenger struct {
@@ -24,13 +24,21 @@ type FakeConstructMessenger struct {
 	enableWinRMSucceededMutex       sync.RWMutex
 	enableWinRMSucceededArgsForCall []struct {
 	}
-	ExecuteScriptStartedStub        func()
-	executeScriptStartedMutex       sync.RWMutex
-	executeScriptStartedArgsForCall []struct {
+	ExecutePostRebootScriptStartedStub        func()
+	executePostRebootScriptStartedMutex       sync.RWMutex
+	executePostRebootScriptStartedArgsForCall []struct {
 	}
-	ExecuteScriptSucceededStub        func()
-	executeScriptSucceededMutex       sync.RWMutex
-	executeScriptSucceededArgsForCall []struct {
+	ExecutePostRebootScriptSucceededStub        func()
+	executePostRebootScriptSucceededMutex       sync.RWMutex
+	executePostRebootScriptSucceededArgsForCall []struct {
+	}
+	ExecuteSetupScriptStartedStub        func()
+	executeSetupScriptStartedMutex       sync.RWMutex
+	executeSetupScriptStartedArgsForCall []struct {
+	}
+	ExecuteSetupScriptSucceededStub        func()
+	executeSetupScriptSucceededMutex       sync.RWMutex
+	executeSetupScriptSucceededArgsForCall []struct {
 	}
 	ExtractArtifactsStartedStub        func()
 	extractArtifactsStartedMutex       sync.RWMutex
@@ -39,6 +47,14 @@ type FakeConstructMessenger struct {
 	ExtractArtifactsSucceededStub        func()
 	extractArtifactsSucceededMutex       sync.RWMutex
 	extractArtifactsSucceededArgsForCall []struct {
+	}
+	RebootHasFinishedStub        func()
+	rebootHasFinishedMutex       sync.RWMutex
+	rebootHasFinishedArgsForCall []struct {
+	}
+	RebootHasStartedStub        func()
+	rebootHasStartedMutex       sync.RWMutex
+	rebootHasStartedArgsForCall []struct {
 	}
 	RestartInProgressStub        func()
 	restartInProgressMutex       sync.RWMutex
@@ -173,50 +189,96 @@ func (fake *FakeConstructMessenger) EnableWinRMSucceededCalls(stub func()) {
 	fake.EnableWinRMSucceededStub = stub
 }
 
-func (fake *FakeConstructMessenger) ExecuteScriptStarted() {
-	fake.executeScriptStartedMutex.Lock()
-	fake.executeScriptStartedArgsForCall = append(fake.executeScriptStartedArgsForCall, struct {
+func (fake *FakeConstructMessenger) ExecutePostRebootScriptStarted() {
+	fake.executePostRebootScriptStartedMutex.Lock()
+	fake.executePostRebootScriptStartedArgsForCall = append(fake.executePostRebootScriptStartedArgsForCall, struct {
 	}{})
-	fake.recordInvocation("ExecuteScriptStarted", []interface{}{})
-	fake.executeScriptStartedMutex.Unlock()
-	if fake.ExecuteScriptStartedStub != nil {
-		fake.ExecuteScriptStartedStub()
+	fake.recordInvocation("ExecutePostRebootScriptStarted", []interface{}{})
+	fake.executePostRebootScriptStartedMutex.Unlock()
+	if fake.ExecutePostRebootScriptStartedStub != nil {
+		fake.ExecutePostRebootScriptStartedStub()
 	}
 }
 
-func (fake *FakeConstructMessenger) ExecuteScriptStartedCallCount() int {
-	fake.executeScriptStartedMutex.RLock()
-	defer fake.executeScriptStartedMutex.RUnlock()
-	return len(fake.executeScriptStartedArgsForCall)
+func (fake *FakeConstructMessenger) ExecutePostRebootScriptStartedCallCount() int {
+	fake.executePostRebootScriptStartedMutex.RLock()
+	defer fake.executePostRebootScriptStartedMutex.RUnlock()
+	return len(fake.executePostRebootScriptStartedArgsForCall)
 }
 
-func (fake *FakeConstructMessenger) ExecuteScriptStartedCalls(stub func()) {
-	fake.executeScriptStartedMutex.Lock()
-	defer fake.executeScriptStartedMutex.Unlock()
-	fake.ExecuteScriptStartedStub = stub
+func (fake *FakeConstructMessenger) ExecutePostRebootScriptStartedCalls(stub func()) {
+	fake.executePostRebootScriptStartedMutex.Lock()
+	defer fake.executePostRebootScriptStartedMutex.Unlock()
+	fake.ExecutePostRebootScriptStartedStub = stub
 }
 
-func (fake *FakeConstructMessenger) ExecuteScriptSucceeded() {
-	fake.executeScriptSucceededMutex.Lock()
-	fake.executeScriptSucceededArgsForCall = append(fake.executeScriptSucceededArgsForCall, struct {
+func (fake *FakeConstructMessenger) ExecutePostRebootScriptSucceeded() {
+	fake.executePostRebootScriptSucceededMutex.Lock()
+	fake.executePostRebootScriptSucceededArgsForCall = append(fake.executePostRebootScriptSucceededArgsForCall, struct {
 	}{})
-	fake.recordInvocation("ExecuteScriptSucceeded", []interface{}{})
-	fake.executeScriptSucceededMutex.Unlock()
-	if fake.ExecuteScriptSucceededStub != nil {
-		fake.ExecuteScriptSucceededStub()
+	fake.recordInvocation("ExecutePostRebootScriptSucceeded", []interface{}{})
+	fake.executePostRebootScriptSucceededMutex.Unlock()
+	if fake.ExecutePostRebootScriptSucceededStub != nil {
+		fake.ExecutePostRebootScriptSucceededStub()
 	}
 }
 
-func (fake *FakeConstructMessenger) ExecuteScriptSucceededCallCount() int {
-	fake.executeScriptSucceededMutex.RLock()
-	defer fake.executeScriptSucceededMutex.RUnlock()
-	return len(fake.executeScriptSucceededArgsForCall)
+func (fake *FakeConstructMessenger) ExecutePostRebootScriptSucceededCallCount() int {
+	fake.executePostRebootScriptSucceededMutex.RLock()
+	defer fake.executePostRebootScriptSucceededMutex.RUnlock()
+	return len(fake.executePostRebootScriptSucceededArgsForCall)
 }
 
-func (fake *FakeConstructMessenger) ExecuteScriptSucceededCalls(stub func()) {
-	fake.executeScriptSucceededMutex.Lock()
-	defer fake.executeScriptSucceededMutex.Unlock()
-	fake.ExecuteScriptSucceededStub = stub
+func (fake *FakeConstructMessenger) ExecutePostRebootScriptSucceededCalls(stub func()) {
+	fake.executePostRebootScriptSucceededMutex.Lock()
+	defer fake.executePostRebootScriptSucceededMutex.Unlock()
+	fake.ExecutePostRebootScriptSucceededStub = stub
+}
+
+func (fake *FakeConstructMessenger) ExecuteSetupScriptStarted() {
+	fake.executeSetupScriptStartedMutex.Lock()
+	fake.executeSetupScriptStartedArgsForCall = append(fake.executeSetupScriptStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ExecuteSetupScriptStarted", []interface{}{})
+	fake.executeSetupScriptStartedMutex.Unlock()
+	if fake.ExecuteSetupScriptStartedStub != nil {
+		fake.ExecuteSetupScriptStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ExecuteSetupScriptStartedCallCount() int {
+	fake.executeSetupScriptStartedMutex.RLock()
+	defer fake.executeSetupScriptStartedMutex.RUnlock()
+	return len(fake.executeSetupScriptStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ExecuteSetupScriptStartedCalls(stub func()) {
+	fake.executeSetupScriptStartedMutex.Lock()
+	defer fake.executeSetupScriptStartedMutex.Unlock()
+	fake.ExecuteSetupScriptStartedStub = stub
+}
+
+func (fake *FakeConstructMessenger) ExecuteSetupScriptSucceeded() {
+	fake.executeSetupScriptSucceededMutex.Lock()
+	fake.executeSetupScriptSucceededArgsForCall = append(fake.executeSetupScriptSucceededArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ExecuteSetupScriptSucceeded", []interface{}{})
+	fake.executeSetupScriptSucceededMutex.Unlock()
+	if fake.ExecuteSetupScriptSucceededStub != nil {
+		fake.ExecuteSetupScriptSucceededStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) ExecuteSetupScriptSucceededCallCount() int {
+	fake.executeSetupScriptSucceededMutex.RLock()
+	defer fake.executeSetupScriptSucceededMutex.RUnlock()
+	return len(fake.executeSetupScriptSucceededArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) ExecuteSetupScriptSucceededCalls(stub func()) {
+	fake.executeSetupScriptSucceededMutex.Lock()
+	defer fake.executeSetupScriptSucceededMutex.Unlock()
+	fake.ExecuteSetupScriptSucceededStub = stub
 }
 
 func (fake *FakeConstructMessenger) ExtractArtifactsStarted() {
@@ -263,6 +325,52 @@ func (fake *FakeConstructMessenger) ExtractArtifactsSucceededCalls(stub func()) 
 	fake.extractArtifactsSucceededMutex.Lock()
 	defer fake.extractArtifactsSucceededMutex.Unlock()
 	fake.ExtractArtifactsSucceededStub = stub
+}
+
+func (fake *FakeConstructMessenger) RebootHasFinished() {
+	fake.rebootHasFinishedMutex.Lock()
+	fake.rebootHasFinishedArgsForCall = append(fake.rebootHasFinishedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("RebootHasFinished", []interface{}{})
+	fake.rebootHasFinishedMutex.Unlock()
+	if fake.RebootHasFinishedStub != nil {
+		fake.RebootHasFinishedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) RebootHasFinishedCallCount() int {
+	fake.rebootHasFinishedMutex.RLock()
+	defer fake.rebootHasFinishedMutex.RUnlock()
+	return len(fake.rebootHasFinishedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) RebootHasFinishedCalls(stub func()) {
+	fake.rebootHasFinishedMutex.Lock()
+	defer fake.rebootHasFinishedMutex.Unlock()
+	fake.RebootHasFinishedStub = stub
+}
+
+func (fake *FakeConstructMessenger) RebootHasStarted() {
+	fake.rebootHasStartedMutex.Lock()
+	fake.rebootHasStartedArgsForCall = append(fake.rebootHasStartedArgsForCall, struct {
+	}{})
+	fake.recordInvocation("RebootHasStarted", []interface{}{})
+	fake.rebootHasStartedMutex.Unlock()
+	if fake.RebootHasStartedStub != nil {
+		fake.RebootHasStartedStub()
+	}
+}
+
+func (fake *FakeConstructMessenger) RebootHasStartedCallCount() int {
+	fake.rebootHasStartedMutex.RLock()
+	defer fake.rebootHasStartedMutex.RUnlock()
+	return len(fake.rebootHasStartedArgsForCall)
+}
+
+func (fake *FakeConstructMessenger) RebootHasStartedCalls(stub func()) {
+	fake.rebootHasStartedMutex.Lock()
+	defer fake.rebootHasStartedMutex.Unlock()
+	fake.RebootHasStartedStub = stub
 }
 
 func (fake *FakeConstructMessenger) RestartInProgress() {
@@ -491,14 +599,22 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.enableWinRMStartedMutex.RUnlock()
 	fake.enableWinRMSucceededMutex.RLock()
 	defer fake.enableWinRMSucceededMutex.RUnlock()
-	fake.executeScriptStartedMutex.RLock()
-	defer fake.executeScriptStartedMutex.RUnlock()
-	fake.executeScriptSucceededMutex.RLock()
-	defer fake.executeScriptSucceededMutex.RUnlock()
+	fake.executePostRebootScriptStartedMutex.RLock()
+	defer fake.executePostRebootScriptStartedMutex.RUnlock()
+	fake.executePostRebootScriptSucceededMutex.RLock()
+	defer fake.executePostRebootScriptSucceededMutex.RUnlock()
+	fake.executeSetupScriptStartedMutex.RLock()
+	defer fake.executeSetupScriptStartedMutex.RUnlock()
+	fake.executeSetupScriptSucceededMutex.RLock()
+	defer fake.executeSetupScriptSucceededMutex.RUnlock()
 	fake.extractArtifactsStartedMutex.RLock()
 	defer fake.extractArtifactsStartedMutex.RUnlock()
 	fake.extractArtifactsSucceededMutex.RLock()
 	defer fake.extractArtifactsSucceededMutex.RUnlock()
+	fake.rebootHasFinishedMutex.RLock()
+	defer fake.rebootHasFinishedMutex.RUnlock()
+	fake.rebootHasStartedMutex.RLock()
+	defer fake.rebootHasStartedMutex.RUnlock()
 	fake.restartInProgressMutex.RLock()
 	defer fake.restartInProgressMutex.RUnlock()
 	fake.shutdownCompletedMutex.RLock()
