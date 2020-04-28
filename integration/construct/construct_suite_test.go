@@ -115,7 +115,7 @@ func waitForVmToBeReady() {
 
 	vmReady := false
 	for !vmReady {
-		_, err := rm.ExecuteCommand("powershell.exe ls c:\\windows")
+		_, err := rm.ExecuteCommand("powershell.exe \"ls c:\\windows 1>$null\"")
 		vmReady = err == nil
 	}
 }
