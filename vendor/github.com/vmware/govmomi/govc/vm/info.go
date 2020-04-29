@@ -88,8 +88,12 @@ func (cmd *info) Usage() string {
 func (cmd *info) Description() string {
 	return `Display info for VM.
 
+The '-r' flag displays additional info for CPU, memory and storage usage,
+along with the VM's Datastores, Networks and PortGroups.
+
 Examples:
   govc vm.info $vm
+  govc vm.info -r $vm | grep Network:
   govc vm.info -json $vm
   govc find . -type m -runtime.powerState poweredOn | xargs govc vm.info`
 }
@@ -180,7 +184,8 @@ type infoResult struct {
 // collectReferences builds a unique set of MORs to the set of VirtualMachines,
 // so we can collect properties in a single call for each reference type {host,datastore,network}.
 func (r *infoResult) collectReferences(pc *property.Collector, ctx context.Context) error {
-	r.entities = make(map[types.ManagedObjectReference]string) // MOR -> Name map
+	// MOR -> Name map
+	r.entities = make(map[types.ManagedObjectReference]string)
 
 	var host []mo.HostSystem
 	var network []mo.Network

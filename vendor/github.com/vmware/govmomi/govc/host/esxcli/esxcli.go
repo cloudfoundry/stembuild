@@ -91,6 +91,12 @@ func (cmd *esxcli) Run(ctx context.Context, f *flag.FlagSet) error {
 	}
 
 	if len(res.Values) == 0 {
+		if res.String != "" {
+			fmt.Print(res.String)
+			if !strings.HasSuffix(res.String, "\n") {
+				fmt.Println()
+			}
+		}
 		return nil
 	}
 
@@ -142,7 +148,10 @@ func (cmd *esxcli) formatSimple(w io.Writer, res *Response) {
 
 func (cmd *esxcli) formatTable(w io.Writer, res *Response) {
 	fields := res.Info.Hints.Fields()
-
+	if len(fields) == 0 {
+		cmd.formatSimple(w, res)
+		return
+	}
 	tw := tabwriter.NewWriter(w, len(fields), 0, 2, ' ', 0)
 
 	var hr []string

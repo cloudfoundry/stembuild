@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"sort"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/vmware/govmomi/vim25/types"
@@ -43,16 +44,24 @@ type Command interface {
 	Run(ctx context.Context, f *flag.FlagSet) error
 }
 
-func generalHelp(w io.Writer) {
-	fmt.Fprintf(w, "Usage of %s:\n", os.Args[0])
-
-	cmds := []string{}
+func generalHelp(w io.Writer, filter string) {
+	var cmds, matches []string
 	for name := range commands {
 		cmds = append(cmds, name)
+
+		if filter != "" && strings.Contains(name, filter) {
+			matches = append(matches, name)
+		}
+	}
+
+	if len(matches) == 0 {
+		fmt.Fprintf(w, "Usage of %s:\n", os.Args[0])
+	} else {
+		fmt.Fprintf(w, "%s: command '%s' not found, did you mean:\n", os.Args[0], filter)
+		cmds = matches
 	}
 
 	sort.Strings(cmds)
-
 	for _, name := range cmds {
 		fmt.Fprintf(w, "  %s\n", name)
 	}
@@ -117,7 +126,7 @@ func Run(args []string) int {
 	var err error
 
 	if len(args) == 0 {
-		generalHelp(hw)
+		generalHelp(hw, "")
 		return rc
 	}
 
@@ -130,7 +139,7 @@ func Run(args []string) int {
 	cmd, ok := commands[name]
 	if !ok {
 		hwrc(name)
-		generalHelp(hw)
+		generalHelp(hw, name)
 		return rc
 	}
 
@@ -170,7 +179,12 @@ error:
 		}
 		commandHelp(hw, args[0], cmd, fs)
 	} else {
-		fmt.Fprintf(os.Stderr, "%s: %s\n", os.Args[0], err)
+		if x, ok := err.(interface{ ExitCode() int }); ok {
+			// propagate exit code, e.g. from guest.run
+			rc = x.ExitCode()
+		} else {
+			fmt.Fprintf(os.Stderr, "%s: %s\n", os.Args[0], err)
+		}
 	}
 
 	_ = clientLogout(ctx, cmd)

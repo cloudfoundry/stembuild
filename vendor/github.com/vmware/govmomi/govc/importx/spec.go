@@ -30,9 +30,28 @@ import (
 )
 
 var (
-	allDiskProvisioningOptions   = []string{"thin", "monolithicSparse", "monolithicFlat", "twoGbMaxExtentSparse", "twoGbMaxExtentFlat", "seSparse", "eagerZeroedThick", "thick", "sparse", "flat"}
-	allIPAllocationPolicyOptions = []string{"dhcpPolicy", "transientPolicy", "fixedPolicy", "fixedAllocatedPolicy"}
-	allIPProtocolOptions         = []string{"IPv4", "IPv6"}
+	allDiskProvisioningOptions = []string{
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeFlat),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeMonolithicSparse),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeMonolithicFlat),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeTwoGbMaxExtentSparse),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeTwoGbMaxExtentFlat),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeThin),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeThick),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeSeSparse),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeEagerZeroedThick),
+		string(types.OvfCreateImportSpecParamsDiskProvisioningTypeSparse),
+	}
+	allIPAllocationPolicyOptions = []string{
+		string(types.VAppIPAssignmentInfoIpAllocationPolicyDhcpPolicy),
+		string(types.VAppIPAssignmentInfoIpAllocationPolicyTransientPolicy),
+		string(types.VAppIPAssignmentInfoIpAllocationPolicyFixedPolicy),
+		string(types.VAppIPAssignmentInfoIpAllocationPolicyFixedAllocatedPolicy),
+	}
+	allIPProtocolOptions = []string{
+		string(types.VAppIPAssignmentInfoProtocolsIPv4),
+		string(types.VAppIPAssignmentInfoProtocolsIPv6),
+	}
 )
 
 type spec struct {
@@ -73,9 +92,9 @@ func (cmd *spec) Run(ctx context.Context, f *flag.FlagSet) error {
 	if len(fpath) > 0 {
 		switch path.Ext(fpath) {
 		case ".ovf":
-			cmd.Archive = &FileArchive{path: fpath}
+			cmd.Archive = &FileArchive{Path: fpath}
 		case "", ".ova":
-			cmd.Archive = &TapeArchive{path: fpath}
+			cmd.Archive = &TapeArchive{Path: fpath}
 			fpath = "*.ovf"
 		default:
 			return fmt.Errorf("invalid file extension %s", path.Ext(fpath))

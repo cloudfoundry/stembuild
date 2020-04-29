@@ -6,13 +6,8 @@ import (
 	"reflect"
 	"strconv"
 	"text/tabwriter"
-	"time"
 
 	"github.com/kr/text"
-)
-
-var (
-	timeType = reflect.TypeOf(time.Time{})
 )
 
 type formatter struct {
@@ -153,11 +148,6 @@ func (p *printer) printValue(v reflect.Value, showType, quote bool) {
 		writeByte(p, '}')
 	case reflect.Struct:
 		t := v.Type()
-		if t == timeType {
-			io.WriteString(p, "time.Now()")
-			break
-		}
-
 		if v.CanAddr() {
 			addr := v.UnsafeAddr()
 			vis := visit{addr, t}
@@ -182,9 +172,6 @@ func (p *printer) printValue(v reflect.Value, showType, quote bool) {
 			for i := 0; i < v.NumField(); i++ {
 				showTypeInStruct := true
 				if f := t.Field(i); f.Name != "" {
-					if f.Name == "DynamicData" {
-						continue
-					}
 					io.WriteString(pp, f.Name)
 					writeByte(pp, ':')
 					if expand {
@@ -229,10 +216,6 @@ func (p *printer) printValue(v reflect.Value, showType, quote bool) {
 			io.WriteString(p, "nil")
 			break
 		}
-		if !showType {
-			// we always want the type for slices
-			io.WriteString(p, t.String())
-		}
 		writeByte(p, '{')
 		expand := !canInline(v.Type())
 		pp := p
@@ -260,23 +243,10 @@ func (p *printer) printValue(v reflect.Value, showType, quote bool) {
 			io.WriteString(p, v.Type().String())
 			io.WriteString(p, ")(nil)")
 		} else {
-			switch e.Kind() {
-			case reflect.Bool:
-				io.WriteString(p, fmt.Sprintf("types.NewBool(%v)", e.Bool()))
-			case reflect.Int32:
-				io.WriteString(p, fmt.Sprintf("types.NewInt32(%v)", e.Int()))
-			case reflect.Int64:
-				io.WriteString(p, fmt.Sprintf("types.NewInt64(%v)", e.Int()))
-			default:
-				if e.Kind() == reflect.Struct && e.Type() == timeType {
-					io.WriteString(p, "types.NewTime(time.Now())")
-				} else {
-					pp := *p
-					pp.depth++
-					writeByte(pp, '&')
-					pp.printValue(e, true, true)
-				}
-			}
+			pp := *p
+			pp.depth++
+			writeByte(pp, '&')
+			pp.printValue(e, true, true)
 		}
 	case reflect.Chan:
 		x := v.Pointer()

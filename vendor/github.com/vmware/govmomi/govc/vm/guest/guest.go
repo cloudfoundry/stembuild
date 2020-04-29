@@ -26,6 +26,8 @@ import (
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/guest/toolbox"
 	"github.com/vmware/govmomi/object"
+	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 type GuestFlag struct {
@@ -41,6 +43,12 @@ func newGuestFlag(ctx context.Context) (*GuestFlag, context.Context) {
 	f.VirtualMachineFlag, ctx = flags.NewVirtualMachineFlag(ctx)
 	f.AuthFlag, ctx = newAuthFlag(ctx)
 	return f, ctx
+}
+
+func newGuestProcessFlag(ctx context.Context) (*GuestFlag, context.Context) {
+	f, gctx := newGuestFlag(ctx)
+	f.proc = true
+	return f, gctx
 }
 
 func (flag *GuestFlag) Register(ctx context.Context, f *flag.FlagSet) {
@@ -73,10 +81,26 @@ func (flag *GuestFlag) Toolbox() (*toolbox.Client, error) {
 		return nil, err
 	}
 
+	vm, err := flag.VirtualMachine()
+	if err != nil {
+		return nil, err
+	}
+
+	family := ""
+	var props mo.VirtualMachine
+	err = vm.Properties(context.Background(), vm.Reference(), []string{"guest.guestFamily"}, &props)
+	if err != nil {
+		return nil, err
+	}
+	if props.Guest != nil {
+		family = props.Guest.GuestFamily
+	}
+
 	return &toolbox.Client{
 		ProcessManager: pm,
 		FileManager:    fm,
 		Authentication: flag.Auth(),
+		GuestFamily:    types.VirtualMachineGuestOsFamily(family),
 	}, nil
 }
 

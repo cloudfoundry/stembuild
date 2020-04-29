@@ -119,11 +119,11 @@ func (cmd *ovfx) Run(ctx context.Context, f *flag.FlagSet) error {
 
 	if !cmd.force {
 		if _, err = os.Stat(target); err == nil {
-			return fmt.Errorf("File already exists: %s", target)
+			return fmt.Errorf("file already exists: %s", target)
 		}
 	}
 
-	if err = os.MkdirAll(cmd.dest, 0755); err != nil {
+	if err = os.MkdirAll(cmd.dest, 0750); err != nil {
 		return err
 	}
 

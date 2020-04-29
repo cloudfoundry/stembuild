@@ -43,7 +43,7 @@ func (cmd *ova) Run(ctx context.Context, f *flag.FlagSet) error {
 		return err
 	}
 
-	archive := &TapeArchive{path: fpath}
+	archive := &TapeArchive{Path: fpath}
 	archive.Client = cmd.Client
 
 	cmd.Archive = archive
@@ -54,7 +54,7 @@ func (cmd *ova) Run(ctx context.Context, f *flag.FlagSet) error {
 	}
 
 	vm := object.NewVirtualMachine(cmd.Client, *moref)
-	return cmd.Deploy(vm)
+	return cmd.Deploy(vm, cmd.OutputFlag)
 }
 
 func (cmd *ova) Import(fpath string) (*types.ManagedObjectReference, error) {

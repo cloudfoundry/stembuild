@@ -25,6 +25,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -233,12 +234,22 @@ func (flag *ClientFlag) Register(ctx context.Context, f *flag.FlagSet) {
 
 func (flag *ClientFlag) Process(ctx context.Context) error {
 	return flag.ProcessOnce(func() error {
-		if err := flag.DebugFlag.Process(ctx); err != nil {
+		err := flag.DebugFlag.Process(ctx)
+		if err != nil {
 			return err
 		}
 
 		if flag.url == nil {
 			return errors.New("specify an " + cDescr)
+		}
+
+		flag.username, err = session.Secret(flag.username)
+		if err != nil {
+			return err
+		}
+		flag.password, err = session.Secret(flag.password)
+		if err != nil {
+			return err
 		}
 
 		// Override username if set
@@ -277,7 +288,7 @@ func (flag *ClientFlag) configure(sc *soap.Client) (soap.RoundTripper, error) {
 	if flag.cert != "" {
 		cert, err := tls.LoadX509KeyPair(flag.cert, flag.key)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s=%q %s=%q: %s", envCertificate, flag.cert, envPrivateKey, flag.key, err)
 		}
 
 		sc.SetCertificate(cert)
@@ -462,6 +473,13 @@ func (flag *ClientFlag) newClient() (*vim25.Client, error) {
 	// Set client, since we didn't pass it in the constructor
 	c.Client = sc
 
+	if flag.vimVersion == "" {
+		if err = c.UseServiceVersion(); err != nil {
+			return nil, err
+		}
+		flag.vimVersion = c.Version
+	}
+
 	if err := flag.Login(ctx, c); err != nil {
 		return nil, err
 	}
@@ -503,16 +521,16 @@ func apiVersionValid(c *vim25.Client, minVersionString string) error {
 
 	realVersion, err := ParseVersion(apiVersion)
 	if err != nil {
-		return fmt.Errorf("Error parsing API version %q: %s", apiVersion, err)
+		return fmt.Errorf("error parsing API version %q: %s", apiVersion, err)
 	}
 
 	minVersion, err := ParseVersion(minVersionString)
 	if err != nil {
-		return fmt.Errorf("Error parsing %s=%q: %s", envMinAPIVersion, minVersionString, err)
+		return fmt.Errorf("error parsing %s=%q: %s", envMinAPIVersion, minVersionString, err)
 	}
 
 	if !minVersion.Lte(realVersion) {
-		err = fmt.Errorf("Require API version %q, connected to API version %q (set %s to override)",
+		err = fmt.Errorf("require API version %q, connected to API version %q (set %s to override)",
 			minVersionString,
 			c.ServiceContent.About.ApiVersion,
 			envMinAPIVersion)
@@ -592,7 +610,11 @@ func (flag *ClientFlag) WithRestClient(ctx context.Context, f func(*rest.Client)
 		}
 	}
 
-	defer c.Logout(ctx)
+	defer func() {
+		if err := c.Logout(ctx); err != nil {
+			log.Printf("user logout error: %v", err)
+		}
+	}()
 
 	return f(c)
 }
@@ -621,12 +643,7 @@ func (flag *ClientFlag) Environ(extra bool) []string {
 	u.Fragment = ""
 	u.RawQuery = ""
 
-	val := u.String()
-	prefix := "https://"
-	if strings.HasPrefix(val, prefix) {
-		val = val[len(prefix):]
-	}
-	add(envURL, val)
+	add(envURL, strings.TrimPrefix(u.String(), "https://"))
 
 	keys := []string{
 		envCertificate,
