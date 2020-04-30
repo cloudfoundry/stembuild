@@ -17,9 +17,9 @@ const WinRmTimeout = 60 * time.Second
 
 type WinRM struct {
 	host          string
-	username      string
-	password      string
-	clientFactory WinRMClientFactoryI
+	username string
+	password string
+	ClientFactory WinRMClientFactoryI
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . WinRMClient
@@ -33,8 +33,12 @@ type WinRMClientFactoryI interface {
 	Build(timeout time.Duration) (WinRMClient, error)
 }
 
-func NewWinRM(host string, username string, password string, clientFactory WinRMClientFactoryI) RemoteManager {
-	return &WinRM{host, username, password, clientFactory}
+func NewWinRM(host string, username string, password string) RemoteManager {
+	return &WinRM{host: host,
+		username: username,
+		password: password,
+		ClientFactory: NewWinRmClientFactory(host, username, password),
+	}
 }
 
 func (w *WinRM) CanReachVM() error {
@@ -47,7 +51,7 @@ func (w *WinRM) CanReachVM() error {
 }
 
 func (w *WinRM) CanLoginVM() error {
-	winrmClient, err := w.clientFactory.Build(WinRmTimeout)
+	winrmClient, err := w.ClientFactory.Build(WinRmTimeout)
 
 	if err != nil {
 		return fmt.Errorf("failed to create winrm client: %s", err)
@@ -63,7 +67,7 @@ func (w *WinRM) CanLoginVM() error {
 }
 
 func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error {
-	client, err := winrmcp.New(w.host, &winrmcp.Config{
+	client, err := winrmcp.New(w.host,  &winrmcp.Config{
 		Auth:                  winrmcp.Auth{User: w.username, Password: w.password},
 		Https:                 false,
 		Insecure:              true,
@@ -98,7 +102,7 @@ func (w *WinRM) ExtractArchive(source, destination string) error {
 }
 
 func (w *WinRM) ExecuteCommandWithTimeout(command string, timeout time.Duration) (int, error) {
-	client, err := w.clientFactory.Build(timeout)
+	client, err := w.ClientFactory.Build(timeout)
 	if err != nil {
 		return -1, err
 	}

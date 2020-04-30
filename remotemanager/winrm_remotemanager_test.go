@@ -47,9 +47,17 @@ func setupTestServer() *Server {
 }
 
 var _ = Describe("WinRM RemoteManager", func() {
+	var (
+		main remotemanager.WinRM
+		fakeClientFactory *remotemanagerfakes.FakeWinRMClientFactoryI
+	)
+
+	BeforeEach(func() {
+		fakeClientFactory = new(remotemanagerfakes.FakeWinRMClientFactoryI)
+		main = remotemanager.WinRM{ClientFactory: fakeClientFactory}
+	})
 	Describe("ExecuteCommand", func() {
 		var (
-			fakeClientFactory *remotemanagerfakes.FakeWinRMClientFactoryI
 			fakeClient        *remotemanagerfakes.FakeWinRMClient
 		)
 
@@ -57,13 +65,11 @@ var _ = Describe("WinRM RemoteManager", func() {
 			BeforeEach(func() {
 				fakeClient = &remotemanagerfakes.FakeWinRMClient{}
 				fakeClient.RunReturns(0, nil)
-				fakeClientFactory = &remotemanagerfakes.FakeWinRMClientFactoryI{}
 				fakeClientFactory.BuildReturns(fakeClient, nil)
 			})
 
 			It("returns an exit code of 0 and no error", func() {
-				remoteManager := remotemanager.NewWinRM("foo", "bar", "baz", fakeClientFactory)
-				exitCode, err := remoteManager.ExecuteCommand("foobar")
+				exitCode, err := main.ExecuteCommand("foobar")
 
 				Expect(err).NotTo(HaveOccurred())
 				Expect(exitCode).To(Equal(0))
@@ -84,7 +90,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 				})
 
 				It("returns the command's nonzero exit code and errors", func() {
-					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz", fakeClientFactory)
+					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz")
 					exitCode, err := remoteManager.ExecuteCommand("foobar")
 
 					Expect(err).To(HaveOccurred())
@@ -97,7 +103,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 				})
 
 				It("returns the command's nonzero exit code and errors", func() {
-					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz", fakeClientFactory)
+					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz")
 					exitCode, err := remoteManager.ExecuteCommand("foobar")
 
 					Expect(err).To(HaveOccurred())
@@ -110,7 +116,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 				})
 
 				It("returns the command's exit code and errors", func() {
-					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz", fakeClientFactory)
+					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz")
 					exitCode, err := remoteManager.ExecuteCommand("foobar")
 
 					Expect(err).To(HaveOccurred())
@@ -150,7 +156,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
 			winRMClientFactory.BuildReturns(winRMClient, nil)
 
-			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass", winRMClientFactory)
+			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass")
 
 			err := remotemanager.CanLoginVM()
 
@@ -161,7 +167,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 			buildError := errors.New("unable to build a client")
 			winRMClientFactory.BuildReturns(nil, buildError)
 
-			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass", winRMClientFactory)
+			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass")
 			err := remotemanager.CanLoginVM()
 
 			Expect(err).To(HaveOccurred())
@@ -173,7 +179,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 			winRMClientFactory.BuildReturns(winRMClient, nil)
 
 			winRMClient.CreateShellReturns(nil, errors.New("some shell creation error"))
-			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass", winRMClientFactory)
+			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass")
 
 			err := remotemanager.CanLoginVM()
 
