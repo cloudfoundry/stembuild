@@ -2,12 +2,12 @@
 package factoryfakes
 
 import (
-	context "context"
-	sync "sync"
+	"context"
+	"sync"
 
 	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
-	vim25 "github.com/vmware/govmomi/vim25"
-	soap "github.com/vmware/govmomi/vim25/soap"
+	"github.com/vmware/govmomi/vim25"
+	"github.com/vmware/govmomi/vim25/soap"
 )
 
 type FakeVim25ClientCreator struct {

@@ -2,10 +2,10 @@
 package constructfakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	construct "github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeScriptExecutorI struct {

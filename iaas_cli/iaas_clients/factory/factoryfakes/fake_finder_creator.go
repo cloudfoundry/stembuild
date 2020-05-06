@@ -2,11 +2,11 @@
 package factoryfakes
 
 import (
-	sync "sync"
+	"sync"
 
 	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
-	find "github.com/vmware/govmomi/find"
-	vim25 "github.com/vmware/govmomi/vim25"
+	"github.com/vmware/govmomi/find"
+	"github.com/vmware/govmomi/vim25"
 )
 
 type FakeFinderCreator struct {

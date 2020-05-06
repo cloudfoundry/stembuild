@@ -2,7 +2,7 @@ package poller
 
 import "time"
 
-//go:generate counterfeiter . PollerI
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PollerI
 type PollerI interface {
 	Poll(duration time.Duration, loopFunc func() (bool, error)) error
 }

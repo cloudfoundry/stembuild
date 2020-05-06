@@ -16,7 +16,7 @@ import (
 	"strconv"
 )
 
-////go:generate counterfeiter . FakeShell
+////go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . FakeShell
 //type FakeShell interface {
 //	 Close() error
 //}

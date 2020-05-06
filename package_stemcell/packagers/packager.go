@@ -10,12 +10,12 @@ type Packager struct {
 	stemcellGenerator StemcellGenerator
 }
 
-//go:generate counterfeiter . Source
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Source
 type Source interface {
 	ArtifactReader() (io.Reader, error)
 }
 
-//go:generate counterfeiter . StemcellGenerator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . StemcellGenerator
 type StemcellGenerator interface {
 	Generate(reader io.Reader) error
 }

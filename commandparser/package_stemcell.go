@@ -15,26 +15,26 @@ import (
 	"github.com/google/subcommands"
 )
 
-//go:generate counterfeiter . OSAndVersionGetter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . OSAndVersionGetter
 type OSAndVersionGetter interface {
 	GetVersion() string
 	GetVersionWithPatchNumber(string) string
 	GetOs() string
 }
 
-//go:generate counterfeiter . PackagerFactory
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PackagerFactory
 type PackagerFactory interface {
 	Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logLevel int, color bool) (Packager, error)
 }
 
-//go:generate counterfeiter . Packager
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Packager
 type Packager interface {
 	Package() error
 	ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error
 	ValidateSourceParameters() error
 }
 
-//go:generate counterfeiter . PackagerMessenger
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PackagerMessenger
 type PackagerMessenger interface {
 	InvalidOutputConfig(error)
 	CannotCreatePackager(error)

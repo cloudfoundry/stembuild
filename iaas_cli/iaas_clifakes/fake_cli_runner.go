@@ -2,9 +2,9 @@
 package iaas_clifakes
 
 import (
-	sync "sync"
+	"sync"
 
-	iaas_cli "github.com/cloudfoundry-incubator/stembuild/iaas_cli"
+	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
 )
 
 type FakeCliRunner struct {

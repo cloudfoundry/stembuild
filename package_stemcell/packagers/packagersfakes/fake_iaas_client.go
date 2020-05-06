@@ -2,9 +2,9 @@
 package packagersfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	packagers "github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
 )
 
 type FakeIaasClient struct {

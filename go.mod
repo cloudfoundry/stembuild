@@ -12,6 +12,7 @@ require (
 	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.1.1
 	github.com/masterzen/winrm v0.0.0-20190308153735-1d17eaf15943
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
 	github.com/mitchellh/mapstructure v1.3.0 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/onsi/ginkgo v1.12.0
@@ -20,4 +21,5 @@ require (
 	github.com/vmware/govmomi v0.22.2
 	github.com/xtreme-gabelan-satchithanantham/winrmcp v0.0.0-20181120153252-ed85582c6e81
 	golang.org/x/sys v0.0.0-20200427175716-29b57079015a
+	golang.org/x/tools v0.0.0-20200505023115-26f46d2f7ef8 // indirect
 )

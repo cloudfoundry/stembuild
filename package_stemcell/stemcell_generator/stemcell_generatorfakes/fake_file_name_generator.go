@@ -2,9 +2,9 @@
 package stemcell_generatorfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	stemcell_generator "github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
 )
 
 type FakeFileNameGenerator struct {

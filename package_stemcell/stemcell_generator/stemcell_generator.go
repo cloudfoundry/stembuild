@@ -5,17 +5,17 @@ import (
 	"io"
 )
 
-//go:generate counterfeiter . ManifestGenerator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ManifestGenerator
 type ManifestGenerator interface {
 	Manifest(reader io.Reader) (io.Reader, error)
 }
 
-//go:generate counterfeiter . FileNameGenerator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . FileNameGenerator
 type FileNameGenerator interface {
 	FileName() string
 }
 
-//go:generate counterfeiter . TarWriter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . TarWriter
 type TarWriter interface {
 	Write(string, ...io.Reader) error
 }

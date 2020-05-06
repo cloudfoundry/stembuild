@@ -31,7 +31,7 @@ func (rw *RebootWaiter) WaitForRebootFinished() error {
 	return nil
 }
 
-//go:generate counterfeiter . RebootCheckerI
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RebootCheckerI
 type RebootCheckerI interface {
 	RebootHasFinished() (bool, error)
 }

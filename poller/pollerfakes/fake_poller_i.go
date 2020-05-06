@@ -2,10 +2,10 @@
 package pollerfakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	poller "github.com/cloudfoundry-incubator/stembuild/poller"
+	"github.com/cloudfoundry-incubator/stembuild/poller"
 )
 
 type FakePollerI struct {

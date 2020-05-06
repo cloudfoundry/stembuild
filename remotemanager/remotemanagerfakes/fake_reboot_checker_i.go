@@ -2,9 +2,9 @@
 package remotemanagerfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	remotemanager "github.com/cloudfoundry-incubator/stembuild/remotemanager"
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
 
 type FakeRebootCheckerI struct {

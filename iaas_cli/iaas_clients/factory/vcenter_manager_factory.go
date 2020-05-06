@@ -14,7 +14,7 @@ import (
 	"github.com/vmware/govmomi/vim25/soap"
 )
 
-//go:generate counterfeiter . Vim25ClientCreator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Vim25ClientCreator
 type Vim25ClientCreator interface {
 	NewClient(ctx context.Context, rt soap.RoundTripper) (*vim25.Client, error)
 }
@@ -32,7 +32,7 @@ func (g *ClientCreator) NewClient(ctx context.Context, rt soap.RoundTripper) (*v
 	return vimClient, nil
 }
 
-//go:generate counterfeiter . FinderCreator
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . FinderCreator
 type FinderCreator interface {
 	NewFinder(client *vim25.Client, all bool) *find.Finder
 }

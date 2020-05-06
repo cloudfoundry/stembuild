@@ -2,10 +2,10 @@
 package remotemanagerfakes
 
 import (
-	sync "sync"
-	time "time"
+	"sync"
+	"time"
 
-	remotemanager "github.com/cloudfoundry-incubator/stembuild/remotemanager"
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 )
 
 type FakeWinRMClientFactoryI struct {

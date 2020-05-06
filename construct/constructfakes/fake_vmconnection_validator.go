@@ -2,9 +2,9 @@
 package constructfakes
 
 import (
-	sync "sync"
+	"sync"
 
-	construct "github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry-incubator/stembuild/construct"
 )
 
 type FakeVMConnectionValidator struct {

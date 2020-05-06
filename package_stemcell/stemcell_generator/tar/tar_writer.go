@@ -14,7 +14,7 @@ func NewTarWriter() *TarWriter {
 	return &TarWriter{}
 }
 
-//go:generate counterfeiter . Tarable
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Tarable
 type Tarable interface {
 	io.Reader
 	Size() int64

@@ -2,10 +2,10 @@
 package stemcell_generatorfakes
 
 import (
-	io "io"
-	sync "sync"
+	"io"
+	"sync"
 
-	stemcell_generator "github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
+	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
 )
 
 type FakeManifestGenerator struct {

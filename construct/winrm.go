@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry-incubator/stembuild/assets"
 )
 
-//go:generate counterfeiter . zipUnarchiver
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . zipUnarchiver
 type zipUnarchiver interface {
 	Unzip(fileArchive []byte, file string) ([]byte, error)
 }
