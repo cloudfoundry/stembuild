@@ -30,8 +30,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeRebootWaiter          *constructfakes.FakeRebootWaiterI
 		fakeScriptExecutor        *constructfakes.FakeScriptExecutorI
 	)
-	const encodedCommand = "JAAoAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIAB3AGkAbgAzADIAXwBvAHAAZQByAGEAdABpAG4AZwBzAHkAcwB0AGUAbQApAC4AVwBpAG4AMwAyAFMAaAB1AHQAZABvAHcAbgAoADAAKQA="
-
+	const rawLogoffCommand = `&{If([string]::IsNullOrEmpty($(Get-WmiObject win32_computersystem).username)) {Write-Host "No users logged in." } Else {Write-Host "Logging out user."; $(Get-WmiObject win32_operatingsystem).Win32Shutdown(0) 1> $null}}`
 	BeforeEach(func() {
 		fakeRemoteManager = &remotemanagerfakes.FakeRemoteManager{}
 		fakeVcenterClient = &constructfakes.FakeIaasClient{}
@@ -274,67 +273,20 @@ var _ = Describe("construct_helpers", func() {
 
 		Describe("logs out users", func() {
 			It("returns success when active user is logged out", func() {
-				fakeVcenterClient.StartReturnsOnCall(0, "5555", nil)
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).ToNot(HaveOccurred())
+				command := fakeRemoteManager.ExecuteCommandArgsForCall(0)
 
-				vmPath, user, pass, command, args := fakeVcenterClient.StartArgsForCall(0)
-
-				Expect(command).To(Equal("C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"))
-				Expect(vmPath).To(Equal("fakeVmPath"))
-				// maybe use contains instead of equal
-				Expect(args).To(Equal([]string{"-EncodedCommand", encodedCommand}))
-				Expect(user).To(Equal("fakeUser"))
-				Expect(pass).To(Equal("fakePass"))
-				Expect(fakeVcenterClient.StartCallCount()).To(Equal(1))
-
-				vmInventoryPath, username, password, pid := fakeVcenterClient.WaitForExitArgsForCall(0)
-				Expect(vmInventoryPath).To(Equal("fakeVmPath"))
-				Expect(username).To(Equal("fakeUser"))
-				Expect(password).To(Equal("fakePass"))
-				Expect(pid).To(Equal("5555"))
+				encodedCommand := EncodePowershellCommand([]byte(rawLogoffCommand))
+				Expect(command).To(ContainSubstring(encodedCommand))
+				Expect(command).To(ContainSubstring("powershell.exe -EncodedCommand "))
 
 				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
 				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(1))
 			})
-			It("returns failure when it does not log out active user because cannot perform Start command", func() {
-				logoutError := errors.New("start command failure")
-				fakeVcenterClient.StartReturns("", logoutError)
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-
-				Expect(fakeVcenterClient.StartCallCount()).To(Equal(1))
-				Expect(err.Error()).To(Equal("failed to log out remote user: " + logoutError.Error()))
-
-				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
-				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(0))
-			})
-			It("returns failure when it does not log out active user because cannot get exit code", func() {
-				logoutError := errors.New("wait for exit error")
-				fakeVcenterClient.WaitForExitReturns(0, logoutError)
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-
-				Expect(fakeVcenterClient.WaitForExitCallCount()).To(Equal(1))
-				Expect(err.Error()).To(Equal("failed to log out remote user: " + logoutError.Error()))
-
-				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
-				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(0))
-			})
-			It("returns failure when it does not log out active user because non-zero exit code", func() {
-				fakeVcenterClient.WaitForExitReturns(1, nil)
-
-				err := vmConstruct.PrepareVM()
-				Expect(err).To(HaveOccurred())
-
-				Expect(fakeVcenterClient.WaitForExitCallCount()).To(Equal(1))
-				Expect(err.Error()).To(Equal("failed to log out remote user: " + "logout process on VM exited with code 1"))
-
-				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
-				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(0))
+			It("returns failure when something goes wrong", func() {
+				Fail("not implemented.")
 			})
 		})
 

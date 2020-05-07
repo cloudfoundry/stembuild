@@ -263,24 +263,16 @@ func (c *VMConstruct) extractArchive() error {
 }
 
 func (c *VMConstruct) logOutUsers() error {
-	failureString := "failed to log out remote user: %s"
-	rawLogoffCommand := []byte("$(Get-WmiObject win32_operatingsystem).Win32Shutdown(0)")
-	logoffCommand := encodePowershellCommand(rawLogoffCommand)
+	failureString := "log out remote user failed with exit code %d: %s"
+	rawLogoffCommand := `&{If([string]::IsNullOrEmpty($(Get-WmiObject win32_computersystem).username)) {Write-Host "No users logged in." } Else {Write-Host "Logging out user."; $(Get-WmiObject win32_operatingsystem).Win32Shutdown(0) 1> $null}}`
+	logoffCommand := EncodePowershellCommand([]byte(rawLogoffCommand))
 
-	pid, err := c.Client.Start(c.vmInventoryPath, c.vmUsername, c.vmPassword, powershell, "-EncodedCommand", logoffCommand)
-
-	if err != nil {
-		return fmt.Errorf(failureString, err)
-	}
-
-	exitCode, err := c.Client.WaitForExit(c.vmInventoryPath, c.vmUsername, c.vmPassword, pid)
+	exitCode, err := c.remoteManager.ExecuteCommand("powershell.exe -EncodedCommand " + logoffCommand)
 
 	if err != nil {
-		return fmt.Errorf(failureString, err)
+		return fmt.Errorf(failureString, exitCode, err)
 	}
-	if exitCode != 0 {
-		return fmt.Errorf(failureString, fmt.Sprintf("logout process on VM exited with code %d", exitCode))
-	}
+
 	return nil
 }
 
@@ -330,7 +322,7 @@ func (c *VMConstruct) isPoweredOff(duration time.Duration) error {
 	return err
 }
 
-func encodePowershellCommand(command []byte) string {
+func EncodePowershellCommand(command []byte) string {
 	runeCommand := []rune(string(command))
 	utf16Command := utf16.Encode(runeCommand)
 	byteCommand := &bytes.Buffer{}

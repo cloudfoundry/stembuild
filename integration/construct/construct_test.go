@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-const(
+const (
 	vCenterUsername = "USER"
 	vCenterPassword = "PASS"
 )
