@@ -53,14 +53,6 @@ type FakeConstructMessenger struct {
 	extractArtifactsSucceededMutex       sync.RWMutex
 	extractArtifactsSucceededArgsForCall []struct {
 	}
-	RebootHasFinishedStub        func()
-	rebootHasFinishedMutex       sync.RWMutex
-	rebootHasFinishedArgsForCall []struct {
-	}
-	RebootHasStartedStub        func()
-	rebootHasStartedMutex       sync.RWMutex
-	rebootHasStartedArgsForCall []struct {
-	}
 	LogOutUsersStartedStub        func()
 	logOutUsersStartedMutex       sync.RWMutex
 	logOutUsersStartedArgsForCall []struct {
@@ -69,9 +61,13 @@ type FakeConstructMessenger struct {
 	logOutUsersSucceededMutex       sync.RWMutex
 	logOutUsersSucceededArgsForCall []struct {
 	}
-	RestartInProgressStub        func()
-	restartInProgressMutex       sync.RWMutex
-	restartInProgressArgsForCall []struct {
+	RebootHasFinishedStub        func()
+	rebootHasFinishedMutex       sync.RWMutex
+	rebootHasFinishedArgsForCall []struct {
+	}
+	RebootHasStartedStub        func()
+	rebootHasStartedMutex       sync.RWMutex
+	rebootHasStartedArgsForCall []struct {
 	}
 	ShutdownCompletedStub        func()
 	shutdownCompletedMutex       sync.RWMutex
@@ -421,9 +417,6 @@ func (fake *FakeConstructMessenger) LogOutUsersSucceededCalls(stub func()) {
 	fake.LogOutUsersSucceededStub = stub
 }
 
-func (fake *FakeConstructMessenger) RestartInProgress() {
-	fake.restartInProgressMutex.Lock()
-	fake.restartInProgressArgsForCall = append(fake.restartInProgressArgsForCall, struct {
 func (fake *FakeConstructMessenger) RebootHasFinished() {
 	fake.rebootHasFinishedMutex.Lock()
 	fake.rebootHasFinishedArgsForCall = append(fake.rebootHasFinishedArgsForCall, struct {
@@ -714,8 +707,6 @@ func (fake *FakeConstructMessenger) Invocations() map[string][][]interface{} {
 	defer fake.logOutUsersStartedMutex.RUnlock()
 	fake.logOutUsersSucceededMutex.RLock()
 	defer fake.logOutUsersSucceededMutex.RUnlock()
-	fake.restartInProgressMutex.RLock()
-	defer fake.restartInProgressMutex.RUnlock()
 	fake.rebootHasFinishedMutex.RLock()
 	defer fake.rebootHasFinishedMutex.RUnlock()
 	fake.rebootHasStartedMutex.RLock()

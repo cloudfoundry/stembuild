@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 	"io/ioutil"
 	"os"
 	"os/exec"
