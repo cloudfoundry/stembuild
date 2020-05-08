@@ -33,13 +33,13 @@ var _ = Describe("stembuild construct", func() {
 	const constructOutputTimeout = 60 * time.Second
 	Context("run successfully", func() {
 
-		FIt("successfully exits when vm becomes powered off", func() {
+		It("successfully exits when vm becomes powered off", func() {
 			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 			Expect(err).ToNot(HaveOccurred())
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			shutdownTimeout := 3 * time.Minute
+			shutdownTimeout := 7 * time.Minute
 			Eventually(session, shutdownTimeout).Should(Exit(0))
 		})
 
@@ -88,35 +88,27 @@ var _ = Describe("stembuild construct", func() {
 		})
 
 		It("successfully runs even when a user has logged in", func() {
-			loggedOnVmIp := "10.74.34.88"
-			loggedOnVmInventoryPath := "/canada-dc/vm/calgary/construct-integration-test88"
-			loggedOnVmSnapshot := "logged-on"
+			fmt.Printf("Logged on VM for test has IP: %s\n", conf.LoggedInVMIP)
 
-			// revert snapshot
-			snapshotCommand := []string{
-				"snapshot.revert",
-				fmt.Sprintf("-vm.ipath=%s", loggedOnVmInventoryPath),
-				fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
-				loggedOnVmSnapshot,
-			}
+			restoreSnapshot(conf.LoggedInVMIpath, conf.LoggedInVMSnapshot)
 
-			fmt.Printf("Reverting VM Snapshot: %s", loggedOnVmSnapshot)
-			runIgnoringOutput(snapshotCommand)
+			waitForVmToBeReady(conf.LoggedInVMIP, conf.VMUsername, conf.VMPassword)
+			time.Sleep(30 * time.Second)
 
 			//run normal stembuild construct command, like we do in prev. test
 			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
 			Expect(err).ToNot(HaveOccurred())
 
 			session := helpers.Stembuild(stembuildExecutable, "construct",
-				"-vm-ip", loggedOnVmIp,
+				"-vm-ip", conf.LoggedInVMIP,
 				"-vm-username", conf.VMUsername,
 				"-vm-password", conf.VMPassword,
 				"-vcenter-url", conf.VCenterURL,
 				"-vcenter-username", conf.VCenterUsername,
 				"-vcenter-password", conf.VCenterPassword,
-				"-vm-inventory-path", loggedOnVmInventoryPath)
+				"-vm-inventory-path", conf.LoggedInVMIpath)
 
-			shutdownTimeout := 3 * time.Minute
+			shutdownTimeout := 5 * time.Minute
 			Eventually(session, shutdownTimeout).Should(Exit(0))
 			Expect(err).NotTo(HaveOccurred())
 		})

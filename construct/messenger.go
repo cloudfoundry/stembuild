@@ -94,11 +94,11 @@ func (m *Messenger) UploadFileSucceeded() {
 }
 
 func (m *Messenger) LogOutUsersStarted() {
-	m.out.Write([]byte("\nAttempting to logout any remote users..."))
+	m.out.Write([]byte("\nAttempting to logout any remote users...\n"))
 }
 
 func (m *Messenger) LogOutUsersSucceeded() {
-	m.out.Write([]byte("Logged out remote users\n"))
+	m.out.Write([]byte("\nLogged out remote users\n"))
 }
 
 func (m *Messenger) OSVersionFileCreationFailed(errorMessage string) {

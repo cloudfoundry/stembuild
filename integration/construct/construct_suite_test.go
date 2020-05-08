@@ -69,6 +69,9 @@ const (
 	vcenterStembuildPasswordVariable  = "VCENTER_STEMBUILD_PASSWORD"
 	StembuildVersionVariable          = "STEMBUILD_VERSION"
 	VmSnapshotName                    = "integration-test-snapshot"
+	LoggedInVmIpVariable              = "LOGOUT_INTEGRATION_TEST_VM_IP"
+	LoggedInVmIpathVariable           = "LOGOUT_INTEGRATION_TEST_VM_INVENTORY_PATH"
+	LoggedInVmSnapshotName            = "logged-in"
 )
 
 var (
@@ -83,23 +86,26 @@ var (
 )
 
 type config struct {
-	TargetIP        string
-	NetworkGateway  string
-	SubnetMask      string
-	VMUsername      string
-	VMPassword      string
-	VMName          string
-	VMNetwork       string
-	VCenterURL      string
-	VCenterUsername string
-	VCenterPassword string
-	VMInventoryPath string
+	TargetIP           string
+	NetworkGateway     string
+	SubnetMask         string
+	VMUsername         string
+	VMPassword         string
+	VMName             string
+	VMNetwork          string
+	VCenterURL         string
+	VCenterUsername    string
+	VCenterPassword    string
+	VMInventoryPath    string
+	LoggedInVMIP       string
+	LoggedInVMIpath    string
+	LoggedInVMSnapshot string
 }
 
-func restoreSnapshot(snapshotName string) {
+func restoreSnapshot(vmIpath string, snapshotName string) {
 	snapshotCommand := []string{
 		"snapshot.revert",
-		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
+		fmt.Sprintf("-vm.ipath=%s", vmIpath),
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
 		snapshotName,
 	}
@@ -107,9 +113,9 @@ func restoreSnapshot(snapshotName string) {
 	runIgnoringOutput(snapshotCommand)
 }
 
-func waitForVmToBeReady() {
-	clientFactory := remotemanager.NewWinRmClientFactory(conf.TargetIP, conf.VMUsername, conf.VMPassword)
-	rm := remotemanager.NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword, clientFactory)
+func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
+	clientFactory := remotemanager.NewWinRmClientFactory(vmIp, vmUsername, vmPassword)
+	rm := remotemanager.NewWinRM(vmIp, vmUsername, vmPassword, clientFactory)
 	Expect(rm).ToNot(BeNil())
 
 	vmReady := false
@@ -120,9 +126,9 @@ func waitForVmToBeReady() {
 }
 
 var _ = BeforeEach(func() {
-	restoreSnapshot(VmSnapshotName)
+	restoreSnapshot(conf.VMInventoryPath, VmSnapshotName)
 
-	waitForVmToBeReady()
+	waitForVmToBeReady(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 	time.Sleep(30 * time.Second)
 })
 
@@ -198,6 +204,9 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	vmPassword := envMustExist(VMPasswordVariable)
 	existingVMIP := os.Getenv(ExistingVmIPVariable)
 	userProvidedIP := os.Getenv(UserProvidedIPVariable)
+	loggedInVmIp := envMustExist(LoggedInVmIpVariable)
+	loggedInVmInventoryPath := envMustExist(LoggedInVmIpathVariable)
+	loggedInVmSnapshot := LoggedInVmSnapshotName
 	vCenterUrl := envMustExist(vcenterBaseURLVariable)
 	vcenterFolder := envMustExist(vcenterFolderVariable)
 	vmNamePrefix := envMustExist(VMNamePrefixVariable)
@@ -215,12 +224,15 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	conf = config{
-		TargetIP:        existingVMIP,
-		VMUsername:      vmUsername,
-		VMPassword:      vmPassword,
-		VCenterURL:      vCenterUrl,
-		VCenterUsername: vCenterStembuildUser,
-		VCenterPassword: vCenterStembuildPassword,
+		TargetIP:           existingVMIP,
+		VMUsername:         vmUsername,
+		VMPassword:         vmPassword,
+		VCenterURL:         vCenterUrl,
+		VCenterUsername:    vCenterStembuildUser,
+		VCenterPassword:    vCenterStembuildPassword,
+		LoggedInVMIP:       loggedInVmIp,
+		LoggedInVMIpath:    loggedInVmInventoryPath,
+		LoggedInVMSnapshot: loggedInVmSnapshot,
 	}
 
 	if existingVMIP == "" {

@@ -273,6 +273,7 @@ var _ = Describe("construct_helpers", func() {
 
 		Describe("logs out users", func() {
 			It("returns success when active user is logged out", func() {
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(0, 0, nil)
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).ToNot(HaveOccurred())
@@ -285,8 +286,17 @@ var _ = Describe("construct_helpers", func() {
 				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
 				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(1))
 			})
-			It("returns failure when something goes wrong", func() {
-				Fail("not implemented.")
+			It("returns failure when it fails to execute a logout", func() {
+				errorMessage := "Unable to execute command"
+				fakeRemoteManager.ExecuteCommandReturnsOnCall(0, 1, errors.New(errorMessage))
+
+				err := vmConstruct.PrepareVM()
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(errorMessage))
+				Expect(err.Error()).To(ContainSubstring("log out remote user failed with exit code 1"))
+
+				Expect(fakeMessenger.LogOutUsersStartedCallCount()).To(Equal(1))
+				Expect(fakeMessenger.LogOutUsersSucceededCallCount()).To(Equal(0))
 			})
 		})
 
