@@ -40,7 +40,7 @@ func NewWinRM(host string, username string, password string, clientFactory WinRM
 func (w *WinRM) CanReachVM() error {
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", w.host, WinRmPort), time.Duration(time.Second*60))
 	if err != nil {
-		return fmt.Errorf("host %s is unreachable. Please ensure WinRM is enabled and the IP is correct", w.host)
+		return fmt.Errorf("host %s is unreachable. Please ensure WinRM is enabled and the IP is correct: %s", w.host, err)
 	}
 	conn.Close()
 	return nil
