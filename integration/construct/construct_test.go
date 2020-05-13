@@ -31,6 +31,7 @@ var _ = Describe("stembuild construct", func() {
 	})
 
 	const constructOutputTimeout = 60 * time.Second
+	const shutdownTimeout = 5 * time.Minute
 	Context("run successfully", func() {
 
 		It("successfully exits when vm becomes powered off", func() {
@@ -39,7 +40,6 @@ var _ = Describe("stembuild construct", func() {
 
 			session := helpers.Stembuild(stembuildExecutable, "construct", "-vm-ip", conf.TargetIP, "-vm-username", conf.VMUsername, "-vm-password", conf.VMPassword, "-vcenter-url", conf.VCenterURL, "-vcenter-username", conf.VCenterUsername, "-vcenter-password", conf.VCenterPassword, "-vm-inventory-path", conf.VMInventoryPath)
 
-			shutdownTimeout := 7 * time.Minute
 			Eventually(session, shutdownTimeout).Should(Exit(0))
 		})
 
@@ -108,7 +108,6 @@ var _ = Describe("stembuild construct", func() {
 				"-vcenter-password", conf.VCenterPassword,
 				"-vm-inventory-path", conf.LoggedInVMIpath)
 
-			shutdownTimeout := 5 * time.Minute
 			Eventually(session, shutdownTimeout).Should(Exit(0))
 			Expect(err).NotTo(HaveOccurred())
 		})

@@ -27,6 +27,8 @@ export EXISTING_VM_IP=
 # export SUBNET_MASK=
 # export VM_NAME_PREFIX=
 # export VM_FOLDER=
+# export LOGOUT_INTEGRATION_TEST_VM_IP
+# export LOGOUT_INTEGRATION_TEST_VM_INVENTORY_PATH
 
 # If using a local OVA file, provide OVA_FILE
 # export OVA_FILE=/tmp/1709.ova
