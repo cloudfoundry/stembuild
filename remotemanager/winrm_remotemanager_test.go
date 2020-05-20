@@ -48,7 +48,7 @@ func setupTestServer() *Server {
 
 var _ = Describe("WinRM RemoteManager", func() {
 	var (
-		main remotemanager.WinRM
+		main              remotemanager.WinRM
 		fakeClientFactory *remotemanagerfakes.FakeWinRMClientFactoryI
 	)
 
@@ -56,9 +56,13 @@ var _ = Describe("WinRM RemoteManager", func() {
 		fakeClientFactory = new(remotemanagerfakes.FakeWinRMClientFactoryI)
 		main = remotemanager.WinRM{ClientFactory: fakeClientFactory}
 	})
+
+	It("winrm_remotemanager's CanReachVM function uses the right port", func() {
+		Fail("missing test coverage")
+	})
 	Describe("ExecuteCommand", func() {
 		var (
-			fakeClient        *remotemanagerfakes.FakeWinRMClient
+			fakeClient *remotemanagerfakes.FakeWinRMClient
 		)
 
 		Context("when a command runs successfully", func() {
@@ -80,7 +84,6 @@ var _ = Describe("WinRM RemoteManager", func() {
 
 			BeforeEach(func() {
 				fakeClient = &remotemanagerfakes.FakeWinRMClient{}
-				fakeClientFactory = &remotemanagerfakes.FakeWinRMClientFactoryI{}
 				fakeClientFactory.BuildReturns(fakeClient, nil)
 			})
 
@@ -90,10 +93,9 @@ var _ = Describe("WinRM RemoteManager", func() {
 				})
 
 				It("returns the command's nonzero exit code and errors", func() {
-					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz")
-					exitCode, err := remoteManager.ExecuteCommand("foobar")
+					exitCode, err := main.ExecuteCommand("foobar")
 
-					Expect(err).To(HaveOccurred())
+					Expect(err).To(MatchError("command error"))
 					Expect(exitCode).To(Equal(2))
 				})
 			})
@@ -103,10 +105,9 @@ var _ = Describe("WinRM RemoteManager", func() {
 				})
 
 				It("returns the command's nonzero exit code and errors", func() {
-					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz")
-					exitCode, err := remoteManager.ExecuteCommand("foobar")
+					exitCode, err := main.ExecuteCommand("foobar")
 
-					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(ContainSubstring(remotemanager.PowershellExecutionErrorMessage))
 					Expect(exitCode).To(Equal(2))
 				})
 			})
@@ -116,10 +117,9 @@ var _ = Describe("WinRM RemoteManager", func() {
 				})
 
 				It("returns the command's exit code and errors", func() {
-					remoteManager := remotemanager.NewWinRM("foo", "bar", "baz")
-					exitCode, err := remoteManager.ExecuteCommand("foobar")
+					exitCode, err := main.ExecuteCommand("foobar")
 
-					Expect(err).To(HaveOccurred())
+					Expect(err).To(MatchError("command error"))
 					Expect(exitCode).To(Equal(0))
 				})
 			})
@@ -131,7 +131,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 			testServer  *Server
 			winRMClient *winrm.Client
 		)
-
+		// Change scope to apply only to "returns nil if shell can be created" test
 		BeforeEach(func() {
 			testServer = setupTestServer()
 
@@ -148,40 +148,40 @@ var _ = Describe("WinRM RemoteManager", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		var _ = AfterEach(func() {
+		AfterEach(func() {
 			testServer.Close()
 		})
 
 		It("returns nil if shell can be created", func() {
-			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
-			winRMClientFactory.BuildReturns(winRMClient, nil)
+			testServerURL, err := url.Parse(testServer.URL())
+			Expect(err).NotTo(HaveOccurred())
 
-			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass")
+			testServerPort, err := strconv.Atoi(testServerURL.Port())
+			Expect(err).NotTo(HaveOccurred())
 
-			err := remotemanager.CanLoginVM()
+			subject := remotemanager.NewWinRM(testServerURL.Hostname(), testServerPort, "", "")
+			fakeClientFactory.BuildReturns(winRMClient, nil)
+
+			err = subject.CanLoginVM()
 
 			Expect(err).NotTo(HaveOccurred())
+			Fail("scope the  before each to just this test")
 		})
 		It("returns error if winrmclient cannot be created", func() {
-			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
 			buildError := errors.New("unable to build a client")
-			winRMClientFactory.BuildReturns(nil, buildError)
+			fakeClientFactory.BuildReturns(nil, buildError)
 
-			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass")
-			err := remotemanager.CanLoginVM()
+			err := main.CanLoginVM()
 
-			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(fmt.Errorf("failed to create winrm client: %s", buildError)))
 		})
 		It("returns error if shell cannot be created", func() {
-			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
 			winRMClient := new(remotemanagerfakes.FakeWinRMClient)
-			winRMClientFactory.BuildReturns(winRMClient, nil)
+			fakeClientFactory.BuildReturns(winRMClient, nil)
 
 			winRMClient.CreateShellReturns(nil, errors.New("some shell creation error"))
-			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass")
 
-			err := remotemanager.CanLoginVM()
+			err := main.CanLoginVM()
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(fmt.Errorf("failed to create winrm shell: some shell creation error")))

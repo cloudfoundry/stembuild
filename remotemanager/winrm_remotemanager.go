@@ -17,8 +17,9 @@ const WinRmTimeout = 60 * time.Second
 
 type WinRM struct {
 	host          string
-	username string
-	password string
+	port          int
+	username      string
+	password      string
 	ClientFactory WinRMClientFactoryI
 }
 
@@ -33,11 +34,12 @@ type WinRMClientFactoryI interface {
 	Build(timeout time.Duration) (WinRMClient, error)
 }
 
-func NewWinRM(host string, username string, password string) RemoteManager {
+func NewWinRM(host string, port int, username string, password string) RemoteManager {
 	return &WinRM{host: host,
-		username: username,
-		password: password,
-		ClientFactory: NewWinRmClientFactory(host, username, password),
+		username:      username,
+		password:      password,
+		port:          port,
+		ClientFactory: NewWinRmClientFactory(host, port, username, password),
 	}
 }
 
@@ -67,7 +69,7 @@ func (w *WinRM) CanLoginVM() error {
 }
 
 func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error {
-	client, err := winrmcp.New(w.host,  &winrmcp.Config{
+	client, err := winrmcp.New(w.host, &winrmcp.Config{
 		Auth:                  winrmcp.Auth{User: w.username, Password: w.password},
 		Https:                 false,
 		Insecure:              true,

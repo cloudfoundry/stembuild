@@ -114,8 +114,8 @@ func restoreSnapshot(vmIpath string, snapshotName string) {
 }
 
 func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
-	clientFactory := remotemanager.NewWinRmClientFactory(vmIp, vmUsername, vmPassword)
-	rm := remotemanager.NewWinRM(vmIp, vmUsername, vmPassword, clientFactory)
+	//clientFactory := remotemanager.NewWinRmClientFactory(vmIp, remotemanager.WinRmPort, vmUsername, vmPassword)
+	rm := remotemanager.NewWinRM(vmIp, remotemanager.WinRmPort, vmUsername, vmPassword)
 	Expect(rm).ToNot(BeNil())
 
 	vmReady := false

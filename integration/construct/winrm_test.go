@@ -13,8 +13,7 @@ var _ = Describe("WinRM Remote Manager", func() {
 	var rm RemoteManager
 
 	BeforeEach(func() {
-		clientFactory := NewWinRmClientFactory(conf.TargetIP, conf.VMUsername, conf.VMPassword)
-		rm = NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword, clientFactory)
+		rm = NewWinRM(conf.TargetIP, WinRmPort, conf.VMUsername, conf.VMPassword)
 		Expect(rm).ToNot(BeNil())
 	})
 
