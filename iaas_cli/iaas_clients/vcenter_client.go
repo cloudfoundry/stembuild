@@ -199,7 +199,7 @@ func (c *VcenterClient) buildGovcCommand(args ...string) []string {
 }
 
 func (c *VcenterClient) IsPoweredOff(vmInventoryPath string) (bool, error) {
-	args := c.buildGovcCommand("vm.info", "-vm.ipath", vmInventoryPath)
+	args := c.buildGovcCommand("vm.info", vmInventoryPath)
 	out, exitCode, err := c.Runner.RunWithOutput(args)
 	if exitCode != 0 {
 		return false, fmt.Errorf("vcenter_client - failed to get vm info, govc exit code: %d", exitCode)
