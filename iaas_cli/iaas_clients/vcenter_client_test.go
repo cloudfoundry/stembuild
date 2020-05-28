@@ -417,7 +417,7 @@ ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 
 			expectedArgs := []string{"vm.info", "-u", credentialUrl, "validVMPath"}
 			runner.RunWithOutputReturns("some result", 0, nil)
 
-			_ , err := vcenterClient.IsPoweredOff("validVMPath")
+			_, err := vcenterClient.IsPoweredOff("validVMPath")
 			argsForRun := runner.RunWithOutputArgsForCall(0)
 
 			Expect(err).To(Not(HaveOccurred()))
