@@ -16,8 +16,8 @@ const WinRmPort = 5985
 const WinRmTimeout = 60 * time.Second
 
 type WinRM struct {
-	host          string
-	port          int
+	Host          string
+	Port          int
 	username      string
 	password      string
 	ClientFactory WinRMClientFactoryI

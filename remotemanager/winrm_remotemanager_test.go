@@ -57,9 +57,34 @@ var _ = Describe("WinRM RemoteManager", func() {
 		main = remotemanager.WinRM{ClientFactory: fakeClientFactory}
 	})
 
-	It("winrm_remotemanager's CanReachVM function uses the right port", func() {
+	It("NewWinRM initializes a WinRM instance with provided port", func() {
 		Fail("missing test coverage")
 	})
+
+	It("winrm_remotemanager's CanReachVM function uses the right port", func() {
+		//Fail("missing test coverage")
+		testServer := setupTestServer()
+
+		//portProvided := 9876
+		//remotemanager.NewWinRM(testServer.)
+		main.Host = testServer.URL()
+
+		testServerURL, err := url.Parse(testServer.URL())
+		Expect(err).NotTo(HaveOccurred())
+
+		main.Host = testServerURL.Hostname()
+		main.Port, err = strconv.Atoi(testServerURL.Port())
+		Expect(err).NotTo(HaveOccurred())
+
+		main.CanReachVM()
+
+		//testServer.AppendHandlers(R)
+		//Expect(portUsed).To(Equal(portProvided))
+		Fail("incomplete test. todo: " +
+			"assert that we see a test server connection on the expected port," +
+			"e.g. via an testServer handler, or by accessing an unhandled request.")
+	})
+
 	Describe("ExecuteCommand", func() {
 		var (
 			fakeClient *remotemanagerfakes.FakeWinRMClient
