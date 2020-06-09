@@ -71,28 +71,6 @@ function InstallCFFeatures
     }
 }
 
-function Enable-HyperV
-{
-    try
-    {
-        $osVersion2019Regex = "10\.0\.17763\..+"
-        $osVersion = Get-OSVersionString
-        if ($osVersion -match $osVersion2019Regex) {
-            Enable-Hyper-V
-            Write-Log "Successfully enabled HyperV"
-        }
-        else {
-            Write-Log "Did not enable HyperV because OS Version is not 2019"
-        }
-
-    }
-    catch [Exception]
-    {
-        Write-Log $_.Exception.Message
-        Write-Log "Failed to enable HyperV. See 'c:\provision\log.log' for more info."
-        throw $_.Exception
-    }
-}
 
 function InstallCFCell
 {

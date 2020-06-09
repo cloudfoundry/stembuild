@@ -12,7 +12,6 @@ Describe "ProvisionVM" {
         Mock Enable-SSHD { $provisionerCalls.Add("Enable-SSHD") }
         Mock Install-SecurityPoliciesAndRegistries { $provisionerCalls.Add("Install-SecurityPoliciesAndRegistries") }
         Mock Extract-LGPO { $provisionerCalls.Add("Extract-LGPO") }
-        Mock Enable-HyperV { $provisionerCalls.Add("Enable-HyperV") }
         Mock Install-WUCerts { $provisionerCalls.Add("Install-WUCerts") }
         Mock Create-VersionFile { $provisionerCalls.Add("Create-VersionFile") }
 
@@ -35,11 +34,6 @@ Describe "ProvisionVM" {
         ProvisionVM
 
         Assert-MockCalled -CommandName InstallCFFeatures
-    }
-    It "enables Hyper-V when possible" {
-        ProvisionVM
-
-        Assert-MockCalled -CommandName Enable-HyperV
     }
 
     It "copy PSModules is the first provisioner called" {
