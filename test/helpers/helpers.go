@@ -171,7 +171,7 @@ func ReadFile(name string) (string, error) {
 }
 
 func BuildStembuild(version string) (string, error) {
-	command := exec.Command("make", "build")
+	command := exec.Command("make", "build-integration")
 	command.Env = AddOrReplaceEnvironment(os.Environ(), "STEMBUILD_VERSION", version)
 
 	_, b, _, _ := runtime.Caller(0)
