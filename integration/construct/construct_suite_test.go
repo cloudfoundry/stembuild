@@ -32,8 +32,7 @@ func TestConstruct(t *testing.T) {
 }
 
 const (
-
-	VMNameVariable					  = "VM_NAME"
+	VMNameVariable                    = "VM_NAME"
 	VMUsernameVariable                = "VM_USERNAME"
 	VMPasswordVariable                = "VM_PASSWORD"
 	ExistingVmIPVariable              = "EXISTING_VM_IP"
@@ -168,7 +167,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		LoggedInVMIP:       loggedInVmIp,
 		LoggedInVMIpath:    loggedInVmInventoryPath,
 		LoggedInVMSnapshot: loggedInVmSnapshot,
-		VMName:				vmName,
+		VMName:             vmName,
 		VMInventoryPath:    vmInventoryPath,
 	}
 
