@@ -43,10 +43,12 @@ const (
 	vcenterStembuildUsernameVariable  = "VCENTER_USERNAME"
 	vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
 	StembuildVersionVariable          = "STEMBUILD_VERSION"
+	BoshPsmodulesRepoVariable         = "BOSH_PSMODULES_REPO"
 	VmSnapshotName                    = "integration-test-snapshot"
 	LoggedInVmIpVariable              = "LOGOUT_INTEGRATION_TEST_VM_IP"
 	LoggedInVmIpathVariable           = "LOGOUT_INTEGRATION_TEST_VM_INVENTORY_PATH"
 	LoggedInVmSnapshotName            = "logged-in"
+	powershell                        = "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 )
 
 var (
@@ -102,8 +104,6 @@ func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
 
 var _ = BeforeEach(func() {
 	restoreSnapshot(conf.VMInventoryPath, VmSnapshotName)
-
-	waitForVmToBeReady(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 	time.Sleep(30 * time.Second)
 })
 
@@ -129,6 +129,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	existingVM = false
 	var err error
 
+	boshPsmodulesRepo := envMustExist(BoshPsmodulesRepoVariable)
 	stembuildVersion := envMustExist(StembuildVersionVariable)
 	stembuildExecutable, err = helpers.BuildStembuild(stembuildVersion)
 	Expect(err).NotTo(HaveOccurred())
@@ -170,13 +171,40 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		VMName:             vmName,
 		VMInventoryPath:    vmInventoryPath,
 	}
-
+	
 	powerOnVM()
+	enableWinRM(boshPsmodulesRepo)
 	createVMSnapshot(VmSnapshotName)
 
 	return nil
 }, func(_ []byte) {
 })
+
+func enableWinRM(repoPath string) {
+	fmt.Println("Enabling WinRM on the base image before integration tests...")
+	uploadCommand := []string{
+		"guest.upload",
+		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		fmt.Sprintf("-l=%s:%s", conf.VMUsername, conf.VMPassword),
+		filepath.Join(repoPath, "modules", "BOSH.WinRM", "BOSH.WinRM.psm1"),
+		"C:\\Windows\\Temp\\BOSH.WinRM.psm1",
+	}
+	runIgnoringOutput(uploadCommand)
+
+	enableCommand := []string{
+		"guest.start",
+		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		fmt.Sprintf("-l=%s:%s", conf.VMUsername, conf.VMPassword),
+		powershell,
+		`-command`,
+		`&{Import-Module C:\Windows\Temp\BOSH.WinRM.psm1; Enable-WinRM}`,
+	}
+	runIgnoringOutput(enableCommand)
+	fmt.Println("WinRM enabled.\n")
+
+}
 
 func createVMSnapshot(snapshotName string) {
 	snapshotCommand := []string{
@@ -189,6 +217,7 @@ func createVMSnapshot(snapshotName string) {
 	// is blocking
 	runIgnoringOutput(snapshotCommand)
 	time.Sleep(30 * time.Second)
+
 }
 
 func powerOnVM() {

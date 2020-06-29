@@ -3,6 +3,7 @@ COMMAND = out/stembuild
 AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
 AUTOMATION_PREFIX = $(shell dirname "${AUTOMATION_PATH}")
 STEMCELL_VERSION = $(shell echo "$${STEMBUILD_VERSION}")
+BOSH_PSMODULES_REPO ?= ${HOME}/workspace/bosh-psmodules
 LD_FLAGS = "-w -s -X github.com/cloudfoundry-incubator/stembuild/version.Version=${STEMCELL_VERSION}"
 
 all : test build
