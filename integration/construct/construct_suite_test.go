@@ -79,52 +79,6 @@ type config struct {
 	LoggedInVMSnapshot string
 }
 
-func restoreSnapshot(vmIpath string, snapshotName string) {
-	snapshotCommand := []string{
-		"snapshot.revert",
-		fmt.Sprintf("-vm.ipath=%s", vmIpath),
-		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
-		snapshotName,
-	}
-	fmt.Printf("Reverting VM Snapshot: %s", snapshotName)
-	runIgnoringOutput(snapshotCommand)
-}
-
-func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
-	clientFactory := remotemanager.NewWinRmClientFactory(vmIp, vmUsername, vmPassword)
-	rm := remotemanager.NewWinRM(vmIp, vmUsername, vmPassword, clientFactory)
-	Expect(rm).ToNot(BeNil())
-
-	vmReady := false
-	for !vmReady {
-		_, err := rm.ExecuteCommand("powershell.exe \"ls c:\\windows 1>$null\"")
-		vmReady = err == nil
-	}
-}
-
-var _ = BeforeEach(func() {
-	restoreSnapshot(conf.VMInventoryPath, VmSnapshotName)
-	time.Sleep(30 * time.Second)
-})
-
-func envMustExist(variableName string) string {
-	result := os.Getenv(variableName)
-	if result == "" {
-		Fail(fmt.Sprintf("%s must be set", variableName))
-	}
-
-	return result
-}
-
-func envMustExistWithDescription(variableName, description string) string {
-	result := os.Getenv(variableName)
-	if result == "" {
-		Fail(fmt.Sprintf("%s %s must be set", description, variableName))
-	}
-
-	return result
-}
-
 var _ = SynchronizedBeforeSuite(func() []byte {
 	existingVM = false
 	var err error
@@ -171,8 +125,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		VMName:             vmName,
 		VMInventoryPath:    vmInventoryPath,
 	}
-	
-	powerOnVM()
+
 	enableWinRM(boshPsmodulesRepo)
 	createVMSnapshot(VmSnapshotName)
 
@@ -180,6 +133,89 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 }, func(_ []byte) {
 })
 
+var _ = BeforeEach(func() {
+	restoreSnapshot(conf.VMInventoryPath, VmSnapshotName)
+	waitForVmToBeReady(conf.TargetIP, conf.VMUsername, conf.VMPassword)
+})
+
+var _ = SynchronizedAfterSuite(func() {
+	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
+
+	if !existingVM && skipCleanup != "TRUE" {
+		deleteCommand := []string{
+			"vm.destroy",
+			fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
+			fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		}
+		Eventually(func() int {
+			return cli.Run(deleteCommand)
+		}, 3*time.Minute, 10*time.Second).Should(BeZero())
+		fmt.Println("VM destroyed")
+		if lockDir != "" {
+			_, _, err := lockPool.ReleaseLock(lockDir)
+			Expect(err).NotTo(HaveOccurred())
+
+			childItems, err := ioutil.ReadDir(lockParentDir)
+			Expect(err).NotTo(HaveOccurred())
+
+			for _, item := range childItems {
+				if item.IsDir() && strings.HasPrefix(filepath.Base(item.Name()), "pool-resource") {
+					fmt.Printf("Cleaning up temporary pool resource %s\n", item.Name())
+					_ = os.RemoveAll(item.Name())
+				}
+			}
+		}
+	}
+
+	_ = os.RemoveAll(tmpDir)
+}, func() {
+})
+
+func restoreSnapshot(vmIpath string, snapshotName string) {
+	snapshotCommand := []string{
+		"snapshot.revert",
+		fmt.Sprintf("-vm.ipath=%s", vmIpath),
+		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		snapshotName,
+	}
+	fmt.Printf("Reverting VM Snapshot: %s\n", snapshotName)
+	runIgnoringOutput(snapshotCommand)
+	time.Sleep(30 * time.Second)
+}
+
+func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
+	fmt.Print("Waiting for VM to come up...")
+	clientFactory := remotemanager.NewWinRmClientFactory(vmIp, vmUsername, vmPassword)
+	rm := remotemanager.NewWinRM(vmIp, vmUsername, vmPassword, clientFactory)
+	Expect(rm).ToNot(BeNil())
+
+	vmReady := false
+	for !vmReady {
+		fmt.Print(".")
+		time.Sleep(5*time.Second)
+		_, err := rm.ExecuteCommand(`powershell.exe "ls c:\windows 1>$null"`)
+		vmReady = err == nil
+	}
+	fmt.Print("ready.\n")
+}
+
+func envMustExist(variableName string) string {
+	result := os.Getenv(variableName)
+	if result == "" {
+		Fail(fmt.Sprintf("%s must be set", variableName))
+	}
+
+	return result
+}
+
+func envMustExistWithDescription(variableName, description string) string {
+	result := os.Getenv(variableName)
+	if result == "" {
+		Fail(fmt.Sprintf("%s %s must be set", description, variableName))
+	}
+
+	return result
+}
 func enableWinRM(repoPath string) {
 	fmt.Println("Enabling WinRM on the base image before integration tests...")
 	uploadCommand := []string{
@@ -202,7 +238,7 @@ func enableWinRM(repoPath string) {
 		`&{Import-Module C:\Windows\Temp\BOSH.WinRM.psm1; Enable-WinRM}`,
 	}
 	runIgnoringOutput(enableCommand)
-	fmt.Println("WinRM enabled.\n")
+	fmt.Println("WinRM enabled.")
 
 }
 
@@ -251,35 +287,3 @@ func runIgnoringOutput(args []string) int {
 	return exitCode
 }
 
-var _ = SynchronizedAfterSuite(func() {
-	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
-
-	if !existingVM && skipCleanup != "TRUE" {
-		deleteCommand := []string{
-			"vm.destroy",
-			fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
-			fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
-		}
-		Eventually(func() int {
-			return cli.Run(deleteCommand)
-		}, 3*time.Minute, 10*time.Second).Should(BeZero())
-		fmt.Println("VM destroyed")
-		if lockDir != "" {
-			_, _, err := lockPool.ReleaseLock(lockDir)
-			Expect(err).NotTo(HaveOccurred())
-
-			childItems, err := ioutil.ReadDir(lockParentDir)
-			Expect(err).NotTo(HaveOccurred())
-
-			for _, item := range childItems {
-				if item.IsDir() && strings.HasPrefix(filepath.Base(item.Name()), "pool-resource") {
-					fmt.Printf("Cleaning up temporary pool resource %s\n", item.Name())
-					_ = os.RemoveAll(item.Name())
-				}
-			}
-		}
-	}
-
-	_ = os.RemoveAll(tmpDir)
-}, func() {
-})
