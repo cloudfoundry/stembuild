@@ -90,7 +90,7 @@ var _ = Describe("stembuild construct", func() {
 		It("successfully runs even when a user has logged in", func() {
 			fmt.Printf("Logged on VM for test has IP: %s\n", conf.LoggedInVMIP)
 
-			restoreSnapshot(conf.LoggedInVMIpath, conf.LoggedInVMSnapshot)
+			revertSnapshot(conf.LoggedInVMIpath, conf.LoggedInVMSnapshot)
 
 			waitForVmToBeReady(conf.LoggedInVMIP, conf.VMUsername, conf.VMPassword)
 			time.Sleep(30 * time.Second)

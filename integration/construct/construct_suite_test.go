@@ -18,6 +18,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/vmware/govmomi/govc/cli"
+	_ "github.com/vmware/govmomi/govc/device"
 	_ "github.com/vmware/govmomi/govc/importx"
 	_ "github.com/vmware/govmomi/govc/vm"
 	_ "github.com/vmware/govmomi/govc/vm/guest"
@@ -35,7 +36,7 @@ const (
 	VMNameVariable                    = "VM_NAME"
 	VMUsernameVariable                = "VM_USERNAME"
 	VMPasswordVariable                = "VM_PASSWORD"
-	ExistingVmIPVariable              = "EXISTING_VM_IP"
+	TargetVmIPVariable                = "TARGET_VM_IP"
 	SkipCleanupVariable               = "SKIP_CLEANUP"
 	vcenterFolderVariable             = "VM_FOLDER"
 	vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
@@ -47,7 +48,7 @@ const (
 	VmSnapshotName                    = "integration-test-snapshot"
 	LoggedInVmIpVariable              = "LOGOUT_INTEGRATION_TEST_VM_IP"
 	LoggedInVmIpathVariable           = "LOGOUT_INTEGRATION_TEST_VM_INVENTORY_PATH"
-	LoggedInVmSnapshotName            = "logged-in"
+	LoggedInVmSnapshotName            = "logged-in-winrm-enabled"
 	powershell                        = "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 )
 
@@ -58,7 +59,6 @@ var (
 	lockPool                  out.LockPool
 	lockDir                   string
 	stembuildExecutable       string
-	existingVM                bool
 	vcenterAdminCredentialUrl string
 )
 
@@ -80,7 +80,6 @@ type config struct {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	existingVM = false
 	var err error
 
 	boshPsmodulesRepo := envMustExist(BoshPsmodulesRepoVariable)
@@ -90,7 +89,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	vmUsername := envMustExist(VMUsernameVariable)
 	vmPassword := envMustExist(VMPasswordVariable)
-	existingVMIP := envMustExist(ExistingVmIPVariable)
+	targetVMIP := envMustExist(TargetVmIPVariable)
 	vmName := envMustExist(VMNameVariable)
 
 	loggedInVmIp := envMustExist(LoggedInVmIpVariable)
@@ -113,7 +112,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	conf = config{
-		TargetIP:           existingVMIP,
+		TargetIP:           targetVMIP,
 		VMUsername:         vmUsername,
 		VMPassword:         vmPassword,
 		VCenterURL:         vCenterUrl,
@@ -127,6 +126,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	}
 
 	enableWinRM(boshPsmodulesRepo)
+	powerOnVM()
 	createVMSnapshot(VmSnapshotName)
 
 	return nil
@@ -134,14 +134,14 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 })
 
 var _ = BeforeEach(func() {
-	restoreSnapshot(conf.VMInventoryPath, VmSnapshotName)
+	revertSnapshot(conf.VMInventoryPath, VmSnapshotName)
 	waitForVmToBeReady(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 })
 
 var _ = SynchronizedAfterSuite(func() {
 	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
 
-	if !existingVM && skipCleanup != "TRUE" {
+	if skipCleanup != "TRUE" {
 		deleteCommand := []string{
 			"vm.destroy",
 			fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
@@ -171,7 +171,7 @@ var _ = SynchronizedAfterSuite(func() {
 }, func() {
 })
 
-func restoreSnapshot(vmIpath string, snapshotName string) {
+func revertSnapshot(vmIpath string, snapshotName string) {
 	snapshotCommand := []string{
 		"snapshot.revert",
 		fmt.Sprintf("-vm.ipath=%s", vmIpath),
@@ -179,12 +179,17 @@ func restoreSnapshot(vmIpath string, snapshotName string) {
 		snapshotName,
 	}
 	fmt.Printf("Reverting VM Snapshot: %s\n", snapshotName)
-	runIgnoringOutput(snapshotCommand)
+	exitCode := runIgnoringOutput(snapshotCommand)
+	if exitCode != 0 {
+		fmt.Print("There was an error reverting the snapshot.")
+	} else {
+		fmt.Println("Revert started.")
+	}
 	time.Sleep(30 * time.Second)
 }
 
 func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
-	fmt.Print("Waiting for VM to come up...")
+	fmt.Print("Waiting for reverting snapshot to finish...")
 	clientFactory := remotemanager.NewWinRmClientFactory(vmIp, vmUsername, vmPassword)
 	rm := remotemanager.NewWinRM(vmIp, vmUsername, vmPassword, clientFactory)
 	Expect(rm).ToNot(BeNil())
@@ -192,11 +197,11 @@ func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
 	vmReady := false
 	for !vmReady {
 		fmt.Print(".")
-		time.Sleep(5*time.Second)
+		time.Sleep(5 * time.Second)
 		_, err := rm.ExecuteCommand(`powershell.exe "ls c:\windows 1>$null"`)
 		vmReady = err == nil
 	}
-	fmt.Print("ready.\n")
+	fmt.Print("done.\n")
 }
 
 func envMustExist(variableName string) string {
@@ -208,14 +213,6 @@ func envMustExist(variableName string) string {
 	return result
 }
 
-func envMustExistWithDescription(variableName, description string) string {
-	result := os.Getenv(variableName)
-	if result == "" {
-		Fail(fmt.Sprintf("%s %s must be set", description, variableName))
-	}
-
-	return result
-}
 func enableWinRM(repoPath string) {
 	fmt.Println("Enabling WinRM on the base image before integration tests...")
 	uploadCommand := []string{
@@ -226,7 +223,11 @@ func enableWinRM(repoPath string) {
 		filepath.Join(repoPath, "modules", "BOSH.WinRM", "BOSH.WinRM.psm1"),
 		"C:\\Windows\\Temp\\BOSH.WinRM.psm1",
 	}
-	runIgnoringOutput(uploadCommand)
+
+	exitCode := runIgnoringOutput(uploadCommand)
+	if exitCode != 0 {
+		fmt.Print("There was an error uploading WinRM psmodule.")
+	}
 
 	enableCommand := []string{
 		"guest.start",
@@ -237,9 +238,12 @@ func enableWinRM(repoPath string) {
 		`-command`,
 		`&{Import-Module C:\Windows\Temp\BOSH.WinRM.psm1; Enable-WinRM}`,
 	}
-	runIgnoringOutput(enableCommand)
-	fmt.Println("WinRM enabled.")
-
+	exitCode = runIgnoringOutput(enableCommand)
+	if exitCode != 0 {
+		fmt.Print("There was an error enabling WinRM.")
+	} else {
+		fmt.Println("WinRM enabled.")
+	}
 }
 
 func createVMSnapshot(snapshotName string) {
@@ -251,9 +255,15 @@ func createVMSnapshot(snapshotName string) {
 	}
 	fmt.Printf("Creating VM Snapshot: %s on VM: %s\n", snapshotName, conf.VMInventoryPath)
 	// is blocking
-	runIgnoringOutput(snapshotCommand)
+	exitCode := runIgnoringOutput(snapshotCommand)
+	if exitCode != 0 {
+		fmt.Print("There was an error creating the snapshot.")
+	} else {
+		fmt.Println("Snapshot command started.")
+	}
+	fmt.Print("Waiting for snapshot to finish...")
 	time.Sleep(30 * time.Second)
-
+	fmt.Print("done.\n")
 }
 
 func powerOnVM() {
@@ -286,4 +296,3 @@ func runIgnoringOutput(args []string) int {
 
 	return exitCode
 }
-

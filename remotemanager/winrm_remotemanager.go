@@ -111,6 +111,8 @@ func (w *WinRM) ExecuteCommandWithTimeout(command string, timeout time.Duration)
 }
 
 func (w *WinRM) ExecuteCommand(command string) (int, error) {
+	//fmt.Printf("Executing %s\n", command)
 	exitCode, err := w.ExecuteCommandWithTimeout(command, WinRmTimeout)
+	//fmt.Printf("Exectued. exit code %d\n", exitCode)
 	return exitCode, err
 }
