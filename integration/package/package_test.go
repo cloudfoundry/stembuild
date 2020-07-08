@@ -30,7 +30,6 @@ var _ = Describe("Package", func() {
 		vcenterURLVariable                = "VCENTER_BASE_URL"
 		vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
 		vcenterFolderVariable             = "VM_FOLDER"
-		existingVMVariable                = "EXISTING_SOURCE_VM"
 		vcenterStembuildUsernameVariable  = "VCENTER_USERNAME"
 		vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
 		stembuildVersionVariable          = "STEMBUILD_VERSION"
@@ -39,7 +38,6 @@ var _ = Describe("Package", func() {
 	var (
 		workingDir                string
 		baseVMName                string
-		sourceVMName              string
 		vmPath                    string
 		vcenterURL                string
 		vcenterAdminCredentialUrl string
@@ -61,18 +59,13 @@ var _ = Describe("Package", func() {
 	})
 
 	BeforeEach(func() {
-		existingVM := os.Getenv(existingVMVariable)
 		vcenterFolder := helpers.EnvMustExist(vcenterFolderVariable)
 
 		rand.Seed(time.Now().UnixNano())
-		if existingVM == "" {
-			sourceVMName = fmt.Sprintf("stembuild-package-test-%d", rand.Int())
-		} else {
-			sourceVMName = fmt.Sprintf("%s-%d", existingVM, rand.Int())
-		}
+		packageTestVMName := fmt.Sprintf("stembuild-package-test-%d", rand.Int())
 
 		baseVMWithPath := fmt.Sprintf(vcenterFolder + "/" + baseVMName)
-		vmPath = strings.Join([]string{vcenterFolder, sourceVMName}, "/")
+		vmPath = strings.Join([]string{vcenterFolder, packageTestVMName}, "/")
 
 		vcenterAdminCredentialUrl = helpers.EnvMustExist(vcenterAdminCredentialUrlVariable)
 
@@ -82,7 +75,7 @@ var _ = Describe("Package", func() {
 			"-folder", vcenterFolder,
 			"-on=false",
 			"-u", vcenterAdminCredentialUrl,
-			sourceVMName,
+			packageTestVMName,
 		})
 
 		vcenterURL = helpers.EnvMustExist(vcenterURLVariable)
