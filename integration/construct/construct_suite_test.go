@@ -199,6 +199,8 @@ func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
 		fmt.Print(".")
 		time.Sleep(5 * time.Second)
 		_, err := rm.ExecuteCommand(`powershell.exe "ls c:\windows 1>$null"`)
+		fmt.Println("Error from the execute command")
+		fmt.Print(err)
 		vmReady = err == nil
 	}
 	fmt.Print("done.\n")

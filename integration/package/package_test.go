@@ -31,8 +31,8 @@ var _ = Describe("Package", func() {
 		vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
 		vcenterFolderVariable             = "VM_FOLDER"
 		existingVMVariable                = "EXISTING_SOURCE_VM"
-		vcenterStembuildUsernameVariable  = "VCENTER_STEMBUILD_USER"
-		vcenterStembuildPasswordVariable  = "VCENTER_STEMBUILD_PASSWORD"
+		vcenterStembuildUsernameVariable  = "VCENTER_USERNAME"
+		vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
 		stembuildVersionVariable          = "STEMBUILD_VERSION"
 	)
 
