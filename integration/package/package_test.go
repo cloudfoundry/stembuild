@@ -79,6 +79,7 @@ var _ = Describe("Package", func() {
 		cli.Run([]string{
 			"vm.clone",
 			"-vm", baseVMWithPath,
+			"-folder", vcenterFolder,
 			"-on=false",
 			"-u", vcenterAdminCredentialUrl,
 			sourceVMName,
