@@ -24,8 +24,8 @@ var _ = BeforeSuite(func() {
 
 	vmFolder := os.Getenv("VM_FOLDER")
 	Expect(vmFolder).NotTo(Equal(""), "VM_FOLDER is required")
-	vmName := os.Getenv("PACKAGE_TEST_BASE_VM_NAME")
-	Expect(vmName).NotTo(Equal(""), "PACKAGE_TEST_BASE_VM_NAME is required")
+	vmName := os.Getenv("PACKAGE_TEST_VM_NAME")
+	Expect(vmName).NotTo(Equal(""), "PACKAGE_TEST_VM_NAME is required")
 
 	targetVMPath = fmt.Sprintf("%s/%s", vmFolder, vmName)
 

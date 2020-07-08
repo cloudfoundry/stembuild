@@ -26,7 +26,7 @@ import (
 
 var _ = Describe("Package", func() {
 	const (
-		baseVMNameEnvVar                  = "PACKAGE_TEST_BASE_VM_NAME"
+		baseVMNameEnvVar                  = "PACKAGE_TEST_VM_NAME"
 		vcenterURLVariable                = "VCENTER_BASE_URL"
 		vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
 		vcenterFolderVariable             = "VM_FOLDER"

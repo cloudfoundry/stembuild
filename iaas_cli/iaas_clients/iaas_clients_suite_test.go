@@ -25,7 +25,8 @@ const (
 	VcenterUsername = "VCENTER_USERNAME"
 	VcenterPassword = "VCENTER_PASSWORD"
 	VcenterCACert   = "VCENTER_CA_CERT"
-	BaseVmPath      = "CONTRACT_TEST_VM_PATH"
+	VmFolder        = "VM_FOLDER"
+	TestVmName      = "CONTRACT_TEST_VM_NAME"
 	TestVmPassword  = "CONTRACT_TEST_VM_PASSWORD"
 	TestVmUsername  = "CONTRACT_TEST_VM_USERNAME"
 )
@@ -52,10 +53,14 @@ var _ = BeforeSuite(func() {
 	err = vCenterManager.Login(CTX)
 	Expect(err).ToNot(HaveOccurred())
 
-	vmToClone, err := vCenterManager.FindVM(CTX, envMustExist(BaseVmPath))
+	vmFolder := envMustExist(VmFolder)
+	testVmName := envMustExist(TestVmName)
+	testVmPath := fmt.Sprintf("%s/%s", vmFolder, testVmName)
+
+	vmToClone, err := vCenterManager.FindVM(CTX, testVmPath)
 	Expect(err).ToNot(HaveOccurred())
 
-	TestVmPath = envMustExist(BaseVmPath) + fmt.Sprintf("%s", uuid.New())[0:8]
+	TestVmPath = testVmPath + fmt.Sprintf("%s", uuid.New())[0:8]
 
 	err = vCenterManager.CloneVM(CTX, vmToClone, TestVmPath)
 	Expect(err).ToNot(HaveOccurred())
