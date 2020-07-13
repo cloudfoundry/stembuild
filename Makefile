@@ -19,7 +19,7 @@ format :
 	go fmt ./...
 
 integration : generate
-	ginkgo -r -v -randomizeAllSpecs integration
+	ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 integration
 
 integration/construct : generate
 	ginkgo -r -v -randomizeAllSpecs integration/construct
