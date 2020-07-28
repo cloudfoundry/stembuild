@@ -30,9 +30,7 @@ build-integration : generate-fake-stemcell-automation $(GOSRC)
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
 
 clean :
-	rm -r version/version.go || true
-	rm -r $(wildcard out/*) || true
-	rm -r assets/stemcell_automation.go || true
+	rm -rf version/version.go assets/stemcell_automation.go assets/StemcellAutomation.zip assets/local/* out/*
 
 format :
 	go fmt ./...
