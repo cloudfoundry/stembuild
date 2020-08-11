@@ -61,7 +61,7 @@ Describe "PostReboot" {
         $postRebootCalls.IndexOf("CleanUpVM") | Should -BeLessThan $postRebootCalls.IndexOf("SysprepVM")
     }
 
-    It "syspreps right before shutting the VM down" {
+    It "syspreps as the last command" {
         PostReboot -Organization "org" -Owner "owner" -SkipRandomPassword:$false
         Assert-MockCalled -CommandName SysprepVM
         Assert-MockCalled -CommandName SysprepVM -ParameterFilter {
@@ -69,15 +69,8 @@ Describe "PostReboot" {
                     $Owner -eq "owner" -and
                     $SkipRandomPassword -eq $false
         }
-        $postRebootCalls.IndexOf("SysprepVM") | Should -BeLessThan $postRebootCalls.IndexOf("Stop-Computer")
-    }
-
-    It "powers off VM last" {
-        PostReboot
-
-        Assert-MockCalled -CommandName Stop-Computer
         $lastIndex = $postRebootCalls.Count - 1
-        $postRebootCalls.IndexOf("Stop-Computer") | Should -Be $lastIndex
+        $postRebootCalls.IndexOf("SysprepVM") | Should -Be $lastIndex
     }
 }
 
