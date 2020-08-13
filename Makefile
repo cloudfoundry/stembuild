@@ -19,13 +19,13 @@ format :
 	go fmt ./...
 
 integration : generate
-	ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 integration
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 integration
 
 integration/construct : generate
-	ginkgo -r -v -randomizeAllSpecs integration/construct
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs integration/construct
 
 integration-badger : generate
-	ginkgo -r -v -randomizeAllSpecs -untilItFails integration
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -untilItFails integration
 
 generate: $(GOSRC) $(AUTOMATION_PATH)
 	go get -u github.com/go-bindata/go-bindata/...
@@ -37,12 +37,12 @@ out/stembuild : generate $(GOSRC)
 test : units
 
 units : format generate
-	@ginkgo version
-	ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
+	@go run github.com/onsi/ginkgo/ginkgo version
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
 	@echo "\nSWEET SUITE SUCCESS"
 
 contract :
-	ginkgo -r -v -randomizeAllSpecs -randomizeSuites iaas_cli
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -randomizeSuites iaas_cli
 
 .PHONY : all build clean format generate
 .PHONY : test units units-full integration integration-tests-full

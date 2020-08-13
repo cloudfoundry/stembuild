@@ -3,7 +3,6 @@ module github.com/cloudfoundry-incubator/stembuild
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.30.15
 	github.com/cloudfoundry-incubator/winrmcp v0.0.0-20180921211025-c76d91c1e7db
 	github.com/concourse/pool-resource v1.1.1
 	github.com/dylanmei/iso8601 v0.1.0 // indirect
