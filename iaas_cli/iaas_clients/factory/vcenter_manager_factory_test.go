@@ -59,7 +59,7 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 
 			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
-				VCenterServer: "127", // make soap.ParseURL fail with
+				VCenterServer: " :", // make soap.ParseURL fail with
 				Username:      "user",
 				Password:      "pass",
 				ClientCreator: fakeClientCreator,
