@@ -55,12 +55,11 @@ var _ = Describe("VcenterManagerFactory", func() {
 		})
 
 		It("returns an error if the vcenter server cannot be parsed", func() {
-
 			parseErr := errors.New("net/url: invalid control character in URL")
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 
 			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
-				VCenterServer: string(127), // make soap.ParseURL fail with
+				VCenterServer: "127", // make soap.ParseURL fail with
 				Username:      "user",
 				Password:      "pass",
 				ClientCreator: fakeClientCreator,
@@ -68,7 +67,6 @@ var _ = Describe("VcenterManagerFactory", func() {
 
 			_, err := managerFactory.VCenterManager(context.TODO())
 			Expect(err.Error()).To(ContainSubstring(parseErr.Error()))
-
 		})
 
 		It("returns an error if a vim25 client cannot be created", func() {
