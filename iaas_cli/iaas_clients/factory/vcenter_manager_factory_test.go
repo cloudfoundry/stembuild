@@ -3,6 +3,7 @@ package vcenter_client_factory_test
 import (
 	"context"
 	"errors"
+	"net/url"
 
 	"github.com/vmware/govmomi/find"
 
@@ -55,7 +56,6 @@ var _ = Describe("VcenterManagerFactory", func() {
 		})
 
 		It("returns an error if the vcenter server cannot be parsed", func() {
-			parseErr := errors.New("net/url: invalid control character in URL")
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 
 			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
@@ -66,7 +66,9 @@ var _ = Describe("VcenterManagerFactory", func() {
 			})
 
 			_, err := managerFactory.VCenterManager(context.TODO())
-			Expect(err.Error()).To(ContainSubstring(parseErr.Error()))
+			parseErr, ok := err.(*url.Error)
+			Expect(ok).To(BeTrue())
+			Expect(parseErr.Op).To(Equal("parse"))
 		})
 
 		It("returns an error if a vim25 client cannot be created", func() {
