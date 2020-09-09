@@ -723,8 +723,8 @@ function CreateFakeLGPOZip
 {
     param([string]$dir, [string]$fakeZipPath)
 
-    New-Item -ItemType Directory "$dir\LGPO"
-    echo "fake lgpo" > "$dir\LGPO\LGPO.exe"
+    New-Item -ItemType Directory "$dir\LGPO\LGPO_30"
+    echo "fake lgpo" > "$dir\LGPO\LGPO_30\LGPO.exe"
 
     Compress-Archive -Force -Path "$dir\LGPO\*" -DestinationPath $fakeZipPath
 }
@@ -902,7 +902,7 @@ Describe "Extract-LGPO" {
         Extract-LGPO
 
         $lgpoexepath = "$env:WINDIR\LGPO.exe"
-        Test-Path -Path $lgpoexepath
+        Test-Path -Path $lgpoexepath | Should -Be $true
     }
 }
 

@@ -1,49 +1,7 @@
-# BOSH Windows Stemcell Automation [![slack.cloudfoundry.org](https://slack.cloudfoundry.org/badge.svg)](https://slack.cloudfoundry.org)
-
-BOSH Windows stemcell automation is an automation tool used to create local BOSH Windows stemcells which can be deployed on [Cloud Foundry BOSH](https://bosh.io).
-
-## Supported IaaS
-The BOSH Windows stemcell automation tool will create stemcells for the following IaaS:
-* VMware vSphere
-
-## Compatibility Matrix
-
-| OS Line | stemcell automation version | Stemcell Version
-| :--- | --- | --- 
-| 1709 | 0.11 | 1709.20
-| 1803 | 0.11 | 1803.9
-| 2019 | 0.11 | 2019.3
-| 1709 | 0.9 | 1709.19
-| 1803 | 0.9 | 1803.8
-| 1709 | 0.9 | 1709.19
-| 1803 | 0.8 | 1803.7
-| 1709 | 0.8 | 1709.18
-| 1803 | 0.7 | 1803.6
-| 1709 | 0.7 | 1709.17
-| 1803 | 0.6 | 1803.5
-| 1709 | 0.6 | 1709.16
-| 1803 | 0.5 | 1803.4
-| 1709 | 0.5 | 1709.15
-| 1803 | 0.4 | 1803.3
-| 1709 | 0.4 | 1709.14
-| 1709 | 0.3 | 1709.13
-| 1803 | 0.3 | 1803.2 
-| 1709 | 0.2 | 1709.11 
-| 1803 | 0.2 | 1803.1 
-
-## Supported Windows Server versions
-The BOSH Windows stemcell automation tool is compatible with the following Windows versions:
-
-* Windows Server 1709
-* Windows Server 1803
-* Windows Server 2019
-
-
 ## Prerequisites
 The following need to be downloaded:
-* Local Group Policy Object Utility v2.2 - [LGPO.exe](https://www.microsoft.com/en-us/download/details.aspx?id=55319)
+* Local Group Policy Object Utility v3 - [LGPO.exe](https://www.microsoft.com/en-us/download/details.aspx?id=55319)
 * The appropriate BOSH Windows stemcell automation release for the desired Windows stemcell version - [StemcellAutomation.zip](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-automation/releases)
-* A Windows Server 1709 installation disk ISO
 
 ## Creating a BOSH Windows stemcell
 ### 1. Preparing the VM

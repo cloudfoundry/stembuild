@@ -423,6 +423,7 @@ function Extract-LGPO
     {
         $LGPOPath="./LGPO.zip"
         Expand-Archive -LiteralPath $LGPOPath -DestinationPath "$env:WINDIR\"
+        Move-Item -PATH "$env:WINDIR\LGPO_30\*.exe" -Destination "$env:WINDIR\"
         Write-Log "Successfully migrated LGPO to destination dir"
     }
 }
