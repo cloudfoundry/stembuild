@@ -38,11 +38,11 @@ test : units
 
 units : format generate
 	@go run github.com/onsi/ginkgo/ginkgo version
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
+	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
 	@echo "\nSWEET SUITE SUCCESS"
 
 contract :
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -randomizeSuites iaas_cli
+	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites iaas_cli
 
 .PHONY : all build clean format generate
 .PHONY : test units units-full integration integration-tests-full
