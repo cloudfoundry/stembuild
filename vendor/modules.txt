@@ -1,6 +1,8 @@
-# github.com/Azure/go-ntlmssp v0.0.0-20180810175552-4a21cbd618b4
+# github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c
+## explicit
 github.com/Azure/go-ntlmssp
-# github.com/ChrisTrenkamp/goxpath v0.0.0-20170922090931-c385f95c6022
+# github.com/ChrisTrenkamp/goxpath v0.0.0-20190607011252-c5096ec8773d
+## explicit
 github.com/ChrisTrenkamp/goxpath
 github.com/ChrisTrenkamp/goxpath/internal/execxp
 github.com/ChrisTrenkamp/goxpath/internal/execxp/findutil
@@ -30,7 +32,8 @@ github.com/fsnotify/fsnotify
 ## explicit
 github.com/go-bindata/go-bindata
 github.com/go-bindata/go-bindata/go-bindata
-# github.com/gofrs/uuid v3.2.0+incompatible
+# github.com/gofrs/uuid v3.3.0+incompatible
+## explicit
 github.com/gofrs/uuid
 # github.com/golang/mock v1.4.3
 ## explicit
@@ -42,16 +45,19 @@ github.com/golang/protobuf/proto
 # github.com/google/subcommands v1.2.0
 ## explicit
 github.com/google/subcommands
-# github.com/google/uuid v1.1.1
+# github.com/google/uuid v1.1.2
 ## explicit
 github.com/google/uuid
-# github.com/kr/pretty v0.1.0
+# github.com/kr/pretty v0.2.1
+## explicit
 github.com/kr/pretty
-# github.com/kr/text v0.1.0
+# github.com/kr/text v0.2.0
+## explicit
 github.com/kr/text
-# github.com/masterzen/simplexml v0.0.0-20160608183007-4572e39b1ab9
+# github.com/masterzen/simplexml v0.0.0-20190410153822-31eea3082786
+## explicit
 github.com/masterzen/simplexml/dom
-# github.com/masterzen/winrm v0.0.0-20190308153735-1d17eaf15943
+# github.com/masterzen/winrm v0.0.0-20200615185753-c42b5136ff88
 ## explicit
 github.com/masterzen/winrm
 github.com/masterzen/winrm/soap
@@ -120,7 +126,7 @@ github.com/onsi/gomega/types
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
-# github.com/vmware/govmomi v0.22.2
+# github.com/vmware/govmomi v0.23.1
 ## explicit
 github.com/vmware/govmomi
 github.com/vmware/govmomi/find
@@ -140,19 +146,18 @@ github.com/vmware/govmomi/guest
 github.com/vmware/govmomi/guest/toolbox
 github.com/vmware/govmomi/internal
 github.com/vmware/govmomi/list
-github.com/vmware/govmomi/lookup
-github.com/vmware/govmomi/lookup/methods
-github.com/vmware/govmomi/lookup/types
 github.com/vmware/govmomi/nfc
 github.com/vmware/govmomi/object
 github.com/vmware/govmomi/ovf
 github.com/vmware/govmomi/property
 github.com/vmware/govmomi/session
-github.com/vmware/govmomi/sts
-github.com/vmware/govmomi/sts/internal
+github.com/vmware/govmomi/session/cache
+github.com/vmware/govmomi/session/keepalive
 github.com/vmware/govmomi/task
 github.com/vmware/govmomi/units
 github.com/vmware/govmomi/vapi/internal
+github.com/vmware/govmomi/vapi/library
+github.com/vmware/govmomi/vapi/library/finder
 github.com/vmware/govmomi/vapi/rest
 github.com/vmware/govmomi/view
 github.com/vmware/govmomi/vim25
@@ -167,23 +172,25 @@ github.com/vmware/govmomi/vmdk
 # github.com/xtreme-gabelan-satchithanantham/winrmcp v0.0.0-20181120153252-ed85582c6e81
 ## explicit
 github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp
-# golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+# golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+## explicit
 golang.org/x/crypto/md4
 # golang.org/x/mod v0.2.0
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2
+# golang.org/x/net v0.0.0-20200904194848-62affa334b73
 ## explicit
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
-# golang.org/x/sys v0.0.0-20200523222454-059865788121
+# golang.org/x/sys v0.0.0-20200909081042-eff7692f9009
 ## explicit
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
-# golang.org/x/text v0.3.2
+# golang.org/x/text v0.3.3
+## explicit
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
