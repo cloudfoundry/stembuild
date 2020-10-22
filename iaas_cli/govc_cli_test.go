@@ -1,10 +1,11 @@
 package iaas_cli_test
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"strings"
 )
 
 var _ = Describe("GovcCli", func() {
@@ -29,7 +30,7 @@ keyboard-600       VirtualKeyboard               Keyboard
 pointing-700       VirtualPointingDevice         Pointing device; Device
 disk-1000-0        VirtualDisk                   41,943,040 KB
 lsilogic-sas-1000  VirtualLsiLogicSASController  LSI Logic SAS
-ethernet-0         VirtualE1000e                 DVSwitch: 97 43 39 50 76 ca 8e 38-0f 4b df aa 09 57 3c f5
+ethernet-0         VirtualE1000e                 internal-network
 vmci-12000         VirtualMachineVMCIDevice      Device on the virtual machine PCI bus that provides support for the virtual machine communication interface
 ahci-15000         VirtualAHCIController         AHCI
 cdrom-16000        VirtualCdrom                  Remote device

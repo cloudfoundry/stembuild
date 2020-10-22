@@ -212,7 +212,7 @@ ps2-300            VirtualPS2Controller          PS2 controller 0
 pci-100            VirtualPCIController          PCI controller 0
 sio-400            VirtualSIOController          SIO controller 0
 floppy-8000        VirtualFloppy                 Remote
-ethernet-0         VirtualE1000e                 DVSwitch: a7 fa 3a 50 a9 72 57 5a-56 d1 f3 82 a6 1e 2a ed
+ethernet-0         VirtualE1000e                 internal-network
 `
 
 		It("returns a list of devices for the given VM", func() {
