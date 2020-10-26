@@ -3,6 +3,7 @@ package iaas_clients
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
 
@@ -63,6 +64,8 @@ var _ = Describe("VcenterClient", func() {
 			opsManager := vCenterManager.OperationsManager(ctx, vm)
 			guestManager, err := vCenterManager.GuestManager(ctx, opsManager, envMustExist(TestVmUsername), envMustExist(TestVmPassword))
 			Expect(err).ToNot(HaveOccurred())
+
+			time.Sleep(10 * time.Second)
 
 			powershell := "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 			pid, err := guestManager.StartProgramInGuest(ctx, powershell, "Exit 59")
@@ -161,6 +164,8 @@ var _ = Describe("VcenterClient", func() {
 			opsManager := vCenterManager.OperationsManager(ctx, vm)
 			guestManager, err = vCenterManager.GuestManager(ctx, opsManager, envMustExist(TestVmUsername), envMustExist(TestVmPassword))
 			Expect(err).ToNot(HaveOccurred())
+
+			time.Sleep(10 * time.Second)
 		})
 
 		Context("specified file exists", func() {

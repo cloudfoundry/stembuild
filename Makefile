@@ -42,7 +42,7 @@ units : format generate
 	@echo "\nSWEET SUITE SUCCESS"
 
 contract :
-	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites iaas_cli
+	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites -flakeAttempts 2 iaas_cli
 
 .PHONY : all build clean format generate
 .PHONY : test units units-full integration integration-tests-full
