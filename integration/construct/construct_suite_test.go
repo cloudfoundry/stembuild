@@ -2,13 +2,14 @@ package construct_test
 
 import (
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
 
 	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
 
@@ -41,6 +42,7 @@ const (
 	vcenterFolderVariable             = "VM_FOLDER"
 	vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
 	vcenterBaseURLVariable            = "VCENTER_BASE_URL"
+	VcenterCACert                     = "VCENTER_CA_CERT"
 	vcenterStembuildUsernameVariable  = "VCENTER_USERNAME"
 	vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
 	StembuildVersionVariable          = "STEMBUILD_VERSION"
@@ -60,6 +62,7 @@ var (
 	lockDir                   string
 	stembuildExecutable       string
 	vcenterAdminCredentialUrl string
+	pathToCACert              string
 )
 
 type config struct {
@@ -71,6 +74,7 @@ type config struct {
 	VMName             string
 	VMNetwork          string
 	VCenterURL         string
+	VCenterCACert      string
 	VCenterUsername    string
 	VCenterPassword    string
 	VMInventoryPath    string
@@ -103,6 +107,14 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	vCenterStembuildUser := envMustExist(vcenterStembuildUsernameVariable)
 	vCenterStembuildPassword := envMustExist(vcenterStembuildPasswordVariable)
 
+	rawCA := envMustExist(VcenterCACert)
+	t, err := ioutil.TempFile("", "ca-cert")
+	Expect(err).ToNot(HaveOccurred())
+	pathToCACert = t.Name()
+	Expect(t.Close()).To(Succeed())
+	err = ioutil.WriteFile(pathToCACert, []byte(rawCA), 0666)
+	Expect(err).ToNot(HaveOccurred())
+
 	wd, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
 	tmpDir, err = ioutil.TempDir(wd, "construct-integration")
@@ -115,6 +127,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		TargetIP:           targetVMIP,
 		VMUsername:         vmUsername,
 		VMPassword:         vmPassword,
+		VCenterCACert:      pathToCACert,
 		VCenterURL:         vCenterUrl,
 		VCenterUsername:    vCenterStembuildUser,
 		VCenterPassword:    vCenterStembuildPassword,
@@ -146,6 +159,7 @@ var _ = SynchronizedAfterSuite(func() {
 			"vm.destroy",
 			fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
 			fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+			fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		}
 		Eventually(func() int {
 			return cli.Run(deleteCommand)
@@ -169,6 +183,9 @@ var _ = SynchronizedAfterSuite(func() {
 
 	_ = os.RemoveAll(tmpDir)
 }, func() {
+	if pathToCACert != "" {
+		os.RemoveAll(pathToCACert)
+	}
 })
 
 func revertSnapshot(vmIpath string, snapshotName string) {
@@ -176,6 +193,7 @@ func revertSnapshot(vmIpath string, snapshotName string) {
 		"snapshot.revert",
 		fmt.Sprintf("-vm.ipath=%s", vmIpath),
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		snapshotName,
 	}
 	fmt.Printf("Reverting VM Snapshot: %s\n", snapshotName)
@@ -222,6 +240,7 @@ func enableWinRM(repoPath string) {
 		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
 		fmt.Sprintf("-l=%s:%s", conf.VMUsername, conf.VMPassword),
+		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		filepath.Join(repoPath, "modules", "BOSH.WinRM", "BOSH.WinRM.psm1"),
 		"C:\\Windows\\Temp\\BOSH.WinRM.psm1",
 	}
@@ -236,6 +255,7 @@ func enableWinRM(repoPath string) {
 		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
 		fmt.Sprintf("-l=%s:%s", conf.VMUsername, conf.VMPassword),
+		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		powershell,
 		`-command`,
 		`&{Import-Module C:\Windows\Temp\BOSH.WinRM.psm1; Enable-WinRM}`,
@@ -253,6 +273,7 @@ func createVMSnapshot(snapshotName string) {
 		"snapshot.create",
 		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
+		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		snapshotName,
 	}
 	fmt.Printf("Creating VM Snapshot: %s on VM: %s\n", snapshotName, conf.VMInventoryPath)
@@ -273,7 +294,8 @@ func powerOnVM() {
 		"vm.power",
 		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
-		fmt.Sprintf("-on"),
+		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
+		"-on",
 	}
 	runIgnoringOutput(powerOnCommand)
 }

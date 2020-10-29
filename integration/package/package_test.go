@@ -75,6 +75,7 @@ var _ = Describe("Package", func() {
 			"-folder", vcenterFolder,
 			"-on=false",
 			"-u", vcenterAdminCredentialUrl,
+			"-tls-ca-certs", pathToCACert,
 			packageTestVMName,
 		})
 
@@ -86,6 +87,18 @@ var _ = Describe("Package", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
+	AfterEach(func() {
+		os.RemoveAll(workingDir)
+		if vmPath != "" {
+			cli.Run([]string{
+				"vm.destroy",
+				"-vm.ipath", vmPath,
+				"-u", vcenterAdminCredentialUrl,
+				"-tls-ca-certs", pathToCACert,
+			})
+		}
+	})
+
 	It("generates a stemcell with the correct shasum", func() {
 		session := helpers.RunCommandInDir(
 			workingDir,
@@ -94,6 +107,7 @@ var _ = Describe("Package", func() {
 			"-vcenter-username", vcenterStembuildUsername,
 			"-vcenter-password", vcenterStembuildPassword,
 			"-vm-inventory-path", vmPath,
+			"-vcenter-ca-certs", pathToCACert,
 		)
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
@@ -148,6 +162,7 @@ var _ = Describe("Package", func() {
 			"-vcenter-password", vcenterStembuildPassword,
 			"-vm-inventory-path", vmPath,
 			"-patch-version", "5",
+			"-vcenter-ca-certs", pathToCACert,
 		)
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
@@ -173,13 +188,6 @@ var _ = Describe("Package", func() {
 		stemcellManifest, err := helpers.ReadFile(stemcellManifestPath.Name())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(stemcellManifest).To(ContainSubstring(strings.Join(expectedStemcellVersion, ".")))
-	})
-
-	AfterEach(func() {
-		os.RemoveAll(workingDir)
-		if vmPath != "" {
-			cli.Run([]string{"vm.destroy", "-vm.ipath", vmPath, "-u", vcenterAdminCredentialUrl})
-		}
 	})
 })
 
