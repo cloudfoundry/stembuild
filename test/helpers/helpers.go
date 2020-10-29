@@ -199,7 +199,7 @@ func BuildStembuild(version string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	gomega.EventuallyWithOffset(1, genSess, 30*time.Second).Should(
+	gomega.EventuallyWithOffset(1, genSess, 60*time.Second).Should(
 		gexec.Exit(0),
 		fmt.Sprintf("Generate command failed with exit code %d", genSess.ExitCode()),
 	)
@@ -215,7 +215,7 @@ func BuildStembuild(version string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	gomega.EventuallyWithOffset(1, goBinSession, 30*time.Second).Should(
+	gomega.EventuallyWithOffset(1, goBinSession, 60*time.Second).Should(
 		gexec.Exit(0),
 		fmt.Sprintf("go-bindata command `%s` exited with exit code %d, stdout: %s, stderr: %s",
 			goBindataCommand,
@@ -240,7 +240,7 @@ func BuildStembuild(version string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	gomega.EventuallyWithOffset(1, session, 30*time.Second).Should(
+	gomega.EventuallyWithOffset(1, session, 60*time.Second).Should(
 		gexec.Exit(0),
 		fmt.Sprintf(
 			"Build command was called with args: %v \n exited with exit code: %d, stdout: %s, stderr: %s",
