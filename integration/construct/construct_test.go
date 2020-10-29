@@ -104,6 +104,7 @@ var _ = Describe("stembuild construct", func() {
 				"-vm-username", conf.VMUsername,
 				"-vm-password", conf.VMPassword,
 				"-vcenter-url", conf.VCenterURL,
+				"-vcenter-ca-certs", conf.VCenterCACert,
 				"-vcenter-username", conf.VCenterUsername,
 				"-vcenter-password", conf.VCenterPassword,
 				"-vm-inventory-path", conf.LoggedInVMIpath)
