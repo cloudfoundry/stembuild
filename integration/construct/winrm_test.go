@@ -18,11 +18,15 @@ var _ = Describe("WinRM Remote Manager", func() {
 		Expect(rm).ToNot(BeNil())
 	})
 
+	AfterEach(func() {
+		_, err := rm.ExecuteCommand("powershell.exe Remove-Item c:\\provision -recurse")
+		Expect(err).ToNot(HaveOccurred())
+	})
+
 	Context("ExtractArchive", func() {
 		BeforeEach(func() {
 			err := rm.UploadArtifact(filepath.Join("assets", "StemcellAutomation.zip"), "C:\\provision\\StemcellAutomation.zip")
 			Expect(err).ToNot(HaveOccurred())
-
 		})
 
 		It("succeeds when Extract-Archive powershell function returns zero exit code", func() {
@@ -34,11 +38,6 @@ var _ = Describe("WinRM Remote Manager", func() {
 			err := rm.ExtractArchive("C:\\provision\\NonExistingFile.zip", "C:\\provision")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(HavePrefix("powershell encountered an issue: "))
-		})
-
-		AfterEach(func() {
-			_, err := rm.ExecuteCommand("powershell.exe Remove-Item c:\\provision -recurse")
-			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 

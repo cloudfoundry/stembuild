@@ -214,14 +214,14 @@ func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
 
 	vmReady := false
 	for !vmReady {
-		fmt.Print(".")
 		time.Sleep(5 * time.Second)
 		_, err := rm.ExecuteCommand(`powershell.exe "ls c:\windows 1>$null"`)
-		fmt.Println("Error from the execute command")
-		fmt.Print(err)
+		if err != nil {
+			fmt.Println("VM not yet ready:", err)
+		}
 		vmReady = err == nil
 	}
-	fmt.Print("done.\n")
+	fmt.Println("done.")
 }
 
 func envMustExist(variableName string) string {
