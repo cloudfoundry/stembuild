@@ -24,6 +24,7 @@ var _ = Describe("stembuild construct", func() {
 	var workingDir string
 
 	BeforeEach(func() {
+		fmt.Fprintln(os.Stdout, "Test Stembuild Construct - Before Each")
 		var err error
 		workingDir, err = os.Getwd()
 		Expect(err).ToNot(HaveOccurred())
@@ -133,6 +134,7 @@ var _ = Describe("stembuild construct", func() {
 	})
 
 	AfterEach(func() {
+		fmt.Fprintln(os.Stdout, "Test Stembuild Construct - After Each")
 		_ = os.Remove(filepath.Join(workingDir, "LGPO.zip"))
 	})
 })
