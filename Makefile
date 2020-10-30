@@ -22,7 +22,7 @@ integration : generate
 	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 integration
 
 integration/withoutconstruct : generate
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 integration -skipPackage integration/construct
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 -skipPackage integration/construct integration
 
 integration/construct : generate
 	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs integration/construct
