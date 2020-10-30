@@ -31,6 +31,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(t.Close()).To(Succeed())
 	err = ioutil.WriteFile(pathToCACert, []byte(rawCA), 0666)
 	Expect(err).ToNot(HaveOccurred())
+	return nil
 }, func(_ []byte) {
 })
 
