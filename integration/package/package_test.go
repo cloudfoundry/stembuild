@@ -25,38 +25,15 @@ import (
 )
 
 var _ = Describe("Package", func() {
-	const (
-		baseVMNameEnvVar                  = "PACKAGE_TEST_VM_NAME"
-		vcenterURLVariable                = "VCENTER_BASE_URL"
-		vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
-		vcenterFolderVariable             = "VM_FOLDER"
-		vcenterStembuildUsernameVariable  = "VCENTER_USERNAME"
-		vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
-		stembuildVersionVariable          = "STEMBUILD_VERSION"
-	)
-
 	var (
 		workingDir                string
-		baseVMName                string
 		vmPath                    string
 		vcenterURL                string
 		vcenterAdminCredentialUrl string
 		vcenterStembuildUsername  string
 		vcenterStembuildPassword  string
-		stembuildVersion          string
-		executable                string
 		err                       error
 	)
-
-	BeforeSuite(func() {
-
-		stembuildVersion = helpers.EnvMustExist(stembuildVersionVariable)
-		executable, err = helpers.BuildStembuild(stembuildVersion)
-		Expect(err).NotTo(HaveOccurred())
-
-		baseVMName = os.Getenv(baseVMNameEnvVar)
-		Expect(baseVMName).NotTo(Equal(""), fmt.Sprintf("%s required", baseVMNameEnvVar))
-	})
 
 	BeforeEach(func() {
 		vcenterFolder := helpers.EnvMustExist(vcenterFolderVariable)

@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -16,11 +18,21 @@ func TestPackage(t *testing.T) {
 }
 
 const (
-	VcenterCACert = "VCENTER_CA_CERT"
+	VcenterCACert                     = "VCENTER_CA_CERT"
+	baseVMNameEnvVar                  = "PACKAGE_TEST_VM_NAME"
+	vcenterURLVariable                = "VCENTER_BASE_URL"
+	vcenterAdminCredentialUrlVariable = "VCENTER_ADMIN_CREDENTIAL_URL"
+	vcenterFolderVariable             = "VM_FOLDER"
+	vcenterStembuildUsernameVariable  = "VCENTER_USERNAME"
+	vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
+	stembuildVersionVariable          = "STEMBUILD_VERSION"
 )
 
 var (
-	pathToCACert string
+	pathToCACert     string
+	stembuildVersion string
+	executable       string
+	baseVMName       string
 )
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -31,6 +43,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(t.Close()).To(Succeed())
 	err = ioutil.WriteFile(pathToCACert, []byte(rawCA), 0666)
 	Expect(err).ToNot(HaveOccurred())
+
+	stembuildVersion = helpers.EnvMustExist(stembuildVersionVariable)
+	executable, err = helpers.BuildStembuild(stembuildVersion)
+	Expect(err).NotTo(HaveOccurred())
+
+	baseVMName = os.Getenv(baseVMNameEnvVar)
+	Expect(baseVMName).NotTo(Equal(""), fmt.Sprintf("%s required", baseVMNameEnvVar))
 	return nil
 }, func(_ []byte) {
 })
