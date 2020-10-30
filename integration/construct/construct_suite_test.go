@@ -202,7 +202,7 @@ func revertSnapshot(vmIpath string, snapshotName string) {
 		snapshotName,
 	}
 	fmt.Printf("Reverting VM Snapshot: %s\n", snapshotName)
-	exitCode := runIgnoringOutput(snapshotCommand)
+	exitCode := runWithoutIgnoringOutput(snapshotCommand)
 	if exitCode != 0 {
 		fmt.Print("There was an error reverting the snapshot.")
 	} else {
@@ -250,7 +250,7 @@ func enableWinRM(repoPath string) {
 		"C:\\Windows\\Temp\\BOSH.WinRM.psm1",
 	}
 
-	exitCode := runIgnoringOutput(uploadCommand)
+	exitCode := runWithoutIgnoringOutput(uploadCommand)
 	if exitCode != 0 {
 		fmt.Print("There was an error uploading WinRM psmodule.")
 	}
@@ -265,7 +265,7 @@ func enableWinRM(repoPath string) {
 		`-command`,
 		`&{Import-Module C:\Windows\Temp\BOSH.WinRM.psm1; Enable-WinRM}`,
 	}
-	exitCode = runIgnoringOutput(enableCommand)
+	exitCode = runWithoutIgnoringOutput(enableCommand)
 	if exitCode != 0 {
 		fmt.Print("There was an error enabling WinRM.")
 	} else {
@@ -283,7 +283,7 @@ func createVMSnapshot(snapshotName string) {
 	}
 	fmt.Printf("Creating VM Snapshot: %s on VM: %s\n", snapshotName, conf.VMInventoryPath)
 	// is blocking
-	exitCode := runIgnoringOutput(snapshotCommand)
+	exitCode := runWithoutIgnoringOutput(snapshotCommand)
 	if exitCode != 0 {
 		fmt.Print("There was an error creating the snapshot.")
 	} else {
@@ -302,7 +302,12 @@ func powerOnVM() {
 		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		"-on",
 	}
-	runIgnoringOutput(powerOnCommand)
+	runWithoutIgnoringOutput(powerOnCommand)
+}
+
+func runWithoutIgnoringOutput(args []string) int {
+	exitCode := cli.Run(args)
+	return exitCode
 }
 
 func runIgnoringOutput(args []string) int {
