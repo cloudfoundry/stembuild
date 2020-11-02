@@ -3,17 +3,18 @@ package remotemanager
 import (
 	"bytes"
 	"fmt"
-	"github.com/masterzen/winrm"
 	"io"
 	"net"
 	"os"
 	"time"
 
+	"github.com/masterzen/winrm"
+
 	"github.com/cloudfoundry-incubator/winrmcp/winrmcp"
 )
 
 const WinRmPort = 5985
-const WinRmTimeout = 60 * time.Second
+const WinRmTimeout = 120 * time.Second
 
 type WinRM struct {
 	host          string
@@ -67,7 +68,8 @@ func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error
 		Auth:                  winrmcp.Auth{User: w.username, Password: w.password},
 		Https:                 false,
 		Insecure:              true,
-		OperationTimeout:      time.Second * 60,
+		ConnectTimeout:        WinRmTimeout,
+		OperationTimeout:      WinRmTimeout,
 		MaxOperationsPerShell: 15,
 	})
 
