@@ -1,8 +1,6 @@
 package construct_test
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 
 	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
@@ -15,21 +13,18 @@ var _ = Describe("WinRM Remote Manager", func() {
 	var rm RemoteManager
 
 	BeforeEach(func() {
-		fmt.Fprintln(os.Stdout, "Test WinRM Remote Manager - Before Each")
 		clientFactory := NewWinRmClientFactory(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 		rm = NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword, clientFactory)
 		Expect(rm).ToNot(BeNil())
 	})
 
 	AfterEach(func() {
-		fmt.Fprintln(os.Stdout, "Test WinRM Remote Manager - After Each")
 		_, err := rm.ExecuteCommand("powershell.exe Remove-Item c:\\provision -recurse")
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Context("ExtractArchive", func() {
 		BeforeEach(func() {
-			fmt.Fprintln(os.Stdout, "Test WinRM Remote Manager ExtractArchive - Before Each")
 			err := rm.UploadArtifact(filepath.Join("assets", "StemcellAutomation.zip"), "C:\\provision\\StemcellAutomation.zip")
 			Expect(err).ToNot(HaveOccurred())
 		})

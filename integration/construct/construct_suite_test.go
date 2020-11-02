@@ -84,7 +84,6 @@ type config struct {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	fmt.Fprintln(os.Stdout, "Starting Before Suite - Single")
 	var err error
 
 	boshPsmodulesRepo := envMustExist(BoshPsmodulesRepoVariable)
@@ -145,17 +144,14 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	return nil
 }, func(_ []byte) {
-	fmt.Fprintln(os.Stdout, "Starting Before Suite - Node")
 })
 
 var _ = BeforeEach(func() {
-	fmt.Fprintln(os.Stdout, "Suite - Before Each")
 	revertSnapshot(conf.VMInventoryPath, VmSnapshotName)
 	waitForVmToBeReady(conf.TargetIP, conf.VMUsername, conf.VMPassword)
 })
 
 var _ = SynchronizedAfterSuite(func() {
-	fmt.Fprintln(os.Stdout, "Starting After Suite - Node")
 	skipCleanup := strings.ToUpper(os.Getenv(SkipCleanupVariable))
 
 	if skipCleanup != "TRUE" {
@@ -187,7 +183,6 @@ var _ = SynchronizedAfterSuite(func() {
 
 	_ = os.RemoveAll(tmpDir)
 }, func() {
-	fmt.Fprintln(os.Stdout, "Starting After Suite - Single")
 	if pathToCACert != "" {
 		os.RemoveAll(pathToCACert)
 	}
