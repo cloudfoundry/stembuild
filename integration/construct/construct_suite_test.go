@@ -277,13 +277,10 @@ func createVMSnapshot(snapshotName string) {
 		snapshotName,
 	}
 	fmt.Printf("Creating VM Snapshot: %s on VM: %s\n", snapshotName, conf.VMInventoryPath)
-	// is blocking
-	exitCode := runIgnoringOutput(snapshotCommand)
-	if exitCode != 0 {
-		fmt.Print("There was an error creating the snapshot.")
-	} else {
-		fmt.Println("Snapshot command started.")
-	}
+	exitCode := cli.Run(snapshotCommand)
+	Expect(exitCode).To(Equal(0), "Creating the snapshot failed")
+
+	fmt.Println("Snapshot command started.")
 	fmt.Print("Waiting for snapshot to finish...")
 	time.Sleep(30 * time.Second)
 	fmt.Print("done.\n")
