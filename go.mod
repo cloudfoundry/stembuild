@@ -5,7 +5,6 @@ go 1.14
 require (
 	github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c // indirect
 	github.com/ChrisTrenkamp/goxpath v0.0.0-20190607011252-c5096ec8773d // indirect
-	github.com/cloudfoundry-incubator/winrmcp v0.0.0-20180921211025-c76d91c1e7db
 	github.com/concourse/pool-resource v1.1.1
 	github.com/dylanmei/iso8601 v0.1.0 // indirect
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
@@ -22,9 +21,9 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/onsi/ginkgo v1.12.2
 	github.com/onsi/gomega v1.10.1
+	github.com/packer-community/winrmcp v0.0.0-20180921211025-c76d91c1e7db
 	github.com/pkg/errors v0.9.1
 	github.com/vmware/govmomi v0.23.1
-	github.com/xtreme-gabelan-satchithanantham/winrmcp v0.0.0-20181120153252-ed85582c6e81
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	golang.org/x/sys v0.0.0-20200909081042-eff7692f9009

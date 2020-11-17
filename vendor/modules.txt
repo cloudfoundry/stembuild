@@ -17,9 +17,6 @@ github.com/ChrisTrenkamp/goxpath/tree/xmltree/xmlbuilder
 github.com/ChrisTrenkamp/goxpath/tree/xmltree/xmlele
 github.com/ChrisTrenkamp/goxpath/tree/xmltree/xmlnode
 github.com/ChrisTrenkamp/goxpath/xconst
-# github.com/cloudfoundry-incubator/winrmcp v0.0.0-20180921211025-c76d91c1e7db
-## explicit
-github.com/cloudfoundry-incubator/winrmcp/winrmcp
 # github.com/concourse/pool-resource v1.1.1
 ## explicit
 github.com/concourse/pool-resource/out
@@ -123,6 +120,9 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
+# github.com/packer-community/winrmcp v0.0.0-20180921211025-c76d91c1e7db
+## explicit
+github.com/packer-community/winrmcp/winrmcp
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
@@ -169,9 +169,6 @@ github.com/vmware/govmomi/vim25/soap
 github.com/vmware/govmomi/vim25/types
 github.com/vmware/govmomi/vim25/xml
 github.com/vmware/govmomi/vmdk
-# github.com/xtreme-gabelan-satchithanantham/winrmcp v0.0.0-20181120153252-ed85582c6e81
-## explicit
-github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp
 # golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 ## explicit
 golang.org/x/crypto/md4

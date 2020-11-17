@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/xtreme-gabelan-satchithanantham/winrmcp/winrmcp"
+	"github.com/packer-community/winrmcp/winrmcp"
 )
 
 func totallyNotMain() {

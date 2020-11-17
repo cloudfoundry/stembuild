@@ -10,7 +10,7 @@ import (
 
 	"github.com/masterzen/winrm"
 
-	"github.com/cloudfoundry-incubator/winrmcp/winrmcp"
+	"github.com/packer-community/winrmcp/winrmcp"
 )
 
 const WinRmPort = 5985
