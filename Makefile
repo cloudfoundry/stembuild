@@ -1,10 +1,15 @@
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
-COMMAND = out/stembuild
 AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
 AUTOMATION_PREFIX = $(shell dirname "${AUTOMATION_PATH}")
 STEMCELL_VERSION = $(shell echo "$${STEMBUILD_VERSION}")
 export BOSH_PSMODULES_REPO ?= ${HOME}/workspace/bosh-psmodules
 LD_FLAGS = "-w -s -X github.com/cloudfoundry-incubator/stembuild/version.Version=${STEMCELL_VERSION}"
+
+ifeq ($(OS),Windows_NT)
+	COMMAND = out/stembuild.exe
+else
+	COMMAND = out/stembuild
+endif
 
 all : test build
 
@@ -28,8 +33,7 @@ integration-badger : generate
 	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -untilItFails integration
 
 generate: $(GOSRC) $(AUTOMATION_PATH)
-	go get -u github.com/go-bindata/go-bindata/...
-	go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
+	go run github.com/go-bindata/go-bindata/go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(AUTOMATION_PREFIX) $(AUTOMATION_PATH)
 
 out/stembuild : generate $(GOSRC)
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
