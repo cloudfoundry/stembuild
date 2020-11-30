@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -173,9 +174,8 @@ func BuildStembuild(version string) (string, error) {
 	command := exec.Command("make", "build")
 	command.Env = AddOrReplaceEnvironment(os.Environ(), "STEMBUILD_VERSION", version)
 
-	pwd, err := os.Getwd()
-	Expect(err).NotTo(HaveOccurred())
-	root := filepath.Dir(pwd)
+	_, b, _, _ := runtime.Caller(0)
+	root := filepath.Dir(filepath.Dir(filepath.Dir(b)))
 	command.Dir = root
 
 	session, err := Start(
