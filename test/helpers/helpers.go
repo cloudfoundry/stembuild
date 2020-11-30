@@ -13,10 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/onsi/ginkgo"
-
-	"github.com/onsi/gomega"
-	"github.com/onsi/gomega/gexec"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gexec"
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {
@@ -175,19 +174,19 @@ func BuildStembuild(version string) (string, error) {
 	command.Env = AddOrReplaceEnvironment(os.Environ(), "STEMBUILD_VERSION", version)
 
 	pwd, err := os.Getwd()
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+	Expect(err).NotTo(HaveOccurred())
 	root := filepath.Dir(pwd)
 	command.Dir = root
 
-	session, err := gexec.Start(
+	session, err := Start(
 		command,
-		gexec.NewPrefixedWriter(DebugOutPrefix, ginkgo.GinkgoWriter),
-		gexec.NewPrefixedWriter(DebugErrPrefix, ginkgo.GinkgoWriter))
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-	gomega.Eventually(session, 120*time.Second).Should(gexec.Exit(0))
+		NewPrefixedWriter(DebugOutPrefix, GinkgoWriter),
+		NewPrefixedWriter(DebugErrPrefix, GinkgoWriter))
+	Expect(err).NotTo(HaveOccurred())
+	Eventually(session, 120*time.Second).Should(Exit(0))
 
-	files, err := ioutil.ReadDir("out")
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+	files, err := ioutil.ReadDir(filepath.Join(root, "out"))
+	Expect(err).NotTo(HaveOccurred())
 
 	for _, f := range files {
 		if strings.Contains(filepath.Base(f.Name()), "stembuild") {
@@ -203,7 +202,7 @@ func BuildStembuild(version string) (string, error) {
 func EnvMustExist(variableName string) string {
 	result := os.Getenv(variableName)
 	if result == "" {
-		ginkgo.Fail(fmt.Sprintf("%s must be set", variableName))
+		Fail(fmt.Sprintf("%s must be set", variableName))
 	}
 
 	return result
