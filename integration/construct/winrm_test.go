@@ -42,7 +42,6 @@ var _ = Describe("WinRM Remote Manager", func() {
 	})
 
 	Context("ExecuteCommand", func() {
-
 		It("succeeds when powershell command returns a zero exit code", func() {
 			_, err := rm.ExecuteCommand("powershell.exe \"ls c:\\windows 1>$null\"")
 			Expect(err).ToNot(HaveOccurred())
@@ -53,6 +52,5 @@ var _ = Describe("WinRM Remote Manager", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(HavePrefix("powershell encountered an issue: "))
 		})
-
 	})
 })

@@ -1,10 +1,11 @@
+// +build !windows
+
 package integration_test
 
 import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -16,16 +17,13 @@ import (
 var _ = Describe("Interrupts", func() {
 	Describe("catchInterruptSignal", func() {
 		It("cleans up on one interrupt", func() {
-			if runtime.GOOS == "windows" {
-				Skip("Skipping, test not supported on Windows.")
-			}
-
 			var err error
 			stembuildExecutable, err = helpers.BuildStembuild("1200.0.0")
 			Expect(err).ToNot(HaveOccurred())
 
 			inputVmdk := filepath.Join("..", "test", "data", "expected.vmdk")
 			tmpDir, err := ioutil.TempDir(os.TempDir(), "stembuild-interrupts")
+			Expect(err).ToNot(HaveOccurred())
 
 			session := helpers.Stembuild(stembuildExecutable, "package", "--vmdk", inputVmdk, "--outputDir", tmpDir)
 			time.Sleep(1 * time.Second)
