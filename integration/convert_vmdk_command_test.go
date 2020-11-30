@@ -96,7 +96,7 @@ var _ = Describe("Convert VMDK", func() {
 
 func expectStembuildToSucceed(arguments ...string) *Session {
 	session := helpers.Stembuild(stembuildExecutable, arguments...)
-	Eventually(session, 20*time.Second).Should(Exit(0),
+	Eventually(session, 60*time.Second).Should(Exit(0),
 		fmt.Sprintf(
 			"Expected %s %s to exit with code 0, exited with code %d\nout: %s\nerr: %s",
 			stembuildExecutable,
@@ -107,11 +107,4 @@ func expectStembuildToSucceed(arguments ...string) *Session {
 		))
 
 	return session
-}
-
-//Stembuild now has stemcell-version baked in. So, it must be rebuilt if a test uses a different stemcell-version
-func buildNewStembuildVersion(version string) {
-	var err error
-	stembuildExecutable, err = helpers.BuildStembuild(version)
-	Expect(err).NotTo(HaveOccurred())
 }

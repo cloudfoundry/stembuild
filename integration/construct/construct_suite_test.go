@@ -212,8 +212,12 @@ func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
 	rm := remotemanager.NewWinRM(vmIp, vmUsername, vmPassword, clientFactory)
 	Expect(rm).ToNot(BeNil())
 
+	start := time.Now()
 	vmReady := false
 	for !vmReady {
+		if time.Since(start) > time.Hour {
+			Fail(fmt.Sprintf("VM at %s failed to start", vmIp))
+		}
 		time.Sleep(5 * time.Second)
 		_, err := rm.ExecuteCommand(`powershell.exe "ls c:\windows 1>$null"`)
 		if err != nil {
