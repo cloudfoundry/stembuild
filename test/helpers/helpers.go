@@ -173,6 +173,11 @@ func BuildStembuild(version string) (string, error) {
 	command := exec.Command("make", "build")
 	command.Env = AddOrReplaceEnvironment(os.Environ(), "STEMBUILD_VERSION", version)
 
+	pwd, err := os.Getwd()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+	root := filepath.Dir(pwd)
+	command.Dir = root
+
 	session, err := gexec.Start(
 		command,
 		gexec.NewPrefixedWriter(DebugOutPrefix, ginkgo.GinkgoWriter),
