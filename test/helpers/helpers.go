@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/onsi/ginkgo"
 
@@ -183,7 +184,7 @@ func BuildStembuild(version string) (string, error) {
 		gexec.NewPrefixedWriter(DebugOutPrefix, ginkgo.GinkgoWriter),
 		gexec.NewPrefixedWriter(DebugErrPrefix, ginkgo.GinkgoWriter))
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-	gomega.Eventually(session).Should(gexec.Exit(0))
+	gomega.Eventually(session, 120*time.Second).Should(gexec.Exit(0))
 
 	files, err := ioutil.ReadDir("out")
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
