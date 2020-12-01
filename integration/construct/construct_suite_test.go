@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -46,7 +47,6 @@ const (
 	vcenterStembuildUsernameVariable  = "VCENTER_USERNAME"
 	vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
 	StembuildVersionVariable          = "STEMBUILD_VERSION"
-	BoshPsmodulesRepoVariable         = "BOSH_PSMODULES_REPO"
 	VmSnapshotName                    = "integration-test-snapshot"
 	LoggedInVmIpVariable              = "LOGOUT_INTEGRATION_TEST_VM_IP"
 	LoggedInVmIpathVariable           = "LOGOUT_INTEGRATION_TEST_VM_INVENTORY_PATH"
@@ -86,7 +86,6 @@ type config struct {
 var _ = SynchronizedBeforeSuite(func() []byte {
 	var err error
 
-	boshPsmodulesRepo := envMustExist(BoshPsmodulesRepoVariable)
 	stembuildVersion := envMustExist(StembuildVersionVariable)
 	stembuildExecutable, err = helpers.BuildStembuild(stembuildVersion)
 	Expect(err).NotTo(HaveOccurred())
@@ -138,7 +137,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		VMInventoryPath:    vmInventoryPath,
 	}
 
-	enableWinRM(boshPsmodulesRepo)
+	enableWinRM()
 	powerOnVM()
 	createVMSnapshot(VmSnapshotName)
 
@@ -237,7 +236,10 @@ func envMustExist(variableName string) string {
 	return result
 }
 
-func enableWinRM(repoPath string) {
+func enableWinRM() {
+	_, b, _, _ := runtime.Caller(0)
+	root := filepath.Dir(filepath.Dir(filepath.Dir(b)))
+
 	fmt.Println("Enabling WinRM on the base image before integration tests...")
 	uploadCommand := []string{
 		"guest.upload",
@@ -245,7 +247,7 @@ func enableWinRM(repoPath string) {
 		fmt.Sprintf("-u=%s", vcenterAdminCredentialUrl),
 		fmt.Sprintf("-l=%s:%s", conf.VMUsername, conf.VMPassword),
 		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
-		filepath.Join(repoPath, "modules", "BOSH.WinRM", "BOSH.WinRM.psm1"),
+		filepath.Join(root, "modules", "BOSH.WinRM", "BOSH.WinRM.psm1"),
 		"C:\\Windows\\Temp\\BOSH.WinRM.psm1",
 	}
 
