@@ -39,6 +39,16 @@ function PostReboot
     SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
 }
 
+function RunQuickerDism
+{
+    Write-Log "Running Quicker Dism (that is, not executing with /ResetBase)"
+    Dism.exe /online /Cleanup-Image /StartComponentCleanup
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Error: Running Dism.exe /online /Cleanup-Image /StartComponentCleanup"
+        Throw "Dism.exe failed"
+    }
+}
+
 function CopyPSModules
 {
     try
