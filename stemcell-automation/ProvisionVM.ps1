@@ -5,7 +5,6 @@ function ProvisionVM() {
         [string]$Version
     )
 
-    RunQuickerDism -IgnoreErrors $True
     CopyPSModules
     Set-RegKeys
     InstallBoshAgent
@@ -25,6 +24,5 @@ function ProvisionVM() {
         Write-Warning "Failed to retrieve updated root certificates from the public Windows Update Server. This should not impact the successful execution of stembuild construct. If your root certificates are out of date, Diego cells running on VMs built from this stemcell may not be able to make outbound network connections."
     }
     Create-VersionFile -Version $Version
-    RunQuickerDism -IgnoreErrors $True
     Restart-Computer
 }

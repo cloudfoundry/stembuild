@@ -34,31 +34,15 @@ function PostReboot
         [string]$Owner = "",
         [switch]$SkipRandomPassword
     )
-    RunQuickerDism -IgnoreErrors $True
-    InstallCFCell
-    RunQuickerDism -IgnoreErrors $True
-    CleanUpVM
-    RunQuickerDism -IgnoreErrors $True
-    SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
-    RunQuickerDism
-}
-
-function RunQuickerDism {
-    param(
-        [bool]$IgnoreErrors = $False
-    )
-
     Write-Log "Running Quicker Dism (that is, not executing with /ResetBase)"
     Dism.exe /online /Cleanup-Image /StartComponentCleanup
     if ($LASTEXITCODE -ne 0) {
         Write-Log "Error: Running Dism.exe /online /Cleanup-Image /StartComponentCleanup"
-        if ($IgnoreErrors) {
-            Write-Log "Continuing, ignoring Dism.exe error."
-        }
-        else {
-            Throw "Dism.exe failed"
-        }
+        Throw "Dism.exe failed"
     }
+    InstallCFCell
+    CleanUpVM
+    SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
 }
 
 function CopyPSModules
