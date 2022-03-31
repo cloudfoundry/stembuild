@@ -135,11 +135,11 @@ assets/local/agent.zip: assets/local/bosh-agent.exe assets/local/pipe.exe assets
 		assets/local/bosh-agent.exe \
 		assets/temp
 	$(CP) assets/local/bosh-blobstore-dav.exe \
-	  assets/local/bosh-blobstore-gcs.exe \
-	  assets/local/bosh-blobstore-s3.exe \
-	  assets/local/job-service-wrapper.exe \
+		assets/local/bosh-blobstore-gcs.exe \
+		assets/local/bosh-blobstore-s3.exe \
+		assets/local/job-service-wrapper.exe \
 		assets/local/pipe.exe \
-	  assets/local/tar.exe \
+		assets/local/tar.exe \
 		assets/temp/deps
 	cd assets/temp && zip -r ../local/agent.zip * && cd -
 	rm -rf assets/temp
