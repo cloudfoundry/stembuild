@@ -14,6 +14,9 @@ BOSH_GCS_URL = 'https://s3.amazonaws.com/bosh-gcscli/bosh-gcscli-0.0.6-windows-a
 PSMODULES_SOURCES = $(shell find ./modules | grep -v .git | grep -vi "test" | grep -v cis-merge)
 BOSH_AGENT_SOURCES = $(shell find $(BOSH_AGENT_REPO) | egrep -v ".git|test.go|fake|.md")
 
+# The default Slow Spec Threshold for integration tests is too low, pollutes the output
+SLOW_SPEC_THRESHOLD_INTEGRATION = 300
+
 ifeq ($(OS),Windows_NT)
 	COMMAND = out/stembuild.exe
 	CP = cp
@@ -42,13 +45,13 @@ format :
 	go fmt ./...
 
 integration : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 integration
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) integration
 
 integration/construct : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs integration/construct
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) integration/construct
 
 integration-badger : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -untilItFails integration
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) -untilItFails integration
 
 generate-fake-stemcell-automation: $(GOSRC) $(FAKE_STEMCELL_AUTOMATION_PATH)
 	go run github.com/go-bindata/go-bindata/go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(FAKE_STEMCELL_AUTOMATION_PREFIX) $(FAKE_STEMCELL_AUTOMATION_PATH)
