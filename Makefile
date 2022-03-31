@@ -45,10 +45,10 @@ format :
 	go fmt ./...
 
 integration : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -flakeAttempts 2 -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) integration
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -keepGoing -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) -flakeAttempts 2 integration
 
 integration/construct : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) integration/construct
+	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -keepGoing -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) -flakeAttempts 2 integration/construct
 
 integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/ginkgo -r -v -randomizeAllSpecs -slowSpecThreshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) -untilItFails integration
@@ -69,11 +69,11 @@ test : units
 
 units : format generate-fake-stemcell-automation
 	@go run github.com/onsi/ginkgo/ginkgo version
-	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration,iaas_cli
+	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites -keepGoing -skipPackage integration,iaas_cli
 	@echo "\nSWEET SUITE SUCCESS"
 
 contract :
-	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites -flakeAttempts 2 iaas_cli
+	go run github.com/onsi/ginkgo/ginkgo -r -randomizeAllSpecs -randomizeSuites -keepGoing -flakeAttempts 2 iaas_cli
 
 .PHONY : all build build-integration clean format generate generate-fake-stemcell-automation
 .PHONY : test units units-full integration integration-tests-full
