@@ -15,7 +15,7 @@ import (
 
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	"github.com/cloudfoundry/stembuild/test/helpers"
 )
 
 var _ = Describe("Convert VMDK", func() {

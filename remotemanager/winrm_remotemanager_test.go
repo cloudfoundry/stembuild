@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager/remotemanagerfakes"
+	"github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
 	"github.com/masterzen/winrm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,11 +15,6 @@ import (
 	"net/url"
 	"strconv"
 )
-
-////go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . FakeShell
-//type FakeShell interface {
-//	 Close() error
-//}
 
 func setupTestServer() *Server {
 	server := NewServer()

@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+	"github.com/cloudfoundry/stembuild/filesystem"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IaasClient

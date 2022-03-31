@@ -4,7 +4,7 @@ package tarfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/tar"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar"
 )
 
 type FakeTarable struct {

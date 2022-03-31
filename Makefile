@@ -2,7 +2,7 @@ GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path 
 FAKE_STEMCELL_AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
 FAKE_STEMCELL_AUTOMATION_PREFIX = $(shell dirname "${FAKE_STEMCELL_AUTOMATION_PATH}")
 STEMCELL_VERSION = $(shell echo "$${STEMBUILD_VERSION}")
-LD_FLAGS = "-w -s -X github.com/cloudfoundry-incubator/stembuild/version.Version=${STEMCELL_VERSION}"
+LD_FLAGS = "-w -s -X github.com/cloudfoundry/stembuild/version.Version=${STEMCELL_VERSION}"
 
 # These are the sources for StemcellAutomation.zip
 STEMCELL_AUTOMATION_PS1 := $(shell ls stemcell-automation/*ps1 | grep -iv Test)

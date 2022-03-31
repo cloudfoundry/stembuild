@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 	"github.com/masterzen/winrm"
 )
 

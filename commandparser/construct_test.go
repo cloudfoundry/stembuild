@@ -5,8 +5,8 @@ import (
 	"errors"
 	"flag"
 
-	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/commandparser/commandparserfakes"
+	. "github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
 	"github.com/google/subcommands"
 
 	. "github.com/onsi/ginkgo"

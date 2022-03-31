@@ -1,8 +1,8 @@
 package archive_test
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/assets"
-	archive2 "github.com/cloudfoundry-incubator/stembuild/construct/archive"
+	"github.com/cloudfoundry/stembuild/assets"
+	archive2 "github.com/cloudfoundry/stembuild/construct/archive"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

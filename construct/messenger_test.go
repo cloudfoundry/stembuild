@@ -3,7 +3,7 @@ package construct_test
 import (
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -267,7 +267,7 @@ var _ = Describe("Messenger", func() {
 		It("writes still running message with timestamp", func() {
 			m := construct.NewMessenger(buf)
 			m.WaitingForShutdown()
-			//to match timestamp format 2006-01-02T15:04:05.99999-07:00
+			// to match timestamp format 2006-01-02T15:04:05.99999-07:00
 			//        should also match 2006-01-02T15:04:05.1+07:00
 			dateTimeRegex := "\\d{4}\\-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d*(\\-|\\+)\\d{2}:\\d{2}"
 

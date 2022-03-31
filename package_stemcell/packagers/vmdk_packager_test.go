@@ -11,10 +11,10 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	. "github.com/cloudfoundry-incubator/stembuild/filesystem/mock"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
-	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	. "github.com/cloudfoundry/stembuild/filesystem/mock"
+	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
+	"github.com/cloudfoundry/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

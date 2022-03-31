@@ -4,19 +4,19 @@ import (
 	"context"
 	"os"
 
-	p "github.com/cloudfoundry-incubator/stembuild/poller"
+	p "github.com/cloudfoundry/stembuild/poller"
 
-	"github.com/cloudfoundry-incubator/stembuild/version"
+	"github.com/cloudfoundry/stembuild/version"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/construct"
-	"github.com/cloudfoundry-incubator/stembuild/construct/archive"
-	"github.com/cloudfoundry-incubator/stembuild/construct/config"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
+	"github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct/archive"
+	"github.com/cloudfoundry/stembuild/construct/config"
+	"github.com/cloudfoundry/stembuild/iaas_cli"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients"
 	"github.com/pkg/errors"
 
-	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
+	. "github.com/cloudfoundry/stembuild/remotemanager"
 )
 
 type VMConstructFactory struct {

@@ -3,7 +3,7 @@ package construct
 import (
 	"context"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/assets"
+	"github.com/cloudfoundry/stembuild/assets"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . zipUnarchiver

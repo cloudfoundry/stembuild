@@ -6,7 +6,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct"
 )
 
 type FakeGuestManager struct {

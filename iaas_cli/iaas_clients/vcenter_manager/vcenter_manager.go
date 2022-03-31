@@ -15,7 +15,7 @@ import (
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/vim25/types"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GovmomiClient

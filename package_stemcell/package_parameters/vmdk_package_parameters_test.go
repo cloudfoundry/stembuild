@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	. "github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
+	. "github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

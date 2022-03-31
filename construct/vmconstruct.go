@@ -11,9 +11,9 @@ import (
 	"time"
 	"unicode/utf16"
 
-	"github.com/cloudfoundry-incubator/stembuild/poller"
+	"github.com/cloudfoundry/stembuild/poller"
 
-	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
+	. "github.com/cloudfoundry/stembuild/remotemanager"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . VersionGetter

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudfoundry-incubator/stembuild/templates"
+	"github.com/cloudfoundry/stembuild/templates"
 )
 
 func parseVMX(vmx string) (map[string]string, error) {

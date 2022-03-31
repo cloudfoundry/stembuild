@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 )
 
 type FakeRemoteManager struct {

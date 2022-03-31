@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
-	fakes "github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/stemcell_generatorfakes"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator"
+	fakes "github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/stemcell_generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

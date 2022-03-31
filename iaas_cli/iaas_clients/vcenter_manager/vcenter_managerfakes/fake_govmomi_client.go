@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
 
 type FakeGovmomiClient struct {

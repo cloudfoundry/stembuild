@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/vmware/govmomi/vim25/types"
 )
 

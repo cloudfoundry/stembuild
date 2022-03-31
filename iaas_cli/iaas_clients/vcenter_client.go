@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
+	"github.com/cloudfoundry/stembuild/iaas_cli"
 )
 
 type VcenterClient struct {

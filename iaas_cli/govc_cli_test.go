@@ -3,7 +3,7 @@ package iaas_cli_test
 import (
 	"strings"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
+	"github.com/cloudfoundry/stembuild/iaas_cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

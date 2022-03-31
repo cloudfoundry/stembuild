@@ -1,9 +1,9 @@
 package vmconstruct_factory
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/commandparser/commandparserfakes"
-	"github.com/cloudfoundry-incubator/stembuild/construct"
-	"github.com/cloudfoundry-incubator/stembuild/construct/config"
+	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
+	"github.com/cloudfoundry/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager/guest_managerfakes"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager/guest_managerfakes"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/vmware/govmomi/vim25/types"

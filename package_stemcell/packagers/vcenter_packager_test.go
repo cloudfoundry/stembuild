@@ -13,12 +13,12 @@ import (
 	"path"
 	"path/filepath"
 
-	. "github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
+	. "github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers/packagersfakes"
+	"github.com/cloudfoundry/stembuild/filesystem"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packagers/packagersfakes"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

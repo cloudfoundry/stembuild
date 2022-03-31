@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	"github.com/cloudfoundry/stembuild/test/helpers"
 )
 
 var _ = Describe("Interrupts", func() {

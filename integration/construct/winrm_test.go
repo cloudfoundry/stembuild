@@ -3,7 +3,7 @@ package construct_test
 import (
 	"path/filepath"
 
-	. "github.com/cloudfoundry-incubator/stembuild/remotemanager"
+	. "github.com/cloudfoundry/stembuild/remotemanager"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

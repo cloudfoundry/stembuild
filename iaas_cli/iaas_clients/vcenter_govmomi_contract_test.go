@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

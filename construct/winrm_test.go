@@ -3,9 +3,9 @@ package construct_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry-incubator/stembuild/assets"
-	"github.com/cloudfoundry-incubator/stembuild/construct"
-	"github.com/cloudfoundry-incubator/stembuild/construct/constructfakes"
+	"github.com/cloudfoundry/stembuild/assets"
+	"github.com/cloudfoundry/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct/constructfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

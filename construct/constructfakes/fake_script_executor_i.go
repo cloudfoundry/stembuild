@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct"
 )
 
 type FakeScriptExecutorI struct {

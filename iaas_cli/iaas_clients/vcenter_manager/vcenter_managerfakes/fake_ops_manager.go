@@ -5,7 +5,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	"github.com/vmware/govmomi/guest"
 )
 

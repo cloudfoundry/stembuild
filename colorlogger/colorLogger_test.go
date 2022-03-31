@@ -2,7 +2,7 @@ package colorlogger_test
 
 import (
 	"bytes"
-	. "github.com/cloudfoundry-incubator/stembuild/colorlogger"
+	. "github.com/cloudfoundry/stembuild/colorlogger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

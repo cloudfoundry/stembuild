@@ -5,7 +5,7 @@ import (
 	"context"
 	"sync"
 
-	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/soap"
 )

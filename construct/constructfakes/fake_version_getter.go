@@ -4,7 +4,7 @@ package constructfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct"
 )
 
 type FakeVersionGetter struct {

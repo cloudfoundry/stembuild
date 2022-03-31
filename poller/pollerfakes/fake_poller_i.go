@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/poller"
+	"github.com/cloudfoundry/stembuild/poller"
 )
 
 type FakePollerI struct {

@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
+	"github.com/cloudfoundry/stembuild/colorlogger"
 
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+	"github.com/cloudfoundry/stembuild/filesystem"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 	"github.com/google/subcommands"
 )
 

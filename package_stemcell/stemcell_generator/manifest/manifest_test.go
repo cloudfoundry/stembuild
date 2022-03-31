@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/manifest"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -38,7 +38,7 @@ stemcell_formats:
 			Expect(err).NotTo(HaveOccurred())
 			s := buf.String()
 
-			//output of `echo -n "An image" | shasum`
+			// output of `echo -n "An image" | shasum`
 			shaSum := "bf8a473a2baa3988b4e7fc4702c35303cdf6df6b"
 
 			Expect(s).To(Equal(fmt.Sprintf(format, "1709", "1709.999", shaSum)))

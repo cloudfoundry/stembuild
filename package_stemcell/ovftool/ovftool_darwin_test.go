@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/ovftool"
+	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 )
 
 var _ = Describe("ovftool darwin", func() {

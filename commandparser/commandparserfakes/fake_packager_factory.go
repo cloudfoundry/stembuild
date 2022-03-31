@@ -4,8 +4,8 @@ package commandparserfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 )
 
 type FakePackagerFactory struct {

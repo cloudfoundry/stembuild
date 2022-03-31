@@ -1,7 +1,7 @@
 package filename_test
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/filename"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/filename"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

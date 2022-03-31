@@ -2,12 +2,10 @@ package construct_test
 
 import (
 	"errors"
-	//"github.com/cloudfoundry-incubator/stembuild/construct"
-	"github.com/cloudfoundry-incubator/stembuild/construct"
-	"github.com/cloudfoundry-incubator/stembuild/remotemanager/remotemanagerfakes"
+	"github.com/cloudfoundry/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	//. "github.com/onsi/gomega"
 )
 
 var _ = Describe("VMConnectionValidator", func() {

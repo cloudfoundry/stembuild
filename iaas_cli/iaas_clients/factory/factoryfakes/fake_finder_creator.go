@@ -4,7 +4,7 @@ package factoryfakes
 import (
 	"sync"
 
-	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/vim25"
 )

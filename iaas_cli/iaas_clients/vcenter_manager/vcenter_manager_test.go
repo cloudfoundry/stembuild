@@ -5,14 +5,14 @@ import (
 	"errors"
 	"runtime"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/object"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/vmware/govmomi/vim25"

@@ -1,7 +1,7 @@
 package version_test
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/version"
+	"github.com/cloudfoundry/stembuild/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

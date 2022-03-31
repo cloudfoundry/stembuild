@@ -4,8 +4,8 @@ package commandparserfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/construct/config"
+	"github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/construct/config"
 )
 
 type FakeVMPreparerFactory struct {

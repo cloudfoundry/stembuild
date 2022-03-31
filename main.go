@@ -9,12 +9,12 @@ import (
 	"path"
 	"strings"
 
-	"github.com/cloudfoundry-incubator/stembuild/assets"
-	. "github.com/cloudfoundry-incubator/stembuild/commandparser"
-	vmconstruct_factory "github.com/cloudfoundry-incubator/stembuild/construct/factory"
-	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
-	packager_factory "github.com/cloudfoundry-incubator/stembuild/package_stemcell/factory"
-	"github.com/cloudfoundry-incubator/stembuild/version"
+	"github.com/cloudfoundry/stembuild/assets"
+	. "github.com/cloudfoundry/stembuild/commandparser"
+	vmconstruct_factory "github.com/cloudfoundry/stembuild/construct/factory"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	packager_factory "github.com/cloudfoundry/stembuild/package_stemcell/factory"
+	"github.com/cloudfoundry/stembuild/version"
 	. "github.com/google/subcommands"
 )
 

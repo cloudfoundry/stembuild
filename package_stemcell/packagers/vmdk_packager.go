@@ -15,11 +15,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/filesystem"
+	"github.com/cloudfoundry/stembuild/filesystem"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/ovftool"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
-	"github.com/cloudfoundry-incubator/stembuild/templates"
+	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
+	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
+	"github.com/cloudfoundry/stembuild/templates"
 )
 
 const Gigabyte = 1024 * 1024 * 1024

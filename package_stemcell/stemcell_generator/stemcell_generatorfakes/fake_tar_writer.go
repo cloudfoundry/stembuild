@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator"
 )
 
 type FakeTarWriter struct {

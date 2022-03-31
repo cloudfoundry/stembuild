@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 )
 
 type FakeStemcellGenerator struct {

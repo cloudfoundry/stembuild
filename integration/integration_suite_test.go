@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/ovftool"
-	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
+	"github.com/cloudfoundry/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

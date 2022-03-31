@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/vmware/govmomi/object"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

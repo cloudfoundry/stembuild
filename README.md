@@ -5,7 +5,7 @@ The stembuild binary is used to build BOSH stemcells for **Windows 2012R2**,**Wi
 **Instructions**: See [here](https://bosh.io/docs/windows-stemcell-create/) for instructions to build Windows stemcells for vSphere.
 
 ## Installation
-Download the latest stembuild from the [Releases page](https://github.com/cloudfoundry-incubator/stembuild/releases) that corresponds to the operating system of your local host and the stemcell version that you want to build
+Download the latest stembuild from the [Releases Page](https://github.com/cloudfoundry/stembuild/releases) that corresponds to the operating system of your local host and the stemcell version that you want to build
 
 ## Dependencies
 [LGPO](https://www.microsoft.com/en-us/download/details.aspx?id=55319) must be downloaded in the same folder as your `stembuild`
@@ -39,7 +39,7 @@ stembuild construct -vm-ip <IP of VM> -vm-username <vm username> -vm-password <v
 ### Requirements
 - LGPO.zip in current working directory
 - Running Windows VM with:
-	- Up to date Operating System
+	- Up-to-date Operating System
 	- Reachable by IP over port 5985
 	- Username and password with Administrator privileges
 	- vCenter URL, username and password
@@ -170,7 +170,7 @@ make integration
 ### Testing stemcell-automation
 
 `stemcell-automation` contains powershell scripts which stembuild runs on the target VM. This directory also contains tests
-for the scripts, which are written with the Pester test framework. These require running in powershell on a Windows environment.
+for the scripts, which are written with the test framework [Pester](https://pester.dev/). These require running in powershell on a Windows environment.
 
 ```
 cd stemcell-automation
@@ -180,7 +180,7 @@ invoke-pester
 ## Vendoring
 
 Vendoring for this project is done using `dep`. 
-To sync all the dependecies run
+To sync all the dependencies run
 ```
 dep ensure
 ```
@@ -198,19 +198,19 @@ To check if dependencies are in sync or not run
 ```
 dep sync
 ```
-The output should be nothing if there no out-of-sync dependencies.
+The output should be nothing if there are no out-of-sync dependencies.
 
 
-## Compile stembuild for MacOS
+## Compile stembuild for macOS
 
-You can use stembuild on MacOS, but following the below steps. 
+You can use stembuild on macOS, but following the below steps. 
 
-- Download or clone the stembuild repository locally on your MacOS inside your `go` directory 
+- Download or clone the stembuild repository locally on your macOS inside your `go` directory 
 ```
 cd $HOME/go/src/github.com/cloudfoundry-incubator
-git clone https://github.com/cloudfoundry-incubator/stembuild.git
+git clone https://github.com/cloudfoundry/stembuild.git
 ```
-- Download the latest released artifact in [Stemcell Automation Github Repo](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-automation/releases)
+- Download the latest released artifact in [Stemcell Automation GitHub Repo](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-automation/releases)
 - Install the [greenhouse-dotfiles](https://github.com/pivotal-cf/greenhouse-dotfiles#greenhouse-dotfiles). Ensure your `./bash_profile` is pointing to the `bash_profile` file downloaded from greenhouse by running `ls -al $HOME`. Repoint it if necessary and then install again.
 - Manually download the `ginkgo` and `go-bindata` libraries
 ```
@@ -218,4 +218,4 @@ go get -u github.com/jteeuwen/go-bindata/...
 go get github.com/onsi/ginkgo/ginkgo
 go get github.com/onsi/gomega/...
 ```
-- Use the command with providing the corresponding values for the Stemcell Version you would like to build and the Stemcell Automation package you downloaded from the previous step -  `make STEMCELL_VERSION=StemcellVersion AUTOMATION_PATH=PathToStemcellAutomationZip build` to build stembuild for MacOS. 
+- Use the command with providing the corresponding values for the Stemcell Version you would like to build and the Stemcell Automation package you downloaded from the previous step -  `make STEMCELL_VERSION=StemcellVersion AUTOMATION_PATH=PathToStemcellAutomationZip build` to build stembuild for macOS. 

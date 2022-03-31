@@ -1,7 +1,7 @@
 package integration_test
 
 import (
-	"github.com/cloudfoundry-incubator/stembuild/test/helpers"
+	"github.com/cloudfoundry/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"

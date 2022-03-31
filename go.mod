@@ -1,4 +1,4 @@
-module github.com/cloudfoundry-incubator/stembuild
+module github.com/cloudfoundry/stembuild
 
 go 1.14
 

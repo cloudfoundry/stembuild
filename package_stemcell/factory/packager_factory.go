@@ -5,15 +5,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli"
+	"github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/iaas_cli"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients"
 
-	"github.com/cloudfoundry-incubator/stembuild/colorlogger"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/config"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/package_parameters"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/packagers"
+	"github.com/cloudfoundry/stembuild/colorlogger"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 )
 
 type PackagerFactory struct{}

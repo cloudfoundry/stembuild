@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/ovftool"
+	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 )
 
 var _ = Describe("ovftool", func() {

@@ -3,7 +3,7 @@ package remotemanager
 import (
 	"errors"
 	"fmt"
-	"github.com/cloudfoundry-incubator/stembuild/poller"
+	"github.com/cloudfoundry/stembuild/poller"
 	"time"
 )
 

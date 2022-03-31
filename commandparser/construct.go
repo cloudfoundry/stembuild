@@ -7,13 +7,13 @@ import (
 	"os"
 	"path/filepath"
 
-	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/guest_manager"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/object"
 
-	"github.com/cloudfoundry-incubator/stembuild/construct/config"
+	"github.com/cloudfoundry/stembuild/construct/config"
 	"github.com/google/subcommands"
 )
 

@@ -4,13 +4,13 @@ import (
 	archiveTar "archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/tar/tarfakes"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar/tarfakes"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry-incubator/stembuild/package_stemcell/stemcell_generator/tar"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

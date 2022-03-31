@@ -5,9 +5,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/cloudfoundry-incubator/stembuild/commandparser"
-	vcenter_client_factory "github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/factory"
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/commandparser"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
 
 type FakeManagerFactory struct {

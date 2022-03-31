@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry-incubator/stembuild/iaas_cli/iaas_clifakes"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clifakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
