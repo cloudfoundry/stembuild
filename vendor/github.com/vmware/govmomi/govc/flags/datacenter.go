@@ -197,12 +197,16 @@ func (flag *DatacenterFlag) ManagedObjects(ctx context.Context, args []string) (
 	}
 
 	for _, arg := range args {
-		var ref types.ManagedObjectReference
-		if ref.FromString(arg) {
+		if ref := object.ReferenceFromString(arg); ref != nil {
 			// e.g. output from object.collect
-			refs = append(refs, ref)
+			refs = append(refs, *ref)
 			continue
 		}
+
+		if !strings.Contains(arg, "/") {
+			return nil, fmt.Errorf("%q must be qualified with a path", arg)
+		}
+
 		elements, err := finder.ManagedObjectList(ctx, arg)
 		if err != nil {
 			return nil, err
