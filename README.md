@@ -113,6 +113,24 @@ Flags:
 
 ```
 
+### Compiling & Running Stembuild Locally
+
+Assuming you've followed [these instructions](https://bosh.io/docs/windows-stemcell-create/) and you've created a Windows VM at 10.9.9.115 whose Administrator's password is "c1oudc0w".
+
+```bash
+    export TARGET_VM_PASSWORD=c1oudc0w VCENTER_PASSWORD='Admin!23'
+BOSH_AGENT_REPO=~/workspace/bosh-agent STEMBUILD_VERSION=2019.2 make
+GOVC_INSECURE=true out/stembuild -debug \
+  construct \
+  -vm-ip 10.9.9.115 \
+  -vm-username Administrator \
+  -vm-password $TARGET_VM_PASSWORD \
+  -vcenter-url vcenter-70.nono.io \
+  -vcenter-username administrator@vsphere.local \
+  -vcenter-password $VCENTER_PASSWORD \
+  -vm-inventory-path "/dc/vm/Discovered virtual machine/w2019-stemcell"
+```
+
 ## [DEPRECATED] Package a Windows Stemcell from a VMDK using `stembuild package`
 
 This command converts a VMDK into a bosh-deployable Windows Stemcell 
