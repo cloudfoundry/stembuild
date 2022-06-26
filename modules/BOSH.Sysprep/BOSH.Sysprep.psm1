@@ -112,6 +112,15 @@ function Create-Unattend {
             </Interface>
         </Interfaces>
     </component>
+    <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <RunAsynchronous>
+        <RunAsynchronousCommand wcm:action="add">
+          <Path>powershell Enable-AgentService</Path>
+          <Order>1</Order>
+          <Description>Enable Bosh Agent Service</Description>
+        </RunAsynchronousCommand>
+      </RunAsynchronous>
+    </component>
   </settings>
   <settings pass="generalize">
     <component name="Microsoft-Windows-PnpSysprep" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -235,6 +244,15 @@ function Create-Unattend-GCP() {
       <ComputerName></ComputerName>
       <TimeZone>UTC</TimeZone>
     </component>
+    <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <RunAsynchronous>
+        <RunAsynchronousCommand wcm:action="add">
+          <Path>powershell Enable-AgentService</Path>
+          <Order>1</Order>
+          <Description>Enable Bosh Agent Service</Description>
+        </RunAsynchronousCommand>
+      </RunAsynchronous>
+    </component>
   </settings>
   <settings pass="oobeSystem">
     <!-- Setting Location Information -->
@@ -325,27 +343,6 @@ function Remove-UserAccounts {
   $content.Save($AnswerFilePath)
 }
 
-function Update-AWS2012R2Config {
-  $ec2config = [xml] (get-content 'C:\Program Files\Amazon\Ec2ConfigService\Settings\config.xml')
-
-  # Enable password generation and retrieval
-  ($ec2config.ec2configurationsettings.plugins.plugin | where { $_.Name -eq "Ec2SetPassword" }).State = 'Enabled'
-
-  # Disable SetDnsSuffixList setting
-  $ec2config.ec2configurationsettings.GlobalSettings.SetDnsSuffixList = "false"
-
-  $ec2config.Save("C:\Program Files\Amazon\Ec2ConfigService\Settings\config.xml")
-
-  # Enable sysprep
-  $ec2settings = [xml] (get-content 'C:\Program Files\Amazon\Ec2ConfigService\Settings\BundleConfig.xml')
-  ($ec2settings.BundleConfig.Property | where { $_.Name -eq "AutoSysprep" }).Value = 'Yes'
-
-  # Don't shutdown when running sysprep, let packer do it
-  # ($ec2settings.BundleConfig.GeneralSettings.Sysprep | where { $_.AnswerFilePath -eq "sysprep2008.xml" }).Switches = "/oobe /quit /generalize"
-
-  $ec2settings.Save('C:\Program Files\Amazon\Ec2ConfigService\Settings\BundleConfig.xml')
-}
-
 function Update-AWS2016Config
 {
   $LaunchConfigJson = 'C:\ProgramData\Amazon\EC2-Windows\Launch\Config\LaunchConfig.json'
@@ -353,6 +350,28 @@ function Update-AWS2016Config
   $LaunchConfig.addDnsSuffixList = $False
   $LaunchConfig.extendBootVolumeSize = $False
   $LaunchConfig | ConvertTo-Json | Set-Content $LaunchConfigJson
+}
+
+function Create-Unattend-AWS
+{
+  $UnattendedXmlPath = 'C:\ProgramData\Amazon\EC2-Windows\Launch\Sysprep\Unattend.xml'
+  $UnattendedContent = [xml](Get-Content $UnattendedXmlPath)
+  $SpecializeSettings = ($UnattendedContent.unattend.settings | Where-Object { $_.pass -EQ "specialize" })
+  $WindowsDeploymentComponent = ($SpecializeSettings.component | Where-Object { $_.name -EQ "Microsoft-Windows-Deployment" })
+  $rynsync = $WindowsDeploymentComponent.RunSynchronous
+  $runsynccommand = $UnattendedContent.CreateElement("RunSynchronousCommand", $UnattendedContent.unattend.xmlns)
+  $rynsync.AppendChild($runsynccommand)
+  $runsynccommand.SetAttribute("action", $WindowsDeploymentComponent.wcm, "add")
+  $pathElement = $UnattendedContent.CreateElement("Path", $UnattendedContent.unattend.xmlns)
+  $pathText = $UnattendedContent.CreateTextNode("powershell Enable-AgentService")
+  $pathElement.AppendChild($pathText)
+  $runsynccommand.AppendChild($pathElement)
+  $orderElement = $UnattendedContent.CreateElement("Order", $UnattendedContent.unattend.xmlns)
+  $orderText = $UnattendedContent.CreateTextNode("3")
+  $orderElement.AppendChild($orderText)
+  $runsynccommand.AppendChild($orderElement)
+
+  $UnattendedContent.Save($UnattendedXmlPath)
 }
 
 function Enable-AWS2016Sysprep {
@@ -419,18 +438,13 @@ function Invoke-Sysprep()
 
   switch ($IaaS) {
     "aws" {
-      switch ($OsVersion) {
-        "windows2012R2" {
-          Update-AWS2012R2Config
-          Start-Process "C:\Program Files\Amazon\Ec2ConfigService\Ec2Config.exe" -ArgumentList "-sysprep" -Wait
-        }
-        {($_ -eq"windows2016") -or ($_ -eq"windows1803") -or ($_ -eq"windows2019")} {
-          Update-AWS2016Config
-          Enable-AWS2016Sysprep
-        }
-      }
+      Disable-AgentService
+      Create-Unattend-AWS
+      Update-AWS2016Config
+      Enable-AWS2016Sysprep
     }
     "gcp" {
+      Disable-AgentService
       Create-Unattend-GCP
       GCESysprep
     }
@@ -438,6 +452,7 @@ function Invoke-Sysprep()
       C:\Windows\System32\Sysprep\sysprep.exe /generalize /quiet /oobe /quit
     }
     "vsphere" {
+      Disable-AgentService
       Create-Unattend -NewPassword $NewPassword -ProductKey $ProductKey `
         -Organization $Organization -Owner $Owner
 

@@ -222,6 +222,16 @@ function Set-Path {
     Setx PATH "${env:PATH};${Path}" /m
 }
 
+function Enable-AgentService {
+    Write-Log "Disabling bosh agent service"
+    Set-Service bosh-agent -StartupType automatic
+}
+
+function Disable-AgentService {
+    Write-Log "Disabling bosh agent service"
+    Set-Service bosh-agent -StartupType manual
+}
+
 function Install-AgentService {
     Write-Log "Updating services timeout from 30s to 60s"
     $parentRegistryPath = "HKLM:\SYSTEM\CurrentControlSet"

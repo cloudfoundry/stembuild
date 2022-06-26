@@ -244,12 +244,15 @@ Describe "Invoke-Sysprep" {
 
             Mock Allow-NTPSync { } -ModuleName BOSH.Sysprep
             Mock Enable-LocalSecurityPolicy { } -ModuleName BOSH.Sysprep
-            Mock Update-AWS2012R2Config { } -ModuleName BOSH.Sysprep
             Mock Update-AWS2016Config { } -ModuleName BOSH.Sysprep
             Mock Enable-AWS2016Sysprep { } -ModuleName BOSH.Sysprep
 
             Mock Create-Unattend { } -ModuleName BOSH.Sysprep
+            Mock Create-Unattend-AWS { } -ModuleName BOSH.Sysprep
             Mock Create-Unattend-GCP { } -ModuleName BOSH.Sysprep
+
+            function Disable-AgentService {}
+            Mock Disable-AgentService { } -ModuleName BOSH.Sysprep
 
             function GCESysprep {}
             Mock GCESysprep {} -ModuleName BOSH.Sysprep
@@ -258,20 +261,6 @@ Describe "Invoke-Sysprep" {
         }
 
         Context "for AWS" {
-            It "handles Windows 2012R2" {
-                Mock Get-OSVersion { "windows2012R2" } -ModuleName BOSH.SysPrep
-
-                { Invoke-Sysprep -Iaas "aws" } | Should -Not -Throw
-
-                Assert-MockCalled Update-AWS2012R2Config -Times 1 -Scope It -ModuleName BOSH.Sysprep
-                Assert-MockCalled Start-Process -Times 1 -Scope It -ParameterFilter { $FilePath -eq "C:\Program Files\Amazon\Ec2ConfigService\Ec2Config.exe" -and $ArgumentList -eq "-sysprep" } -ModuleName BOSH.Sysprep
-
-                Assert-MockCalled Get-OSVersion -Times 1 -Scope It -ModuleName BOSH.Sysprep
-
-                Assert-MockCalled Update-AWS2016Config -Times 0 -Scope It -ModuleName BOSH.Sysprep
-                Assert-MockCalled Enable-AWS2016Sysprep -Times 0 -Scope It -ModuleName BOSH.Sysprep
-            }
-
             It "handles Windows 1709" {
                 Mock Get-OSVersion { "windows2016" } -ModuleName BOSH.Sysprep
 
@@ -282,7 +271,6 @@ Describe "Invoke-Sysprep" {
 
                 Assert-MockCalled Get-OSVersion -Times 1 -Scope It -ModuleName BOSH.Sysprep
 
-                Assert-MockCalled Update-AWS2012R2Config -Times 0 -Scope It -ModuleName BOSH.Sysprep
                 Assert-MockCalled Start-Process -Times 0 -Scope It -ParameterFilter { $FilePath -eq "C:\Program Files\Amazon\Ec2ConfigService\Ec2Config.exe" -and $ArgumentList -eq "-sysprep" } -ModuleName BOSH.Sysprep
             }
 
@@ -296,7 +284,6 @@ Describe "Invoke-Sysprep" {
 
                 Assert-MockCalled Get-OSVersion -Times 1 -Scope It -ModuleName BOSH.Sysprep
 
-                Assert-MockCalled Update-AWS2012R2Config -Times 0 -Scope It -ModuleName BOSH.Sysprep
                 Assert-MockCalled Start-Process -Times 0 -Scope It -ParameterFilter { $FilePath -eq "C:\Program Files\Amazon\Ec2ConfigService\Ec2Config.exe" -and $ArgumentList -eq "-sysprep" } -ModuleName BOSH.Sysprep
             }
 
@@ -309,7 +296,6 @@ Describe "Invoke-Sysprep" {
 
                 Assert-MockCalled Update-AWS2016Config -Times 0 -Scope It -ModuleName BOSH.Sysprep
                 Assert-MockCalled Enable-AWS2016Sysprep -Times 0 -Scope It -ModuleName BOSH.Sysprep
-                Assert-MockCalled Update-AWS2012R2Config -Times 0 -Scope It -ModuleName BOSH.Sysprep
                 Assert-MockCalled Start-Process -Times 0 -Scope It -ParameterFilter { $FilePath -eq "C:\Program Files\Amazon\Ec2ConfigService\Ec2Config.exe" -and $ArgumentList -eq "-sysprep" } -ModuleName BOSH.Sysprep
             }
         }
