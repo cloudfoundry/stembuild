@@ -47,6 +47,7 @@ Describe "PostReboot" {
         Mock CleanUpVM { $postRebootCalls.Add("CleanUpVM")}
         Mock SysprepVM { $postRebootCalls.Add("SysprepVM")}
         Mock Stop-Computer {$postRebootCalls.Add("Stop-Computer")}
+        Mock RunQuickerDism { }
     }
 
     It "installs cf cell before cleaning up the VM" {

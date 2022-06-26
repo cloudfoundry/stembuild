@@ -14,6 +14,7 @@ Describe "ProvisionVM" {
         Mock Extract-LGPO { $provisionerCalls.Add("Extract-LGPO") }
         Mock Install-WUCerts { $provisionerCalls.Add("Install-WUCerts") }
         Mock Create-VersionFile { $provisionerCalls.Add("Create-VersionFile") }
+        Mock RunQuickerDism { }
 
         if (!(Get-Command "Restart-Computer" -errorAction SilentlyContinue))
         {
