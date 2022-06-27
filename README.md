@@ -129,6 +129,12 @@ GOVC_INSECURE=true out/stembuild -debug \
   -vcenter-username administrator@vsphere.local \
   -vcenter-password $VCENTER_PASSWORD \
   -vm-inventory-path "/dc/vm/Discovered virtual machine/w2019-stemcell"
+GOVC_INSECURE=true out/stembuild -debug \
+  package \
+  -vcenter-url vcenter-70.nono.io \
+  -vcenter-username administrator@vsphere.local \
+  -vcenter-password $VCENTER_PASSWORD \
+  -vm-inventory-path "/dc/vm/Discovered virtual machine/w2019-stemcell"
 ```
 
 ## [DEPRECATED] Package a Windows Stemcell from a VMDK using `stembuild package`
