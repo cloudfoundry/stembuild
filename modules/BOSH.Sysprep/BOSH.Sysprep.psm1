@@ -113,13 +113,12 @@ function Create-Unattend {
         </Interfaces>
     </component>
     <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <RunAsynchronous>
-        <RunAsynchronousCommand wcm:action="add">
+      <RunSynchronous>
+        <RunSynchronousCommand wcm:action="add">
           <Path>powershell Enable-AgentService</Path>
           <Order>1</Order>
-          <Description>Enable Bosh Agent Service</Description>
-        </RunAsynchronousCommand>
-      </RunAsynchronous>
+        </RunSynchronousCommand>
+      </RunSynchronous>
     </component>
   </settings>
   <settings pass="generalize">
