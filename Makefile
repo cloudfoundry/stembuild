@@ -7,7 +7,7 @@ LD_FLAGS = "-w -s -X github.com/cloudfoundry/stembuild/version.Version=${STEMCEL
 # These are the sources for StemcellAutomation.zip
 STEMCELL_AUTOMATION_PS1 := $(shell ls stemcell-automation/*ps1 | grep -iv Test)
 BOSH_AGENT_REPO ?= ${HOME}/go/src/github.com/cloudfoundry/bosh-agent
-LGPO_URL = 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=55319&6B49FDFB-8E5B-4B07-BC31-15695C5A2143=1'
+LGPO_URL = 'https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/LGPO.zip'
 BOSH_GCS_URL = 'https://s3.amazonaws.com/bosh-gcscli/bosh-gcscli-0.0.6-windows-amd64.exe'
 # Ignore things under cis-merge* directory because the paths contain spaces and make doesn't like
 # that

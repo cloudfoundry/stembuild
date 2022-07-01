@@ -292,6 +292,11 @@ function Get-OSVersion {
             Write-Log "Found OS version: Windows 2019"
             "windows2019"
         }
+        elseif ($osVersion -match "10\.0\.20348\..+")
+        {
+            Write-Log "Found OS version: Windows 2022"
+            "windows2022"
+        }
         else {
             throw "invalid OS detected"
         }
@@ -328,13 +333,13 @@ function Get-WinRMConfig {
 
 function Get-WUCerts {
     Write-Log "Loading certs from windows update server"
-    $sstfile = SST-Path
+    $sstfile = Get-SST-Path
     Invoke-Certutil -generateSSTFromWU $sstfile
     Invoke-Import-Certificate -CertStoreLocation Cert:\LocalMachine\Root -FilePath $sstfile
     Invoke-Remove-Item -path $sstfile
 }
 
-function SST-Path {
+function Get-SST-Path {
     return [System.IO.Path]::GetTempPath() + 'roots.sst'
 }
 

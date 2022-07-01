@@ -333,8 +333,12 @@ function Validate-OSVersion
         {
             Write-Log "Found correct OS version: Windows Server 2019"
         }
+        elseif ($osVersion -match "10\.0\.20348\..+")
+        {
+            Write-Log "Found correct OS version: Windows Server 2022"
+        }
         else {
-            throw "OS Version Mismatch: Please use Windows Server 2019 as the OS on your targeted VM"
+            throw "OS Version Mismatch: Please use Windows Server 2019 or 2022 as the OS on your targeted VM"
         }
     }
     catch [Exception]
@@ -421,14 +425,14 @@ function Install-SecurityPoliciesAndRegistries
 {
     try
     {
-        $osVersion2019Regex = "10\.0\.17763\..+"
+        $osVersion2019or2022Regex = "10\.0\.(17763|20348)\..+"
         $osVersion = Get-OSVersionString
         Write-Log "osVersion: $osVersion"
-        if ($osVersion -match $osVersion2019Regex) {
+        if ($osVersion -match $osVersion2019or2022Regex) {
             Set-InternetExplorerRegistries
             Write-Log "Succesfully ran Set-InternetExplorerRegistries"
         } else {
-            Write-Log "Did not run Set-InternetExplorerRegistries because OS version was not 2019"
+            Write-Log "Did not run Set-InternetExplorerRegistries because OS version was not 2019 or 2022"
         }
     }
     catch [Exception]

@@ -41,7 +41,7 @@ func (c OutputConfig) ValidateConfig() error {
 
 func IsValidOS(os string) bool {
 	switch os {
-	case "2012R2", "1803", "2016", "2019":
+	case "2012R2", "1803", "2016", "2019", "2022":
 		return true
 	default:
 		return false
