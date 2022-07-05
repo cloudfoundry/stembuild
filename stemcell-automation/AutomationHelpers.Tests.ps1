@@ -690,7 +690,7 @@ Describe "Install-SecurityPoliciesAndRegistries" {
         { Install-SecurityPoliciesAndRegistries } | Should -Not -Throw
 
         Assert-MockCalled Set-InternetExplorerRegistries -Times 0 -Scope It
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Did not run Set-InternetExplorerRegistries because OS version was not 2019" }
+        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter { $Message -eq "Did not run Set-InternetExplorerRegistries because OS version was not 2019 or 2022" }
 
     }
 
