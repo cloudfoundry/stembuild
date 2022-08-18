@@ -227,19 +227,19 @@ The output should be nothing if there are no out-of-sync dependencies.
 
 ## Compile stembuild for macOS
 
-You can use stembuild on macOS, but following the below steps. 
+You can use stembuild on macOS by following the below steps:
 
-- Download or clone the stembuild repository locally on your macOS inside your `go` directory 
+- Download or clone the bosh-agent repository
 ```
-cd $HOME/go/src/github.com/cloudfoundry-incubator
+git clone https://github.com/cloudfoundry/bosh-agent.git
+```
+- Download or clone the stembuild repository and navigate to it
+```
 git clone https://github.com/cloudfoundry/stembuild.git
+cd stembuild
 ```
-- Download the latest released artifact in [Stemcell Automation GitHub Repo](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-automation/releases)
-- Install the [greenhouse-dotfiles](https://github.com/pivotal-cf/greenhouse-dotfiles#greenhouse-dotfiles). Ensure your `./bash_profile` is pointing to the `bash_profile` file downloaded from greenhouse by running `ls -al $HOME`. Repoint it if necessary and then install again.
-- Manually download the `ginkgo` and `go-bindata` libraries
+- Download the latest released artifact from [Stemcell Automation GitHub Repo](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-automation/releases)
+- Use `make build` to build stembuild for macOS, providing the corresponding values for the bosh-agent path, Stemcell Version you would like to build, and the Stemcell Automation package you downloaded
 ```
-go get -u github.com/jteeuwen/go-bindata/...
-go get github.com/onsi/ginkgo/ginkgo
-go get github.com/onsi/gomega/...
+BOSH_AGENT_REPO=PathToBoshAgentRepo make STEMCELL_VERSION=StemcellVersion AUTOMATION_PATH=PathToStemcellAutomationZip build
 ```
-- Use the command with providing the corresponding values for the Stemcell Version you would like to build and the Stemcell Automation package you downloaded from the previous step -  `make STEMCELL_VERSION=StemcellVersion AUTOMATION_PATH=PathToStemcellAutomationZip build` to build stembuild for macOS. 
