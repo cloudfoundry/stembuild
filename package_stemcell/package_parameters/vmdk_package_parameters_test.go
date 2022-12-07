@@ -5,7 +5,7 @@ import (
 	"math/rand"
 
 	. "github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

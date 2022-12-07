@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
 	"github.com/google/subcommands"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

@@ -2,7 +2,7 @@ package version_test
 
 import (
 	"github.com/cloudfoundry/stembuild/version"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

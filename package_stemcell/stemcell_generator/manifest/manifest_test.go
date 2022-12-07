@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/manifest"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

@@ -3,7 +3,7 @@ package archive_test
 import (
 	"github.com/cloudfoundry/stembuild/assets"
 	archive2 "github.com/cloudfoundry/stembuild/construct/archive"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

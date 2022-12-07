@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clifakes"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

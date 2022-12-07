@@ -37,7 +37,7 @@ __N.B.:__ The Windows Firewall needs to be running to run this command. See [Mic
 
 __N.B.:__ Do not disable Negotiate authentication as the `winrm` command itself uses this for internal authentication, and you risk getting a system where `winrm` doesn't work anymore.
 
-__N.B.:__ The `MaxMemoryPerShellMB` option has no effects on some Windows 2008R2 systems because of a WinRM bug. Make sure to install the hotfix described [Microsoft Knowledge Base article #2842230](http://support.microsoft.com/kb/2842230) if you need to run commands that uses more than 150MB of memory.
+__N.B.:__ The `MaxMemoryPerShellMB` option has no effects on some Windows 2008R2 systems because of a WinRM bug. Make sure to install the hotfix described [Microsoft Knowledge Base article #2842230](http://support.microsoft.com/kb/2842230) if you need to run commands that use more than 150MB of memory.
 
 For more information on WinRM, please refer to <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa384426(v=vs.85).aspx">the online documentation at Microsoft's DevCenter</a>.
 
@@ -95,7 +95,9 @@ client, err := winrm.NewClient(endpoint, "Administrator", "secret")
 if err != nil {
 	panic(err)
 }
-client.Run("ipconfig /all", os.Stdout, os.Stderr)
+ctx, cancel := context.WithCancel(context.Background())
+defer cancel()
+client.RunWithContext(ctx, "ipconfig /all", os.Stdout, os.Stderr)
 ```
 
 or
@@ -113,7 +115,9 @@ if err != nil {
 	panic(err)
 }
 
-_, err := client.RunWithInput("ipconfig", os.Stdout, os.Stderr, os.Stdin)
+ctx, cancel := context.WithCancel(context.Background())
+defer cancel()
+_, err := client.RunWithContextWithInput(ctx, "ipconfig", os.Stdout, os.Stderr, os.Stdin)
 if err != nil {
 	panic(err)
 }
@@ -178,7 +182,9 @@ if err != nil {
         panic(err)
 }
 
-_, err := client.RunWithInput("ipconfig", os.Stdout, os.Stderr, os.Stdin)
+ctx, cancel := context.WithCancel(context.Background())
+defer cancel()
+_, err := client.RunWithContextWithInput(ctx, "ipconfig", os.Stdout, os.Stderr, os.Stdin)
 if err != nil {
         panic(err)
 }
@@ -215,7 +221,9 @@ package main
         panic(err)
     }
  
-    _, err = client.RunWithInput("ipconfig", os.Stdout, os.Stderr, os.Stdin)
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+    _, err = client.RunWithContextWithInput(ctx, "ipconfig", os.Stdout, os.Stderr, os.Stdin)
     if err != nil {
         panic(err)
     }
@@ -246,8 +254,10 @@ shell, err := client.CreateShell()
 if err != nil {
   panic(err)
 }
+ctx, cancel := context.WithCancel(context.Background())
+defer cancel()
 var cmd *winrm.Command
-cmd, err = shell.Execute("cmd.exe")
+cmd, err = shell.ExecuteWithContext(ctx, "cmd.exe")
 if err != nil {
   panic(err)
 }
@@ -301,12 +311,19 @@ func main() {
     if err != nil {
         log.Fatalf("failed to create client: %q", err)
     }
-    _, err = client.Run("whoami", os.Stdout, os.Stderr)
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+    _, err = client.RunWithContext(ctx, "whoami", os.Stdout, os.Stderr)
     if err != nil {
         log.Fatalf("failed to run command: %q", err)
     }
 }
 ```
+
+Note: canceling the `context.Context` passed as first argument to the various
+functions of the API will not cancel the HTTP requests themselves, it will
+rather cause a running command to be aborted on the remote machine via a call to
+`command.Stop()`.
 
 ## Developing on WinRM
 

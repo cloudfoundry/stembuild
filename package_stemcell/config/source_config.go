@@ -50,7 +50,7 @@ func (c SourceConfig) vcenterProvided() bool {
 	return false
 }
 
-//At least one vCenter configuration given
+// At least one vCenter configuration given
 func (c SourceConfig) partialvCenterProvided() bool {
 	if c.VmInventoryPath != "" || c.Username != "" || c.Password != "" || c.URL != "" {
 		return true

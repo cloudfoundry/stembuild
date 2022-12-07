@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

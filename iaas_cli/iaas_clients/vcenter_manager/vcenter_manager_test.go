@@ -13,7 +13,7 @@ import (
 
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vmware/govmomi/vim25"
 )

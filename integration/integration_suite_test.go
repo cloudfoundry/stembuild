@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 	"github.com/cloudfoundry/stembuild/test/helpers"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"testing"

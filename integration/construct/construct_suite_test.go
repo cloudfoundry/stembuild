@@ -16,7 +16,7 @@ import (
 
 	"github.com/concourse/pool-resource/out"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"github.com/vmware/govmomi/govc/cli"

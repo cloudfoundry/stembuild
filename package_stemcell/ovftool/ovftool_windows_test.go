@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"golang.org/x/sys/windows/registry"
 )

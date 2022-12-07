@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
 	"github.com/cloudfoundry/stembuild/construct"
 	"github.com/cloudfoundry/stembuild/construct/config"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
 )

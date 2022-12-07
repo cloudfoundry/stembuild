@@ -8,7 +8,7 @@ import (
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator"
 	fakes "github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/stemcell_generatorfakes"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
