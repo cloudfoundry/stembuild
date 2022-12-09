@@ -10,7 +10,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/masterzen/winrm v0.0.0-20220917170901-b07f6cb0598d
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.5.0
-	github.com/onsi/ginkgo/v2 v2.5.1
+	github.com/onsi/ginkgo/v2 v2.5.2-0.20221209042256-2165648f7697
 	github.com/onsi/gomega v1.24.1
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
 	github.com/pkg/errors v0.9.1
