@@ -14,9 +14,6 @@ BOSH_GCS_URL = 'https://s3.amazonaws.com/bosh-gcscli/bosh-gcscli-0.0.6-windows-a
 PSMODULES_SOURCES = $(shell find ./modules | grep -v .git | grep -vi "test" | grep -v cis-merge)
 BOSH_AGENT_SOURCES = $(shell find $(BOSH_AGENT_REPO) | egrep -v ".git|test.go|fake|.md")
 
-# The default Slow Spec Threshold for integration tests is too low, pollutes the output
-SLOW_SPEC_THRESHOLD_INTEGRATION = 300s
-
 ifeq ($(OS),Windows_NT)
 	COMMAND = out/stembuild.exe
 	CP = cp
@@ -45,13 +42,13 @@ format :
 	go fmt ./...
 
 integration : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --keep-going --slow-spec-threshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) --flake-attempts 2 --timeout 3h integration
+	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --keep-going --flake-attempts 2 --timeout 3h integration
 
 integration/construct : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --keep-going --slow-spec-threshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) --flake-attempts 2 --timeout 3h integration/construct
+	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --keep-going --flake-attempts 2 --timeout 3h integration/construct
 
 integration-badger : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --slow-spec-threshold $(SLOW_SPEC_THRESHOLD_INTEGRATION) --until-it-fails --timeout 3h integration
+	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
 
 generate-fake-stemcell-automation: $(GOSRC) $(FAKE_STEMCELL_AUTOMATION_PATH)
 	go run github.com/go-bindata/go-bindata/go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(FAKE_STEMCELL_AUTOMATION_PREFIX) $(FAKE_STEMCELL_AUTOMATION_PATH)
@@ -69,11 +66,11 @@ test : units
 
 units : format generate-fake-stemcell-automation
 	@go run github.com/onsi/ginkgo/v2/ginkgo version
-	go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all -randomizeSuites --keep-going -skipPackage integration,iaas_cli
+	go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all --randomize-suites --keep-going --skip-package integration,iaas_cli
 	@echo "\nSWEET SUITE SUCCESS"
 
 contract :
-	go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all -randomizeSuites --keep-going --flake-attempts 2 iaas_cli
+	go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all --randomize-suites --keep-going --flake-attempts 2 iaas_cli
 
 .PHONY : all build build-integration clean format generate generate-fake-stemcell-automation
 .PHONY : test units units-full integration integration-tests-full
