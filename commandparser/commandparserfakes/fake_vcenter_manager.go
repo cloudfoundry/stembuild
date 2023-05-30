@@ -77,15 +77,16 @@ func (fake *FakeVCenterManager) FindVM(arg1 context.Context, arg2 string) (*obje
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.FindVMStub
+	fakeReturns := fake.findVMReturns
 	fake.recordInvocation("FindVM", []interface{}{arg1, arg2})
 	fake.findVMMutex.Unlock()
-	if fake.FindVMStub != nil {
-		return fake.FindVMStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.findVMReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -143,15 +144,16 @@ func (fake *FakeVCenterManager) GuestManager(arg1 context.Context, arg2 vcenter_
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.GuestManagerStub
+	fakeReturns := fake.guestManagerReturns
 	fake.recordInvocation("GuestManager", []interface{}{arg1, arg2, arg3, arg4})
 	fake.guestManagerMutex.Unlock()
-	if fake.GuestManagerStub != nil {
-		return fake.GuestManagerStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.guestManagerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -206,15 +208,16 @@ func (fake *FakeVCenterManager) Login(arg1 context.Context) error {
 	fake.loginArgsForCall = append(fake.loginArgsForCall, struct {
 		arg1 context.Context
 	}{arg1})
+	stub := fake.LoginStub
+	fakeReturns := fake.loginReturns
 	fake.recordInvocation("Login", []interface{}{arg1})
 	fake.loginMutex.Unlock()
-	if fake.LoginStub != nil {
-		return fake.LoginStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.loginReturns
 	return fakeReturns.result1
 }
 
@@ -267,15 +270,16 @@ func (fake *FakeVCenterManager) OperationsManager(arg1 context.Context, arg2 *ob
 		arg1 context.Context
 		arg2 *object.VirtualMachine
 	}{arg1, arg2})
+	stub := fake.OperationsManagerStub
+	fakeReturns := fake.operationsManagerReturns
 	fake.recordInvocation("OperationsManager", []interface{}{arg1, arg2})
 	fake.operationsManagerMutex.Unlock()
-	if fake.OperationsManagerStub != nil {
-		return fake.OperationsManagerStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.operationsManagerReturns
 	return fakeReturns.result1
 }
 

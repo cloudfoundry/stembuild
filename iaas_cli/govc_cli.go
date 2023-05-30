@@ -15,7 +15,9 @@ import (
 	_ "github.com/vmware/govmomi/govc/vm/guest"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CliRunner
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
+//counterfeiter:generate . CliRunner
 type CliRunner interface {
 	Run(args []string) int
 	RunWithOutput(args []string) (string, int, error)

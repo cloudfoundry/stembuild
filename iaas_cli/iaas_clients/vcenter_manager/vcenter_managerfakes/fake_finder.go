@@ -89,15 +89,16 @@ func (fake *FakeFinder) DatacenterOrDefault(arg1 context.Context, arg2 string) (
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DatacenterOrDefaultStub
+	fakeReturns := fake.datacenterOrDefaultReturns
 	fake.recordInvocation("DatacenterOrDefault", []interface{}{arg1, arg2})
 	fake.datacenterOrDefaultMutex.Unlock()
-	if fake.DatacenterOrDefaultStub != nil {
-		return fake.DatacenterOrDefaultStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.datacenterOrDefaultReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -153,15 +154,16 @@ func (fake *FakeFinder) FolderOrDefault(arg1 context.Context, arg2 string) (*obj
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.FolderOrDefaultStub
+	fakeReturns := fake.folderOrDefaultReturns
 	fake.recordInvocation("FolderOrDefault", []interface{}{arg1, arg2})
 	fake.folderOrDefaultMutex.Unlock()
-	if fake.FolderOrDefaultStub != nil {
-		return fake.FolderOrDefaultStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.folderOrDefaultReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -217,15 +219,16 @@ func (fake *FakeFinder) ResourcePoolOrDefault(arg1 context.Context, arg2 string)
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ResourcePoolOrDefaultStub
+	fakeReturns := fake.resourcePoolOrDefaultReturns
 	fake.recordInvocation("ResourcePoolOrDefault", []interface{}{arg1, arg2})
 	fake.resourcePoolOrDefaultMutex.Unlock()
-	if fake.ResourcePoolOrDefaultStub != nil {
-		return fake.ResourcePoolOrDefaultStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.resourcePoolOrDefaultReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -280,15 +283,16 @@ func (fake *FakeFinder) SetDatacenter(arg1 *object.Datacenter) *find.Finder {
 	fake.setDatacenterArgsForCall = append(fake.setDatacenterArgsForCall, struct {
 		arg1 *object.Datacenter
 	}{arg1})
+	stub := fake.SetDatacenterStub
+	fakeReturns := fake.setDatacenterReturns
 	fake.recordInvocation("SetDatacenter", []interface{}{arg1})
 	fake.setDatacenterMutex.Unlock()
-	if fake.SetDatacenterStub != nil {
-		return fake.SetDatacenterStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setDatacenterReturns
 	return fakeReturns.result1
 }
 
@@ -341,15 +345,16 @@ func (fake *FakeFinder) VirtualMachine(arg1 context.Context, arg2 string) (*obje
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.VirtualMachineStub
+	fakeReturns := fake.virtualMachineReturns
 	fake.recordInvocation("VirtualMachine", []interface{}{arg1, arg2})
 	fake.virtualMachineMutex.Unlock()
-	if fake.VirtualMachineStub != nil {
-		return fake.VirtualMachineStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.virtualMachineReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

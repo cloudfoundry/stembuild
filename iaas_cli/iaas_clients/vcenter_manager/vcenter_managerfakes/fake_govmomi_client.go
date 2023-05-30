@@ -33,15 +33,16 @@ func (fake *FakeGovmomiClient) Login(arg1 context.Context, arg2 *url.Userinfo) e
 		arg1 context.Context
 		arg2 *url.Userinfo
 	}{arg1, arg2})
+	stub := fake.LoginStub
+	fakeReturns := fake.loginReturns
 	fake.recordInvocation("Login", []interface{}{arg1, arg2})
 	fake.loginMutex.Unlock()
-	if fake.LoginStub != nil {
-		return fake.LoginStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.loginReturns
 	return fakeReturns.result1
 }
 

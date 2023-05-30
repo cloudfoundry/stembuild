@@ -36,15 +36,16 @@ func (fake *FakeVim25ClientCreator) NewClient(arg1 context.Context, arg2 soap.Ro
 		arg1 context.Context
 		arg2 soap.RoundTripper
 	}{arg1, arg2})
+	stub := fake.NewClientStub
+	fakeReturns := fake.newClientReturns
 	fake.recordInvocation("NewClient", []interface{}{arg1, arg2})
 	fake.newClientMutex.Unlock()
-	if fake.NewClientStub != nil {
-		return fake.NewClientStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.newClientReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

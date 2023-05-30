@@ -60,15 +60,16 @@ func (fake *FakeProcManager) Client() *vim25.Client {
 	ret, specificReturn := fake.clientReturnsOnCall[len(fake.clientArgsForCall)]
 	fake.clientArgsForCall = append(fake.clientArgsForCall, struct {
 	}{})
+	stub := fake.ClientStub
+	fakeReturns := fake.clientReturns
 	fake.recordInvocation("Client", []interface{}{})
 	fake.clientMutex.Unlock()
-	if fake.ClientStub != nil {
-		return fake.ClientStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.clientReturns
 	return fakeReturns.result1
 }
 
@@ -120,15 +121,16 @@ func (fake *FakeProcManager) ListProcesses(arg1 context.Context, arg2 types.Base
 		arg2 types.BaseGuestAuthentication
 		arg3 []int64
 	}{arg1, arg2, arg3Copy})
+	stub := fake.ListProcessesStub
+	fakeReturns := fake.listProcessesReturns
 	fake.recordInvocation("ListProcesses", []interface{}{arg1, arg2, arg3Copy})
 	fake.listProcessesMutex.Unlock()
-	if fake.ListProcessesStub != nil {
-		return fake.ListProcessesStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listProcessesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -185,15 +187,16 @@ func (fake *FakeProcManager) StartProgram(arg1 context.Context, arg2 types.BaseG
 		arg2 types.BaseGuestAuthentication
 		arg3 types.BaseGuestProgramSpec
 	}{arg1, arg2, arg3})
+	stub := fake.StartProgramStub
+	fakeReturns := fake.startProgramReturns
 	fake.recordInvocation("StartProgram", []interface{}{arg1, arg2, arg3})
 	fake.startProgramMutex.Unlock()
-	if fake.StartProgramStub != nil {
-		return fake.StartProgramStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.startProgramReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

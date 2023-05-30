@@ -29,15 +29,16 @@ func (fake *FakeRebootCheckerI) RebootHasFinished() (bool, error) {
 	ret, specificReturn := fake.rebootHasFinishedReturnsOnCall[len(fake.rebootHasFinishedArgsForCall)]
 	fake.rebootHasFinishedArgsForCall = append(fake.rebootHasFinishedArgsForCall, struct {
 	}{})
+	stub := fake.RebootHasFinishedStub
+	fakeReturns := fake.rebootHasFinishedReturns
 	fake.recordInvocation("RebootHasFinished", []interface{}{})
 	fake.rebootHasFinishedMutex.Unlock()
-	if fake.RebootHasFinishedStub != nil {
-		return fake.RebootHasFinishedStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.rebootHasFinishedReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

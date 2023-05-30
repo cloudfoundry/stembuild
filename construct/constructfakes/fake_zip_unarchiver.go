@@ -36,15 +36,16 @@ func (fake *FakeZipUnarchiver) Unzip(arg1 []byte, arg2 string) ([]byte, error) {
 		arg1 []byte
 		arg2 string
 	}{arg1Copy, arg2})
+	stub := fake.UnzipStub
+	fakeReturns := fake.unzipReturns
 	fake.recordInvocation("Unzip", []interface{}{arg1Copy, arg2})
 	fake.unzipMutex.Unlock()
-	if fake.UnzipStub != nil {
-		return fake.UnzipStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.unzipReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

@@ -49,15 +49,16 @@ func (fake *FakeCliRunner) Run(arg1 []string) int {
 	fake.runArgsForCall = append(fake.runArgsForCall, struct {
 		arg1 []string
 	}{arg1Copy})
+	stub := fake.RunStub
+	fakeReturns := fake.runReturns
 	fake.recordInvocation("Run", []interface{}{arg1Copy})
 	fake.runMutex.Unlock()
-	if fake.RunStub != nil {
-		return fake.RunStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.runReturns
 	return fakeReturns.result1
 }
 
@@ -114,15 +115,16 @@ func (fake *FakeCliRunner) RunWithOutput(arg1 []string) (string, int, error) {
 	fake.runWithOutputArgsForCall = append(fake.runWithOutputArgsForCall, struct {
 		arg1 []string
 	}{arg1Copy})
+	stub := fake.RunWithOutputStub
+	fakeReturns := fake.runWithOutputReturns
 	fake.recordInvocation("RunWithOutput", []interface{}{arg1Copy})
 	fake.runWithOutputMutex.Unlock()
-	if fake.RunWithOutputStub != nil {
-		return fake.RunWithOutputStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.runWithOutputReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

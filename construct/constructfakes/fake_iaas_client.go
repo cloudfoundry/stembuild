@@ -93,15 +93,16 @@ func (fake *FakeIaasClient) IsPoweredOff(arg1 string) (bool, error) {
 	fake.isPoweredOffArgsForCall = append(fake.isPoweredOffArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.IsPoweredOffStub
+	fakeReturns := fake.isPoweredOffReturns
 	fake.recordInvocation("IsPoweredOff", []interface{}{arg1})
 	fake.isPoweredOffMutex.Unlock()
-	if fake.IsPoweredOffStub != nil {
-		return fake.IsPoweredOffStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.isPoweredOffReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -159,15 +160,16 @@ func (fake *FakeIaasClient) MakeDirectory(arg1 string, arg2 string, arg3 string,
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.MakeDirectoryStub
+	fakeReturns := fake.makeDirectoryReturns
 	fake.recordInvocation("MakeDirectory", []interface{}{arg1, arg2, arg3, arg4})
 	fake.makeDirectoryMutex.Unlock()
-	if fake.MakeDirectoryStub != nil {
-		return fake.MakeDirectoryStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.makeDirectoryReturns
 	return fakeReturns.result1
 }
 
@@ -223,15 +225,16 @@ func (fake *FakeIaasClient) Start(arg1 string, arg2 string, arg3 string, arg4 st
 		arg4 string
 		arg5 []string
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.StartStub
+	fakeReturns := fake.startReturns
 	fake.recordInvocation("Start", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.startMutex.Unlock()
-	if fake.StartStub != nil {
-		return fake.StartStub(arg1, arg2, arg3, arg4, arg5...)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.startReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -290,15 +293,16 @@ func (fake *FakeIaasClient) UploadArtifact(arg1 string, arg2 string, arg3 string
 		arg4 string
 		arg5 string
 	}{arg1, arg2, arg3, arg4, arg5})
+	stub := fake.UploadArtifactStub
+	fakeReturns := fake.uploadArtifactReturns
 	fake.recordInvocation("UploadArtifact", []interface{}{arg1, arg2, arg3, arg4, arg5})
 	fake.uploadArtifactMutex.Unlock()
-	if fake.UploadArtifactStub != nil {
-		return fake.UploadArtifactStub(arg1, arg2, arg3, arg4, arg5)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4, arg5)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uploadArtifactReturns
 	return fakeReturns.result1
 }
 
@@ -353,15 +357,16 @@ func (fake *FakeIaasClient) WaitForExit(arg1 string, arg2 string, arg3 string, a
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.WaitForExitStub
+	fakeReturns := fake.waitForExitReturns
 	fake.recordInvocation("WaitForExit", []interface{}{arg1, arg2, arg3, arg4})
 	fake.waitForExitMutex.Unlock()
-	if fake.WaitForExitStub != nil {
-		return fake.WaitForExitStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.waitForExitReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

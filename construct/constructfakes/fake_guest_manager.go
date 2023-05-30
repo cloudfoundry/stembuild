@@ -66,15 +66,16 @@ func (fake *FakeGuestManager) DownloadFileInGuest(arg1 context.Context, arg2 str
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DownloadFileInGuestStub
+	fakeReturns := fake.downloadFileInGuestReturns
 	fake.recordInvocation("DownloadFileInGuest", []interface{}{arg1, arg2})
 	fake.downloadFileInGuestMutex.Unlock()
-	if fake.DownloadFileInGuestStub != nil {
-		return fake.DownloadFileInGuestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.downloadFileInGuestReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -133,15 +134,16 @@ func (fake *FakeGuestManager) ExitCodeForProgramInGuest(arg1 context.Context, ar
 		arg1 context.Context
 		arg2 int64
 	}{arg1, arg2})
+	stub := fake.ExitCodeForProgramInGuestStub
+	fakeReturns := fake.exitCodeForProgramInGuestReturns
 	fake.recordInvocation("ExitCodeForProgramInGuest", []interface{}{arg1, arg2})
 	fake.exitCodeForProgramInGuestMutex.Unlock()
-	if fake.ExitCodeForProgramInGuestStub != nil {
-		return fake.ExitCodeForProgramInGuestStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.exitCodeForProgramInGuestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -198,15 +200,16 @@ func (fake *FakeGuestManager) StartProgramInGuest(arg1 context.Context, arg2 str
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.StartProgramInGuestStub
+	fakeReturns := fake.startProgramInGuestReturns
 	fake.recordInvocation("StartProgramInGuest", []interface{}{arg1, arg2, arg3})
 	fake.startProgramInGuestMutex.Unlock()
-	if fake.StartProgramInGuestStub != nil {
-		return fake.StartProgramInGuestStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.startProgramInGuestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

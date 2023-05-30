@@ -41,15 +41,16 @@ func (fake *FakeDownloadClient) Download(arg1 context.Context, arg2 *url.URL, ar
 		arg2 *url.URL
 		arg3 *soap.Download
 	}{arg1, arg2, arg3})
+	stub := fake.DownloadStub
+	fakeReturns := fake.downloadReturns
 	fake.recordInvocation("Download", []interface{}{arg1, arg2, arg3})
 	fake.downloadMutex.Unlock()
-	if fake.DownloadStub != nil {
-		return fake.DownloadStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.downloadReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 

@@ -46,15 +46,16 @@ func (fake *FakeWinRMClient) CreateShell() (*winrm.Shell, error) {
 	ret, specificReturn := fake.createShellReturnsOnCall[len(fake.createShellArgsForCall)]
 	fake.createShellArgsForCall = append(fake.createShellArgsForCall, struct {
 	}{})
+	stub := fake.CreateShellStub
+	fakeReturns := fake.createShellReturns
 	fake.recordInvocation("CreateShell", []interface{}{})
 	fake.createShellMutex.Unlock()
-	if fake.CreateShellStub != nil {
-		return fake.CreateShellStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.createShellReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -104,15 +105,16 @@ func (fake *FakeWinRMClient) Run(arg1 string, arg2 io.Writer, arg3 io.Writer) (i
 		arg2 io.Writer
 		arg3 io.Writer
 	}{arg1, arg2, arg3})
+	stub := fake.RunStub
+	fakeReturns := fake.runReturns
 	fake.recordInvocation("Run", []interface{}{arg1, arg2, arg3})
 	fake.runMutex.Unlock()
-	if fake.RunStub != nil {
-		return fake.RunStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.runReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

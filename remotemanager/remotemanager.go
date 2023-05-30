@@ -2,7 +2,9 @@ package remotemanager
 
 import "time"
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RemoteManager
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
+//counterfeiter:generate . RemoteManager
 
 const PowershellExecutionErrorMessage = "powershell encountered an issue"
 

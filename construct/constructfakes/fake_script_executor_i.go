@@ -41,15 +41,16 @@ func (fake *FakeScriptExecutorI) ExecutePostRebootScript(arg1 time.Duration) err
 	fake.executePostRebootScriptArgsForCall = append(fake.executePostRebootScriptArgsForCall, struct {
 		arg1 time.Duration
 	}{arg1})
+	stub := fake.ExecutePostRebootScriptStub
+	fakeReturns := fake.executePostRebootScriptReturns
 	fake.recordInvocation("ExecutePostRebootScript", []interface{}{arg1})
 	fake.executePostRebootScriptMutex.Unlock()
-	if fake.ExecutePostRebootScriptStub != nil {
-		return fake.ExecutePostRebootScriptStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executePostRebootScriptReturns
 	return fakeReturns.result1
 }
 
@@ -101,15 +102,16 @@ func (fake *FakeScriptExecutorI) ExecuteSetupScript(arg1 string) error {
 	fake.executeSetupScriptArgsForCall = append(fake.executeSetupScriptArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ExecuteSetupScriptStub
+	fakeReturns := fake.executeSetupScriptReturns
 	fake.recordInvocation("ExecuteSetupScript", []interface{}{arg1})
 	fake.executeSetupScriptMutex.Unlock()
-	if fake.ExecuteSetupScriptStub != nil {
-		return fake.ExecuteSetupScriptStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeSetupScriptReturns
 	return fakeReturns.result1
 }
 

@@ -48,15 +48,16 @@ func (fake *FakeOSAndVersionGetter) GetOs() string {
 	ret, specificReturn := fake.getOsReturnsOnCall[len(fake.getOsArgsForCall)]
 	fake.getOsArgsForCall = append(fake.getOsArgsForCall, struct {
 	}{})
+	stub := fake.GetOsStub
+	fakeReturns := fake.getOsReturns
 	fake.recordInvocation("GetOs", []interface{}{})
 	fake.getOsMutex.Unlock()
-	if fake.GetOsStub != nil {
-		return fake.GetOsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getOsReturns
 	return fakeReturns.result1
 }
 
@@ -100,15 +101,16 @@ func (fake *FakeOSAndVersionGetter) GetVersion() string {
 	ret, specificReturn := fake.getVersionReturnsOnCall[len(fake.getVersionArgsForCall)]
 	fake.getVersionArgsForCall = append(fake.getVersionArgsForCall, struct {
 	}{})
+	stub := fake.GetVersionStub
+	fakeReturns := fake.getVersionReturns
 	fake.recordInvocation("GetVersion", []interface{}{})
 	fake.getVersionMutex.Unlock()
-	if fake.GetVersionStub != nil {
-		return fake.GetVersionStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getVersionReturns
 	return fakeReturns.result1
 }
 
@@ -153,15 +155,16 @@ func (fake *FakeOSAndVersionGetter) GetVersionWithPatchNumber(arg1 string) strin
 	fake.getVersionWithPatchNumberArgsForCall = append(fake.getVersionWithPatchNumberArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.GetVersionWithPatchNumberStub
+	fakeReturns := fake.getVersionWithPatchNumberReturns
 	fake.recordInvocation("GetVersionWithPatchNumber", []interface{}{arg1})
 	fake.getVersionWithPatchNumberMutex.Unlock()
-	if fake.GetVersionWithPatchNumberStub != nil {
-		return fake.GetVersionWithPatchNumberStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.getVersionWithPatchNumberReturns
 	return fakeReturns.result1
 }
 

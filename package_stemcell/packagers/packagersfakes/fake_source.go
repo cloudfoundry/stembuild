@@ -30,15 +30,16 @@ func (fake *FakeSource) ArtifactReader() (io.Reader, error) {
 	ret, specificReturn := fake.artifactReaderReturnsOnCall[len(fake.artifactReaderArgsForCall)]
 	fake.artifactReaderArgsForCall = append(fake.artifactReaderArgsForCall, struct {
 	}{})
+	stub := fake.ArtifactReaderStub
+	fakeReturns := fake.artifactReaderReturns
 	fake.recordInvocation("ArtifactReader", []interface{}{})
 	fake.artifactReaderMutex.Unlock()
-	if fake.ArtifactReaderStub != nil {
-		return fake.ArtifactReaderStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.artifactReaderReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

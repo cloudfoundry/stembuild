@@ -3,10 +3,11 @@ package construct
 import (
 	"context"
 	"fmt"
+
 	"github.com/cloudfoundry/stembuild/assets"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . zipUnarchiver
+//counterfeiter:generate . zipUnarchiver
 type zipUnarchiver interface {
 	Unzip(fileArchive []byte, file string) ([]byte, error)
 }

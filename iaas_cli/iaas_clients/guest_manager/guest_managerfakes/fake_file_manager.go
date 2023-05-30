@@ -52,15 +52,16 @@ func (fake *FakeFileManager) InitiateFileTransferFromGuest(arg1 context.Context,
 		arg2 types.BaseGuestAuthentication
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.InitiateFileTransferFromGuestStub
+	fakeReturns := fake.initiateFileTransferFromGuestReturns
 	fake.recordInvocation("InitiateFileTransferFromGuest", []interface{}{arg1, arg2, arg3})
 	fake.initiateFileTransferFromGuestMutex.Unlock()
-	if fake.InitiateFileTransferFromGuestStub != nil {
-		return fake.InitiateFileTransferFromGuestStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.initiateFileTransferFromGuestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -116,15 +117,16 @@ func (fake *FakeFileManager) TransferURL(arg1 context.Context, arg2 string) (*ur
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.TransferURLStub
+	fakeReturns := fake.transferURLReturns
 	fake.recordInvocation("TransferURL", []interface{}{arg1, arg2})
 	fake.transferURLMutex.Unlock()
-	if fake.TransferURLStub != nil {
-		return fake.TransferURLStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.transferURLReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

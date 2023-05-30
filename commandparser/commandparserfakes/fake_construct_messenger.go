@@ -34,9 +34,10 @@ func (fake *FakeConstructMessenger) ArgumentsNotProvided() {
 	fake.argumentsNotProvidedMutex.Lock()
 	fake.argumentsNotProvidedArgsForCall = append(fake.argumentsNotProvidedArgsForCall, struct {
 	}{})
+	stub := fake.ArgumentsNotProvidedStub
 	fake.recordInvocation("ArgumentsNotProvided", []interface{}{})
 	fake.argumentsNotProvidedMutex.Unlock()
-	if fake.ArgumentsNotProvidedStub != nil {
+	if stub != nil {
 		fake.ArgumentsNotProvidedStub()
 	}
 }
@@ -58,9 +59,10 @@ func (fake *FakeConstructMessenger) CannotConnectToVM(arg1 error) {
 	fake.cannotConnectToVMArgsForCall = append(fake.cannotConnectToVMArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.CannotConnectToVMStub
 	fake.recordInvocation("CannotConnectToVM", []interface{}{arg1})
 	fake.cannotConnectToVMMutex.Unlock()
-	if fake.CannotConnectToVMStub != nil {
+	if stub != nil {
 		fake.CannotConnectToVMStub(arg1)
 	}
 }
@@ -89,9 +91,10 @@ func (fake *FakeConstructMessenger) CannotPrepareVM(arg1 error) {
 	fake.cannotPrepareVMArgsForCall = append(fake.cannotPrepareVMArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.CannotPrepareVMStub
 	fake.recordInvocation("CannotPrepareVM", []interface{}{arg1})
 	fake.cannotPrepareVMMutex.Unlock()
-	if fake.CannotPrepareVMStub != nil {
+	if stub != nil {
 		fake.CannotPrepareVMStub(arg1)
 	}
 }
@@ -119,9 +122,10 @@ func (fake *FakeConstructMessenger) LGPONotFound() {
 	fake.lGPONotFoundMutex.Lock()
 	fake.lGPONotFoundArgsForCall = append(fake.lGPONotFoundArgsForCall, struct {
 	}{})
+	stub := fake.LGPONotFoundStub
 	fake.recordInvocation("LGPONotFound", []interface{}{})
 	fake.lGPONotFoundMutex.Unlock()
-	if fake.LGPONotFoundStub != nil {
+	if stub != nil {
 		fake.LGPONotFoundStub()
 	}
 }

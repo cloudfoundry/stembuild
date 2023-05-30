@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 type TarWriter struct {
 }
 
@@ -14,7 +16,7 @@ func NewTarWriter() *TarWriter {
 	return &TarWriter{}
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Tarable
+//counterfeiter:generate . Tarable
 type Tarable interface {
 	io.Reader
 	Size() int64

@@ -27,15 +27,16 @@ func (fake *FakeRebootWaiterI) WaitForRebootFinished() error {
 	ret, specificReturn := fake.waitForRebootFinishedReturnsOnCall[len(fake.waitForRebootFinishedArgsForCall)]
 	fake.waitForRebootFinishedArgsForCall = append(fake.waitForRebootFinishedArgsForCall, struct {
 	}{})
+	stub := fake.WaitForRebootFinishedStub
+	fakeReturns := fake.waitForRebootFinishedReturns
 	fake.recordInvocation("WaitForRebootFinished", []interface{}{})
 	fake.waitForRebootFinishedMutex.Unlock()
-	if fake.WaitForRebootFinishedStub != nil {
-		return fake.WaitForRebootFinishedStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.waitForRebootFinishedReturns
 	return fakeReturns.result1
 }
 

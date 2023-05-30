@@ -42,9 +42,10 @@ func (fake *FakePackagerMessenger) CannotCreatePackager(arg1 error) {
 	fake.cannotCreatePackagerArgsForCall = append(fake.cannotCreatePackagerArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.CannotCreatePackagerStub
 	fake.recordInvocation("CannotCreatePackager", []interface{}{arg1})
 	fake.cannotCreatePackagerMutex.Unlock()
-	if fake.CannotCreatePackagerStub != nil {
+	if stub != nil {
 		fake.CannotCreatePackagerStub(arg1)
 	}
 }
@@ -73,9 +74,10 @@ func (fake *FakePackagerMessenger) DoesNotHaveEnoughSpace(arg1 error) {
 	fake.doesNotHaveEnoughSpaceArgsForCall = append(fake.doesNotHaveEnoughSpaceArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.DoesNotHaveEnoughSpaceStub
 	fake.recordInvocation("DoesNotHaveEnoughSpace", []interface{}{arg1})
 	fake.doesNotHaveEnoughSpaceMutex.Unlock()
-	if fake.DoesNotHaveEnoughSpaceStub != nil {
+	if stub != nil {
 		fake.DoesNotHaveEnoughSpaceStub(arg1)
 	}
 }
@@ -104,9 +106,10 @@ func (fake *FakePackagerMessenger) InvalidOutputConfig(arg1 error) {
 	fake.invalidOutputConfigArgsForCall = append(fake.invalidOutputConfigArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.InvalidOutputConfigStub
 	fake.recordInvocation("InvalidOutputConfig", []interface{}{arg1})
 	fake.invalidOutputConfigMutex.Unlock()
-	if fake.InvalidOutputConfigStub != nil {
+	if stub != nil {
 		fake.InvalidOutputConfigStub(arg1)
 	}
 }
@@ -135,9 +138,10 @@ func (fake *FakePackagerMessenger) PackageFailed(arg1 error) {
 	fake.packageFailedArgsForCall = append(fake.packageFailedArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.PackageFailedStub
 	fake.recordInvocation("PackageFailed", []interface{}{arg1})
 	fake.packageFailedMutex.Unlock()
-	if fake.PackageFailedStub != nil {
+	if stub != nil {
 		fake.PackageFailedStub(arg1)
 	}
 }
@@ -166,9 +170,10 @@ func (fake *FakePackagerMessenger) SourceParametersAreInvalid(arg1 error) {
 	fake.sourceParametersAreInvalidArgsForCall = append(fake.sourceParametersAreInvalidArgsForCall, struct {
 		arg1 error
 	}{arg1})
+	stub := fake.SourceParametersAreInvalidStub
 	fake.recordInvocation("SourceParametersAreInvalid", []interface{}{arg1})
 	fake.sourceParametersAreInvalidMutex.Unlock()
-	if fake.SourceParametersAreInvalidStub != nil {
+	if stub != nil {
 		fake.SourceParametersAreInvalidStub(arg1)
 	}
 }

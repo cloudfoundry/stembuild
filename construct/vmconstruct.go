@@ -16,7 +16,9 @@ import (
 	. "github.com/cloudfoundry/stembuild/remotemanager"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . VersionGetter
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
+//counterfeiter:generate . VersionGetter
 type VersionGetter interface {
 	GetVersion() string
 }
@@ -85,25 +87,25 @@ func NewVMConstruct(
 	}
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ScriptExecutorI
+//counterfeiter:generate . ScriptExecutorI
 type ScriptExecutorI interface {
 	ExecuteSetupScript(stembuildVersion string) error
 	ExecutePostRebootScript(timeout time.Duration) error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RebootWaiterI
+//counterfeiter:generate . RebootWaiterI
 type RebootWaiterI interface {
 	WaitForRebootFinished() error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GuestManager
+//counterfeiter:generate . GuestManager
 type GuestManager interface {
 	ExitCodeForProgramInGuest(ctx context.Context, pid int64) (int32, error)
 	StartProgramInGuest(ctx context.Context, command, args string) (int64, error)
 	DownloadFileInGuest(ctx context.Context, path string) (io.Reader, int64, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IaasClient
+//counterfeiter:generate . IaasClient
 type IaasClient interface {
 	UploadArtifact(vmInventoryPath, artifact, destination, username, password string) error
 	MakeDirectory(vmInventoryPath, path, username, password string) error
@@ -112,17 +114,17 @@ type IaasClient interface {
 	IsPoweredOff(vmInventoryPath string) (bool, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . WinRMEnabler
+//counterfeiter:generate . WinRMEnabler
 type WinRMEnabler interface {
 	Enable() error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . VMConnectionValidator
+//counterfeiter:generate . VMConnectionValidator
 type VMConnectionValidator interface {
 	Validate() error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ConstructMessenger
+//counterfeiter:generate . ConstructMessenger
 type ConstructMessenger interface {
 	CreateProvisionDirStarted()
 	CreateProvisionDirSucceeded()

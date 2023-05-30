@@ -38,15 +38,16 @@ func (fake *FakeConstructCmdValidator) LGPOInDirectory() bool {
 	ret, specificReturn := fake.lGPOInDirectoryReturnsOnCall[len(fake.lGPOInDirectoryArgsForCall)]
 	fake.lGPOInDirectoryArgsForCall = append(fake.lGPOInDirectoryArgsForCall, struct {
 	}{})
+	stub := fake.LGPOInDirectoryStub
+	fakeReturns := fake.lGPOInDirectoryReturns
 	fake.recordInvocation("LGPOInDirectory", []interface{}{})
 	fake.lGPOInDirectoryMutex.Unlock()
-	if fake.LGPOInDirectoryStub != nil {
-		return fake.LGPOInDirectoryStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.lGPOInDirectoryReturns
 	return fakeReturns.result1
 }
 
@@ -91,15 +92,16 @@ func (fake *FakeConstructCmdValidator) PopulatedArgs(arg1 ...string) bool {
 	fake.populatedArgsArgsForCall = append(fake.populatedArgsArgsForCall, struct {
 		arg1 []string
 	}{arg1})
+	stub := fake.PopulatedArgsStub
+	fakeReturns := fake.populatedArgsReturns
 	fake.recordInvocation("PopulatedArgs", []interface{}{arg1})
 	fake.populatedArgsMutex.Unlock()
-	if fake.PopulatedArgsStub != nil {
-		return fake.PopulatedArgsStub(arg1...)
+	if stub != nil {
+		return stub(arg1...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.populatedArgsReturns
 	return fakeReturns.result1
 }
 

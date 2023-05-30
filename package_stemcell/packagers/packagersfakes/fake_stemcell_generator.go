@@ -30,15 +30,16 @@ func (fake *FakeStemcellGenerator) Generate(arg1 io.Reader) error {
 	fake.generateArgsForCall = append(fake.generateArgsForCall, struct {
 		arg1 io.Reader
 	}{arg1})
+	stub := fake.GenerateStub
+	fakeReturns := fake.generateReturns
 	fake.recordInvocation("Generate", []interface{}{arg1})
 	fake.generateMutex.Unlock()
-	if fake.GenerateStub != nil {
-		return fake.GenerateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.generateReturns
 	return fakeReturns.result1
 }
 

@@ -17,12 +17,14 @@ import (
 	"github.com/google/subcommands"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . VmConstruct
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
+//counterfeiter:generate . VmConstruct
 type VmConstruct interface {
 	PrepareVM() error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . VCenterManager
+//counterfeiter:generate . VCenterManager
 type VCenterManager interface {
 	OperationsManager(ctx context.Context, vm *object.VirtualMachine) *guest.OperationsManager
 	GuestManager(ctx context.Context, opsManager vcenter_manager.OpsManager, username, password string) (*guest_manager.GuestManager, error)
@@ -30,24 +32,24 @@ type VCenterManager interface {
 	Login(ctx context.Context) error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . VMPreparerFactory
+//counterfeiter:generate . VMPreparerFactory
 type VMPreparerFactory interface {
 	VMPreparer(config config.SourceConfig, vCenterManager VCenterManager) (VmConstruct, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ManagerFactory
+//counterfeiter:generate . ManagerFactory
 type ManagerFactory interface {
 	VCenterManager(ctx context.Context) (*vcenter_manager.VCenterManager, error)
 	SetConfig(config vcenter_client_factory.FactoryConfig)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ConstructCmdValidator
+//counterfeiter:generate . ConstructCmdValidator
 type ConstructCmdValidator interface {
 	PopulatedArgs(...string) bool
 	LGPOInDirectory() bool
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ConstructMessenger
+//counterfeiter:generate . ConstructMessenger
 type ConstructMessenger interface {
 	ArgumentsNotProvided()
 	LGPONotFound()

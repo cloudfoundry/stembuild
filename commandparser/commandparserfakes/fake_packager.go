@@ -49,15 +49,16 @@ func (fake *FakePackager) Package() error {
 	ret, specificReturn := fake.packageReturnsOnCall[len(fake.packageArgsForCall)]
 	fake.packageArgsForCall = append(fake.packageArgsForCall, struct {
 	}{})
+	stub := fake.PackageStub
+	fakeReturns := fake.packageReturns
 	fake.recordInvocation("Package", []interface{}{})
 	fake.packageMutex.Unlock()
-	if fake.PackageStub != nil {
-		return fake.PackageStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.packageReturns
 	return fakeReturns.result1
 }
 
@@ -102,15 +103,16 @@ func (fake *FakePackager) ValidateFreeSpaceForPackage(arg1 filesystem.FileSystem
 	fake.validateFreeSpaceForPackageArgsForCall = append(fake.validateFreeSpaceForPackageArgsForCall, struct {
 		arg1 filesystem.FileSystem
 	}{arg1})
+	stub := fake.ValidateFreeSpaceForPackageStub
+	fakeReturns := fake.validateFreeSpaceForPackageReturns
 	fake.recordInvocation("ValidateFreeSpaceForPackage", []interface{}{arg1})
 	fake.validateFreeSpaceForPackageMutex.Unlock()
-	if fake.ValidateFreeSpaceForPackageStub != nil {
-		return fake.ValidateFreeSpaceForPackageStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.validateFreeSpaceForPackageReturns
 	return fakeReturns.result1
 }
 
@@ -161,15 +163,16 @@ func (fake *FakePackager) ValidateSourceParameters() error {
 	ret, specificReturn := fake.validateSourceParametersReturnsOnCall[len(fake.validateSourceParametersArgsForCall)]
 	fake.validateSourceParametersArgsForCall = append(fake.validateSourceParametersArgsForCall, struct {
 	}{})
+	stub := fake.ValidateSourceParametersStub
+	fakeReturns := fake.validateSourceParametersReturns
 	fake.recordInvocation("ValidateSourceParameters", []interface{}{})
 	fake.validateSourceParametersMutex.Unlock()
-	if fake.ValidateSourceParametersStub != nil {
-		return fake.ValidateSourceParametersStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.validateSourceParametersReturns
 	return fakeReturns.result1
 }
 

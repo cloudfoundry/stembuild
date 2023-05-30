@@ -32,15 +32,16 @@ func (fake *FakeManifestGenerator) Manifest(arg1 io.Reader) (io.Reader, error) {
 	fake.manifestArgsForCall = append(fake.manifestArgsForCall, struct {
 		arg1 io.Reader
 	}{arg1})
+	stub := fake.ManifestStub
+	fakeReturns := fake.manifestReturns
 	fake.recordInvocation("Manifest", []interface{}{arg1})
 	fake.manifestMutex.Unlock()
-	if fake.ManifestStub != nil {
-		return fake.ManifestStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.manifestReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

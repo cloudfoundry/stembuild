@@ -38,15 +38,16 @@ func (fake *FakePackagerFactory) Packager(arg1 config.SourceConfig, arg2 config.
 		arg3 int
 		arg4 bool
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.PackagerStub
+	fakeReturns := fake.packagerReturns
 	fake.recordInvocation("Packager", []interface{}{arg1, arg2, arg3, arg4})
 	fake.packagerMutex.Unlock()
-	if fake.PackagerStub != nil {
-		return fake.PackagerStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.packagerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

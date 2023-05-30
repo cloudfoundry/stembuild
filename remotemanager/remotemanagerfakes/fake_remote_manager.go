@@ -89,15 +89,16 @@ func (fake *FakeRemoteManager) CanLoginVM() error {
 	ret, specificReturn := fake.canLoginVMReturnsOnCall[len(fake.canLoginVMArgsForCall)]
 	fake.canLoginVMArgsForCall = append(fake.canLoginVMArgsForCall, struct {
 	}{})
+	stub := fake.CanLoginVMStub
+	fakeReturns := fake.canLoginVMReturns
 	fake.recordInvocation("CanLoginVM", []interface{}{})
 	fake.canLoginVMMutex.Unlock()
-	if fake.CanLoginVMStub != nil {
-		return fake.CanLoginVMStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.canLoginVMReturns
 	return fakeReturns.result1
 }
 
@@ -141,15 +142,16 @@ func (fake *FakeRemoteManager) CanReachVM() error {
 	ret, specificReturn := fake.canReachVMReturnsOnCall[len(fake.canReachVMArgsForCall)]
 	fake.canReachVMArgsForCall = append(fake.canReachVMArgsForCall, struct {
 	}{})
+	stub := fake.CanReachVMStub
+	fakeReturns := fake.canReachVMReturns
 	fake.recordInvocation("CanReachVM", []interface{}{})
 	fake.canReachVMMutex.Unlock()
-	if fake.CanReachVMStub != nil {
-		return fake.CanReachVMStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.canReachVMReturns
 	return fakeReturns.result1
 }
 
@@ -194,15 +196,16 @@ func (fake *FakeRemoteManager) ExecuteCommand(arg1 string) (int, error) {
 	fake.executeCommandArgsForCall = append(fake.executeCommandArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ExecuteCommandStub
+	fakeReturns := fake.executeCommandReturns
 	fake.recordInvocation("ExecuteCommand", []interface{}{arg1})
 	fake.executeCommandMutex.Unlock()
-	if fake.ExecuteCommandStub != nil {
-		return fake.ExecuteCommandStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.executeCommandReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -258,15 +261,16 @@ func (fake *FakeRemoteManager) ExecuteCommandWithTimeout(arg1 string, arg2 time.
 		arg1 string
 		arg2 time.Duration
 	}{arg1, arg2})
+	stub := fake.ExecuteCommandWithTimeoutStub
+	fakeReturns := fake.executeCommandWithTimeoutReturns
 	fake.recordInvocation("ExecuteCommandWithTimeout", []interface{}{arg1, arg2})
 	fake.executeCommandWithTimeoutMutex.Unlock()
-	if fake.ExecuteCommandWithTimeoutStub != nil {
-		return fake.ExecuteCommandWithTimeoutStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.executeCommandWithTimeoutReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -322,15 +326,16 @@ func (fake *FakeRemoteManager) ExtractArchive(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ExtractArchiveStub
+	fakeReturns := fake.extractArchiveReturns
 	fake.recordInvocation("ExtractArchive", []interface{}{arg1, arg2})
 	fake.extractArchiveMutex.Unlock()
-	if fake.ExtractArchiveStub != nil {
-		return fake.ExtractArchiveStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.extractArchiveReturns
 	return fakeReturns.result1
 }
 
@@ -383,15 +388,16 @@ func (fake *FakeRemoteManager) UploadArtifact(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.UploadArtifactStub
+	fakeReturns := fake.uploadArtifactReturns
 	fake.recordInvocation("UploadArtifact", []interface{}{arg1, arg2})
 	fake.uploadArtifactMutex.Unlock()
-	if fake.UploadArtifactStub != nil {
-		return fake.UploadArtifactStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.uploadArtifactReturns
 	return fakeReturns.result1
 }
 

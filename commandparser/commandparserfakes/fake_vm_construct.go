@@ -27,15 +27,16 @@ func (fake *FakeVmConstruct) PrepareVM() error {
 	ret, specificReturn := fake.prepareVMReturnsOnCall[len(fake.prepareVMArgsForCall)]
 	fake.prepareVMArgsForCall = append(fake.prepareVMArgsForCall, struct {
 	}{})
+	stub := fake.PrepareVMStub
+	fakeReturns := fake.prepareVMReturns
 	fake.recordInvocation("PrepareVM", []interface{}{})
 	fake.prepareVMMutex.Unlock()
-	if fake.PrepareVMStub != nil {
-		return fake.PrepareVMStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.prepareVMReturns
 	return fakeReturns.result1
 }
 

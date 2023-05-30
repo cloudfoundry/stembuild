@@ -46,15 +46,16 @@ func (fake *FakeOpsManager) FileManager(arg1 context.Context) (*guest.FileManage
 	fake.fileManagerArgsForCall = append(fake.fileManagerArgsForCall, struct {
 		arg1 context.Context
 	}{arg1})
+	stub := fake.FileManagerStub
+	fakeReturns := fake.fileManagerReturns
 	fake.recordInvocation("FileManager", []interface{}{arg1})
 	fake.fileManagerMutex.Unlock()
-	if fake.FileManagerStub != nil {
-		return fake.FileManagerStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.fileManagerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -109,15 +110,16 @@ func (fake *FakeOpsManager) ProcessManager(arg1 context.Context) (*guest.Process
 	fake.processManagerArgsForCall = append(fake.processManagerArgsForCall, struct {
 		arg1 context.Context
 	}{arg1})
+	stub := fake.ProcessManagerStub
+	fakeReturns := fake.processManagerReturns
 	fake.recordInvocation("ProcessManager", []interface{}{arg1})
 	fake.processManagerMutex.Unlock()
-	if fake.ProcessManagerStub != nil {
-		return fake.ProcessManagerStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.processManagerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

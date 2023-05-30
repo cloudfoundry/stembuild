@@ -3,8 +3,9 @@ package remotemanager
 import (
 	"errors"
 	"fmt"
-	"github.com/cloudfoundry/stembuild/poller"
 	"time"
+
+	"github.com/cloudfoundry/stembuild/poller"
 )
 
 var tryCheckReboot = `shutdown /r /f /t 60 /c "stembuild reboot test"`
@@ -31,7 +32,7 @@ func (rw *RebootWaiter) WaitForRebootFinished() error {
 	return nil
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RebootCheckerI
+//counterfeiter:generate . RebootCheckerI
 type RebootCheckerI interface {
 	RebootHasFinished() (bool, error)
 }

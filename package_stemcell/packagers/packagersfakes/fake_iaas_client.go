@@ -99,15 +99,16 @@ func (fake *FakeIaasClient) EjectCDRom(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.EjectCDRomStub
+	fakeReturns := fake.ejectCDRomReturns
 	fake.recordInvocation("EjectCDRom", []interface{}{arg1, arg2})
 	fake.ejectCDRomMutex.Unlock()
-	if fake.EjectCDRomStub != nil {
-		return fake.EjectCDRomStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.ejectCDRomReturns
 	return fakeReturns.result1
 }
 
@@ -160,15 +161,16 @@ func (fake *FakeIaasClient) ExportVM(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ExportVMStub
+	fakeReturns := fake.exportVMReturns
 	fake.recordInvocation("ExportVM", []interface{}{arg1, arg2})
 	fake.exportVMMutex.Unlock()
-	if fake.ExportVMStub != nil {
-		return fake.ExportVMStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.exportVMReturns
 	return fakeReturns.result1
 }
 
@@ -220,15 +222,16 @@ func (fake *FakeIaasClient) FindVM(arg1 string) error {
 	fake.findVMArgsForCall = append(fake.findVMArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.FindVMStub
+	fakeReturns := fake.findVMReturns
 	fake.recordInvocation("FindVM", []interface{}{arg1})
 	fake.findVMMutex.Unlock()
-	if fake.FindVMStub != nil {
-		return fake.FindVMStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.findVMReturns
 	return fakeReturns.result1
 }
 
@@ -280,15 +283,16 @@ func (fake *FakeIaasClient) ListDevices(arg1 string) ([]string, error) {
 	fake.listDevicesArgsForCall = append(fake.listDevicesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ListDevicesStub
+	fakeReturns := fake.listDevicesReturns
 	fake.recordInvocation("ListDevices", []interface{}{arg1})
 	fake.listDevicesMutex.Unlock()
-	if fake.ListDevicesStub != nil {
-		return fake.ListDevicesStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.listDevicesReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -344,15 +348,16 @@ func (fake *FakeIaasClient) RemoveDevice(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.RemoveDeviceStub
+	fakeReturns := fake.removeDeviceReturns
 	fake.recordInvocation("RemoveDevice", []interface{}{arg1, arg2})
 	fake.removeDeviceMutex.Unlock()
-	if fake.RemoveDeviceStub != nil {
-		return fake.RemoveDeviceStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.removeDeviceReturns
 	return fakeReturns.result1
 }
 
@@ -403,15 +408,16 @@ func (fake *FakeIaasClient) ValidateCredentials() error {
 	ret, specificReturn := fake.validateCredentialsReturnsOnCall[len(fake.validateCredentialsArgsForCall)]
 	fake.validateCredentialsArgsForCall = append(fake.validateCredentialsArgsForCall, struct {
 	}{})
+	stub := fake.ValidateCredentialsStub
+	fakeReturns := fake.validateCredentialsReturns
 	fake.recordInvocation("ValidateCredentials", []interface{}{})
 	fake.validateCredentialsMutex.Unlock()
-	if fake.ValidateCredentialsStub != nil {
-		return fake.ValidateCredentialsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.validateCredentialsReturns
 	return fakeReturns.result1
 }
 
@@ -455,15 +461,16 @@ func (fake *FakeIaasClient) ValidateUrl() error {
 	ret, specificReturn := fake.validateUrlReturnsOnCall[len(fake.validateUrlArgsForCall)]
 	fake.validateUrlArgsForCall = append(fake.validateUrlArgsForCall, struct {
 	}{})
+	stub := fake.ValidateUrlStub
+	fakeReturns := fake.validateUrlReturns
 	fake.recordInvocation("ValidateUrl", []interface{}{})
 	fake.validateUrlMutex.Unlock()
-	if fake.ValidateUrlStub != nil {
-		return fake.ValidateUrlStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.validateUrlReturns
 	return fakeReturns.result1
 }
 

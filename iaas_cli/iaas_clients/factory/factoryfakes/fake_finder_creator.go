@@ -33,15 +33,16 @@ func (fake *FakeFinderCreator) NewFinder(arg1 *vim25.Client, arg2 bool) *find.Fi
 		arg1 *vim25.Client
 		arg2 bool
 	}{arg1, arg2})
+	stub := fake.NewFinderStub
+	fakeReturns := fake.newFinderReturns
 	fake.recordInvocation("NewFinder", []interface{}{arg1, arg2})
 	fake.newFinderMutex.Unlock()
-	if fake.NewFinderStub != nil {
-		return fake.NewFinderStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.newFinderReturns
 	return fakeReturns.result1
 }
 

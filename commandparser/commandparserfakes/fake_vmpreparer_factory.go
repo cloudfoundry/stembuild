@@ -34,15 +34,16 @@ func (fake *FakeVMPreparerFactory) VMPreparer(arg1 config.SourceConfig, arg2 com
 		arg1 config.SourceConfig
 		arg2 commandparser.VCenterManager
 	}{arg1, arg2})
+	stub := fake.VMPreparerStub
+	fakeReturns := fake.vMPreparerReturns
 	fake.recordInvocation("VMPreparer", []interface{}{arg1, arg2})
 	fake.vMPreparerMutex.Unlock()
-	if fake.VMPreparerStub != nil {
-		return fake.VMPreparerStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.vMPreparerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

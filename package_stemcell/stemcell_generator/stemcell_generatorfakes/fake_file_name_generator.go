@@ -27,15 +27,16 @@ func (fake *FakeFileNameGenerator) FileName() string {
 	ret, specificReturn := fake.fileNameReturnsOnCall[len(fake.fileNameArgsForCall)]
 	fake.fileNameArgsForCall = append(fake.fileNameArgsForCall, struct {
 	}{})
+	stub := fake.FileNameStub
+	fakeReturns := fake.fileNameReturns
 	fake.recordInvocation("FileName", []interface{}{})
 	fake.fileNameMutex.Unlock()
-	if fake.FileNameStub != nil {
-		return fake.FileNameStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.fileNameReturns
 	return fakeReturns.result1
 }
 

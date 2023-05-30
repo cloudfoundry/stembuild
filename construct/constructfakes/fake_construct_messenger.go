@@ -114,9 +114,10 @@ func (fake *FakeConstructMessenger) CreateProvisionDirStarted() {
 	fake.createProvisionDirStartedMutex.Lock()
 	fake.createProvisionDirStartedArgsForCall = append(fake.createProvisionDirStartedArgsForCall, struct {
 	}{})
+	stub := fake.CreateProvisionDirStartedStub
 	fake.recordInvocation("CreateProvisionDirStarted", []interface{}{})
 	fake.createProvisionDirStartedMutex.Unlock()
-	if fake.CreateProvisionDirStartedStub != nil {
+	if stub != nil {
 		fake.CreateProvisionDirStartedStub()
 	}
 }
@@ -137,9 +138,10 @@ func (fake *FakeConstructMessenger) CreateProvisionDirSucceeded() {
 	fake.createProvisionDirSucceededMutex.Lock()
 	fake.createProvisionDirSucceededArgsForCall = append(fake.createProvisionDirSucceededArgsForCall, struct {
 	}{})
+	stub := fake.CreateProvisionDirSucceededStub
 	fake.recordInvocation("CreateProvisionDirSucceeded", []interface{}{})
 	fake.createProvisionDirSucceededMutex.Unlock()
-	if fake.CreateProvisionDirSucceededStub != nil {
+	if stub != nil {
 		fake.CreateProvisionDirSucceededStub()
 	}
 }
@@ -160,9 +162,10 @@ func (fake *FakeConstructMessenger) EnableWinRMStarted() {
 	fake.enableWinRMStartedMutex.Lock()
 	fake.enableWinRMStartedArgsForCall = append(fake.enableWinRMStartedArgsForCall, struct {
 	}{})
+	stub := fake.EnableWinRMStartedStub
 	fake.recordInvocation("EnableWinRMStarted", []interface{}{})
 	fake.enableWinRMStartedMutex.Unlock()
-	if fake.EnableWinRMStartedStub != nil {
+	if stub != nil {
 		fake.EnableWinRMStartedStub()
 	}
 }
@@ -183,9 +186,10 @@ func (fake *FakeConstructMessenger) EnableWinRMSucceeded() {
 	fake.enableWinRMSucceededMutex.Lock()
 	fake.enableWinRMSucceededArgsForCall = append(fake.enableWinRMSucceededArgsForCall, struct {
 	}{})
+	stub := fake.EnableWinRMSucceededStub
 	fake.recordInvocation("EnableWinRMSucceeded", []interface{}{})
 	fake.enableWinRMSucceededMutex.Unlock()
-	if fake.EnableWinRMSucceededStub != nil {
+	if stub != nil {
 		fake.EnableWinRMSucceededStub()
 	}
 }
@@ -206,9 +210,10 @@ func (fake *FakeConstructMessenger) ExecutePostRebootScriptStarted() {
 	fake.executePostRebootScriptStartedMutex.Lock()
 	fake.executePostRebootScriptStartedArgsForCall = append(fake.executePostRebootScriptStartedArgsForCall, struct {
 	}{})
+	stub := fake.ExecutePostRebootScriptStartedStub
 	fake.recordInvocation("ExecutePostRebootScriptStarted", []interface{}{})
 	fake.executePostRebootScriptStartedMutex.Unlock()
-	if fake.ExecutePostRebootScriptStartedStub != nil {
+	if stub != nil {
 		fake.ExecutePostRebootScriptStartedStub()
 	}
 }
@@ -229,9 +234,10 @@ func (fake *FakeConstructMessenger) ExecutePostRebootScriptSucceeded() {
 	fake.executePostRebootScriptSucceededMutex.Lock()
 	fake.executePostRebootScriptSucceededArgsForCall = append(fake.executePostRebootScriptSucceededArgsForCall, struct {
 	}{})
+	stub := fake.ExecutePostRebootScriptSucceededStub
 	fake.recordInvocation("ExecutePostRebootScriptSucceeded", []interface{}{})
 	fake.executePostRebootScriptSucceededMutex.Unlock()
-	if fake.ExecutePostRebootScriptSucceededStub != nil {
+	if stub != nil {
 		fake.ExecutePostRebootScriptSucceededStub()
 	}
 }
@@ -253,9 +259,10 @@ func (fake *FakeConstructMessenger) ExecutePostRebootWarning(arg1 string) {
 	fake.executePostRebootWarningArgsForCall = append(fake.executePostRebootWarningArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ExecutePostRebootWarningStub
 	fake.recordInvocation("ExecutePostRebootWarning", []interface{}{arg1})
 	fake.executePostRebootWarningMutex.Unlock()
-	if fake.ExecutePostRebootWarningStub != nil {
+	if stub != nil {
 		fake.ExecutePostRebootWarningStub(arg1)
 	}
 }
@@ -283,9 +290,10 @@ func (fake *FakeConstructMessenger) ExecuteSetupScriptStarted() {
 	fake.executeSetupScriptStartedMutex.Lock()
 	fake.executeSetupScriptStartedArgsForCall = append(fake.executeSetupScriptStartedArgsForCall, struct {
 	}{})
+	stub := fake.ExecuteSetupScriptStartedStub
 	fake.recordInvocation("ExecuteSetupScriptStarted", []interface{}{})
 	fake.executeSetupScriptStartedMutex.Unlock()
-	if fake.ExecuteSetupScriptStartedStub != nil {
+	if stub != nil {
 		fake.ExecuteSetupScriptStartedStub()
 	}
 }
@@ -306,9 +314,10 @@ func (fake *FakeConstructMessenger) ExecuteSetupScriptSucceeded() {
 	fake.executeSetupScriptSucceededMutex.Lock()
 	fake.executeSetupScriptSucceededArgsForCall = append(fake.executeSetupScriptSucceededArgsForCall, struct {
 	}{})
+	stub := fake.ExecuteSetupScriptSucceededStub
 	fake.recordInvocation("ExecuteSetupScriptSucceeded", []interface{}{})
 	fake.executeSetupScriptSucceededMutex.Unlock()
-	if fake.ExecuteSetupScriptSucceededStub != nil {
+	if stub != nil {
 		fake.ExecuteSetupScriptSucceededStub()
 	}
 }
@@ -329,9 +338,10 @@ func (fake *FakeConstructMessenger) ExtractArtifactsStarted() {
 	fake.extractArtifactsStartedMutex.Lock()
 	fake.extractArtifactsStartedArgsForCall = append(fake.extractArtifactsStartedArgsForCall, struct {
 	}{})
+	stub := fake.ExtractArtifactsStartedStub
 	fake.recordInvocation("ExtractArtifactsStarted", []interface{}{})
 	fake.extractArtifactsStartedMutex.Unlock()
-	if fake.ExtractArtifactsStartedStub != nil {
+	if stub != nil {
 		fake.ExtractArtifactsStartedStub()
 	}
 }
@@ -352,9 +362,10 @@ func (fake *FakeConstructMessenger) ExtractArtifactsSucceeded() {
 	fake.extractArtifactsSucceededMutex.Lock()
 	fake.extractArtifactsSucceededArgsForCall = append(fake.extractArtifactsSucceededArgsForCall, struct {
 	}{})
+	stub := fake.ExtractArtifactsSucceededStub
 	fake.recordInvocation("ExtractArtifactsSucceeded", []interface{}{})
 	fake.extractArtifactsSucceededMutex.Unlock()
-	if fake.ExtractArtifactsSucceededStub != nil {
+	if stub != nil {
 		fake.ExtractArtifactsSucceededStub()
 	}
 }
@@ -375,9 +386,10 @@ func (fake *FakeConstructMessenger) LogOutUsersStarted() {
 	fake.logOutUsersStartedMutex.Lock()
 	fake.logOutUsersStartedArgsForCall = append(fake.logOutUsersStartedArgsForCall, struct {
 	}{})
+	stub := fake.LogOutUsersStartedStub
 	fake.recordInvocation("LogOutUsersStarted", []interface{}{})
 	fake.logOutUsersStartedMutex.Unlock()
-	if fake.LogOutUsersStartedStub != nil {
+	if stub != nil {
 		fake.LogOutUsersStartedStub()
 	}
 }
@@ -398,9 +410,10 @@ func (fake *FakeConstructMessenger) LogOutUsersSucceeded() {
 	fake.logOutUsersSucceededMutex.Lock()
 	fake.logOutUsersSucceededArgsForCall = append(fake.logOutUsersSucceededArgsForCall, struct {
 	}{})
+	stub := fake.LogOutUsersSucceededStub
 	fake.recordInvocation("LogOutUsersSucceeded", []interface{}{})
 	fake.logOutUsersSucceededMutex.Unlock()
-	if fake.LogOutUsersSucceededStub != nil {
+	if stub != nil {
 		fake.LogOutUsersSucceededStub()
 	}
 }
@@ -421,9 +434,10 @@ func (fake *FakeConstructMessenger) RebootHasFinished() {
 	fake.rebootHasFinishedMutex.Lock()
 	fake.rebootHasFinishedArgsForCall = append(fake.rebootHasFinishedArgsForCall, struct {
 	}{})
+	stub := fake.RebootHasFinishedStub
 	fake.recordInvocation("RebootHasFinished", []interface{}{})
 	fake.rebootHasFinishedMutex.Unlock()
-	if fake.RebootHasFinishedStub != nil {
+	if stub != nil {
 		fake.RebootHasFinishedStub()
 	}
 }
@@ -444,9 +458,10 @@ func (fake *FakeConstructMessenger) RebootHasStarted() {
 	fake.rebootHasStartedMutex.Lock()
 	fake.rebootHasStartedArgsForCall = append(fake.rebootHasStartedArgsForCall, struct {
 	}{})
+	stub := fake.RebootHasStartedStub
 	fake.recordInvocation("RebootHasStarted", []interface{}{})
 	fake.rebootHasStartedMutex.Unlock()
-	if fake.RebootHasStartedStub != nil {
+	if stub != nil {
 		fake.RebootHasStartedStub()
 	}
 }
@@ -467,9 +482,10 @@ func (fake *FakeConstructMessenger) ShutdownCompleted() {
 	fake.shutdownCompletedMutex.Lock()
 	fake.shutdownCompletedArgsForCall = append(fake.shutdownCompletedArgsForCall, struct {
 	}{})
+	stub := fake.ShutdownCompletedStub
 	fake.recordInvocation("ShutdownCompleted", []interface{}{})
 	fake.shutdownCompletedMutex.Unlock()
-	if fake.ShutdownCompletedStub != nil {
+	if stub != nil {
 		fake.ShutdownCompletedStub()
 	}
 }
@@ -490,9 +506,10 @@ func (fake *FakeConstructMessenger) UploadArtifactsStarted() {
 	fake.uploadArtifactsStartedMutex.Lock()
 	fake.uploadArtifactsStartedArgsForCall = append(fake.uploadArtifactsStartedArgsForCall, struct {
 	}{})
+	stub := fake.UploadArtifactsStartedStub
 	fake.recordInvocation("UploadArtifactsStarted", []interface{}{})
 	fake.uploadArtifactsStartedMutex.Unlock()
-	if fake.UploadArtifactsStartedStub != nil {
+	if stub != nil {
 		fake.UploadArtifactsStartedStub()
 	}
 }
@@ -513,9 +530,10 @@ func (fake *FakeConstructMessenger) UploadArtifactsSucceeded() {
 	fake.uploadArtifactsSucceededMutex.Lock()
 	fake.uploadArtifactsSucceededArgsForCall = append(fake.uploadArtifactsSucceededArgsForCall, struct {
 	}{})
+	stub := fake.UploadArtifactsSucceededStub
 	fake.recordInvocation("UploadArtifactsSucceeded", []interface{}{})
 	fake.uploadArtifactsSucceededMutex.Unlock()
-	if fake.UploadArtifactsSucceededStub != nil {
+	if stub != nil {
 		fake.UploadArtifactsSucceededStub()
 	}
 }
@@ -537,9 +555,10 @@ func (fake *FakeConstructMessenger) UploadFileStarted(arg1 string) {
 	fake.uploadFileStartedArgsForCall = append(fake.uploadFileStartedArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.UploadFileStartedStub
 	fake.recordInvocation("UploadFileStarted", []interface{}{arg1})
 	fake.uploadFileStartedMutex.Unlock()
-	if fake.UploadFileStartedStub != nil {
+	if stub != nil {
 		fake.UploadFileStartedStub(arg1)
 	}
 }
@@ -567,9 +586,10 @@ func (fake *FakeConstructMessenger) UploadFileSucceeded() {
 	fake.uploadFileSucceededMutex.Lock()
 	fake.uploadFileSucceededArgsForCall = append(fake.uploadFileSucceededArgsForCall, struct {
 	}{})
+	stub := fake.UploadFileSucceededStub
 	fake.recordInvocation("UploadFileSucceeded", []interface{}{})
 	fake.uploadFileSucceededMutex.Unlock()
-	if fake.UploadFileSucceededStub != nil {
+	if stub != nil {
 		fake.UploadFileSucceededStub()
 	}
 }
@@ -590,9 +610,10 @@ func (fake *FakeConstructMessenger) ValidateVMConnectionStarted() {
 	fake.validateVMConnectionStartedMutex.Lock()
 	fake.validateVMConnectionStartedArgsForCall = append(fake.validateVMConnectionStartedArgsForCall, struct {
 	}{})
+	stub := fake.ValidateVMConnectionStartedStub
 	fake.recordInvocation("ValidateVMConnectionStarted", []interface{}{})
 	fake.validateVMConnectionStartedMutex.Unlock()
-	if fake.ValidateVMConnectionStartedStub != nil {
+	if stub != nil {
 		fake.ValidateVMConnectionStartedStub()
 	}
 }
@@ -613,9 +634,10 @@ func (fake *FakeConstructMessenger) ValidateVMConnectionSucceeded() {
 	fake.validateVMConnectionSucceededMutex.Lock()
 	fake.validateVMConnectionSucceededArgsForCall = append(fake.validateVMConnectionSucceededArgsForCall, struct {
 	}{})
+	stub := fake.ValidateVMConnectionSucceededStub
 	fake.recordInvocation("ValidateVMConnectionSucceeded", []interface{}{})
 	fake.validateVMConnectionSucceededMutex.Unlock()
-	if fake.ValidateVMConnectionSucceededStub != nil {
+	if stub != nil {
 		fake.ValidateVMConnectionSucceededStub()
 	}
 }
@@ -636,9 +658,10 @@ func (fake *FakeConstructMessenger) WaitingForShutdown() {
 	fake.waitingForShutdownMutex.Lock()
 	fake.waitingForShutdownArgsForCall = append(fake.waitingForShutdownArgsForCall, struct {
 	}{})
+	stub := fake.WaitingForShutdownStub
 	fake.recordInvocation("WaitingForShutdown", []interface{}{})
 	fake.waitingForShutdownMutex.Unlock()
-	if fake.WaitingForShutdownStub != nil {
+	if stub != nil {
 		fake.WaitingForShutdownStub()
 	}
 }
@@ -659,9 +682,10 @@ func (fake *FakeConstructMessenger) WinRMDisconnectedForReboot() {
 	fake.winRMDisconnectedForRebootMutex.Lock()
 	fake.winRMDisconnectedForRebootArgsForCall = append(fake.winRMDisconnectedForRebootArgsForCall, struct {
 	}{})
+	stub := fake.WinRMDisconnectedForRebootStub
 	fake.recordInvocation("WinRMDisconnectedForReboot", []interface{}{})
 	fake.winRMDisconnectedForRebootMutex.Unlock()
-	if fake.WinRMDisconnectedForRebootStub != nil {
+	if stub != nil {
 		fake.WinRMDisconnectedForRebootStub()
 	}
 }

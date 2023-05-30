@@ -27,15 +27,16 @@ func (fake *FakeWinRMEnabler) Enable() error {
 	ret, specificReturn := fake.enableReturnsOnCall[len(fake.enableArgsForCall)]
 	fake.enableArgsForCall = append(fake.enableArgsForCall, struct {
 	}{})
+	stub := fake.EnableStub
+	fakeReturns := fake.enableReturns
 	fake.recordInvocation("Enable", []interface{}{})
 	fake.enableMutex.Unlock()
-	if fake.EnableStub != nil {
-		return fake.EnableStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.enableReturns
 	return fakeReturns.result1
 }
 

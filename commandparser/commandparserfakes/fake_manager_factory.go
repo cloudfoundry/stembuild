@@ -38,9 +38,10 @@ func (fake *FakeManagerFactory) SetConfig(arg1 vcenter_client_factory.FactoryCon
 	fake.setConfigArgsForCall = append(fake.setConfigArgsForCall, struct {
 		arg1 vcenter_client_factory.FactoryConfig
 	}{arg1})
+	stub := fake.SetConfigStub
 	fake.recordInvocation("SetConfig", []interface{}{arg1})
 	fake.setConfigMutex.Unlock()
-	if fake.SetConfigStub != nil {
+	if stub != nil {
 		fake.SetConfigStub(arg1)
 	}
 }
@@ -70,15 +71,16 @@ func (fake *FakeManagerFactory) VCenterManager(arg1 context.Context) (*vcenter_m
 	fake.vCenterManagerArgsForCall = append(fake.vCenterManagerArgsForCall, struct {
 		arg1 context.Context
 	}{arg1})
+	stub := fake.VCenterManagerStub
+	fakeReturns := fake.vCenterManagerReturns
 	fake.recordInvocation("VCenterManager", []interface{}{arg1})
 	fake.vCenterManagerMutex.Unlock()
-	if fake.VCenterManagerStub != nil {
-		return fake.VCenterManagerStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.vCenterManagerReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 

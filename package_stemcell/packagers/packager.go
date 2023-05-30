@@ -5,17 +5,19 @@ import (
 	"io"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
 type Packager struct {
 	source            Source
 	stemcellGenerator StemcellGenerator
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Source
+//counterfeiter:generate . Source
 type Source interface {
 	ArtifactReader() (io.Reader, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . StemcellGenerator
+//counterfeiter:generate . StemcellGenerator
 type StemcellGenerator interface {
 	Generate(reader io.Reader) error
 }

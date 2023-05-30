@@ -23,13 +23,13 @@ type WinRM struct {
 	clientFactory WinRMClientFactoryI
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . WinRMClient
+//counterfeiter:generate . WinRMClient
 type WinRMClient interface {
 	Run(command string, stdout io.Writer, stderr io.Writer) (int, error)
 	CreateShell() (*winrm.Shell, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . WinRMClientFactoryI
+//counterfeiter:generate . WinRMClientFactoryI
 type WinRMClientFactoryI interface {
 	Build(timeout time.Duration) (WinRMClient, error)
 }

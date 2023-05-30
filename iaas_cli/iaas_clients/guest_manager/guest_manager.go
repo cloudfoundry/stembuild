@@ -13,20 +13,22 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ProcManager
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
+//counterfeiter:generate . ProcManager
 type ProcManager interface {
 	StartProgram(ctx context.Context, auth types.BaseGuestAuthentication, spec types.BaseGuestProgramSpec) (int64, error)
 	ListProcesses(ctx context.Context, auth types.BaseGuestAuthentication, pids []int64) ([]types.GuestProcessInfo, error)
 	Client() *vim25.Client
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . FileManager
+//counterfeiter:generate . FileManager
 type FileManager interface {
 	InitiateFileTransferFromGuest(ctx context.Context, auth types.BaseGuestAuthentication, guestFilePath string) (*types.FileTransferInformation, error)
 	TransferURL(ctx context.Context, u string) (*url.URL, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . DownloadClient
+//counterfeiter:generate . DownloadClient
 type DownloadClient interface {
 	Download(ctx context.Context, u *url.URL, param *soap.Download) (io.ReadCloser, int64, error)
 }

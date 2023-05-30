@@ -18,12 +18,14 @@ import (
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GovmomiClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
+//counterfeiter:generate . GovmomiClient
 type GovmomiClient interface {
 	Login(ctx context.Context, u *url.Userinfo) error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Finder
+//counterfeiter:generate . Finder
 type Finder interface {
 	VirtualMachine(ctx context.Context, path string) (*object.VirtualMachine, error)
 	DatacenterOrDefault(ctx context.Context, path string) (*object.Datacenter, error)
@@ -32,7 +34,7 @@ type Finder interface {
 	FolderOrDefault(ctx context.Context, path string) (*object.Folder, error)
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . OpsManager
+//counterfeiter:generate . OpsManager
 type OpsManager interface {
 	ProcessManager(ctx context.Context) (*guest.ProcessManager, error)
 	FileManager(ctx context.Context) (*guest.FileManager, error)

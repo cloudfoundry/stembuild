@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IaasClient
+//counterfeiter:generate . IaasClient
 type IaasClient interface {
 	ValidateUrl() error
 	ValidateCredentials() error

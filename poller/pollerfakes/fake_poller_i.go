@@ -32,15 +32,16 @@ func (fake *FakePollerI) Poll(arg1 time.Duration, arg2 func() (bool, error)) err
 		arg1 time.Duration
 		arg2 func() (bool, error)
 	}{arg1, arg2})
+	stub := fake.PollStub
+	fakeReturns := fake.pollReturns
 	fake.recordInvocation("Poll", []interface{}{arg1, arg2})
 	fake.pollMutex.Unlock()
-	if fake.PollStub != nil {
-		return fake.PollStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.pollReturns
 	return fakeReturns.result1
 }
 
