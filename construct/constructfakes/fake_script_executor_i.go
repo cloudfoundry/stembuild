@@ -20,10 +20,11 @@ type FakeScriptExecutorI struct {
 	executePostRebootScriptReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ExecuteSetupScriptStub        func(string) error
+	ExecuteSetupScriptStub        func(string, []string) error
 	executeSetupScriptMutex       sync.RWMutex
 	executeSetupScriptArgsForCall []struct {
 		arg1 string
+		arg2 []string
 	}
 	executeSetupScriptReturns struct {
 		result1 error
@@ -96,18 +97,24 @@ func (fake *FakeScriptExecutorI) ExecutePostRebootScriptReturnsOnCall(i int, res
 	}{result1}
 }
 
-func (fake *FakeScriptExecutorI) ExecuteSetupScript(arg1 string) error {
+func (fake *FakeScriptExecutorI) ExecuteSetupScript(arg1 string, arg2 []string) error {
+	var arg2Copy []string
+	if arg2 != nil {
+		arg2Copy = make([]string, len(arg2))
+		copy(arg2Copy, arg2)
+	}
 	fake.executeSetupScriptMutex.Lock()
 	ret, specificReturn := fake.executeSetupScriptReturnsOnCall[len(fake.executeSetupScriptArgsForCall)]
 	fake.executeSetupScriptArgsForCall = append(fake.executeSetupScriptArgsForCall, struct {
 		arg1 string
-	}{arg1})
+		arg2 []string
+	}{arg1, arg2Copy})
 	stub := fake.ExecuteSetupScriptStub
 	fakeReturns := fake.executeSetupScriptReturns
-	fake.recordInvocation("ExecuteSetupScript", []interface{}{arg1})
+	fake.recordInvocation("ExecuteSetupScript", []interface{}{arg1, arg2Copy})
 	fake.executeSetupScriptMutex.Unlock()
 	if stub != nil {
-		return stub(arg1)
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
@@ -121,17 +128,17 @@ func (fake *FakeScriptExecutorI) ExecuteSetupScriptCallCount() int {
 	return len(fake.executeSetupScriptArgsForCall)
 }
 
-func (fake *FakeScriptExecutorI) ExecuteSetupScriptCalls(stub func(string) error) {
+func (fake *FakeScriptExecutorI) ExecuteSetupScriptCalls(stub func(string, []string) error) {
 	fake.executeSetupScriptMutex.Lock()
 	defer fake.executeSetupScriptMutex.Unlock()
 	fake.ExecuteSetupScriptStub = stub
 }
 
-func (fake *FakeScriptExecutorI) ExecuteSetupScriptArgsForCall(i int) string {
+func (fake *FakeScriptExecutorI) ExecuteSetupScriptArgsForCall(i int) (string, []string) {
 	fake.executeSetupScriptMutex.RLock()
 	defer fake.executeSetupScriptMutex.RUnlock()
 	argsForCall := fake.executeSetupScriptArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeScriptExecutorI) ExecuteSetupScriptReturns(result1 error) {

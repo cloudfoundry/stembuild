@@ -4,16 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cloudfoundry/stembuild/poller/pollerfakes"
-	"github.com/cloudfoundry/stembuild/remotemanager"
-	"github.com/onsi/gomega/gbytes"
 	"time"
 
 	. "github.com/cloudfoundry/stembuild/construct"
 	"github.com/cloudfoundry/stembuild/construct/constructfakes"
+	"github.com/cloudfoundry/stembuild/poller/pollerfakes"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("construct_helpers", func() {
@@ -29,6 +29,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeVMConnectionValidator *constructfakes.FakeVMConnectionValidator
 		fakeRebootWaiter          *constructfakes.FakeRebootWaiterI
 		fakeScriptExecutor        *constructfakes.FakeScriptExecutorI
+		fakeSetupFlags            []string
 	)
 	const rawLogoffCommand = `&{If([string]::IsNullOrEmpty($(Get-WmiObject win32_computersystem).username)) {Write-Host "No users logged in." } Else {Write-Host "Logging out user."; $(Get-WmiObject win32_operatingsystem).Win32Shutdown(0) 1> $null}}`
 	BeforeEach(func() {
@@ -42,6 +43,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeVMConnectionValidator = &constructfakes.FakeVMConnectionValidator{}
 		fakeRebootWaiter = &constructfakes.FakeRebootWaiterI{}
 		fakeScriptExecutor = &constructfakes.FakeScriptExecutorI{}
+		fakeSetupFlags = []string{"SomeFlag SomeValue", "OtherFlag OtherValue"}
 
 		vmConstruct = NewVMConstruct(
 			context.TODO(),
@@ -58,6 +60,7 @@ var _ = Describe("construct_helpers", func() {
 			fakeVersionGetter,
 			fakeRebootWaiter,
 			fakeScriptExecutor,
+			fakeSetupFlags,
 		)
 		vmConstruct.RebootWaitTime = 0
 
@@ -77,13 +80,15 @@ var _ = Describe("construct_helpers", func() {
 
 			e := NewScriptExecutor(fakeRemoteManager)
 			version := "11.11.11"
-			err := e.ExecuteSetupScript(version)
+			err := e.ExecuteSetupScript(version, fakeSetupFlags)
 			executeCommandCallArg := fakeRemoteManager.ExecuteCommandArgsForCall(0)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(executeCommandCallArg).To(ContainSubstring("powershell"))
 			Expect(executeCommandCallArg).To(ContainSubstring("Setup.ps1"))
 			Expect(executeCommandCallArg).To(ContainSubstring(" -Version " + version))
+			Expect(executeCommandCallArg).To(ContainSubstring(" -SomeFlag SomeValue"))
+			Expect(executeCommandCallArg).To(ContainSubstring(" -OtherFlag OtherValue"))
 		})
 
 		It("executes post-reboot script with correct arguments", func() {
@@ -352,8 +357,9 @@ var _ = Describe("construct_helpers", func() {
 
 				Expect(fakeScriptExecutor.ExecuteSetupScriptCallCount()).To(Equal(1))
 
-				version := fakeScriptExecutor.ExecuteSetupScriptArgsForCall(0)
+				version, setupFlags := fakeScriptExecutor.ExecuteSetupScriptArgsForCall(0)
 				Expect(version).To(Equal(stembuildVersion))
+				Expect(setupFlags).To(Equal(fakeSetupFlags))
 
 				Expect(fakeMessenger.ExecuteSetupScriptStartedCallCount()).To(Equal(1))
 				Expect(fakeMessenger.ExecuteSetupScriptSucceededCallCount()).To(Equal(1))
@@ -369,7 +375,7 @@ var _ = Describe("construct_helpers", func() {
 					return nil
 				})
 
-				fakeScriptExecutor.ExecuteSetupScriptCalls(func(version string) error {
+				fakeScriptExecutor.ExecuteSetupScriptCalls(func(version string, setupFlags []string) error {
 					calls = append(calls, "executeSetupScriptCalls")
 					return nil
 				})

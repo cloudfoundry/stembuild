@@ -9,4 +9,5 @@ type SourceConfig struct {
 	VCenterPassword string
 	VmInventoryPath string
 	CaCertFile      string
+	SetupFlags      []string
 }

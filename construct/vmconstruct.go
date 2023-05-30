@@ -39,6 +39,7 @@ type VMConstruct struct {
 	rebootWaiter          RebootWaiterI
 	scriptExecutor        ScriptExecutorI
 	RebootWaitTime        time.Duration
+	SetupFlags            []string
 }
 
 const provisionDir = "C:\\provision\\"
@@ -66,30 +67,32 @@ func NewVMConstruct(
 	versionGetter VersionGetter,
 	rebootWaiter RebootWaiterI,
 	scriptExecutor ScriptExecutorI,
+	setupFlags []string,
 ) *VMConstruct {
 
 	return &VMConstruct{
-		ctx,
-		remoteManager,
-		client,
-		guestManager,
-		vmInventoryPath,
-		vmUsername,
-		vmPassword,
-		winRMEnabler,
-		vmConnectionValidator,
-		messenger,
-		poller,
-		versionGetter,
-		rebootWaiter,
-		scriptExecutor,
-		time.Second * 60,
+		ctx:                   ctx,
+		remoteManager:         remoteManager,
+		Client:                client,
+		guestManager:          guestManager,
+		vmInventoryPath:       vmInventoryPath,
+		vmUsername:            vmUsername,
+		vmPassword:            vmPassword,
+		winRMEnabler:          winRMEnabler,
+		vmConnectionValidator: vmConnectionValidator,
+		messenger:             messenger,
+		poller:                poller,
+		versionGetter:         versionGetter,
+		rebootWaiter:          rebootWaiter,
+		scriptExecutor:        scriptExecutor,
+		RebootWaitTime:        time.Second * 60,
+		SetupFlags:            setupFlags,
 	}
 }
 
 //counterfeiter:generate . ScriptExecutorI
 type ScriptExecutorI interface {
-	ExecuteSetupScript(stembuildVersion string) error
+	ExecuteSetupScript(stembuildVersion string, setupFlags []string) error
 	ExecutePostRebootScript(timeout time.Duration) error
 }
 
@@ -195,7 +198,7 @@ func (c *VMConstruct) PrepareVM() error {
 	c.messenger.LogOutUsersSucceeded()
 
 	c.messenger.ExecuteSetupScriptStarted()
-	err = c.scriptExecutor.ExecuteSetupScript(stembuildVersion)
+	err = c.scriptExecutor.ExecuteSetupScript(stembuildVersion, c.SetupFlags)
 	if err != nil {
 		return err
 	}
@@ -288,9 +291,16 @@ func NewScriptExecutor(remoteManager RemoteManager) *ScriptExecutor {
 	}
 }
 
-func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string) error {
-	versionArg := " -Version " + stembuildVersion
-	_, err := e.remoteManager.ExecuteCommand("powershell.exe " + stemcellAutomationSetupScript + versionArg)
+func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string, setupFlags []string) error {
+	var automationSetupScriptArgs []string
+	automationSetupScriptArgs = append(automationSetupScriptArgs, fmt.Sprintf("-Version %s", stembuildVersion))
+
+	for _, arg := range setupFlags {
+		automationSetupScriptArgs = append(automationSetupScriptArgs, fmt.Sprintf("-%s", arg))
+	}
+
+	powershellCommand := fmt.Sprintf("powershell.exe %s, %s", stemcellAutomationSetupScript, strings.Join(automationSetupScriptArgs, " "))
+	_, err := e.remoteManager.ExecuteCommand(powershellCommand)
 	return err
 }
 
