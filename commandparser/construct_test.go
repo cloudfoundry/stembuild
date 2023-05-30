@@ -92,6 +92,47 @@ var _ = Describe("construct", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ConstrCmd.GetSourceConfig().CaCertFile).To(Equal("somecerts.txt"))
 		})
+
+		Describe("setup-arg flag", func() {
+			var args = []string{
+				"-vm-ip", "10.0.0.5",
+				"-vm-username", "Admin",
+				"-vm-password", "some_password",
+				"-vcenter-url", "vcenter.example.com",
+				"-vcenter-username", "vCenterUsername",
+				"-vcenter-password", "vCenterPassword",
+				"-vm-inventory-path", "/my-datacenter/vm/my-folder/my-vm",
+				"-vcenter-ca-certs", "somecerts.txt",
+				"-setup-arg", "SomeFlag SomeValue",
+			}
+
+			It("passes the value of the setup arg", func() {
+				err := f.Parse(args)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ConstrCmd.GetSourceConfig().SetupFlags).To(Equal([]string{"SomeFlag SomeValue"}))
+			})
+
+			Context("when there are multiple setup-arg flags", func() {
+				var args = []string{
+					"-vm-ip", "10.0.0.5",
+					"-vm-username", "Admin",
+					"-vm-password", "some_password",
+					"-vcenter-url", "vcenter.example.com",
+					"-vcenter-username", "vCenterUsername",
+					"-vcenter-password", "vCenterPassword",
+					"-vm-inventory-path", "/my-datacenter/vm/my-folder/my-vm",
+					"-vcenter-ca-certs", "somecerts.txt",
+					"-setup-arg", "SomeFlag SomeValue",
+					"-setup-arg", "OtherSwitchFlag",
+				}
+
+				It("stores the value of the setup arg", func() {
+					err := f.Parse(args)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(ConstrCmd.GetSourceConfig().SetupFlags).To(Equal([]string{"SomeFlag SomeValue", "OtherSwitchFlag"}))
+				})
+			})
+		})
 	})
 
 	Describe("Execute", func() {

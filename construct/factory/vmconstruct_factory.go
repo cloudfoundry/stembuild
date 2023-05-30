@@ -82,5 +82,6 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		versionGetter,
 		rebootWaiter,
 		scriptExecutor,
+		config.SetupFlags,
 	), nil
 }

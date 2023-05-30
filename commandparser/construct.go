@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
@@ -67,6 +68,23 @@ type ConstructCmd struct {
 	GlobalFlags    *GlobalFlags
 }
 
+type setupFlagsValue struct {
+	sourceConfig *config.SourceConfig
+}
+
+func newSetupFlagsValue(sourceConfig *config.SourceConfig) setupFlagsValue {
+	return setupFlagsValue{sourceConfig: sourceConfig}
+}
+
+func (v setupFlagsValue) String() string {
+	return strings.Join(v.sourceConfig.SetupFlags, "; ")
+}
+
+func (v setupFlagsValue) Set(s string) error {
+	v.sourceConfig.SetupFlags = append(v.sourceConfig.SetupFlags, s)
+	return nil
+}
+
 func NewConstructCmd(ctx context.Context, prepFactory VMPreparerFactory, managerFactory ManagerFactory, validator ConstructCmdValidator, messenger ConstructMessenger) *ConstructCmd {
 	return &ConstructCmd{ctx: ctx, prepFactory: prepFactory, managerFactory: managerFactory, validator: validator, messenger: messenger}
 }
@@ -107,6 +125,7 @@ func (p *ConstructCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.sourceConfig.VCenterPassword, "vcenter-password", "", "vCenter password")
 	f.StringVar(&p.sourceConfig.VmInventoryPath, "vm-inventory-path", "", "vCenter VM inventory path. (e.g: <datacenter>/vm/<vm-folder>/<vm-name>)")
 	f.StringVar(&p.sourceConfig.CaCertFile, "vcenter-ca-certs", "", "filepath for custom ca certs")
+	f.Var(newSetupFlagsValue(&p.sourceConfig), "setup-arg", "a 'flag value' combination to be passed to Setup.ps1 - can be set multiple times")
 }
 
 func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
