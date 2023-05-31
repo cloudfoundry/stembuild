@@ -1,5 +1,6 @@
 param(
-    [String]$Version
+    [String]$Version,
+    [switch]$FailOnInstallWUCerts
 )
 
 Push-Location $PSScriptRoot
@@ -9,7 +10,7 @@ Push-Location $PSScriptRoot
 
 try
 {
-    Setup -Version $Version
+    Setup -Version $Version -FailOnInstallWUCerts:$FailOnInstallWUCerts
 }
 catch [Exception]
 {
