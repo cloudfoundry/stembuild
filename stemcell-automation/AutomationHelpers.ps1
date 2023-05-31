@@ -19,12 +19,13 @@ function Write-Log
 function Setup()
 {
     param(
-        [String]$Version
+        [String]$Version,
+        [switch]$FailOnInstallWUCerts
     )
 
     Validate-OSVersion
     Check-Dependencies
-    ProvisionVM -Version $Version
+    ProvisionVM -Version $Version -FailOnInstallWUCerts:$FailOnInstallWUCerts
 }
 
 function PostReboot

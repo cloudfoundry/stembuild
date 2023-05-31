@@ -78,23 +78,36 @@ Describe "ProvisionVM" {
         $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeLessThan $provisionerCalls.IndexOf("Enable-SSHD")
     }
 
-    It "fails gracefully when Install-WUCerts helper fails" {
-        Mock Install-WUCerts { throw "Something went wrong trying to Install-WUCerts" }
-        Mock Write-Log { }
-        Mock Write-Warning { }
-
-        { ProvisionVM } | Should -Not -Throw
-
-        Assert-MockCalled Install-WUCerts -Times 1 -Scope It
-        Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Install-WUCerts" }
-        Assert-MockCalled Write-Warning -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to retrieve updated root certificates from the public Windows Update Server. This should not impact the successful execution of stembuild construct. If your root certificates are out of date, Diego cells running on VMs built from this stemcell may not be able to make outbound network connections." }
-
-    }
-
     It "installs WU certs" {
         ProvisionVM
 
         Assert-MockCalled -CommandName Install-WUCerts
+    }
+
+    Context "when Install-WUCerts helper fails" {
+        It "fails gracefully" {
+            Mock Install-WUCerts { throw "Something went wrong trying to Install-WUCerts" }
+            Mock Write-Log { }
+            Mock Write-Warning { }
+
+            { ProvisionVM } | Should -Not -Throw
+
+            Assert-MockCalled Install-WUCerts -Times 1 -Scope It
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Install-WUCerts" }
+            Assert-MockCalled Write-Warning -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to retrieve updated root certificates from the public Windows Update Server. This should not impact the successful execution of stembuild construct. If your root certificates are out of date, Diego cells running on VMs built from this stemcell may not be able to make outbound network connections." }
+        }
+
+        Context "when the '-FailOnInstallWUCerts' flag is passed" {
+            It "throws an error" {
+                Mock Install-WUCerts { throw "Something went wrong trying to Install-WUCerts" }
+                Mock Write-Log { }
+
+                { ProvisionVM -FailOnInstallWUCerts } | Should -Throw
+
+                Assert-MockCalled Install-WUCerts -Times 1 -Scope It
+                Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Install-WUCerts" }
+            }
+        }
     }
 
     It "creates a version file" {

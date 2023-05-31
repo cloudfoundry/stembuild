@@ -42,6 +42,17 @@ Describe "Setup" {
         $provisionerCalls.IndexOf("ProvisionVM") | Should -Be $lastIndex
     }
 
+    Context "when the '-FailOnInstallWUCerts' flag is passed" {
+        It "calls ProvisionVM with '-FailOnInstallWUCerts'" {
+            Setup -FailOnInstallWUCerts
+
+            Assert-MockCalled -CommandName ProvisionVM -ParameterFilter {
+                $FailOnInstallWUCerts
+            }
+            $lastIndex = $provisionerCalls.Count - 1
+            $provisionerCalls.IndexOf("ProvisionVM") | Should -Be $lastIndex
+        }
+    }
 }
 
 Describe "PostReboot" {
