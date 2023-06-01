@@ -6,7 +6,6 @@ param(
 Push-Location $PSScriptRoot
 
 . ./AutomationHelpers.ps1
-. ./ProvisionVM.ps1
 
 try
 {
