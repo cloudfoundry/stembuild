@@ -1,8 +1,7 @@
 # We import module BOSH.SSH to ensure that we get the Install-SSHD function it defines. Starting with
 # OpenSSH 9.1, there is a conflicting install-sshd.ps1 script that takes precedence instead if you do
 # not load the module.
-#Import-Module -Name BOSH.SSH
-Import-Module -Name ~/workspace/bosh-psmodules/modules/BOSH.SSH/BOSH.SSH.psd1
+Import-Module -Name BOSH.SSH
 . ./AutomationHelpers.ps1
 
 Describe "Setup" {
