@@ -1,21 +1,38 @@
 # We import module BOSH.SSH to ensure that we get the Install-SSHD function it defines. Starting with
 # OpenSSH 9.1, there is a conflicting install-sshd.ps1 script that takes precedence instead if you do
 # not load the module.
-Import-Module -Name BOSH.SSH
+#Import-Module -Name BOSH.SSH
+Import-Module -Name ~/workspace/bosh-psmodules/modules/BOSH.SSH/BOSH.SSH.psd1
 . ./AutomationHelpers.ps1
-. ./ProvisionVM.ps1
 
 Describe "Setup" {
     BeforeEach {
         [System.Collections.ArrayList]$provisionerCalls = @()
-        Mock Validate-OSVersion {
-            $provisionerCalls.Add("Validate-OSVersion")
-        }
-        Mock Check-Dependencies {
-            $provisionerCalls.Add("Check-Dependencies")
-        }
-        Mock ProvisionVM {
-            $provisionerCalls.Add("ProvisionVM")
+
+        Mock Validate-OSVersion { $provisionerCalls.Add("Validate-OSVersion") }
+        Mock Check-Dependencies { $provisionerCalls.Add("Check-Dependencies") }
+
+        Mock RunQuickerDism { }
+
+        Mock CopyPSModules { $provisionerCalls.Add("CopyPSModules") }
+        Mock Set-RegKeys { $provisionerCalls.Add("Set-RegKeys") }
+        Mock InstallBoshAgent { $provisionerCalls.Add("InstallBoshAgent") }
+        Mock InstallOpenSSH { $provisionerCalls.Add("InstallOpenSSH") }
+        Mock Extract-LGPO { $provisionerCalls.Add("Extract-LGPO") }
+        Mock Install-SecurityPoliciesAndRegistries { $provisionerCalls.Add("Install-SecurityPoliciesAndRegistries") }
+        Mock Enable-SSHD { $provisionerCalls.Add("Enable-SSHD") }
+
+        Mock Install-WUCerts { $provisionerCalls.Add("Install-WUCerts") }
+
+        Mock InstallCFFeatures { $provisionerCalls.Add("InstallCFFeatures") }
+        Mock Create-VersionFile { $provisionerCalls.Add("Create-VersionFile") }
+        Mock Restart-Computer { $provisionerCalls.Add("Restart-Computer") }
+
+        if (!(Get-Command "Restart-Computer" -errorAction SilentlyContinue))
+        {
+            function Restart-Computer() {
+                throw "what is happening I should never be invoked"
+            }
         }
     }
 
@@ -30,28 +47,110 @@ Describe "Setup" {
         Setup
 
         Assert-MockCalled -CommandName Check-Dependencies
+        $provisionerCalls.IndexOf("Check-Dependencies") | Should -Be 1
     }
 
-    It "provisions the VM last" {
-        Setup -Version "123"
+    It "copy PSModules is the first provisioner called" {
+        Setup
 
-        Assert-MockCalled -CommandName ProvisionVM -ParameterFilter {
-            $Version -eq "123"
+        Assert-MockCalled -CommandName CopyPSModules
+        $provisionerCalls.IndexOf("CopyPSModules") | Should -Be 2
+    }
+
+    It "sets registry keys to stop zombie load and meltdown exploits" {
+        Setup
+
+        Assert-MockCalled -CommandName Set-RegKeys
+    }
+
+    It "installs BoshAgent" {
+        Setup
+
+        Assert-MockCalled -CommandName InstallBoshAgent
+    }
+
+    It "installs OpenSSH before enabling SSH" {
+        Setup
+
+        Assert-MockCalled -CommandName InstallOpenSSH
+        $provisionerCalls.IndexOf("InstallOpenSSH") | Should -BeGreaterOrEqual 0
+        $provisionerCalls.IndexOf("InstallOpenSSH") | Should -BeLessThan $provisionerCalls.IndexOf("Enable-SSHD")
+    }
+
+    It "enables SSHD" {
+        Setup
+
+        Assert-MockCalled -CommandName Enable-SSHD
+    }
+
+    It "installs SecurityPoliciesAndRegistries after extracting LGPO" {
+        Setup
+
+        Assert-MockCalled -CommandName Install-SecurityPoliciesAndRegistries
+
+        $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeGreaterOrEqual 0
+        $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeLessThan $provisionerCalls.IndexOf("Install-SecurityPoliciesAndRegistries")
+    }
+
+    It "extracts LGPO before enabling SSH" {
+        Setup
+
+        Assert-MockCalled -CommandName Extract-LGPO
+
+        $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeGreaterOrEqual 0
+        $provisionerCalls.IndexOf("Extract-LGPO") | Should -BeLessThan $provisionerCalls.IndexOf("Enable-SSHD")
+    }
+
+    It "installs CFFeatures" {
+        Setup
+
+        Assert-MockCalled -CommandName InstallCFFeatures
+    }
+
+    It "installs WU certs" {
+        Setup
+
+        Assert-MockCalled -CommandName Install-WUCerts
+    }
+
+    Context "when Install-WUCerts helper fails" {
+        It "fails gracefully" {
+            Mock Install-WUCerts { throw "Something went wrong trying to Install-WUCerts" }
+            Mock Write-Log { }
+            Mock Write-Warning { }
+
+            { Setup } | Should -Not -Throw
+
+            Assert-MockCalled Install-WUCerts -Times 1 -Scope It
+            Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Install-WUCerts" }
+            Assert-MockCalled Write-Warning -Times 1 -Scope It -ParameterFilter {$Message -eq "Failed to retrieve updated root certificates from the public Windows Update Server. This should not impact the successful execution of stembuild construct. If your root certificates are out of date, Diego cells running on VMs built from this stemcell may not be able to make outbound network connections." }
         }
-        $lastIndex = $provisionerCalls.Count - 1
-        $provisionerCalls.IndexOf("ProvisionVM") | Should -Be $lastIndex
-    }
 
-    Context "when the '-FailOnInstallWUCerts' flag is passed" {
-        It "calls ProvisionVM with '-FailOnInstallWUCerts'" {
-            Setup -FailOnInstallWUCerts
+        Context "when the '-FailOnInstallWUCerts' flag is passed" {
+            It "throws an error" {
+                Mock Install-WUCerts { throw "Something went wrong trying to Install-WUCerts" }
+                Mock Write-Log { }
 
-            Assert-MockCalled -CommandName ProvisionVM -ParameterFilter {
-                $FailOnInstallWUCerts
+                { Setup -FailOnInstallWUCerts } | Should -Throw
+
+                Assert-MockCalled Install-WUCerts -Times 1 -Scope It
+                Assert-MockCalled Write-Log -Times 1 -Scope It -ParameterFilter {$Message -eq "Something went wrong trying to Install-WUCerts" }
             }
-            $lastIndex = $provisionerCalls.Count - 1
-            $provisionerCalls.IndexOf("ProvisionVM") | Should -Be $lastIndex
         }
+    }
+
+    It "creates a version file" {
+        Setup
+
+        Assert-MockCalled -CommandName Create-VersionFile
+    }
+
+    It "restarts as the last command" {
+        Setup
+
+        Assert-MockCalled -CommandName Restart-Computer
+        $lastIndex = $provisionerCalls.Count - 1
+        $provisionerCalls.IndexOf("Restart-Computer") | Should -Be $lastIndex
     }
 }
 
