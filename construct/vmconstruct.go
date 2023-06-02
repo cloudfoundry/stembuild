@@ -299,7 +299,7 @@ func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string, setupFlags 
 		automationSetupScriptArgs = append(automationSetupScriptArgs, fmt.Sprintf("-%s", arg))
 	}
 
-	powershellCommand := fmt.Sprintf("powershell.exe %s, %s", stemcellAutomationSetupScript, strings.Join(automationSetupScriptArgs, " "))
+	powershellCommand := fmt.Sprintf("powershell.exe %s %s", stemcellAutomationSetupScript, strings.Join(automationSetupScriptArgs, " "))
 	_, err := e.remoteManager.ExecuteCommand(powershellCommand)
 	return err
 }
