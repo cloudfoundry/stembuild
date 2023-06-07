@@ -160,7 +160,7 @@ var _ = SynchronizedAfterSuite(func() {
 		Eventually(func() int {
 			return cli.Run(deleteCommand)
 		}, 3*time.Minute, 10*time.Second).Should(BeZero())
-		fmt.Println("VM destroyed")
+		By("VM destroyed")
 		if lockDir != "" {
 			_, _, err := lockPool.ReleaseLock(lockDir)
 			Expect(err).NotTo(HaveOccurred())
@@ -170,7 +170,7 @@ var _ = SynchronizedAfterSuite(func() {
 
 			for _, item := range childItems {
 				if item.IsDir() && strings.HasPrefix(filepath.Base(item.Name()), "pool-resource") {
-					fmt.Printf("Cleaning up temporary pool resource %s\n", item.Name())
+					By(fmt.Sprintf("Cleaning up temporary pool resource %s\n", item.Name()))
 					_ = os.RemoveAll(item.Name())
 				}
 			}
@@ -192,18 +192,18 @@ func revertSnapshot(vmIpath string, snapshotName string) {
 		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		snapshotName,
 	}
-	fmt.Printf("Reverting VM Snapshot: %s\n", snapshotName)
+	By(fmt.Sprintf("Reverting VM Snapshot: %s\n", snapshotName))
 	exitCode := runIgnoringOutput(snapshotCommand)
 	if exitCode != 0 {
-		fmt.Print("There was an error reverting the snapshot.")
+		By("There was an error reverting the snapshot.")
 	} else {
-		fmt.Println("Revert started.")
+		By("Revert started.")
 	}
 	time.Sleep(30 * time.Second)
 }
 
 func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
-	fmt.Print("Waiting for reverting snapshot to finish...")
+	By("Waiting for reverting snapshot to finish...")
 	clientFactory := remotemanager.NewWinRmClientFactory(vmIp, vmUsername, vmPassword)
 	rm := remotemanager.NewWinRM(vmIp, vmUsername, vmPassword, clientFactory)
 	Expect(rm).ToNot(BeNil())
@@ -217,11 +217,11 @@ func waitForVmToBeReady(vmIp string, vmUsername string, vmPassword string) {
 		time.Sleep(5 * time.Second)
 		_, err := rm.ExecuteCommand(`powershell.exe "ls c:\windows 1>$null"`)
 		if err != nil {
-			fmt.Println("VM not yet ready:", err)
+			By(fmt.Sprintf("VM not yet ready: %v", err))
 		}
 		vmReady = err == nil
 	}
-	fmt.Println("done.")
+	By("done.")
 }
 
 func envMustExist(variableName string) string {
@@ -237,7 +237,7 @@ func enableWinRM() {
 	_, b, _, _ := runtime.Caller(0)
 	root := filepath.Dir(filepath.Dir(filepath.Dir(b)))
 
-	fmt.Println("Enabling WinRM on the base image before integration tests...")
+	By("Enabling WinRM on the base image before integration tests...")
 	uploadCommand := []string{
 		"guest.upload",
 		fmt.Sprintf("-vm.ipath=%s", conf.VMInventoryPath),
@@ -250,7 +250,7 @@ func enableWinRM() {
 
 	exitCode := runIgnoringOutput(uploadCommand)
 	if exitCode != 0 {
-		fmt.Print("There was an error uploading WinRM psmodule.")
+		By("There was an error uploading WinRM psmodule.")
 	}
 
 	enableCommand := []string{
@@ -265,9 +265,9 @@ func enableWinRM() {
 	}
 	exitCode = runIgnoringOutput(enableCommand)
 	if exitCode != 0 {
-		fmt.Print("There was an error enabling WinRM.")
+		By("There was an error enabling WinRM.")
 	} else {
-		fmt.Println("WinRM enabled.")
+		By("WinRM enabled.")
 	}
 }
 
@@ -279,14 +279,15 @@ func createVMSnapshot(snapshotName string) {
 		fmt.Sprintf("-tls-ca-certs=%s", pathToCACert),
 		snapshotName,
 	}
-	fmt.Printf("Creating VM Snapshot: %s on VM: %s\n", snapshotName, conf.VMInventoryPath)
+	By(fmt.Sprintf("Creating VM Snapshot: %s on VM: %s\n", snapshotName, conf.VMInventoryPath))
 	exitCode := cli.Run(snapshotCommand)
 	Expect(exitCode).To(Equal(0), "Creating the snapshot failed")
 
-	fmt.Println("Snapshot command started.")
-	fmt.Print("Waiting for snapshot to finish...")
-	time.Sleep(30 * time.Second)
-	fmt.Print("done.\n")
+	By("Snapshot command started.")
+	timeout := 30 * time.Second
+	By(fmt.Sprintf("Waiting '%s' for snapshot to finish...", timeout))
+	time.Sleep(timeout)
+	By("done.\n")
 }
 
 func powerOnVM() {

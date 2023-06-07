@@ -89,8 +89,8 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		session.Out.Write(out)
-		fmt.Print(string(out))
+		Expect(session.Out.Write(out)).To(Succeed())
+		By(string(out))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
 		expectedStemcellVersion := strings.Split(stembuildVersion, ".")[:2]
@@ -144,8 +144,8 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		session.Out.Write(out)
-		fmt.Print(string(out))
+		Expect(session.Out.Write(out)).To(Succeed())
+		By(string(out))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
 		expectedStemcellVersion := strings.Split(stembuildVersion, ".")[:2]

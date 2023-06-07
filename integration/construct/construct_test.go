@@ -62,7 +62,7 @@ var _ = Describe("stembuild construct", func() {
 		})
 
 		It("successfully runs even when a user has logged in", func() {
-			fmt.Printf("Logged on VM for test has IP: %s\n", conf.LoggedInVMIP)
+			By(fmt.Sprintf("Logged on VM for test has IP: %s\n", conf.LoggedInVMIP))
 
 			revertSnapshot(conf.LoggedInVMIpath, conf.LoggedInVMSnapshot)
 
@@ -105,13 +105,12 @@ var _ = Describe("stembuild construct", func() {
 func CopyFile(src string, dest string) error {
 	input, err := ioutil.ReadFile(src)
 	if err != nil {
-		fmt.Println(err)
+		By(fmt.Sprintf("Error reading %s: %s", src, err))
 		return err
 	}
 	err = ioutil.WriteFile(dest, input, 0644)
 	if err != nil {
-		fmt.Println("Error creating file")
-		fmt.Println(err)
+		By(fmt.Sprintf("Error creating %s: %s", dest, err))
 		return err
 	}
 
