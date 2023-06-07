@@ -7,13 +7,12 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
 	"github.com/cloudfoundry/stembuild/remotemanager"
-
 	"github.com/cloudfoundry/stembuild/test/helpers"
-
 	"github.com/concourse/pool-resource/out"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -25,8 +24,6 @@ import (
 	_ "github.com/vmware/govmomi/govc/vm"
 	_ "github.com/vmware/govmomi/govc/vm/guest"
 	_ "github.com/vmware/govmomi/govc/vm/snapshot"
-
-	"syscall"
 )
 
 func TestConstruct(t *testing.T) {
