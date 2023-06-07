@@ -190,7 +190,7 @@ func BuildStembuild(version string) (string, error) {
 	for _, f := range files {
 		if strings.Contains(filepath.Base(f.Name()), "stembuild") {
 			stem := filepath.Join(root, "out", f.Name())
-			fmt.Fprintf(GinkgoWriter, "Stembuild: %s", stem)
+			By(fmt.Sprintf("Stembuild: %s", stem))
 			return stem, nil
 		}
 	}
