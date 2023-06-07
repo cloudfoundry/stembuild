@@ -6,7 +6,6 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -60,7 +59,7 @@ var _ = Describe("Package", func() {
 		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsernameVariable)
 		vcenterStembuildPassword = helpers.EnvMustExist(vcenterStembuildPasswordVariable)
 
-		workingDir, err = ioutil.TempDir(os.TempDir(), "stembuild-package-test")
+		workingDir, err = os.MkdirTemp(os.TempDir(), "stembuild-package-test")
 		Expect(err).NotTo(HaveOccurred())
 	})
 

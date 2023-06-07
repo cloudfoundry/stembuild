@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -147,7 +146,7 @@ func (c *VmdkPackager) TempDir() (string, error) {
 		}
 		return c.tmpdir, nil
 	}
-	name, err := ioutil.TempDir(c.BuildOptions.OutputDir, "stemcell-")
+	name, err := os.MkdirTemp(c.BuildOptions.OutputDir, "stemcell-")
 	if err != nil {
 		return "", fmt.Errorf("creating temp directory: %s", err)
 	}

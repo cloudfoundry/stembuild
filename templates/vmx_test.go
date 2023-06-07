@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -74,7 +73,7 @@ func TestVMXTemplate(t *testing.T) {
 }
 
 func TestWriteVMXTemplate(t *testing.T) {
-	tmpdir, err := ioutil.TempDir("", "test-")
+	tmpdir, err := os.MkdirTemp("", "test-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +82,7 @@ func TestWriteVMXTemplate(t *testing.T) {
 	if err := templates.WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
 		t.Fatal(err)
 	}
-	b, err := ioutil.ReadFile(vmxPath)
+	b, err := os.ReadFile(vmxPath)
 	if err != nil {
 		t.Fatal(err)
 	}

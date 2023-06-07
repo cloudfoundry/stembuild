@@ -2,7 +2,6 @@ package construct_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -103,12 +102,12 @@ var _ = Describe("stembuild construct", func() {
 })
 
 func CopyFile(src string, dest string) error {
-	input, err := ioutil.ReadFile(src)
+	input, err := os.ReadFile(src)
 	if err != nil {
 		By(fmt.Sprintf("Error reading %s: %s", src, err))
 		return err
 	}
-	err = ioutil.WriteFile(dest, input, 0644)
+	err = os.WriteFile(dest, input, 0644)
 	if err != nil {
 		By(fmt.Sprintf("Error creating %s: %s", dest, err))
 		return err

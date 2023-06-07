@@ -3,13 +3,11 @@ package iaas_clients
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
-
-	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 
@@ -91,10 +89,10 @@ var _ = Describe("VcenterClient", func() {
 					Skip(fmt.Sprintf("export VCENTER_CA_CERT=<a valid ca cert> to run this test"))
 				}
 
-				tmpDir, err := ioutil.TempDir("", "vcenter-client-contract-tests")
+				tmpDir, err := os.MkdirTemp("", "vcenter-client-contract-tests")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).ToNot(HaveOccurred())
-				f, err := ioutil.TempFile(tmpDir, "valid-cert")
+				f, err := os.CreateTemp(tmpDir, "valid-cert")
 				Expect(err).ToNot(HaveOccurred())
 
 				_, err = f.WriteString(cert)

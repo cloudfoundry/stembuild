@@ -2,7 +2,6 @@ package package_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -37,11 +36,11 @@ var (
 
 var _ = SynchronizedBeforeSuite(func() []byte {
 	rawCA := envMustExist(VcenterCACert)
-	t, err := ioutil.TempFile("", "ca-cert")
+	t, err := os.CreateTemp("", "ca-cert")
 	Expect(err).ToNot(HaveOccurred())
 	pathToCACert = t.Name()
 	Expect(t.Close()).To(Succeed())
-	err = ioutil.WriteFile(pathToCACert, []byte(rawCA), 0666)
+	err = os.WriteFile(pathToCACert, []byte(rawCA), 0666)
 	Expect(err).ToNot(HaveOccurred())
 
 	stembuildVersion = helpers.EnvMustExist(stembuildVersionVariable)

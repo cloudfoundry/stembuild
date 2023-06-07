@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -31,7 +30,7 @@ var _ = Describe("VcenterPackager", func() {
 	var fakeVcenterClient *packagersfakes.FakeIaasClient
 
 	BeforeEach(func() {
-		outputDir, _ = ioutil.TempDir(os.TempDir(), "vcenter-test-output-dir")
+		outputDir, _ = os.MkdirTemp(os.TempDir(), "vcenter-test-output-dir")
 		sourceConfig = config.SourceConfig{Password: "password", URL: "url", Username: "username", VmInventoryPath: "path/valid-vm-name"}
 		outputConfig = config.OutputConfig{Os: "2012R2", StemcellVersion: "1200.2", OutputDir: outputDir}
 		fakeVcenterClient = &packagersfakes.FakeIaasClient{}
@@ -107,7 +106,7 @@ var _ = Describe("VcenterPackager", func() {
 				os.Mkdir(filepath.Join(destination, vmName), 0777)
 
 				testOvfName := "valid-vm-name.content"
-				err := ioutil.WriteFile(filepath.Join(filepath.Join(destination, vmName), testOvfName), []byte(""), 0777)
+				err := os.WriteFile(filepath.Join(filepath.Join(destination, vmName), testOvfName), []byte(""), 0777)
 				Expect(err).NotTo(HaveOccurred())
 				return nil
 			}

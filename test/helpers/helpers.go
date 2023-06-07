@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -141,7 +140,7 @@ func extractArchive(archive io.Reader, dirname string) error {
 // ExtractGzipArchive extracts the tgz archive name to a temp directory
 // returning the filepath of the temp directory.
 func ExtractGzipArchive(name string) (string, error) {
-	tmpdir, err := ioutil.TempDir("", "test-")
+	tmpdir, err := os.MkdirTemp("", "test-")
 	if err != nil {
 		return "", err
 	}
@@ -166,7 +165,7 @@ func ExtractGzipArchive(name string) (string, error) {
 }
 
 func ReadFile(name string) (string, error) {
-	b, err := ioutil.ReadFile(name)
+	b, err := os.ReadFile(name)
 	return string(b), err
 }
 
@@ -185,7 +184,7 @@ func BuildStembuild(version string) (string, error) {
 	Expect(err).NotTo(HaveOccurred())
 	Eventually(session, 120*time.Second).Should(Exit(0))
 
-	files, err := ioutil.ReadDir(filepath.Join(root, "out"))
+	files, err := os.ReadDir(filepath.Join(root, "out"))
 	Expect(err).NotTo(HaveOccurred())
 
 	for _, f := range files {

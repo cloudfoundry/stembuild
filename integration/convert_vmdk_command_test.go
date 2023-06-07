@@ -2,18 +2,15 @@ package integration_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
-
-	"strings"
-
-	"time"
 
 	"github.com/cloudfoundry/stembuild/test/helpers"
 )
@@ -87,7 +84,7 @@ var _ = Describe("Convert VMDK", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				actualVmdkFilepath := filepath.Join(imageDir, "image-disk1.vmdk")
-				_, err = ioutil.ReadFile(actualVmdkFilepath)
+				_, err = os.ReadFile(actualVmdkFilepath)
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})

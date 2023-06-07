@@ -4,7 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strings"
 )
 
@@ -24,7 +24,7 @@ func (z *Zip) Unzip(fileArchive []byte, file string) ([]byte, error) {
 			if err != nil {
 				return nil, fmt.Errorf("could not open %s in zip archive: %s", file, err)
 			}
-			data, err := ioutil.ReadAll(r)
+			data, err := io.ReadAll(r)
 			if err != nil {
 				return nil, fmt.Errorf("could not read content of %s in zip archive: %s", file, err)
 			}

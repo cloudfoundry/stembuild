@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -26,7 +25,7 @@ var _ = Describe("VmdkPackager", func() {
 
 	BeforeEach(func() {
 		var err error
-		tmpDir, err = ioutil.TempDir("", "")
+		tmpDir, err = os.MkdirTemp("", "")
 		Expect(err).NotTo(HaveOccurred())
 
 		stembuildConfig = package_parameters.VmdkPackageParameters{
@@ -49,7 +48,7 @@ var _ = Describe("VmdkPackager", func() {
 		Context("valid vmdk file specified", func() {
 			It("should be valid", func() {
 
-				vmdk, err := ioutil.TempFile("", "temp.vmdk")
+				vmdk, err := os.CreateTemp("", "temp.vmdk")
 				Expect(err).ToNot(HaveOccurred())
 				defer os.Remove(vmdk.Name())
 
@@ -101,11 +100,11 @@ var _ = Describe("VmdkPackager", func() {
 
 			imageDir, err := helpers.ExtractGzipArchive(c.Image)
 			Expect(err).NotTo(HaveOccurred())
-			list, err := ioutil.ReadDir(imageDir)
+			list, err := os.ReadDir(imageDir)
 			Expect(err).NotTo(HaveOccurred())
 
 			var names []string
-			infos := make(map[string]os.FileInfo)
+			infos := make(map[string]os.DirEntry)
 			for _, fi := range list {
 				names = append(names, fi.Name())
 				infos[fi.Name()] = fi

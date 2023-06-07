@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -28,9 +27,9 @@ var _ = Describe("ovftool", func() {
 	})
 
 	It("when ovftool is on the PATH, its path is returned", func() {
-		tmpDir, err := ioutil.TempDir(os.TempDir(), "ovftmp")
+		tmpDir, err := os.MkdirTemp(os.TempDir(), "ovftmp")
 		Expect(err).ToNot(HaveOccurred())
-		err = ioutil.WriteFile(filepath.Join(tmpDir, "ovftool"), []byte{}, 0700)
+		err = os.WriteFile(filepath.Join(tmpDir, "ovftool"), []byte{}, 0700)
 		Expect(err).ToNot(HaveOccurred())
 		os.Setenv("PATH", tmpDir)
 

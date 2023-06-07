@@ -3,7 +3,6 @@ package iaas_clients
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clifakes"
@@ -256,7 +255,7 @@ ethernet-0         VirtualE1000e                 internal-network
 	Context("ExportVM", func() {
 		var destinationDir string
 		BeforeEach(func() {
-			destinationDir, _ = ioutil.TempDir(os.TempDir(), "destinationDir")
+			destinationDir, _ = os.MkdirTemp(os.TempDir(), "destinationDir")
 		})
 		It("exports the VM to local machine from vcenter using vm inventory path", func() {
 			expectedArgs := []string{"export.ovf", "-u", credentialUrl, "-sha", "1", "-vm", "validVMPath", destinationDir}

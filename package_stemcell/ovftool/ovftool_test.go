@@ -1,14 +1,12 @@
 package ovftool_test
 
 import (
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"path/filepath"
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 )
@@ -20,7 +18,7 @@ var _ = Describe("ovftool", func() {
 
 		BeforeEach(func() {
 			var err error
-			exeFolder, err = ioutil.TempDir(os.TempDir(), "dummyExecutables")
+			exeFolder, err = os.MkdirTemp(os.TempDir(), "dummyExecutables")
 			Expect(err).NotTo(HaveOccurred())
 
 			outFolder = filepath.Join(exeFolder, "out")
@@ -38,7 +36,7 @@ var _ = Describe("ovftool", func() {
 		}
 
 		It("given root that has executable and valid executable name, should return location of the executable", func() {
-			ioutil.WriteFile(filepath.Join(outFolder, ovftoolExe), []byte{}, os.ModePerm)
+			os.WriteFile(filepath.Join(outFolder, ovftoolExe), []byte{}, os.ModePerm)
 
 			executable, err := ovftool.FindExecutable(exeFolder, ovftoolExe)
 

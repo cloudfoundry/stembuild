@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -32,7 +31,7 @@ func main() {
 		os.Exit(1)
 	}
 	s := "./StemcellAutomation.zip"
-	err = ioutil.WriteFile(s, data, 0644)
+	err = os.WriteFile(s, data, 0644)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Unable to write StemcellAutomation.zip")
 		os.Exit(1)

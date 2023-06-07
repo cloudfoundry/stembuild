@@ -3,7 +3,6 @@ package packagers
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -41,13 +40,13 @@ func (v VCenterPackager) Package() error {
 		return err
 	}
 
-	workingDir, err := ioutil.TempDir(os.TempDir(), "vcenter-packager-working-directory")
+	workingDir, err := os.MkdirTemp(os.TempDir(), "vcenter-packager-working-directory")
 
 	if err != nil {
 		return errors.New("failed to create working directory")
 	}
 
-	stemcellDir, err := ioutil.TempDir(os.TempDir(), "vcenter-packager-stemcell-directory")
+	stemcellDir, err := os.MkdirTemp(os.TempDir(), "vcenter-packager-stemcell-directory")
 	if err != nil {
 		return errors.New("failed to create stemcell directory")
 	}

@@ -4,11 +4,11 @@ import (
 	archiveTar "archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar/tarfakes"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar/tarfakes"
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar"
 	. "github.com/onsi/ginkgo/v2"
@@ -25,7 +25,7 @@ var _ = Describe("TarWriter", func() {
 		BeforeEach(func() {
 			tmpDir := os.TempDir()
 			var err error
-			workingDir, err = ioutil.TempDir(tmpDir, "TarWriterTest")
+			workingDir, err = os.MkdirTemp(tmpDir, "TarWriterTest")
 			Expect(err).NotTo(HaveOccurred())
 
 			fakeFile := bytes.NewReader([]byte{})

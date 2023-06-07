@@ -7,7 +7,6 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -21,14 +20,14 @@ var _ bool = Describe("Packager Utility", func() {
 		var destinationDir string
 
 		BeforeEach(func() {
-			sourceDir, _ = ioutil.TempDir(os.TempDir(), "packager-utility-test-source")
-			destinationDir, _ = ioutil.TempDir(os.TempDir(), "packager-utility-test-destination")
+			sourceDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-source")
+			destinationDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-destination")
 		})
 
 		It("should tar all files inside provided folder and return its sha1", func() {
-			err := ioutil.WriteFile(filepath.Join(sourceDir, "file1"), []byte("file1 content\n"), 0777)
+			err := os.WriteFile(filepath.Join(sourceDir, "file1"), []byte("file1 content\n"), 0777)
 			Expect(err).NotTo(HaveOccurred())
-			err = ioutil.WriteFile(filepath.Join(sourceDir, "file2"), []byte("file2 content\n"), 0777)
+			err = os.WriteFile(filepath.Join(sourceDir, "file2"), []byte("file2 content\n"), 0777)
 			Expect(err).NotTo(HaveOccurred())
 			fileContentMap := make(map[string]string)
 			fileContentMap["file1"] = "file1 content\n"

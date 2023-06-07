@@ -1,7 +1,6 @@
 package ovftool_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -88,9 +87,9 @@ var _ = Describe("ovftool", func() {
 		})
 
 		It("when ovftool is on the path, its path is returned", func() {
-			tmpDir, err := ioutil.TempDir(os.TempDir(), "ovftmp")
+			tmpDir, err := os.MkdirTemp(os.TempDir(), "ovftmp")
 			Expect(err).ToNot(HaveOccurred())
-			err = ioutil.WriteFile(filepath.Join(tmpDir, "ovftool.exe"), []byte{}, 0700)
+			err = os.WriteFile(filepath.Join(tmpDir, "ovftool.exe"), []byte{}, 0700)
 			Expect(err).ToNot(HaveOccurred())
 			os.Setenv("PATH", tmpDir)
 
@@ -102,7 +101,7 @@ var _ = Describe("ovftool", func() {
 		})
 
 		It("fails when given invalid set of install paths", func() {
-			tmpDir, err := ioutil.TempDir(os.TempDir(), "ovftmp")
+			tmpDir, err := os.MkdirTemp(os.TempDir(), "ovftmp")
 			Expect(err).ToNot(HaveOccurred())
 
 			_, err = ovftool.Ovftool([]string{tmpDir})
@@ -121,11 +120,11 @@ var _ = Describe("ovftool", func() {
 
 			BeforeEach(func() {
 				var err error
-				tmpDir, err = ioutil.TempDir(os.TempDir(), "ovftmp")
+				tmpDir, err = os.MkdirTemp(os.TempDir(), "ovftmp")
 				Expect(err).ToNot(HaveOccurred())
-				dummyDir, err = ioutil.TempDir(os.TempDir(), "trashdir")
+				dummyDir, err = os.MkdirTemp(os.TempDir(), "trashdir")
 				Expect(err).ToNot(HaveOccurred())
-				err = ioutil.WriteFile(filepath.Join(tmpDir, "ovftool.exe"), []byte{}, 0644)
+				err = os.WriteFile(filepath.Join(tmpDir, "ovftool.exe"), []byte{}, 0644)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
