@@ -91,7 +91,7 @@ func (v VCenterPackager) executeOnMatchingDevice(action func(a, b string) error,
 	return nil
 }
 
-func (v VCenterPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
+func (v VCenterPackager) ValidateFreeSpaceForPackage(_fs filesystem.FileSystem) error {
 	return nil
 }
 
