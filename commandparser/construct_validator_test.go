@@ -54,7 +54,7 @@ var _ = Describe("ConstructValidator", func() {
 			Expect(err).ToNot(HaveOccurred())
 			_, err = os.Stat(LGPOPath)
 			Expect(err).ToNot(HaveOccurred())
-			file.Close()
+			file.Close() //nolint:errcheck
 
 			result := c.LGPOInDirectory()
 

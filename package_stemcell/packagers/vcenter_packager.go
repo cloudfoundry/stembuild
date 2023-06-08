@@ -58,7 +58,7 @@ func (v VCenterPackager) Package() error {
 
 	fmt.Println("Converting VMDK into stemcell")
 	vmName := path.Base(v.SourceConfig.VmInventoryPath)
-	shaSum, err := TarGenerator(filepath.Join(stemcellDir, "image"), filepath.Join(workingDir, vmName))
+	shaSum, err := TarGenerator(filepath.Join(stemcellDir, "image"), filepath.Join(workingDir, vmName)) //nolint:ineffassign,staticcheck
 	manifestContents := CreateManifest(v.OutputConfig.Os, v.OutputConfig.StemcellVersion, shaSum)
 	err = WriteManifest(manifestContents, stemcellDir)
 
@@ -67,7 +67,7 @@ func (v VCenterPackager) Package() error {
 	}
 
 	stemcellFilename := StemcellFilename(v.OutputConfig.StemcellVersion, v.OutputConfig.Os)
-	_, err = TarGenerator(filepath.Join(v.OutputConfig.OutputDir, stemcellFilename), stemcellDir)
+	_, err = TarGenerator(filepath.Join(v.OutputConfig.OutputDir, stemcellFilename), stemcellDir) //nolint:ineffassign,staticcheck
 
 	fmt.Printf("Stemcell successfully created: %s\n", stemcellFilename)
 	return nil

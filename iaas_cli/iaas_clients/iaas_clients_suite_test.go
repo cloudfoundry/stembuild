@@ -59,7 +59,7 @@ var _ = BeforeSuite(func() {
 	vmToClone, err := vCenterManager.FindVM(CTX, testVmPath)
 	Expect(err).ToNot(HaveOccurred())
 
-	TestVmPath = testVmPath + fmt.Sprintf("%s", uuid.New())[0:8]
+	TestVmPath = testVmPath + fmt.Sprintf("%s", uuid.New())[0:8] //nolint:gosimple
 
 	err = vCenterManager.CloneVM(CTX, vmToClone, TestVmPath)
 	Expect(err).ToNot(HaveOccurred())

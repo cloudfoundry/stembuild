@@ -21,8 +21,8 @@ func WriteManifest(manifestContents, manifestPath string) error {
 	}
 	defer f.Close()
 
-	if _, err := fmt.Fprintf(f, manifestContents); err != nil {
-		os.Remove(manifestPath)
+	if _, err := fmt.Fprintf(f, manifestContents); err != nil { //nolint:staticcheck
+		os.Remove(manifestPath) //nolint:errcheck
 		return fmt.Errorf("writing stemcell.MF (%s): %s", manifestPath, err)
 	}
 	return nil

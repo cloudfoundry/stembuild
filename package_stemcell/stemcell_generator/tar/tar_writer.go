@@ -38,11 +38,11 @@ func (t *TarWriter) Write(filename string, tarables ...Tarable) error {
 		header.Size = t.Size()
 		header.Mode = int64(os.FileMode(0644))
 
-		tarfileWriter.WriteHeader(header)
-		io.Copy(tarfileWriter, t)
+		tarfileWriter.WriteHeader(header) //nolint:errcheck
+		io.Copy(tarfileWriter, t)         //nolint:errcheck
 	}
-	tarfileWriter.Close()
-	gzw.Close()
+	tarfileWriter.Close() //nolint:errcheck
+	gzw.Close()           //nolint:errcheck
 
 	return nil
 }

@@ -103,7 +103,7 @@ var _ = Describe("VcenterPackager", func() {
 
 			fakeVcenterClient.ExportVMStub = func(vmInventoryPath string, destination string) error {
 				vmName := path.Base(vmInventoryPath)
-				os.Mkdir(filepath.Join(destination, vmName), 0777)
+				os.Mkdir(filepath.Join(destination, vmName), 0777) //nolint:errcheck
 
 				testOvfName := "valid-vm-name.content"
 				err := os.WriteFile(filepath.Join(filepath.Join(destination, vmName), testOvfName), []byte(""), 0777)
@@ -162,7 +162,7 @@ stemcell_formats:
 				case "image":
 					count++
 					actualSha1 := sha1.New()
-					io.Copy(actualSha1, tarfileReader)
+					io.Copy(actualSha1, tarfileReader) //nolint:errcheck
 
 					expectedManifestContent = fmt.Sprintf(expectedManifestContent, actualSha1.Sum(nil))
 

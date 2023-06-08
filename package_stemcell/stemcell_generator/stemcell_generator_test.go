@@ -63,7 +63,7 @@ var _ = Describe("StemcellGenerator", func() {
 			fileNameGenerator.FileNameReturns(expectedFileName)
 			manifestGenerator.ManifestReturns(expectedManifest, nil)
 
-			stemcellGenerator.Generate(fakeImage)
+			stemcellGenerator.Generate(fakeImage) //nolint:errcheck
 			Expect(tarWriter.WriteCallCount()).To(Equal(1))
 
 			actualFileName, objects := tarWriter.WriteArgsForCall(0)

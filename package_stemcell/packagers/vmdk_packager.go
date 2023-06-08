@@ -243,7 +243,7 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 	case <-c.Stop:
 		if cmd.Process != nil {
 			c.Debugf("received stop signall killing ovftool process")
-			cmd.Process.Kill()
+			cmd.Process.Kill() //nolint:errcheck
 		}
 		return ErrInterupt
 	case err := <-errCh:

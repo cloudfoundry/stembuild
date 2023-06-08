@@ -88,7 +88,7 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		session.Out.Write(out)
+		session.Out.Write(out) //nolint:errcheck
 		By(string(out))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
@@ -143,7 +143,7 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		session.Out.Write(out)
+		session.Out.Write(out) //nolint:errcheck
 		By(string(out))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]

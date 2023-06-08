@@ -83,7 +83,7 @@ var _ = Describe("TarWriter", func() {
 			err := os.Chdir(workingDir)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = w.Write("some-zipped-tar", fakeTarable1, fakeTarable2)
+			err = w.Write("some-zipped-tar", fakeTarable1, fakeTarable2) //nolint:ineffassign,staticcheck
 
 			var fileReader, _ = os.OpenFile("some-zipped-tar", os.O_RDONLY, 0777)
 

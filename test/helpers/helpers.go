@@ -25,15 +25,15 @@ func recursiveFileList(destDir, searchDir string) ([]string, []string, []string,
 	leafSearchDir := searchDir
 	lastSepIndex := strings.LastIndex(searchDir, string(filepath.Separator))
 	if lastSepIndex >= 0 {
-		leafSearchDir = searchDir[lastSepIndex:len(searchDir)]
+		leafSearchDir = searchDir[lastSepIndex:len(searchDir)] //nolint:gosimple
 	}
 
 	e := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
-			dirList = append(dirList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)]))
+			dirList = append(dirList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)])) //nolint:gosimple
 		} else {
 			srcFileList = append(srcFileList, path)
-			destFileList = append(destFileList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)]))
+			destFileList = append(destFileList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)])) //nolint:gosimple
 		}
 		return err
 	})
@@ -69,7 +69,7 @@ func CopyRecursive(destRoot, srcRoot string) error {
 		}
 	}
 
-	for i, _ := range srcFileList {
+	for i, _ := range srcFileList { //nolint:gosimple
 		srcFile, err := os.Open(srcFileList[i])
 		if err != nil {
 			return err

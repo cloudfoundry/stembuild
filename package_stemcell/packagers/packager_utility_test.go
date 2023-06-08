@@ -64,10 +64,10 @@ var _ bool = Describe("Packager Utility", func() {
 			}
 			Expect(count).To(Equal(2))
 
-			tarballFile, err := os.Open(tarball)
-			defer tarballFile.Close()
+			tarballFile, err := os.Open(tarball) //nolint:ineffassign,staticcheck
+			defer tarballFile.Close()            //nolint:staticcheck
 			expectedSha1 := sha1.New()
-			io.Copy(expectedSha1, tarballFile)
+			io.Copy(expectedSha1, tarballFile) //nolint:errcheck
 
 			sum := fmt.Sprintf("%x", expectedSha1.Sum(nil))
 			Expect(sha1Sum).To(Equal(sum))

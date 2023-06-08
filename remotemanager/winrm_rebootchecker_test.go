@@ -35,7 +35,7 @@ var _ = Describe("WinRM RebootChecker", func() {
 			numberOfPollCalls := 8
 			fakePoller.PollStub = func(duration time.Duration, pollFunc func() (bool, error)) error {
 				for call := 0; call < numberOfPollCalls; call++ {
-					pollFunc()
+					pollFunc() //nolint:errcheck
 				}
 				return nil
 			}
@@ -52,7 +52,7 @@ var _ = Describe("WinRM RebootChecker", func() {
 
 		It("returns nil if a reboot has finished successfully", func() {
 			fakePoller.PollStub = func(duration time.Duration, pollFunc func() (bool, error)) error {
-				pollFunc()
+				pollFunc() //nolint:errcheck
 				return nil
 			}
 

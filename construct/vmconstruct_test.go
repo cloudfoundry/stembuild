@@ -512,7 +512,7 @@ var _ = Describe("construct_helpers", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(fakeMessenger.WaitingForShutdownCallCount()).To(Equal(2))
 
-				isPoweredOff, err = pollFunc()
+				isPoweredOff, err = pollFunc() //nolint:ineffassign,staticcheck
 				Expect(err).To(MatchError("checking for powered off is hard"))
 				Expect(fakeMessenger.WaitingForShutdownCallCount()).To(Equal(2))
 
