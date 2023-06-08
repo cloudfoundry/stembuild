@@ -5,7 +5,7 @@ import (
 	"errors"
 	"runtime"
 
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/vmware/govmomi/guest"

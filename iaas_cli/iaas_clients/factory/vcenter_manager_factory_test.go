@@ -6,13 +6,11 @@ import (
 	"net/url"
 
 	"github.com/vmware/govmomi/find"
-
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
-
 	"github.com/vmware/govmomi/vim25"
 
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory/factoryfakes"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

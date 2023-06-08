@@ -1,11 +1,12 @@
 package commandparser_test
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/cloudfoundry/stembuild/commandparser"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"os"
-	"path/filepath"
 )
 
 var _ = Describe("ConstructValidator", func() {

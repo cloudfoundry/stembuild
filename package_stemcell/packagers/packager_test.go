@@ -3,6 +3,7 @@ package packagers_test
 import (
 	"bytes"
 	"errors"
+
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers/packagersfakes"
 	. "github.com/onsi/ginkgo/v2"

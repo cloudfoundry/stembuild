@@ -6,10 +6,9 @@ import (
 	"testing"
 	"time"
 
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/google/uuid"
 	"github.com/vmware/govmomi/object"
-
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

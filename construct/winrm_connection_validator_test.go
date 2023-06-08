@@ -2,6 +2,7 @@ package construct_test
 
 import (
 	"errors"
+
 	"github.com/cloudfoundry/stembuild/construct"
 	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
 	. "github.com/onsi/ginkgo/v2"

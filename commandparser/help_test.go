@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"os"
+	"path"
+
 	. "github.com/cloudfoundry/stembuild/commandparser"
 	"github.com/cloudfoundry/stembuild/version"
 	"github.com/google/subcommands"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"os"
-	"path"
 )
 
 var _ = Describe("help", func() {

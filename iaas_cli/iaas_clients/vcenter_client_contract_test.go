@@ -9,8 +9,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli"
-
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

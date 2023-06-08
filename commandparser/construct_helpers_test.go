@@ -1,10 +1,11 @@
 package commandparser_test
 
 import (
+	"path/filepath"
+
 	. "github.com/cloudfoundry/stembuild/commandparser"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"path/filepath"
 )
 
 var _ = Describe("construct_helpers", func() {

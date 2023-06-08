@@ -1,8 +1,9 @@
 package remotemanager
 
 import (
-	"github.com/masterzen/winrm"
 	"time"
+
+	"github.com/masterzen/winrm"
 )
 
 type WinRMClientFactory struct {

@@ -2,8 +2,9 @@ package ovftool
 
 import (
 	"fmt"
-	"golang.org/x/sys/windows/registry"
 	"os/exec"
+
+	"golang.org/x/sys/windows/registry"
 )
 
 var keypaths = []string{
