@@ -19,8 +19,6 @@ func (c *ConstructValidator) PopulatedArgs(args ...string) bool {
 func (c *ConstructValidator) LGPOInDirectory() bool {
 	dir, _ := os.Getwd()
 	_, err := os.Stat(filepath.Join(dir, "LGPO.zip"))
-	if err != nil {
-		return false
-	}
-	return true
+
+	return err == nil
 }
