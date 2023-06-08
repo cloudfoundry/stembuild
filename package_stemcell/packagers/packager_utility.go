@@ -50,20 +50,20 @@ func TarGenerator(destinationfileName string, sourceDirName string) (string, err
 
 	sourcedir, err := os.Open(sourceDirName)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("unable to open %s", sourceDirName))
+		return "", fmt.Errorf("unable to open %s", sourceDirName)
 	}
 	defer sourcedir.Close()
 
 	// get list of files
 	files, err := sourcedir.Readdir(0)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("unable to list files in %s", sourceDirName))
+		return "", fmt.Errorf("unable to list files in %s", sourceDirName)
 	}
 
 	// create tar file
 	destinationFile, err := os.Create(destinationfileName)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("unable to create destination file with name %s", destinationfileName))
+		return "", fmt.Errorf("unable to create destination file with name %s", destinationfileName)
 	}
 	defer destinationFile.Close()
 
@@ -79,7 +79,7 @@ func TarGenerator(destinationfileName string, sourceDirName string) (string, err
 
 		file, err := os.Open(sourcedir.Name() + string(filepath.Separator) + fileInfo.Name())
 		if err != nil {
-			return "", errors.New(fmt.Sprintf("unable to open files in %s", sourceDirName))
+			return "", fmt.Errorf("unable to open files in %s", sourceDirName)
 		}
 		defer file.Close()
 

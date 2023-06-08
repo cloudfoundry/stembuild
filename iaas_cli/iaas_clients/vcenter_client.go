@@ -48,7 +48,7 @@ func (c *VcenterClient) ValidateCredentials() error {
 	args := c.buildGovcCommand("about")
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
-		return errors.New(fmt.Sprintf("vcenter_client - invalid credentials for: %s", c.redactedUrl))
+		return fmt.Errorf("vcenter_client - invalid credentials for: %s", c.redactedUrl)
 	}
 
 	return nil
@@ -58,7 +58,7 @@ func (c *VcenterClient) FindVM(vmInventoryPath string) error {
 	args := c.buildGovcCommand("find", "-maxdepth=0", vmInventoryPath)
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
-		return errors.New(fmt.Sprintf("vcenter_client - unable to find VM: %s. Ensure your inventory path is formatted properly and includes \"vm\" in its path, example: /my-datacenter/vm/my-folder/my-vm-name", vmInventoryPath))
+		return fmt.Errorf("vcenter_client - unable to find VM: %s. Ensure your inventory path is formatted properly and includes \"vm\" in its path, example: /my-datacenter/vm/my-folder/my-vm-name", vmInventoryPath)
 	}
 
 	return nil
@@ -108,12 +108,12 @@ func (c *VcenterClient) EjectCDRom(vmInventoryPath string, deviceName string) er
 func (c *VcenterClient) ExportVM(vmInventoryPath string, destination string) error {
 	_, err := os.Stat(destination)
 	if err != nil {
-		return errors.New(fmt.Sprintf("vcenter_client - provided destination directory: %s does not exist", destination))
+		return fmt.Errorf("vcenter_client - provided destination directory: %s does not exist", destination)
 	}
 	args := c.buildGovcCommand("export.ovf", "-sha", "1", "-vm", vmInventoryPath, destination)
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
-		return errors.New(fmt.Sprintf("vcenter_client - %s could not be exported", vmInventoryPath))
+		return fmt.Errorf("vcenter_client - %s could not be exported", vmInventoryPath)
 	}
 	return nil
 }
