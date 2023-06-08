@@ -520,12 +520,12 @@ var _ = Describe("construct_helpers", func() {
 			})
 
 			It("returns failure when it cannot determine VM power state", func() {
-				error := "cannot determine VM state"
-				fakePoller.PollReturnsOnCall(0, errors.New(error))
+				errorString := "cannot determine VM state"
+				fakePoller.PollReturnsOnCall(0, errors.New(errorString))
 
 				err := vmConstruct.PrepareVM()
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal(error))
+				Expect(err.Error()).To(Equal(errorString))
 
 				Expect(fakeMessenger.ShutdownCompletedCallCount()).To(Equal(0))
 			})
