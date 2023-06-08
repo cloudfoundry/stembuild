@@ -22,7 +22,7 @@ var _ = Describe("ovftool", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			outFolder = filepath.Join(exeFolder, "out")
-			os.Mkdir(outFolder, os.ModeDir|os.ModePerm)
+			Expect(os.Mkdir(outFolder, os.ModeDir|os.ModePerm)).To(Succeed())
 		})
 
 		AfterEach(func() {
@@ -36,7 +36,7 @@ var _ = Describe("ovftool", func() {
 		}
 
 		It("given root that has executable and valid executable name, should return location of the executable", func() {
-			os.WriteFile(filepath.Join(outFolder, ovftoolExe), []byte{}, os.ModePerm)
+			Expect(os.WriteFile(filepath.Join(outFolder, ovftoolExe), []byte{}, os.ModePerm)).To(Succeed())
 
 			executable, err := ovftool.FindExecutable(exeFolder, ovftoolExe)
 
