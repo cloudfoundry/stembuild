@@ -86,7 +86,7 @@ var _ = Describe("VcenterClient", func() {
 			It("Starts a program and returns its exit code", func() {
 				cert := os.Getenv(VcenterCACert)
 				if cert == "" {
-					Skip(fmt.Sprintf("export VCENTER_CA_CERT=<a valid ca cert> to run this test"))
+					Skip("export VCENTER_CA_CERT=<a valid ca cert> to run this test")
 				}
 
 				tmpDir, err := os.MkdirTemp("", "vcenter-client-contract-tests")

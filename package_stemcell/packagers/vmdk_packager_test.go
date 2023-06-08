@@ -181,7 +181,7 @@ var _ = Describe("VmdkPackager", func() {
 
 				Expect(err).To(HaveOccurred())
 
-				expectedErrorMsg := fmt.Sprintf("Not enough space to create stemcell. Free up ")
+				expectedErrorMsg := "Not enough space to create stemcell. Free up "
 				Expect(err.Error()).To(ContainSubstring(expectedErrorMsg))
 			})
 		})
@@ -199,7 +199,7 @@ var _ = Describe("VmdkPackager", func() {
 				err := c.ValidateFreeSpaceForPackage(mockFileSystem)
 
 				Expect(err).To(HaveOccurred())
-				expectedErrorMsg := fmt.Sprintf("could not check free space on disk: ")
+				expectedErrorMsg := "could not check free space on disk: "
 				Expect(err.Error()).To(ContainSubstring(expectedErrorMsg))
 			})
 		})
