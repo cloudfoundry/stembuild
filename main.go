@@ -38,7 +38,7 @@ func main() {
 	}
 
 	var gf GlobalFlags
-	packageCmd := NewPackageCommand(version.NewVersionGetter(), &packager_factory.PackagerFactory{}, &PackageMessenger{os.Stderr})
+	packageCmd := NewPackageCommand(version.NewVersionGetter(), &packager_factory.PackagerFactory{}, &PackageMessenger{Output: os.Stderr})
 	packageCmd.GlobalFlags = &gf
 	constructCmd := NewConstructCmd(context.Background(), &vmconstruct_factory.VMConstructFactory{}, &vcenter_client_factory.ManagerFactory{}, &ConstructValidator{}, &ConstructCmdMessenger{OutputChannel: os.Stderr})
 	constructCmd.GlobalFlags = &gf

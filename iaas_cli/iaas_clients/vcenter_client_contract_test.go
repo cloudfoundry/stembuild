@@ -71,7 +71,7 @@ var _ = Describe("VcenterManager", func() {
 				}
 
 				managerFactory := &vcenter_client_factory.ManagerFactory{
-					*factoryConfig,
+					Config: *factoryConfig,
 				}
 
 				ctx := context.TODO()

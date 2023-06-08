@@ -140,12 +140,12 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 	}
 
 	p.managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
-		p.sourceConfig.VCenterUrl,
-		p.sourceConfig.VCenterUsername,
-		p.sourceConfig.VCenterPassword,
-		&vcenter_client_factory.ClientCreator{},
-		&vcenter_client_factory.GovmomiFinderCreator{},
-		p.sourceConfig.CaCertFile,
+		VCenterServer:  p.sourceConfig.VCenterUrl,
+		Username:       p.sourceConfig.VCenterUsername,
+		Password:       p.sourceConfig.VCenterPassword,
+		ClientCreator:  &vcenter_client_factory.ClientCreator{},
+		FinderCreator:  &vcenter_client_factory.GovmomiFinderCreator{},
+		RootCACertPath: p.sourceConfig.CaCertFile,
 	})
 
 	vCenterManager, err := p.managerFactory.VCenterManager(p.ctx)
