@@ -55,7 +55,7 @@ func StembuildWithEnv(passedEnv map[string]string, command string, args ...strin
 
 func WriteCommand(command string, args []string) {
 	display := append([]string{DebugCommandPrefix, command}, args...)
-	GinkgoWriter.Write([]byte(strings.Join(append(display, "\n"), " ")))
+	GinkgoWriter.Write([]byte(strings.Join(append(display, "\n"), " "))) //nolint:errcheck
 }
 
 // AddOrReplaceEnvironment will update environment if it already exists or will add
