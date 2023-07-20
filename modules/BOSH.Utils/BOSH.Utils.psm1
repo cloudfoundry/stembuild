@@ -8,7 +8,7 @@
 function Write-Log {
    Param (
    [Parameter(Mandatory=$True,Position=1)][string]$Message,
-   [string]$LogFile="C:\provision\log.log"
+   [string]$LogFile=$(if ( $IsWindows ) { "C:\provision\log.log" } else { "/tmp/log.log" })
    )
 
    New-Item -Path $(split-path $LogFile -parent) -ItemType Directory -Force | Out-Null
@@ -362,7 +362,22 @@ function Invoke-Certutil {
         [Parameter(Mandatory=$True)]
         [string]$generateSSTFromWU
         )
-    certutil -generateSSTFromWU $generateSSTFromWU
+    # We balance number of retries against unnecessarily slowing down air-grapped envs
+    # 595 seconds is one standard deviation for intervals of failed certutils;
+    $NumberOfRetries = 20 # One standard deviation (30 seconds * 20 retries = 600)
+    $i = 0
+    while ($i -lt $NumberOfRetries) {
+        $Result = Invoke-Command -ScriptBlock { certutil -generateSSTFromWU $generateSSTFromWU }
+
+        if ($LASTEXITCODE -eq 0) {
+            $Result
+            break
+        }
+
+        Write-Host "Error generating cert file from windows update server. Retry #$i $Result"
+        Start-Sleep -Seconds 30
+        $i++
+    }
     if ($LASTEXITCODE -ne 0) {
         Throw "Error generating cert file from windows update server, exited with $LASTEXITCODE"
     }
