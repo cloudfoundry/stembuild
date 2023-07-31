@@ -57,10 +57,10 @@ generate: assets/StemcellAutomation.zip
 	go run github.com/go-bindata/go-bindata/go-bindata -o assets/stemcell_automation.go -pkg assets -prefix assets assets/StemcellAutomation.zip
 
 out/stembuild : generate $(GOSRC)
-	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
+	CGO_ENABLED=0 go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
 
 out/stembuild.exe : generate $(GOSRC)
-	GOOS=windows go build -o out/stembuild.exe -ldflags $(LD_FLAGS) .
+	GOOS=windows CGO_ENABLED=0 go build -o out/stembuild.exe -ldflags $(LD_FLAGS) .
 
 test : units
 
