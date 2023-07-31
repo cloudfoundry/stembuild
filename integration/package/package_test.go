@@ -37,7 +37,6 @@ var _ = Describe("Package", func() {
 	BeforeEach(func() {
 		vcenterFolder := helpers.EnvMustExist(vcenterFolderVariable)
 
-		rand.Seed(time.Now().UnixNano())
 		packageTestVMName := fmt.Sprintf("stembuild-package-test-%d", rand.Int())
 
 		baseVMWithPath := fmt.Sprintf(vcenterFolder + "/" + baseVMName)
