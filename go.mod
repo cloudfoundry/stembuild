@@ -9,7 +9,7 @@ require (
 	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.3.0
 	github.com/masterzen/winrm v0.0.0-20220917170901-b07f6cb0598d
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.2
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.10
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
@@ -30,7 +30,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
-	github.com/google/pprof v0.0.0-20230811205829-9131a7e9cc17 // indirect
+	github.com/google/pprof v0.0.0-20230817174616-7a8ec2ada47b // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
