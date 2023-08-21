@@ -22,14 +22,14 @@ function Optimize-Disk {
 
     # Cleanup WinSxS folder: https://technet.microsoft.com/en-us/library/dn251565.aspx
     Write-Log "Running Dism"
-    Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase
+    Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase"
+        Write-Log "Error: Running Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase"
         Throw "Dism.exe failed"
     }
-    Dism.exe /online /Cleanup-Image /SPSuperseded
+    Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running Dism.exe /online /Cleanup-Image /SPSuperseded"
+        Write-Log "Error: Running Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded"
         Throw "Dism.exe failed"
     }
     Write-Log "Finished clean disk"
