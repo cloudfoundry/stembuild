@@ -1,6 +1,8 @@
 module github.com/cloudfoundry/stembuild
 
-go 1.20
+go 1.21
+
+toolchain go1.21.0
 
 require (
 	github.com/concourse/pool-resource v1.1.1
