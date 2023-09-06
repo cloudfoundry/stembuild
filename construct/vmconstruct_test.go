@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/cloudfoundry/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/construct"
 	"github.com/cloudfoundry/stembuild/construct/constructfakes"
 	"github.com/cloudfoundry/stembuild/poller/pollerfakes"
 	"github.com/cloudfoundry/stembuild/remotemanager"
 	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -19,7 +20,7 @@ import (
 var _ = Describe("construct_helpers", func() {
 	var (
 		fakeRemoteManager         *remotemanagerfakes.FakeRemoteManager
-		vmConstruct               *VMConstruct
+		vmConstruct               *construct.VMConstruct
 		fakeVcenterClient         *constructfakes.FakeIaasClient
 		fakeGuestManager          *constructfakes.FakeGuestManager
 		fakeWinRMEnabler          *constructfakes.FakeWinRMEnabler
@@ -45,7 +46,7 @@ var _ = Describe("construct_helpers", func() {
 		fakeScriptExecutor = &constructfakes.FakeScriptExecutorI{}
 		fakeSetupFlags = []string{"SomeFlag SomeValue", "OtherFlag OtherValue"}
 
-		vmConstruct = NewVMConstruct(
+		vmConstruct = construct.NewVMConstruct(
 			context.TODO(),
 			fakeRemoteManager,
 			"fakeUser",
@@ -78,7 +79,7 @@ var _ = Describe("construct_helpers", func() {
 	Describe("ScriptExecutor", func() {
 		It("executes setup script with correct arguments", func() {
 
-			e := NewScriptExecutor(fakeRemoteManager)
+			e := construct.NewScriptExecutor(fakeRemoteManager)
 			version := "11.11.11"
 			err := e.ExecuteSetupScript(version, fakeSetupFlags)
 			executeCommandCallArg := fakeRemoteManager.ExecuteCommandArgsForCall(0)
@@ -92,7 +93,7 @@ var _ = Describe("construct_helpers", func() {
 		})
 
 		It("executes post-reboot script with correct arguments", func() {
-			e := NewScriptExecutor(fakeRemoteManager)
+			e := construct.NewScriptExecutor(fakeRemoteManager)
 			superLongTimeout := 24 * time.Hour
 			err := e.ExecutePostRebootScript(superLongTimeout)
 			executeCommandCallArg, timeout := fakeRemoteManager.ExecuteCommandWithTimeoutArgsForCall(0)
@@ -104,7 +105,7 @@ var _ = Describe("construct_helpers", func() {
 		})
 
 		It("returns an error when there is a powershell script execution error", func() {
-			e := NewScriptExecutor(fakeRemoteManager)
+			e := construct.NewScriptExecutor(fakeRemoteManager)
 			superLongTimeout := 24 * time.Hour
 			powershellErrorPrefix := errors.New(remotemanager.PowershellExecutionErrorMessage)
 			powershellErr := fmt.Errorf("%s: %s", powershellErrorPrefix, "a command failed to run")
@@ -116,7 +117,7 @@ var _ = Describe("construct_helpers", func() {
 		})
 
 		It("wraps a non-powershell execution error", func() {
-			e := NewScriptExecutor(fakeRemoteManager)
+			e := construct.NewScriptExecutor(fakeRemoteManager)
 			superLongTimeout := 24 * time.Hour
 			winRMError := errors.New("some EOF thing")
 
@@ -284,7 +285,7 @@ var _ = Describe("construct_helpers", func() {
 				Expect(err).ToNot(HaveOccurred())
 				command := fakeRemoteManager.ExecuteCommandArgsForCall(0)
 
-				encodedCommand := EncodePowershellCommand([]byte(rawLogoffCommand))
+				encodedCommand := construct.EncodePowershellCommand([]byte(rawLogoffCommand))
 				Expect(command).To(ContainSubstring(encodedCommand))
 				Expect(command).To(ContainSubstring("powershell.exe -EncodedCommand "))
 
