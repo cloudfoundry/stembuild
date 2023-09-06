@@ -77,14 +77,15 @@ function RunQuickerDism {
 
     Write-Log "Running Quicker Dism (that is, not executing with /ResetBase)"
     # /LogLevel default is 3
+    Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
     Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup"
+        Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
         if ($IgnoreErrors) {
-            Write-Log "Continuing, ignoring Dism.exe error."
+            Write-Log "Ignoring: Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
         }
         else {
-            Throw "Dism.exe failed"
+            Throw "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup' failed"
         }
     }
 }

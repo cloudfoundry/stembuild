@@ -21,17 +21,20 @@ function Optimize-Disk {
     Uninstall-WindowsFeature -Remove
 
     # Cleanup WinSxS folder: https://technet.microsoft.com/en-us/library/dn251565.aspx
-    Write-Log "Running Dism"
+    Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase'"
     Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase"
-        Throw "Dism.exe failed"
+        Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase'"
+        Throw "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase' failed"
     }
+
+    Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded'"
     Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded"
-        Throw "Dism.exe failed"
+        Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded'"
+        Throw "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded' failed"
     }
+
     Write-Log "Finished clean disk"
 }
 
