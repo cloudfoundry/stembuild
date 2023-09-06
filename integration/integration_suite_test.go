@@ -1,13 +1,13 @@
 package integration_test
 
 import (
+	"os"
+	"testing"
+
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 	"github.com/cloudfoundry/stembuild/test/helpers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"os"
-
-	"testing"
 )
 
 func TestIntegration(t *testing.T) {
