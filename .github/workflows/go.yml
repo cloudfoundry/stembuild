@@ -7,7 +7,8 @@ jobs:
   lint:
     strategy:
       matrix:
-        os: [windows-2019, ubuntu-latest]
+        # removing windows-2019 until go-bindata can be generated
+        os: [ubuntu-latest]
     name: lint
     runs-on: ${{ matrix.os }}
     steps:
@@ -16,14 +17,15 @@ jobs:
       with:
         go-version-file: go.mod
     - name: generate fake go-bindata for assets package
+      if: ${{ matrix.os != 'windows-2019' }}
       run: |
         go run github.com/go-bindata/go-bindata/go-bindata \
           -o assets/stemcell_automation.go \
           -pkg assets \
           -prefix assets \
           <(echo 'fake assets')
-    - uses: golangci/golangci-lint-action@v3
-      if: ${{ matrix.os == 'windows-2019' }}
+    # - uses: golangci/golangci-lint-action@v3
+    #   if: ${{ matrix.os == 'windows-2019' }}
     - uses: golangci/golangci-lint-action@v3
       if: ${{ matrix.os != 'windows-2019' }}
       with:
