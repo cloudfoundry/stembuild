@@ -15,6 +15,13 @@ jobs:
     - uses: actions/setup-go@v4
       with:
         go-version-file: go.mod
+    - name: generate fake go-bindata for assets package
+      run: |
+        go run github.com/go-bindata/go-bindata/go-bindata \
+          -o assets/stemcell_automation.go \
+          -pkg assets \
+          -prefix assets \
+          <(echo 'fake assets')
     - uses: golangci/golangci-lint-action@v3
       if: ${{ matrix.os == 'windows-2019' }}
     - uses: golangci/golangci-lint-action@v3
