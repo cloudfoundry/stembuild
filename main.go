@@ -20,9 +20,9 @@ import (
 func main() {
 	envs := os.Environ()
 	for _, env := range envs {
-		env_name := strings.Split(env, "=")[0]
-		if strings.HasPrefix(env_name, "GOVC_") || strings.HasPrefix(env_name, "GOVMOMI_") {
-			_, _ = fmt.Fprintf(os.Stderr, "Warning: The following environment variable is set and might override flags provided to stembuild: %s\n", env_name)
+		envName := strings.Split(env, "=")[0]
+		if strings.HasPrefix(envName, "GOVC_") || strings.HasPrefix(envName, "GOVMOMI_") {
+			_, _ = fmt.Fprintf(os.Stderr, "Warning: The following environment variable is set and might override flags provided to stembuild: %s\n", envName)
 		}
 	}
 	data, err := assets.Asset("StemcellAutomation.zip")
