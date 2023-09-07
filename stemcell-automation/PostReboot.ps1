@@ -13,7 +13,7 @@ Push-Location $PSScriptRoot
 try {
     PostReboot -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
 } catch [Exception] {
-    Write-Log "Failed to prepare the VM. See 'c:\provisions\log.log' for more info."
+    Write-Log "Failed to prepare the VM. See 'c:\provision\log.log' for more info."
     Exit $postRebootExceptionExitCode
 }
 
