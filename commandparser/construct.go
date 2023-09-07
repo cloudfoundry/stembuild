@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	"github.com/vmware/govmomi/guest"
@@ -41,7 +41,7 @@ type VMPreparerFactory interface {
 //counterfeiter:generate . ManagerFactory
 type ManagerFactory interface {
 	VCenterManager(ctx context.Context) (*vcenter_manager.VCenterManager, error)
-	SetConfig(config vcenter_client_factory.FactoryConfig)
+	SetConfig(config vcenterclientfactory.FactoryConfig)
 }
 
 //counterfeiter:generate . ConstructCmdValidator
@@ -139,12 +139,12 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		return subcommands.ExitFailure
 	}
 
-	p.managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
+	p.managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
 		VCenterServer:  p.sourceConfig.VCenterUrl,
 		Username:       p.sourceConfig.VCenterUsername,
 		Password:       p.sourceConfig.VCenterPassword,
-		ClientCreator:  &vcenter_client_factory.ClientCreator{},
-		FinderCreator:  &vcenter_client_factory.GovmomiFinderCreator{},
+		ClientCreator:  &vcenterclientfactory.ClientCreator{},
+		FinderCreator:  &vcenterclientfactory.GovmomiFinderCreator{},
 		RootCACertPath: p.sourceConfig.CaCertFile,
 	})
 

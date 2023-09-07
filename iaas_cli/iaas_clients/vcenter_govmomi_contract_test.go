@@ -7,9 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
-
-	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -29,21 +28,21 @@ var _ = Describe("VcenterClient", func() {
 	Describe("StartProgram", func() {
 
 		var (
-			managerFactory *vcenter_client_factory.ManagerFactory
-			factoryConfig  *vcenter_client_factory.FactoryConfig
+			managerFactory *vcenterclientfactory.ManagerFactory
+			factoryConfig  *vcenterclientfactory.FactoryConfig
 		)
 
 		BeforeEach(func() {
 
-			factoryConfig = &vcenter_client_factory.FactoryConfig{
+			factoryConfig = &vcenterclientfactory.FactoryConfig{
 				VCenterServer: envMustExist(VcenterUrl),
 				Username:      envMustExist(VcenterUsername),
 				Password:      envMustExist(VcenterPassword),
-				ClientCreator: &vcenter_client_factory.ClientCreator{},
-				FinderCreator: &vcenter_client_factory.GovmomiFinderCreator{},
+				ClientCreator: &vcenterclientfactory.ClientCreator{},
+				FinderCreator: &vcenterclientfactory.GovmomiFinderCreator{},
 			}
 
-			managerFactory = &vcenter_client_factory.ManagerFactory{}
+			managerFactory = &vcenterclientfactory.ManagerFactory{}
 		})
 
 		ExpectProgramToStartAndExitSuccessfully := func() {
@@ -127,22 +126,22 @@ var _ = Describe("VcenterClient", func() {
 
 	Describe("DownloadFileFromGuest", func() {
 		var (
-			managerFactory   *vcenter_client_factory.ManagerFactory
-			factoryConfig    *vcenter_client_factory.FactoryConfig
+			managerFactory   *vcenterclientfactory.ManagerFactory
+			factoryConfig    *vcenterclientfactory.FactoryConfig
 			fileToDownload   string
 			expectedContents string
 			guestManager     *guest_manager.GuestManager
 		)
 
 		BeforeEach(func() {
-			factoryConfig = &vcenter_client_factory.FactoryConfig{
+			factoryConfig = &vcenterclientfactory.FactoryConfig{
 				VCenterServer: envMustExist(VcenterUrl),
 				Username:      envMustExist(VcenterUsername),
 				Password:      envMustExist(VcenterPassword),
-				ClientCreator: &vcenter_client_factory.ClientCreator{},
-				FinderCreator: &vcenter_client_factory.GovmomiFinderCreator{},
+				ClientCreator: &vcenterclientfactory.ClientCreator{},
+				FinderCreator: &vcenterclientfactory.GovmomiFinderCreator{},
 			}
-			managerFactory = &vcenter_client_factory.ManagerFactory{}
+			managerFactory = &vcenterclientfactory.ManagerFactory{}
 			factoryConfig.RootCACertPath = ""
 			managerFactory.SetConfig(*factoryConfig)
 

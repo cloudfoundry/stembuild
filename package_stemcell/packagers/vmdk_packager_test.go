@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	mock_filesystem "github.com/cloudfoundry/stembuild/filesystem/mock"
+	mockfilesystem "github.com/cloudfoundry/stembuild/filesystem/mock"
 	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 	"github.com/cloudfoundry/stembuild/test/helpers"
@@ -123,7 +123,7 @@ var _ = Describe("VmdkPackager", func() {
 	Describe("ValidateFreeSpaceForPackage", func() {
 		var (
 			mockCtrl       *gomock.Controller
-			mockFileSystem *mock_filesystem.MockFileSystem
+			mockFileSystem *mockfilesystem.MockFileSystem
 		)
 
 		Context("When VMDK file is invalid", func() {
@@ -131,7 +131,7 @@ var _ = Describe("VmdkPackager", func() {
 				c.BuildOptions.VMDKFile = ""
 
 				mockCtrl = gomock.NewController(GinkgoT())
-				mockFileSystem = mock_filesystem.NewMockFileSystem(mockCtrl)
+				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
 				err := c.ValidateFreeSpaceForPackage(mockFileSystem)
 				Expect(err).To(HaveOccurred())
@@ -145,7 +145,7 @@ var _ = Describe("VmdkPackager", func() {
 				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
 
 				mockCtrl = gomock.NewController(GinkgoT())
-				mockFileSystem = mock_filesystem.NewMockFileSystem(mockCtrl)
+				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
 				vmdkFile, err := os.Stat(c.BuildOptions.VMDKFile)
 				Expect(err).ToNot(HaveOccurred())
@@ -166,7 +166,7 @@ var _ = Describe("VmdkPackager", func() {
 				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
 
 				mockCtrl = gomock.NewController(GinkgoT())
-				mockFileSystem = mock_filesystem.NewMockFileSystem(mockCtrl)
+				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
 				vmdkFile, err := os.Stat(c.BuildOptions.VMDKFile)
 				Expect(err).ToNot(HaveOccurred())
@@ -191,7 +191,7 @@ var _ = Describe("VmdkPackager", func() {
 				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
 
 				mockCtrl = gomock.NewController(GinkgoT())
-				mockFileSystem = mock_filesystem.NewMockFileSystem(mockCtrl)
+				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
 				directoryPath := filepath.Dir(c.BuildOptions.VMDKFile)
 				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(4), errors.New("some error")).AnyTimes()

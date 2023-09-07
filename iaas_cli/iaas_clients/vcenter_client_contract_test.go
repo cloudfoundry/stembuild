@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli"
-	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -61,16 +62,16 @@ var _ = Describe("VcenterManager", func() {
 					Skip("windows cannot run a vcsim server")
 				}
 
-				factoryConfig := &vcenter_client_factory.FactoryConfig{
+				factoryConfig := &vcenterclientfactory.FactoryConfig{
 					VCenterServer:  vCenterUrl,
 					Username:       vCenterUsername,
 					Password:       vCenterPassword,
-					ClientCreator:  &vcenter_client_factory.ClientCreator{},
-					FinderCreator:  &vcenter_client_factory.GovmomiFinderCreator{},
+					ClientCreator:  &vcenterclientfactory.ClientCreator{},
+					FinderCreator:  &vcenterclientfactory.GovmomiFinderCreator{},
 					RootCACertPath: certPath,
 				}
 
-				managerFactory := &vcenter_client_factory.ManagerFactory{
+				managerFactory := &vcenterclientfactory.ManagerFactory{
 					Config: *factoryConfig,
 				}
 

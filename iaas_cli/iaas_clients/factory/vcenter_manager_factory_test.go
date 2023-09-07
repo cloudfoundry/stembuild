@@ -8,7 +8,7 @@ import (
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/vim25"
 
-	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory/factoryfakes"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	. "github.com/onsi/ginkgo/v2"
@@ -18,11 +18,11 @@ import (
 var _ = Describe("VcenterManagerFactory", func() {
 
 	var (
-		managerFactory *vcenter_client_factory.ManagerFactory
+		managerFactory *vcenterclientfactory.ManagerFactory
 	)
 
 	BeforeEach(func() {
-		managerFactory = &vcenter_client_factory.ManagerFactory{}
+		managerFactory = &vcenterclientfactory.ManagerFactory{}
 	})
 
 	Context("VCenterManager", func() {
@@ -37,7 +37,7 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeFinderCreator := &factoryfakes.FakeFinderCreator{}
 			fakeFinderCreator.NewFinderReturns(fakeFinder)
 
-			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
+			managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
 				VCenterServer:  "example.com",
 				Username:       "user",
 				Password:       "pass",
@@ -56,7 +56,7 @@ var _ = Describe("VcenterManagerFactory", func() {
 		It("returns an error if the vcenter server cannot be parsed", func() {
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 
-			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
+			managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
 				VCenterServer: " :", // make soap.ParseURL fail with
 				Username:      "user",
 				Password:      "pass",
@@ -75,7 +75,7 @@ var _ = Describe("VcenterManagerFactory", func() {
 			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
 			fakeClientCreator.NewClientReturns(nil, clientErr)
 
-			managerFactory.SetConfig(vcenter_client_factory.FactoryConfig{
+			managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
 				VCenterServer: "example.com",
 				Username:      "user",
 				Password:      "pass",

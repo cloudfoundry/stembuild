@@ -54,9 +54,9 @@ var _ = Describe("package_stemcell", func() {
 			})
 
 			It("packager is instantiated with expected vmdk source config", func() {
-				vmdk_args := []string{"-vmdk", "some_vmdk_file"}
+				vmdkArgs := []string{"-vmdk", "some_vmdk_file"}
 
-				err := f.Parse(vmdk_args)
+				err := f.Parse(vmdkArgs)
 				Expect(err).ToNot(HaveOccurred())
 
 				exitStatus := PkgCmd.Execute(context.Background(), f)
@@ -68,7 +68,7 @@ var _ = Describe("package_stemcell", func() {
 			})
 
 			It("packager is instantiated with expected vcenter source config", func() {
-				vcenter_args := []string{
+				vcenterArgs := []string{
 					"-vcenter-url", "https://vcenter.test",
 					"-vcenter-username", "test-user",
 					"-vcenter-password", "verysecure",
@@ -76,7 +76,7 @@ var _ = Describe("package_stemcell", func() {
 					"-vm-inventory-path", "/path/to/vm",
 				}
 
-				err := f.Parse(vcenter_args)
+				err := f.Parse(vcenterArgs)
 				Expect(err).ToNot(HaveOccurred())
 
 				exitStatus := PkgCmd.Execute(context.Background(), f)

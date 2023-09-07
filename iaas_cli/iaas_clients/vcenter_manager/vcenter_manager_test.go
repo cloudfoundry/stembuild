@@ -5,14 +5,13 @@ import (
 	"errors"
 	"runtime"
 
-	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
-
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/object"
 
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vmware/govmomi/vim25"
@@ -137,16 +136,16 @@ var _ = Describe("VcenterManager", func() {
 				inventoryPath := "/DC0/vm/DC0_H0_VM0"
 				clonePath := "/DC0/vm/DC0_H0_VM0_NewClone"
 
-				factoryConfig := &vcenter_client_factory.FactoryConfig{
+				factoryConfig := &vcenterclientfactory.FactoryConfig{
 					VCenterServer:  "https://user:pass@127.0.0.1:8989/sdk",
 					Username:       "user",
 					Password:       "pass",
-					ClientCreator:  &vcenter_client_factory.ClientCreator{},
-					FinderCreator:  &vcenter_client_factory.GovmomiFinderCreator{},
+					ClientCreator:  &vcenterclientfactory.ClientCreator{},
+					FinderCreator:  &vcenterclientfactory.GovmomiFinderCreator{},
 					RootCACertPath: CertPath,
 				}
 
-				managerFactory := &vcenter_client_factory.ManagerFactory{
+				managerFactory := &vcenterclientfactory.ManagerFactory{
 					Config: *factoryConfig,
 				}
 
