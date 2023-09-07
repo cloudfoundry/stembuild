@@ -5,3 +5,6 @@ run:
 output:
   # Sort results by: filepath, line and column.
   sort-results: true
+linters:
+  enable:
+  - goimports
