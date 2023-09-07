@@ -9,12 +9,12 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/stembuild/assets"
-	. "github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/commandparser"
 	vmconstruct_factory "github.com/cloudfoundry/stembuild/construct/factory"
 	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	packager_factory "github.com/cloudfoundry/stembuild/package_stemcell/factory"
 	"github.com/cloudfoundry/stembuild/version"
-	. "github.com/google/subcommands"
+	"github.com/google/subcommands"
 )
 
 func main() {
@@ -37,13 +37,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	var gf GlobalFlags
-	packageCmd := NewPackageCommand(version.NewVersionGetter(), &packager_factory.PackagerFactory{}, &PackageMessenger{Output: os.Stderr})
+	var gf commandparser.GlobalFlags
+	packageCmd := commandparser.NewPackageCommand(version.NewVersionGetter(), &packager_factory.PackagerFactory{}, &commandparser.PackageMessenger{Output: os.Stderr})
 	packageCmd.GlobalFlags = &gf
-	constructCmd := NewConstructCmd(context.Background(), &vmconstruct_factory.VMConstructFactory{}, &vcenter_client_factory.ManagerFactory{}, &ConstructValidator{}, &ConstructCmdMessenger{OutputChannel: os.Stderr})
+	constructCmd := commandparser.NewConstructCmd(context.Background(), &vmconstruct_factory.VMConstructFactory{}, &vcenter_client_factory.ManagerFactory{}, &commandparser.ConstructValidator{}, &commandparser.ConstructCmdMessenger{OutputChannel: os.Stderr})
 	constructCmd.GlobalFlags = &gf
 
-	var commands = make([]Command, 0)
+	var commands = make([]subcommands.Command, 0)
 
 	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	fs.BoolVar(&gf.Debug, "debug", false, "Print lots of debugging information")
@@ -51,9 +51,9 @@ func main() {
 	fs.BoolVar(&gf.ShowVersion, "version", false, "Show Stembuild version")
 	fs.BoolVar(&gf.ShowVersion, "v", false, "Stembuild version (shorthand)")
 
-	commander := NewCommander(fs, path.Base(os.Args[0]))
+	commander := subcommands.NewCommander(fs, path.Base(os.Args[0]))
 
-	sh := NewStembuildHelp(commander, fs, &commands)
+	sh := commandparser.NewStembuildHelp(commander, fs, &commands)
 	commander.Register(sh, "")
 	commands = append(commands, sh)
 

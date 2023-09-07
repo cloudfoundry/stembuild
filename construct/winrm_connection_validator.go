@@ -1,11 +1,11 @@
 package construct
 
 import (
-	. "github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 )
 
 type WinRMConnectionValidator struct {
-	RemoteManager RemoteManager
+	RemoteManager remotemanager.RemoteManager
 }
 
 func (v *WinRMConnectionValidator) Validate() error {

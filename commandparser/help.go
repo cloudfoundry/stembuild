@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"github.com/cloudfoundry/stembuild/version"
-	. "github.com/google/subcommands"
+	"github.com/google/subcommands"
 )
 
 /*
@@ -20,11 +20,11 @@ line.
 
 type stembuildHelp struct {
 	topLevelFlags *flag.FlagSet
-	commands      *[]Command
-	commander     *Commander
+	commands      *[]subcommands.Command
+	commander     *subcommands.Commander
 }
 
-func NewStembuildHelp(commander *Commander, topLevelFlags *flag.FlagSet, commands *[]Command) *stembuildHelp {
+func NewStembuildHelp(commander *subcommands.Commander, topLevelFlags *flag.FlagSet, commands *[]subcommands.Command) *stembuildHelp {
 	var sh = stembuildHelp{}
 	sh.commander = commander
 	sh.topLevelFlags = topLevelFlags
@@ -49,11 +49,11 @@ func (h *stembuildHelp) Usage() string {
 	return h.commander.HelpCommand().Usage()
 }
 
-func (h *stembuildHelp) Execute(c context.Context, f *flag.FlagSet, args ...interface{}) ExitStatus {
+func (h *stembuildHelp) Execute(c context.Context, f *flag.FlagSet, args ...interface{}) subcommands.ExitStatus {
 	switch f.NArg() {
 	case 0:
 		h.Explain(h.commander.Output)
-		return ExitSuccess
+		return subcommands.ExitSuccess
 
 	default:
 		return h.commander.HelpCommand().Execute(c, f, args)

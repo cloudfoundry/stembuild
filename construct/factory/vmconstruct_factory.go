@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients"
 	"github.com/pkg/errors"
 
-	. "github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 )
 
 type VMConstructFactory struct {
@@ -52,8 +52,8 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 	}
 	versionGetter := version.NewVersionGetter()
 
-	winRmClientFactory := NewWinRmClientFactory(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
-	remoteManager := NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, winRmClientFactory)
+	winRmClientFactory := remotemanager.NewWinRmClientFactory(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
+	remoteManager := remotemanager.NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, winRmClientFactory)
 
 	vmConnectionValidator := &construct.WinRMConnectionValidator{
 		RemoteManager: remoteManager,
@@ -61,9 +61,9 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 
 	poller := &p.Poller{}
 
-	rebootChecker := NewRebootChecker(remoteManager)
+	rebootChecker := remotemanager.NewRebootChecker(remoteManager)
 
-	rebootWaiter := NewRebootWaiter(poller, rebootChecker)
+	rebootWaiter := remotemanager.NewRebootWaiter(poller, rebootChecker)
 
 	scriptExecutor := construct.NewScriptExecutor(remoteManager)
 

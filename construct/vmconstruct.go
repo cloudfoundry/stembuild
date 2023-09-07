@@ -13,7 +13,7 @@ import (
 
 	"github.com/cloudfoundry/stembuild/poller"
 
-	. "github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
@@ -25,7 +25,7 @@ type VersionGetter interface {
 
 type VMConstruct struct {
 	ctx                   context.Context
-	remoteManager         RemoteManager
+	remoteManager         remotemanager.RemoteManager
 	Client                IaasClient
 	guestManager          GuestManager
 	vmInventoryPath       string
@@ -54,7 +54,7 @@ const winRMPsScript = "BOSH.WinRM.psm1"
 
 func NewVMConstruct(
 	ctx context.Context,
-	remoteManager RemoteManager,
+	remoteManager remotemanager.RemoteManager,
 	vmUsername,
 	vmPassword,
 	vmInventoryPath string,
@@ -282,10 +282,10 @@ func (c *VMConstruct) logOutUsers() error {
 }
 
 type ScriptExecutor struct {
-	remoteManager RemoteManager
+	remoteManager remotemanager.RemoteManager
 }
 
-func NewScriptExecutor(remoteManager RemoteManager) *ScriptExecutor {
+func NewScriptExecutor(remoteManager remotemanager.RemoteManager) *ScriptExecutor {
 	return &ScriptExecutor{
 		remoteManager,
 	}
@@ -307,7 +307,7 @@ func (e *ScriptExecutor) ExecuteSetupScript(stembuildVersion string, setupFlags 
 func (e *ScriptExecutor) ExecutePostRebootScript(timeout time.Duration) error {
 	_, err := e.remoteManager.ExecuteCommandWithTimeout("powershell.exe "+stemcellAutomationPostRebootScript, timeout)
 
-	if err != nil && strings.Contains(err.Error(), PowershellExecutionErrorMessage) {
+	if err != nil && strings.Contains(err.Error(), remotemanager.PowershellExecutionErrorMessage) {
 		return err
 	}
 
