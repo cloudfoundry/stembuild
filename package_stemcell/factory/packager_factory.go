@@ -27,8 +27,8 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 	case config.VCENTER:
 		runner := &iaas_cli.GovcRunner{}
 		client := iaas_clients.NewVcenterClient(sourceConfig.Username, sourceConfig.Password, sourceConfig.URL, sourceConfig.CaCertFile, runner)
-		v := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: client}
-		return v, nil
+		vCenterPackager := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: client}
+		return vCenterPackager, nil
 	case config.VMDK:
 		options := package_parameters.VmdkPackageParameters{}
 		logger := colorlogger.ConstructLogger(logLevel, color, os.Stderr)
