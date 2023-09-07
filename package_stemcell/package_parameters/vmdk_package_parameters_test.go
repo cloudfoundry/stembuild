@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	. "github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
+	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -12,13 +12,13 @@ import (
 var _ = Describe("VmdkPackageParameters", func() {
 	Context("CopyFrom", func() {
 		var (
-			dest VmdkPackageParameters
-			src  VmdkPackageParameters
+			dest package_parameters.VmdkPackageParameters
+			src  package_parameters.VmdkPackageParameters
 		)
 
 		BeforeEach(func() {
-			src = VmdkPackageParameters{}
-			dest = VmdkPackageParameters{}
+			src = package_parameters.VmdkPackageParameters{}
+			dest = package_parameters.VmdkPackageParameters{}
 		})
 
 		JustBeforeEach(func() {
@@ -211,7 +211,7 @@ var _ = Describe("VmdkPackageParameters", func() {
 				})
 
 				It("copies into dest only those fields which are empty in dest", func() {
-					expected := VmdkPackageParameters{
+					expected := package_parameters.VmdkPackageParameters{
 						OSVersion: "the",
 						OutputDir: "needful",
 						Version:   "do",

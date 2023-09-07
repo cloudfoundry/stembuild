@@ -3,18 +3,18 @@ package construct_test
 import (
 	"path/filepath"
 
-	. "github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("WinRM Remote Manager", func() {
 
-	var rm RemoteManager
+	var rm remotemanager.RemoteManager
 
 	BeforeEach(func() {
-		clientFactory := NewWinRmClientFactory(conf.TargetIP, conf.VMUsername, conf.VMPassword)
-		rm = NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword, clientFactory)
+		clientFactory := remotemanager.NewWinRmClientFactory(conf.TargetIP, conf.VMUsername, conf.VMPassword)
+		rm = remotemanager.NewWinRM(conf.TargetIP, conf.VMUsername, conf.VMPassword, clientFactory)
 		Expect(rm).ToNot(BeNil())
 	})
 

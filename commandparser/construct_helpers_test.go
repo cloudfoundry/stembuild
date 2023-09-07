@@ -3,7 +3,7 @@ package commandparser_test
 import (
 	"path/filepath"
 
-	. "github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/commandparser"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -20,7 +20,7 @@ var _ = Describe("construct_helpers", func() {
 					dir := filepath.Join("..", "test", "constructData", "emptyDir")
 
 					It("should return false with no error", func() {
-						present, err := IsArtifactInDirectory(dir, filename)
+						present, err := commandparser.IsArtifactInDirectory(dir, filename)
 						Expect(err).ToNot(HaveOccurred())
 						Expect(present).To(BeFalse())
 					})
@@ -30,7 +30,7 @@ var _ = Describe("construct_helpers", func() {
 					dir := filepath.Join("..", "test", "constructData", "fullDir")
 
 					It("should return true with no error", func() {
-						present, err := IsArtifactInDirectory(dir, filename)
+						present, err := commandparser.IsArtifactInDirectory(dir, filename)
 						Expect(err).ToNot(HaveOccurred())
 						Expect(present).To(BeTrue())
 					})
@@ -42,7 +42,7 @@ var _ = Describe("construct_helpers", func() {
 			filename := "file"
 			It("should return an error", func() {
 				dir := filepath.Join("..", "test", "constructData", "notExist")
-				_, err := IsArtifactInDirectory(dir, filename)
+				_, err := commandparser.IsArtifactInDirectory(dir, filename)
 				Expect(err).To(HaveOccurred())
 			})
 		})

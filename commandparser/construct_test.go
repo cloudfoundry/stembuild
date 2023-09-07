@@ -5,7 +5,7 @@ import (
 	"errors"
 	"flag"
 
-	. "github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/commandparser"
 	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
 	"github.com/google/subcommands"
 
@@ -20,11 +20,11 @@ var _ = Describe("construct", func() {
 	Describe("SetFlags", func() {
 
 		var f *flag.FlagSet
-		var ConstrCmd *ConstructCmd
+		var ConstrCmd *commandparser.ConstructCmd
 
 		BeforeEach(func() {
 			f = flag.NewFlagSet("test", flag.ContinueOnError)
-			ConstrCmd = &ConstructCmd{}
+			ConstrCmd = &commandparser.ConstructCmd{}
 			ConstrCmd.SetFlags(f)
 		})
 
@@ -138,8 +138,8 @@ var _ = Describe("construct", func() {
 	Describe("Execute", func() {
 
 		var f *flag.FlagSet
-		var gf *GlobalFlags
-		var ConstrCmd *ConstructCmd
+		var gf *commandparser.GlobalFlags
+		var ConstrCmd *commandparser.ConstructCmd
 		var emptyContext context.Context
 
 		var fakeFactory *commandparserfakes.FakeVMPreparerFactory
@@ -150,7 +150,7 @@ var _ = Describe("construct", func() {
 
 		BeforeEach(func() {
 			f = flag.NewFlagSet("test", flag.ExitOnError)
-			gf = &GlobalFlags{false, false, false}
+			gf = &commandparser.GlobalFlags{false, false, false}
 
 			fakeFactory = &commandparserfakes.FakeVMPreparerFactory{}
 			fakeVmConstruct = &commandparserfakes.FakeVmConstruct{}
@@ -159,7 +159,7 @@ var _ = Describe("construct", func() {
 			fakeManagerFactory = &commandparserfakes.FakeManagerFactory{}
 			fakeFactory.VMPreparerReturns(fakeVmConstruct, nil)
 
-			ConstrCmd = NewConstructCmd(context.Background(), fakeFactory, fakeManagerFactory, fakeValidator, fakeMessenger)
+			ConstrCmd = commandparser.NewConstructCmd(context.Background(), fakeFactory, fakeManagerFactory, fakeValidator, fakeMessenger)
 			ConstrCmd.SetFlags(f)
 			ConstrCmd.GlobalFlags = gf
 			emptyContext = context.Background()

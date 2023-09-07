@@ -5,11 +5,12 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/stembuild/poller/pollerfakes"
-	. "github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager"
 	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
+	"github.com/pkg/errors"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/pkg/errors"
 )
 
 const expectedTryCheckRebootCommand = "shutdown /r /f /t 60 /c \"stembuild reboot test\""
@@ -21,14 +22,14 @@ var _ = Describe("WinRM RebootChecker", func() {
 	var (
 		fakeRemoteManager *remotemanagerfakes.FakeRemoteManager
 		fakePoller        *pollerfakes.FakePollerI
-		rc                *RebootChecker
+		rc                *remotemanager.RebootChecker
 	)
 
 	BeforeEach(func() {
 		fakeRemoteManager = &remotemanagerfakes.FakeRemoteManager{}
 		fakePoller = &pollerfakes.FakePollerI{}
 
-		rc = NewRebootChecker(fakeRemoteManager)
+		rc = remotemanager.NewRebootChecker(fakeRemoteManager)
 	})
 	Describe("WaitForRebootFinished", func() {
 		It("calls the hasFinished func using the Poller", func() {
@@ -42,7 +43,7 @@ var _ = Describe("WinRM RebootChecker", func() {
 
 			rc := &remotemanagerfakes.FakeRebootCheckerI{}
 			rc.RebootHasFinishedReturns(false, nil)
-			waiter := NewRebootWaiter(fakePoller, rc)
+			waiter := remotemanager.NewRebootWaiter(fakePoller, rc)
 
 			_ = waiter.WaitForRebootFinished()
 
@@ -58,7 +59,7 @@ var _ = Describe("WinRM RebootChecker", func() {
 
 			rc := &remotemanagerfakes.FakeRebootCheckerI{}
 			rc.RebootHasFinishedReturns(false, nil)
-			waiter := NewRebootWaiter(fakePoller, rc)
+			waiter := remotemanager.NewRebootWaiter(fakePoller, rc)
 
 			err := waiter.WaitForRebootFinished()
 			Expect(err).ToNot(HaveOccurred())
@@ -68,7 +69,7 @@ var _ = Describe("WinRM RebootChecker", func() {
 			errorMessage := "unable to abort reboot."
 			fakePoller.PollReturns(errors.New(errorMessage))
 
-			waiter := NewRebootWaiter(fakePoller, rc)
+			waiter := remotemanager.NewRebootWaiter(fakePoller, rc)
 
 			err := waiter.WaitForRebootFinished()
 			Expect(err.Error()).To(ContainSubstring(errorMessage))

@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	. "github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/commandparser"
 	"github.com/cloudfoundry/stembuild/version"
 	"github.com/google/subcommands"
 	. "github.com/onsi/ginkgo/v2"
@@ -24,7 +24,7 @@ var _ = Describe("help", func() {
 			buf := bytes.Buffer{}
 			fs := flag.NewFlagSet(path.Base(os.Args[0]), flag.ExitOnError)
 			commands := make([]subcommands.Command, 0)
-			sb := NewStembuildHelp(subcommands.DefaultCommander, fs, &commands)
+			sb := commandparser.NewStembuildHelp(subcommands.DefaultCommander, fs, &commands)
 
 			sb.Explain(&buf)
 
