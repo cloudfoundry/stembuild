@@ -150,7 +150,7 @@ var _ = Describe("construct", func() {
 
 		BeforeEach(func() {
 			f = flag.NewFlagSet("test", flag.ExitOnError)
-			gf = &commandparser.GlobalFlags{false, false, false}
+			gf = &commandparser.GlobalFlags{}
 
 			fakeFactory = &commandparserfakes.FakeVMPreparerFactory{}
 			fakeVmConstruct = &commandparserfakes.FakeVmConstruct{}

@@ -42,7 +42,7 @@ var _ = Describe("package_stemcell", func() {
 
 			PkgCmd = commandparser.NewPackageCommand(oSAndVersionGetter, packagerFactory, packagerMessenger)
 			PkgCmd.SetFlags(f)
-			PkgCmd.GlobalFlags = &commandparser.GlobalFlags{false, false, false}
+			PkgCmd.GlobalFlags = &commandparser.GlobalFlags{}
 		})
 
 		var defaultArgs = []string{}

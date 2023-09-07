@@ -18,7 +18,7 @@ var _ = Describe("PackageMessenger", func() {
 
 	BeforeEach(func() {
 		buf = gbytes.NewBuffer()
-		messenger = &commandparser.PackageMessenger{buf}
+		messenger = &commandparser.PackageMessenger{Output: buf}
 	})
 
 	It("writes the error message to the write when InvalidOutputConfig is called", func() {
