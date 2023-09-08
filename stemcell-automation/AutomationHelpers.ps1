@@ -26,7 +26,7 @@ function Setup()
     Validate-OSVersion
     Check-Dependencies
 
-    RunQuickerDism
+    RunQuickerDism -IgnoreErrors $True
 
     CopyPSModules
     Set-RegKeys
@@ -50,7 +50,7 @@ function Setup()
     }
 
     Create-VersionFile -Version $Version
-    RunQuickerDism
+    RunQuickerDism -IgnoreErrors $True
     Restart-Computer
 }
 
@@ -71,6 +71,10 @@ function PostReboot
 }
 
 function RunQuickerDism {
+    param(
+        [bool]$IgnoreErrors = $False
+    )
+
     Write-Log "Running Quicker Dism (that is, not executing with /ResetBase)"
     $DismStatus = 0
     do {
@@ -80,6 +84,9 @@ function RunQuickerDism {
         $DismStatus = $LASTEXITCODE
         if ($DismStatus -ne 0) {
             Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
+            if ($IgnoreErrors) {
+                break
+            }
             Write-Log "Sleeping for 30 seconds then retrying"
             Start-Sleep -Seconds 30
         }
