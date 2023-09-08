@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers/packagersfakes"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

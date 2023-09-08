@@ -9,7 +9,6 @@ import (
 	"regexp"
 
 	"github.com/cloudfoundry/stembuild/filesystem"
-
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 )
 

@@ -4,19 +4,16 @@ import (
 	"context"
 	"os"
 
-	p "github.com/cloudfoundry/stembuild/poller"
-
-	"github.com/cloudfoundry/stembuild/version"
-
 	"github.com/cloudfoundry/stembuild/commandparser"
 	"github.com/cloudfoundry/stembuild/construct"
 	"github.com/cloudfoundry/stembuild/construct/archive"
 	"github.com/cloudfoundry/stembuild/construct/config"
 	"github.com/cloudfoundry/stembuild/iaas_cli"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients"
-	"github.com/pkg/errors"
-
+	"github.com/cloudfoundry/stembuild/poller"
 	"github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/version"
+	"github.com/pkg/errors"
 )
 
 type VMConstructFactory struct {
@@ -59,11 +56,11 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		RemoteManager: remoteManager,
 	}
 
-	poller := &p.Poller{}
+	rebootPoller := &poller.Poller{}
 
 	rebootChecker := remotemanager.NewRebootChecker(remoteManager)
 
-	rebootWaiter := remotemanager.NewRebootWaiter(poller, rebootChecker)
+	rebootWaiter := remotemanager.NewRebootWaiter(rebootPoller, rebootChecker)
 
 	scriptExecutor := construct.NewScriptExecutor(remoteManager)
 
@@ -78,7 +75,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		winRMManager,
 		vmConnectionValidator,
 		messenger,
-		poller,
+		rebootPoller,
 		versionGetter,
 		rebootWaiter,
 		scriptExecutor,

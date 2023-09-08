@@ -12,7 +12,6 @@ import (
 	"unicode/utf16"
 
 	"github.com/cloudfoundry/stembuild/poller"
-
 	"github.com/cloudfoundry/stembuild/remotemanager"
 )
 

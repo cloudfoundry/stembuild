@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/stembuild/filesystem"
-
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry/stembuild/templates"

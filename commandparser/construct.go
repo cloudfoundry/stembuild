@@ -8,14 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cloudfoundry/stembuild/construct/config"
 	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/google/subcommands"
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/object"
-
-	"github.com/cloudfoundry/stembuild/construct/config"
-	"github.com/google/subcommands"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate

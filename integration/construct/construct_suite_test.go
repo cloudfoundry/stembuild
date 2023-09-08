@@ -13,16 +13,15 @@ import (
 	"github.com/cloudfoundry/stembuild/remotemanager"
 	"github.com/cloudfoundry/stembuild/test/helpers"
 	"github.com/concourse/pool-resource/out"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-
 	"github.com/vmware/govmomi/govc/cli"
 	_ "github.com/vmware/govmomi/govc/device"
 	_ "github.com/vmware/govmomi/govc/importx"
 	_ "github.com/vmware/govmomi/govc/vm"
 	_ "github.com/vmware/govmomi/govc/vm/guest"
 	_ "github.com/vmware/govmomi/govc/vm/snapshot"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 func TestConstruct(t *testing.T) {

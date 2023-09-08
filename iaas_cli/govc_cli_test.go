@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/stembuild/iaas_cli"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -39,7 +40,6 @@ cdrom-16000        VirtualCdrom                  Remote device
 			for _, device := range devices {
 				Expect(out).Should(ContainSubstring(device))
 			}
-
 		})
 
 		It("returns exit code 1, if VM doesn't exist", func() {

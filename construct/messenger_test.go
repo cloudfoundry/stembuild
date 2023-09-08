@@ -4,16 +4,17 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/stembuild/construct"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("Messenger", func() {
-	var buf *gbytes.Buffer
+	var buf *Buffer
 
 	BeforeEach(func() {
-		buf = gbytes.NewBuffer()
+		buf = NewBuffer()
 	})
 
 	Describe("Enable WinRM messages", func() {
@@ -21,14 +22,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.EnableWinRMStarted()
 
-			Expect(buf).To(gbytes.Say("\nAttempting to enable WinRM on the guest vm..."))
+			Expect(buf).To(Say("\nAttempting to enable WinRM on the guest vm..."))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.EnableWinRMSucceeded()
 
-			Expect(buf).To(gbytes.Say("WinRm enabled on the guest VM\n"))
+			Expect(buf).To(Say("WinRm enabled on the guest VM\n"))
 		})
 
 		It("writes both WinRM messages on one line", func() {
@@ -36,7 +37,7 @@ var _ = Describe("Messenger", func() {
 			m.EnableWinRMStarted()
 			m.EnableWinRMSucceeded()
 
-			Expect(buf).To(gbytes.Say("Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM"))
+			Expect(buf).To(Say("Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM"))
 		})
 	})
 
@@ -45,14 +46,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.ValidateVMConnectionStarted()
 
-			Expect(buf).To(gbytes.Say("\nValidating connection to vm..."))
+			Expect(buf).To(Say("\nValidating connection to vm..."))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ValidateVMConnectionSucceeded()
 
-			Expect(buf).To(gbytes.Say("succeeded.\n"))
+			Expect(buf).To(Say("succeeded.\n"))
 		})
 
 		It("writes both validate vm connection messages on one line", func() {
@@ -60,7 +61,7 @@ var _ = Describe("Messenger", func() {
 			m.ValidateVMConnectionStarted()
 			m.ValidateVMConnectionSucceeded()
 
-			Expect(buf).To(gbytes.Say("Validating connection to vm...succeeded."))
+			Expect(buf).To(Say("Validating connection to vm...succeeded."))
 		})
 	})
 
@@ -69,14 +70,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.CreateProvisionDirStarted()
 
-			Expect(buf).To(gbytes.Say("\nCreating provision dir on target VM..."))
+			Expect(buf).To(Say("\nCreating provision dir on target VM..."))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.CreateProvisionDirSucceeded()
 
-			Expect(buf).To(gbytes.Say("succeeded.\n"))
+			Expect(buf).To(Say("succeeded.\n"))
 		})
 
 		It("writes both messages on one line", func() {
@@ -84,7 +85,7 @@ var _ = Describe("Messenger", func() {
 			m.CreateProvisionDirStarted()
 			m.CreateProvisionDirSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nCreating provision dir on target VM...succeeded.\n"))
+			Expect(buf).To(Say("\nCreating provision dir on target VM...succeeded.\n"))
 		})
 	})
 
@@ -93,14 +94,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.UploadArtifactsStarted()
 
-			Expect(buf).To(gbytes.Say("\nTransferring ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes\n"))
+			Expect(buf).To(Say("\nTransferring ~20 MB to the Windows VM. Depending on your connection, the transfer may take 15-45 minutes\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.UploadArtifactsSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nAll files have been uploaded.\n"))
+			Expect(buf).To(Say("\nAll files have been uploaded.\n"))
 		})
 	})
 
@@ -109,14 +110,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.ExtractArtifactsStarted()
 
-			Expect(buf).To(gbytes.Say("\nExtracting artifacts..."))
+			Expect(buf).To(Say("\nExtracting artifacts..."))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ExtractArtifactsSucceeded()
 
-			Expect(buf).To(gbytes.Say("succeeded.\n"))
+			Expect(buf).To(Say("succeeded.\n"))
 		})
 
 		It("writes both messages on one line", func() {
@@ -124,7 +125,7 @@ var _ = Describe("Messenger", func() {
 			m.ExtractArtifactsStarted()
 			m.ExtractArtifactsSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nExtracting artifacts...succeeded.\n"))
+			Expect(buf).To(Say("\nExtracting artifacts...succeeded.\n"))
 		})
 	})
 
@@ -133,14 +134,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.LogOutUsersStarted()
 
-			Expect(buf).To(gbytes.Say("\nAttempting to logout any remote users...\n"))
+			Expect(buf).To(Say("\nAttempting to logout any remote users...\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.LogOutUsersSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nLogged out remote users\n"))
+			Expect(buf).To(Say("\nLogged out remote users\n"))
 		})
 
 	})
@@ -150,14 +151,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecuteSetupScriptStarted()
 
-			Expect(buf).To(gbytes.Say("\nExecuting setup script 1 of 2...\n"))
+			Expect(buf).To(Say("\nExecuting setup script 1 of 2...\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecuteSetupScriptSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nFinished executing setup script 1 of 2.\n"))
+			Expect(buf).To(Say("\nFinished executing setup script 1 of 2.\n"))
 		})
 
 	})
@@ -167,7 +168,7 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.WinRMDisconnectedForReboot()
 
-			Expect(buf).To(gbytes.Say("WinRM has been disconnected so the VM can reboot.\n"))
+			Expect(buf).To(Say("WinRM has been disconnected so the VM can reboot.\n"))
 
 		})
 
@@ -175,14 +176,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.RebootHasStarted()
 
-			Expect(buf).To(gbytes.Say("\nThe reboot has started...\n"))
+			Expect(buf).To(Say("\nThe reboot has started...\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.RebootHasFinished()
 
-			Expect(buf).To(gbytes.Say("\nThe reboot has finished.\n"))
+			Expect(buf).To(Say("\nThe reboot has finished.\n"))
 		})
 	})
 
@@ -191,14 +192,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecutePostRebootScriptStarted()
 
-			Expect(buf).To(gbytes.Say("\nExecuting setup script 2 of 2...\n"))
+			Expect(buf).To(Say("\nExecuting setup script 2 of 2...\n"))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ExecutePostRebootScriptSucceeded()
 
-			Expect(buf).To(gbytes.Say("\nFinished executing setup script 2 of 2.\n"))
+			Expect(buf).To(Say("\nFinished executing setup script 2 of 2.\n"))
 		})
 
 		It("writes the warning message to the writer", func() {
@@ -209,7 +210,7 @@ var _ = Describe("Messenger", func() {
 			m.ExecutePostRebootWarning(warning)
 
 			expectedMessage := "\n" + warning + "\n"
-			Expect(buf).To(gbytes.Say(expectedMessage))
+			Expect(buf).To(Say(expectedMessage))
 		})
 
 	})
@@ -219,14 +220,14 @@ var _ = Describe("Messenger", func() {
 			m := construct.NewMessenger(buf)
 			m.UploadFileStarted("some artifact")
 
-			Expect(buf).To(gbytes.Say("\tUploading some artifact to target VM..."))
+			Expect(buf).To(Say("\tUploading some artifact to target VM..."))
 		})
 
 		It("writes the succeeded message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.UploadFileSucceeded()
 
-			Expect(buf).To(gbytes.Say("succeeded.\n"))
+			Expect(buf).To(Say("succeeded.\n"))
 		})
 
 		It("writes both messages on one line", func() {
@@ -234,7 +235,7 @@ var _ = Describe("Messenger", func() {
 			m.UploadFileStarted("some third artifact")
 			m.UploadFileSucceeded()
 
-			Expect(buf).To(gbytes.Say("Uploading some third artifact to target VM...succeed."))
+			Expect(buf).To(Say("Uploading some third artifact to target VM...succeed."))
 		})
 	})
 
@@ -245,21 +246,21 @@ var _ = Describe("Messenger", func() {
 			errorMessage := "some error message"
 			m := construct.NewMessenger(buf)
 			m.OSVersionFileCreationFailed(errorMessage)
-			Expect(buf).To(gbytes.Say(fmt.Sprintf("Warning: OS Version file creation failed:\n%s\n%s", matchingVersionWarning, errorMessage)))
+			Expect(buf).To(Say(fmt.Sprintf("Warning: OS Version file creation failed:\n%s\n%s", matchingVersionWarning, errorMessage)))
 		})
 
 		It("writes the exit code retrieval failed message to the writer", func() {
 			errorMessage := "some error message"
 			m := construct.NewMessenger(buf)
 			m.ExitCodeRetrievalFailed(errorMessage)
-			Expect(buf).To(gbytes.Say(fmt.Sprintf("Warning: Failed to retrieve exit code for process to create OS Version file:\n%s\n%s", matchingVersionWarning, errorMessage)))
+			Expect(buf).To(Say(fmt.Sprintf("Warning: Failed to retrieve exit code for process to create OS Version file:\n%s\n%s", matchingVersionWarning, errorMessage)))
 		})
 
 		It("writes the download file failed message to the writer", func() {
 			errorMessage := "some error message"
 			m := construct.NewMessenger(buf)
 			m.DownloadFileFailed(errorMessage)
-			Expect(buf).To(gbytes.Say(fmt.Sprintf("Warning: Failed to download OS Version file:\n%s\n%s", matchingVersionWarning, errorMessage)))
+			Expect(buf).To(Say(fmt.Sprintf("Warning: Failed to download OS Version file:\n%s\n%s", matchingVersionWarning, errorMessage)))
 		})
 	})
 
@@ -274,14 +275,14 @@ var _ = Describe("Messenger", func() {
 			messageString := "Still preparing VM...\n"
 			logLineRegex := fmt.Sprintf("%s\\s*%s", dateTimeRegex, messageString)
 
-			Expect(buf).To(gbytes.Say(logLineRegex))
+			Expect(buf).To(Say(logLineRegex))
 		})
 
 		It("writes the shutdown message to the writer", func() {
 			m := construct.NewMessenger(buf)
 			m.ShutdownCompleted()
 
-			Expect(buf).To(gbytes.Say("VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
+			Expect(buf).To(Say("VM has now been shutdown. Run `stembuild package` to finish building the stemcell.\n"))
 		})
 
 	})

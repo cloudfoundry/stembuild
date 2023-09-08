@@ -9,7 +9,6 @@ import (
 
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/soap"
-
 	"github.com/vmware/govmomi/vim25/types"
 )
 

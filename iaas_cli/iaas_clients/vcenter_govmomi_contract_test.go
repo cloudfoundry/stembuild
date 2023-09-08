@@ -12,7 +12,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gbytes"
 )
 
 func envMustExist(variableName string) string {
@@ -183,7 +183,7 @@ var _ = Describe("VcenterClient", func() {
 				fileContents, _, err := guestManager.DownloadFileInGuest(ctx, fileToDownload)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(gbytes.BufferReader(fileContents)).Should(gbytes.Say(expectedContents))
+				Eventually(BufferReader(fileContents)).Should(Say(expectedContents))
 
 			})
 

@@ -5,11 +5,10 @@ import (
 	"errors"
 	"flag"
 
+	"github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
 	"github.com/google/subcommands"
 
-	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
-
-	"github.com/cloudfoundry/stembuild/commandparser"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

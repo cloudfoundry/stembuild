@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 )
 
 var _ = Describe("ovftool", func() {

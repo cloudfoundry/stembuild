@@ -1,6 +1,8 @@
 package filename
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type filenameGenerator struct {
 	os      string

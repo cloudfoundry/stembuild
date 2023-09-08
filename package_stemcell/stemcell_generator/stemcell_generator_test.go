@@ -7,7 +7,8 @@ import (
 	"io"
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator"
-	fakes "github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/stemcell_generatorfakes"
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/stemcell_generatorfakes"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -16,17 +17,17 @@ var _ = Describe("StemcellGenerator", func() {
 	Describe("Generate", func() {
 		var (
 			stemcellGenerator *stemcell_generator.StemcellGenerator
-			manifestGenerator *fakes.FakeManifestGenerator
-			fileNameGenerator *fakes.FakeFileNameGenerator
-			tarWriter         *fakes.FakeTarWriter
+			manifestGenerator *stemcell_generatorfakes.FakeManifestGenerator
+			fileNameGenerator *stemcell_generatorfakes.FakeFileNameGenerator
+			tarWriter         *stemcell_generatorfakes.FakeTarWriter
 			fakeImage         io.Reader
 		)
 
 		BeforeEach(func() {
 			fakeImage = bytes.NewReader([]byte{})
-			manifestGenerator = &fakes.FakeManifestGenerator{}
-			fileNameGenerator = &fakes.FakeFileNameGenerator{}
-			tarWriter = &fakes.FakeTarWriter{}
+			manifestGenerator = &stemcell_generatorfakes.FakeManifestGenerator{}
+			fileNameGenerator = &stemcell_generatorfakes.FakeFileNameGenerator{}
+			tarWriter = &stemcell_generatorfakes.FakeTarWriter{}
 			stemcellGenerator = stemcell_generator.NewStemcellGenerator(manifestGenerator, fileNameGenerator, tarWriter)
 		})
 

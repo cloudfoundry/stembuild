@@ -4,13 +4,13 @@
 package ovftool_test
 
 import (
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-
 	"os"
 	"path/filepath"
 
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("ovftool", func() {

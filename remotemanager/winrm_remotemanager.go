@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/masterzen/winrm"
-
 	"github.com/packer-community/winrmcp/winrmcp"
 )
 

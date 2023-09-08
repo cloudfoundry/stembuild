@@ -12,10 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/onsi/gomega/gexec"
-
 	"github.com/cloudfoundry/stembuild/test/helpers"
-
+	"github.com/onsi/gomega/gexec"
 	"github.com/vmware/govmomi/govc/cli"
 
 	. "github.com/onsi/ginkgo/v2"

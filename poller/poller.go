@@ -1,6 +1,8 @@
 package poller
 
-import "time"
+import (
+	"time"
+)
 
 type Poller struct{}
 

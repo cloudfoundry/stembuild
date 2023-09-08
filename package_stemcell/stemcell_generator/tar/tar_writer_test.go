@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar"
 	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar/tarfakes"
 
-	"github.com/cloudfoundry/stembuild/package_stemcell/stemcell_generator/tar"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

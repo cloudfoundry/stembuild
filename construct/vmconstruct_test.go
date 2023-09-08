@@ -14,7 +14,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("construct_helpers", func() {
@@ -67,7 +67,7 @@ var _ = Describe("construct_helpers", func() {
 
 		fakeGuestManager.StartProgramInGuestReturnsOnCall(0, 0, nil)
 		fakeGuestManager.ExitCodeForProgramInGuestReturnsOnCall(0, 0, nil)
-		versionBuffer := gbytes.NewBuffer()
+		versionBuffer := NewBuffer()
 		_, err := versionBuffer.Write([]byte("dev"))
 		Expect(err).NotTo(HaveOccurred())
 

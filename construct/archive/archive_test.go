@@ -2,14 +2,15 @@ package archive_test
 
 import (
 	"github.com/cloudfoundry/stembuild/assets"
-	archive2 "github.com/cloudfoundry/stembuild/construct/archive"
+	"github.com/cloudfoundry/stembuild/construct/archive"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Zip", func() {
 
-	zip := new(archive2.Zip)
+	zip := new(archive.Zip)
 
 	Describe("Unzip", func() {
 		It("should return byte array of the file when it is found in the archive", func() {

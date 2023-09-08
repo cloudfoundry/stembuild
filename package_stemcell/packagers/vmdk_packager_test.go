@@ -12,8 +12,8 @@ import (
 	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 	"github.com/cloudfoundry/stembuild/test/helpers"
-
 	"github.com/golang/mock/gomock"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
