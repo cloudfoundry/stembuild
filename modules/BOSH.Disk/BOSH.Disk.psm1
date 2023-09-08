@@ -19,21 +19,31 @@ function Optimize-Disk {
     Get-WindowsFeature |
     ? { $_.InstallState -eq 'Available' } |
     Uninstall-WindowsFeature -Remove
+    $DismStatus = 0
 
-    # Cleanup WinSxS folder: https://technet.microsoft.com/en-us/library/dn251565.aspx
-    Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase'"
-    Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase
-    if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase'"
-        Throw "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase' failed"
-    }
+    do {
+        # Cleanup WinSxS folder: https://technet.microsoft.com/en-us/library/dn251565.aspx
+        # /LogLevel default is 3
+        Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase'"
+        Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase
+        $DismStatus = $LASTEXITCODE
+        if ($DismStatus -ne 0) {
+            Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase'"
+            Write-Log "Sleeping for 30 seconds then retrying"
+            Start-Sleep -Seconds 30
+        }
+    } while ($DismStatus -ne 0)
 
-    Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded'"
-    Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded
-    if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded'"
-        Throw "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded' failed"
-    }
+    do {
+        Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded'"
+        Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded
+        $DismStatus = $LASTEXITCODE
+        if ($DismStatus -ne 0) {
+            Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /SPSuperseded'"
+            Write-Log "Sleeping for 30 seconds then retrying"
+            Start-Sleep -Seconds 30
+        }
+    } while ($DismStatus -ne 0)
 
     Write-Log "Finished clean disk"
 }

@@ -26,7 +26,7 @@ function Setup()
     Validate-OSVersion
     Check-Dependencies
 
-    RunQuickerDism -IgnoreErrors $True
+    RunQuickerDism
 
     CopyPSModules
     Set-RegKeys
@@ -50,7 +50,7 @@ function Setup()
     }
 
     Create-VersionFile -Version $Version
-    RunQuickerDism -IgnoreErrors $True
+    RunQuickerDism
     Restart-Computer
 }
 
@@ -61,33 +61,29 @@ function PostReboot
         [string]$Owner = "",
         [switch]$SkipRandomPassword
     )
-    RunQuickerDism -IgnoreErrors $True
+    RunQuickerDism
     InstallCFCell
-    RunQuickerDism -IgnoreErrors $True
+    RunQuickerDism
     CleanUpVM
-    RunQuickerDism -IgnoreErrors $True
+    RunQuickerDism
     SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
     RunQuickerDism
 }
 
 function RunQuickerDism {
-    param(
-        [bool]$IgnoreErrors = $False
-    )
-
     Write-Log "Running Quicker Dism (that is, not executing with /ResetBase)"
-    # /LogLevel default is 3
-    Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
-    Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup
-    if ($LASTEXITCODE -ne 0) {
-        Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
-        if ($IgnoreErrors) {
-            Write-Log "Ignoring: Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
+    $DismStatus = 0
+    do {
+        # /LogLevel default is 3
+        Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
+        Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup
+        $DismStatus = $LASTEXITCODE
+        if ($DismStatus -ne 0) {
+            Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
+            Write-Log "Sleeping for 30 seconds then retrying"
+            Start-Sleep -Seconds 30
         }
-        else {
-            Throw "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup' failed"
-        }
-    }
+    } while ($DismStatus -ne 0)
 }
 
 function CopyPSModules
