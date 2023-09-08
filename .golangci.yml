@@ -5,6 +5,7 @@ run:
 output:
   # Sort results by: filepath, line and column.
   sort-results: true
-linters:
-  enable:
-  - goimports
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
