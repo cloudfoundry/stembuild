@@ -24,3 +24,18 @@ jobs:
       if: ${{ matrix.os != 'windows-2019' }}
       with:
         args: --enable goimports
+
+  test_unit:
+    strategy:
+      matrix:
+        os: [windows-2019, ubuntu-latest]
+    name: lint
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v4
+      with:
+        go-version-file: go.mod
+    - name: Run unit tests
+      run: |
+        make test
