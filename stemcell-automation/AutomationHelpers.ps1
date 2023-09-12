@@ -61,11 +61,11 @@ function PostReboot
         [string]$Owner = "",
         [switch]$SkipRandomPassword
     )
-    RunQuickerDism
+    RunQuickerDism -IgnoreErrors $True
     InstallCFCell
-    RunQuickerDism
+    RunQuickerDism -IgnoreErrors $True
     CleanUpVM
-    RunQuickerDism
+    RunQuickerDism -IgnoreErrors $True
     SysprepVM -Organization $Organization -Owner $Owner -SkipRandomPassword $SkipRandomPassword
     RunQuickerDism
 }
@@ -76,21 +76,18 @@ function RunQuickerDism {
     )
 
     Write-Log "Running Quicker Dism (that is, not executing with /ResetBase)"
-    $DismStatus = 0
-    do {
-        # /LogLevel default is 3
-        Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
-        Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup
-        $DismStatus = $LASTEXITCODE
-        if ($DismStatus -ne 0) {
-            Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
-            if ($IgnoreErrors) {
-                break
-            }
-            Write-Log "Sleeping for 30 seconds then retrying"
-            Start-Sleep -Seconds 30
+    # /LogLevel default is 3
+    Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
+    Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
+        if ($IgnoreErrors) {
+            Write-Log "Ignoring: Error: Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup'"
         }
-    } while ($DismStatus -ne 0)
+        else {
+            Throw "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup' failed"
+        }
+    }
 }
 
 function CopyPSModules
