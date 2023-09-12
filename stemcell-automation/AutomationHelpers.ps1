@@ -36,6 +36,7 @@ function Setup()
     Install-SecurityPoliciesAndRegistries
     Enable-SSHD
     InstallCFFeatures
+    Remove-Available-Windows-Features
 
     try { Install-WUCerts }
     catch [Exception]

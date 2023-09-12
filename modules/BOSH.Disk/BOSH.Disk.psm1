@@ -16,11 +16,10 @@ function Compress-Disk {
 function Optimize-Disk {
     Write-Log "Starting to clean disk"
 
-    Get-WindowsFeature |
-    ? { $_.InstallState -eq 'Available' } |
-    Uninstall-WindowsFeature -Remove
+    Remove-Available-Windows-Features
 
     # Cleanup WinSxS folder: https://technet.microsoft.com/en-us/library/dn251565.aspx
+    # /LogLevel default is 3
     Write-Log "Running 'Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase'"
     Dism.exe /online /LogLevel:4 /Cleanup-Image /StartComponentCleanup /ResetBase
     if ($LASTEXITCODE -ne 0) {
@@ -36,6 +35,16 @@ function Optimize-Disk {
     }
 
     Write-Log "Finished clean disk"
+}
+
+function Remove-Available-Windows-Features {
+    Write-Log "Starting to remove 'Available' Windows Features"
+
+    Get-WindowsFeature |
+            ? { $_.InstallState -eq 'Available' } |
+            Uninstall-WindowsFeature -Remove
+
+    Write-Log "Finished removing 'Available' Windows Features"
 }
 
 function DefragDisk {
