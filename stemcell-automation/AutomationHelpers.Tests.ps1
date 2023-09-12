@@ -24,7 +24,7 @@ Describe "Setup" {
         Mock Install-WUCerts { $provisionerCalls.Add("Install-WUCerts") }
 
         Mock InstallCFFeatures { $provisionerCalls.Add("InstallCFFeatures") }
-        Mock Remove-Available-Windows-Features { }
+        Mock RemoveAvailableWindowsFeatures { }
         Mock Create-VersionFile { $provisionerCalls.Add("Create-VersionFile") }
         Mock Restart-Computer { $provisionerCalls.Add("Restart-Computer") }
 

@@ -36,7 +36,7 @@ function Setup()
     Install-SecurityPoliciesAndRegistries
     Enable-SSHD
     InstallCFFeatures
-    Remove-Available-Windows-Features
+    RemoveAvailableWindowsFeatures
 
     try { Install-WUCerts }
     catch [Exception]
@@ -119,6 +119,11 @@ function InstallCFFeatures
         Write-Log "Failed to install the CF features. See 'c:\provision\log.log' for more info."
         throw $_.Exception
     }
+}
+
+function RemoveAvailableWindowsFeatures
+{
+    Remove-Available-Windows-Features
 }
 
 
