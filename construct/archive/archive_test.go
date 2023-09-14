@@ -14,8 +14,7 @@ var _ = Describe("Zip", func() {
 
 	Describe("Unzip", func() {
 		It("should return byte array of the file when it is found in the archive", func() {
-			fileArchive, err := assets.Asset("StemcellAutomation.zip")
-			Expect(err).ToNot(HaveOccurred())
+			fileArchive := assets.StemcellAutomation
 			Expect(fileArchive).ToNot(BeNil())
 
 			r, err := zip.Unzip(fileArchive, "Setup.ps1")
@@ -24,15 +23,13 @@ var _ = Describe("Zip", func() {
 		})
 
 		It("should return an error if the file cannot be found in the archive", func() {
-			fileArchive, err := assets.Asset("StemcellAutomation.zip")
-			Expect(err).ToNot(HaveOccurred())
+			fileArchive := assets.StemcellAutomation
 			Expect(fileArchive).ToNot(BeNil())
 
 			r, err := zip.Unzip(fileArchive, "Setup2.ps1")
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError("could not find Setup2.ps1 in zip archive"))
 			Expect(r).To(BeNil())
-
 		})
 
 		It("should return an error if the fileArchive is not a zip file", func() {
