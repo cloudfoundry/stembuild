@@ -50,9 +50,9 @@ integration-badger : generate-fake-stemcell-automation
 
 ifeq ($(OS),Windows_NT)
 generate-fake-stemcell-automation:
-	@echo "\nThis is a NO-OP on Windows"
-	@echo "\n    - in CI the command 'cp' fails on Windows workers"
-	@echo "\n    - in CI we pre-generate the output of 'generate-fake-stemcell-automation' on a linux worker"
+	@echo "This is a NO-OP on Windows"
+	@echo "    - in CI the command 'cp' fails on Windows workers"
+	@echo "    - in CI we pre-generate the output of 'generate-fake-stemcell-automation' on a linux worker"
 else
 generate-fake-stemcell-automation:
 	$(CP) integration/construct/assets/StemcellAutomation.zip assets/
