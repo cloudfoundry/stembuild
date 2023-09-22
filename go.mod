@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/masterzen/winrm v0.0.0-20220917170901-b07f6cb0598d
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
-	github.com/onsi/ginkgo/v2 v2.12.0
+	github.com/onsi/ginkgo/v2 v2.12.1
 	github.com/onsi/gomega v1.27.10
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
 	github.com/pkg/errors v0.9.1
