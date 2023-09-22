@@ -49,6 +49,10 @@ integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
 
 generate-fake-stemcell-automation:
+	@ls integration/construct/assets/
+	@ls assets/
+	@pwd
+	@$(CP) LICENSE LICENSE.new
 	$(CP) integration/construct/assets/StemcellAutomation.zip assets/
 
 generate: assets/StemcellAutomation.zip
