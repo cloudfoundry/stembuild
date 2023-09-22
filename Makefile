@@ -13,9 +13,6 @@ PSMODULES_SOURCES = $(shell find ./modules | grep -v .git | grep -vi "test" | gr
 BOSH_AGENT_SOURCES = $(shell find $(BOSH_AGENT_REPO) | egrep -v ".git|test.go|fake|.md")
 
 ifeq ($(OS),Windows_NT)
-	SHELL := powershell.exe
-    .SHELLFLAGS := -NoProfile -Command
-
 	COMMAND = out/stembuild.exe
 	CP = cp
 else
@@ -51,8 +48,15 @@ integration/construct : generate-fake-stemcell-automation
 integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
 
+ifeq ($(OS),Windows_NT)
+generate-fake-stemcell-automation:
+	@echo "\nThis is a NO-OP on Windows"
+	@echo "\n    - in CI the command 'cp' fails on Windows workers"
+	@echo "\n    - in CI we pre-generate the output of 'generate-fake-stemcell-automation' on a linux worker"
+else
 generate-fake-stemcell-automation:
 	$(CP) integration/construct/assets/StemcellAutomation.zip assets/
+endif
 
 generate: assets/StemcellAutomation.zip
 
