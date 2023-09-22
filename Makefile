@@ -1,5 +1,4 @@
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
-FAKE_STEMCELL_AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
 STEMCELL_VERSION = $(shell echo "$${STEMBUILD_VERSION}")
 LD_FLAGS = "-w -s -X github.com/cloudfoundry/stembuild/version.Version=${STEMCELL_VERSION}"
 
@@ -49,13 +48,8 @@ integration/construct : generate-fake-stemcell-automation
 integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
 
-ifeq ($(OS),Windows_NT)
-generate-fake-stemcell-automation: $(FAKE_STEMCELL_AUTOMATION_PATH)
-	copy $(FAKE_STEMCELL_AUTOMATION_PATH) assets/
-else
-generate-fake-stemcell-automation: $(FAKE_STEMCELL_AUTOMATION_PATH)
-	$(CP) $(FAKE_STEMCELL_AUTOMATION_PATH) assets/
-endif
+generate-fake-stemcell-automation:
+	$(CP) integration/construct/assets/StemcellAutomation.zip assets/
 
 generate: assets/StemcellAutomation.zip
 
