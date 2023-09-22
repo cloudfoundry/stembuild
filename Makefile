@@ -49,8 +49,8 @@ integration/construct : generate-fake-stemcell-automation
 integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
 
-generate-fake-stemcell-automation: $(GOSRC) $(FAKE_STEMCELL_AUTOMATION_PATH)
-	cp $(FAKE_STEMCELL_AUTOMATION_PATH) assets/
+generate-fake-stemcell-automation: $(FAKE_STEMCELL_AUTOMATION_PATH)
+	$(CP) $(FAKE_STEMCELL_AUTOMATION_PATH) assets/
 
 generate: assets/StemcellAutomation.zip
 
