@@ -13,6 +13,9 @@ PSMODULES_SOURCES = $(shell find ./modules | grep -v .git | grep -vi "test" | gr
 BOSH_AGENT_SOURCES = $(shell find $(BOSH_AGENT_REPO) | egrep -v ".git|test.go|fake|.md")
 
 ifeq ($(OS),Windows_NT)
+	SHELL := powershell.exe
+    .SHELLFLAGS := -NoProfile -Command
+
 	COMMAND = out/stembuild.exe
 	CP = cp
 else
@@ -49,10 +52,6 @@ integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
 
 generate-fake-stemcell-automation:
-	pwd
-	ls assets/
-	ls integration/construct/assets/
-	$(CP) LICENSE LICENSE.new
 	$(CP) integration/construct/assets/StemcellAutomation.zip assets/
 
 generate: assets/StemcellAutomation.zip
