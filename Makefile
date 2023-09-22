@@ -1,6 +1,5 @@
 GOSRC = $(shell find . -name "*.go" ! -name "*test.go" ! -name "*fake*" ! -path "./integration/*")
 FAKE_STEMCELL_AUTOMATION_PATH = integration/construct/assets/StemcellAutomation.zip
-FAKE_STEMCELL_AUTOMATION_PREFIX = $(shell dirname "${FAKE_STEMCELL_AUTOMATION_PATH}")
 STEMCELL_VERSION = $(shell echo "$${STEMBUILD_VERSION}")
 LD_FLAGS = "-w -s -X github.com/cloudfoundry/stembuild/version.Version=${STEMCELL_VERSION}"
 
@@ -36,7 +35,7 @@ build-integration : generate-fake-stemcell-automation $(GOSRC)
 	go build -o $(COMMAND) -ldflags $(LD_FLAGS) .
 
 clean :
-	rm -rf version/version.go assets/stemcell_automation.go assets/StemcellAutomation.zip assets/local/* out/*
+	rm -rf version/version.go assets/StemcellAutomation.zip assets/local/* out/*
 
 format :
 	go fmt ./...
@@ -51,10 +50,9 @@ integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
 
 generate-fake-stemcell-automation: $(GOSRC) $(FAKE_STEMCELL_AUTOMATION_PATH)
-	go run github.com/go-bindata/go-bindata/go-bindata -o assets/stemcell_automation.go -pkg assets -prefix $(FAKE_STEMCELL_AUTOMATION_PREFIX) $(FAKE_STEMCELL_AUTOMATION_PATH)
+	cp $(FAKE_STEMCELL_AUTOMATION_PATH) assets/
 
 generate: assets/StemcellAutomation.zip
-	go run github.com/go-bindata/go-bindata/go-bindata -o assets/stemcell_automation.go -pkg assets -prefix assets assets/StemcellAutomation.zip
 
 out/stembuild : generate $(GOSRC)
 	CGO_ENABLED=0 go build -o $(COMMAND) -ldflags $(LD_FLAGS) .

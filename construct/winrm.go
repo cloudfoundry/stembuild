@@ -19,10 +19,7 @@ type WinRMManager struct {
 
 func (w *WinRMManager) Enable() error {
 	failureString := "failed to enable WinRM: %s"
-	saZip, err := assets.Asset(stemcellAutomationName)
-	if err != nil {
-		return fmt.Errorf(failureString, err)
-	}
+	saZip := assets.StemcellAutomation
 
 	bmZip, err := w.Unarchiver.Unzip(saZip, boshPsModules)
 	if err != nil {

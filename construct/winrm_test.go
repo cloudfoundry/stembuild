@@ -23,9 +23,7 @@ var _ = Describe("WinRMManager", func() {
 		fakeGuestManager = &constructfakes.FakeGuestManager{}
 		fakeZipUnarchiver = &constructfakes.FakeZipUnarchiver{}
 
-		var err error
-		saByteData, err = assets.Asset("StemcellAutomation.zip")
-		Expect(err).ToNot(HaveOccurred())
+		saByteData = assets.StemcellAutomation
 
 		winrmManager = &construct.WinRMManager{
 			GuestManager: fakeGuestManager,

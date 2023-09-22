@@ -6,7 +6,6 @@ toolchain go1.21.0
 
 require (
 	github.com/concourse/pool-resource v1.1.1
-	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.3.0

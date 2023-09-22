@@ -25,13 +25,9 @@ func main() {
 			_, _ = fmt.Fprintf(os.Stderr, "Warning: The following environment variable is set and might override flags provided to stembuild: %s\n", envName)
 		}
 	}
-	data, err := assets.Asset("StemcellAutomation.zip")
-	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, "StemcellAutomation not found")
-		os.Exit(1)
-	}
+
 	s := "./StemcellAutomation.zip"
-	err = os.WriteFile(s, data, 0644)
+	err := os.WriteFile(s, assets.StemcellAutomation, 0644)
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Unable to write StemcellAutomation.zip")
 		os.Exit(1)
