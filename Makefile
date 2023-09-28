@@ -64,7 +64,8 @@ test : units
 units : format generate-fake-stemcell-automation
 	@go run github.com/onsi/ginkgo/v2/ginkgo version
 	go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all --randomize-suites --keep-going --skip-package integration,iaas_cli
-	@echo "\nSWEET SUITE SUCCESS"
+	@echo ""
+	@echo "SWEET SUITE SUCCESS"
 
 contract :
 	go run github.com/onsi/ginkgo/v2/ginkgo -r --randomize-all --randomize-suites --keep-going --flake-attempts 2 iaas_cli
