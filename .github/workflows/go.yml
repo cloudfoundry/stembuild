@@ -17,7 +17,7 @@ jobs:
         go-version-file: go.mod
     - name: Provide `StemcellAutomation.zip` for `go:embed` consumption in `assets` package
       run: |
-        cp integration/construct/assets/StemcellAutomation.zip assets/
+        make generate-fake-stemcell-automation
     - uses: golangci/golangci-lint-action@v3
       if: ${{ matrix.os == 'windows-2019' }}
     - uses: golangci/golangci-lint-action@v3
