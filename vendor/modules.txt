@@ -20,6 +20,13 @@ github.com/ChrisTrenkamp/goxpath/xconst
 # github.com/a8m/tree v0.0.0-20230208161321-36ae24ddad15
 ## explicit; go 1.15
 github.com/a8m/tree
+# github.com/bodgit/ntlmssp v0.0.0-20231122144230-2b2bca29f22b
+## explicit; go 1.18
+github.com/bodgit/ntlmssp
+github.com/bodgit/ntlmssp/http
+# github.com/bodgit/windows v1.0.1
+## explicit; go 1.13
+github.com/bodgit/windows
 # github.com/concourse/pool-resource v1.1.1
 ## explicit
 github.com/concourse/pool-resource/out
@@ -65,6 +72,9 @@ github.com/google/subcommands
 # github.com/google/uuid v1.3.1
 ## explicit
 github.com/google/uuid
+# github.com/hashicorp/go-cleanhttp v0.5.2
+## explicit; go 1.13
+github.com/hashicorp/go-cleanhttp
 # github.com/hashicorp/go-uuid v1.0.3
 ## explicit
 github.com/hashicorp/go-uuid
@@ -125,7 +135,7 @@ github.com/kr/text
 # github.com/masterzen/simplexml v0.0.0-20190410153822-31eea3082786
 ## explicit
 github.com/masterzen/simplexml/dom
-# github.com/masterzen/winrm v0.0.0-20230926183142-a7fbe840deba
+# github.com/masterzen/winrm v0.0.0-20231120155043-807053a1bcb9
 ## explicit; go 1.14
 github.com/masterzen/winrm
 github.com/masterzen/winrm/soap
@@ -188,6 +198,9 @@ github.com/packer-community/winrmcp/winrmcp
 github.com/pkg/errors
 # github.com/rogpeppe/go-internal v1.6.1
 ## explicit; go 1.11
+# github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde
+## explicit
+github.com/tidwall/transform
 # github.com/vmware/govmomi v0.33.1
 ## explicit; go 1.19
 github.com/vmware/govmomi
