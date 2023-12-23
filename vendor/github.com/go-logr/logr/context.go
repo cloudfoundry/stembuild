@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014-2022 VMware, Inc. All Rights Reserved.
+Copyright 2023 The logr Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,12 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package version
+package logr
 
-const (
-	// ClientName is the name of this SDK
-	ClientName = "govmomi"
+// contextKey is how we find Loggers in a context.Context. With Go < 1.21,
+// the value is always a Logger value. With Go >= 1.21, the value can be a
+// Logger value or a slog.Logger pointer.
+type contextKey struct{}
 
-	// ClientVersion is the version of this SDK
-	ClientVersion = "0.34.1"
-)
+// notFoundError exists to carry an IsNotFound method.
+type notFoundError struct{}
+
+func (notFoundError) Error() string {
+	return "no logr.Logger was present"
+}
+
+func (notFoundError) IsNotFound() bool {
+	return true
+}

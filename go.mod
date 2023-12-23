@@ -9,13 +9,13 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.4.0
-	github.com/masterzen/winrm v0.0.0-20231215180349-a482b3cc42e7
+	github.com/masterzen/winrm v0.0.0-20231222090117-f1fbea7700af
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
 	github.com/pkg/errors v0.9.1
-	github.com/vmware/govmomi v0.34.0
+	github.com/vmware/govmomi v0.34.1
 	golang.org/x/sys v0.15.0
 )
 
@@ -23,12 +23,12 @@ require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/ChrisTrenkamp/goxpath v0.0.0-20210404020558-97928f7e12b6 // indirect
 	github.com/a8m/tree v0.0.0-20230208161321-36ae24ddad15 // indirect
-	github.com/bodgit/ntlmssp v0.0.0-20231207143743-d70777b171a7 // indirect
+	github.com/bodgit/ntlmssp v0.0.0-20231219172012-333c521e41ca // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/dougm/pretty v0.0.0-20171025230240-2ee9d7453c02 // indirect
 	github.com/dylanmei/iso8601 v0.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/go-logr/logr v1.3.0 // indirect
+	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -49,7 +49,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
 	github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde // indirect
-	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
