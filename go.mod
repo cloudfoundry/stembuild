@@ -16,13 +16,13 @@ require (
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
 	github.com/pkg/errors v0.9.1
 	github.com/vmware/govmomi v0.34.1
-	golang.org/x/sys v0.15.0
+	golang.org/x/sys v0.16.0
 )
 
 require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/ChrisTrenkamp/goxpath v0.0.0-20210404020558-97928f7e12b6 // indirect
-	github.com/a8m/tree v0.0.0-20230208161321-36ae24ddad15 // indirect
+	github.com/a8m/tree v0.0.0-20240104212747-2c8764a5f17e // indirect
 	github.com/bodgit/ntlmssp v0.0.0-20231224131242-ee0981b06f47 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/dougm/pretty v0.0.0-20171025230240-2ee9d7453c02 // indirect

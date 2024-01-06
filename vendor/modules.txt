@@ -17,7 +17,7 @@ github.com/ChrisTrenkamp/goxpath/tree/xmltree/xmlbuilder
 github.com/ChrisTrenkamp/goxpath/tree/xmltree/xmlele
 github.com/ChrisTrenkamp/goxpath/tree/xmltree/xmlnode
 github.com/ChrisTrenkamp/goxpath/xconst
-# github.com/a8m/tree v0.0.0-20230208161321-36ae24ddad15
+# github.com/a8m/tree v0.0.0-20240104212747-2c8764a5f17e
 ## explicit; go 1.15
 github.com/a8m/tree
 # github.com/bodgit/ntlmssp v0.0.0-20231224131242-ee0981b06f47
@@ -271,7 +271,7 @@ golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/http2/hpack
-# golang.org/x/sys v0.15.0
+# golang.org/x/sys v0.16.0
 ## explicit; go 1.18
 golang.org/x/sys/unix
 golang.org/x/sys/windows
