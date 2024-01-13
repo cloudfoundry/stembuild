@@ -20,7 +20,7 @@ github.com/ChrisTrenkamp/goxpath/xconst
 # github.com/a8m/tree v0.0.0-20240104212747-2c8764a5f17e
 ## explicit; go 1.15
 github.com/a8m/tree
-# github.com/bodgit/ntlmssp v0.0.0-20231224131242-ee0981b06f47
+# github.com/bodgit/ntlmssp v0.0.0-20240109233507-5712ac3c36d9
 ## explicit; go 1.18
 github.com/bodgit/ntlmssp
 github.com/bodgit/ntlmssp/http
@@ -139,8 +139,8 @@ github.com/masterzen/simplexml/dom
 ## explicit; go 1.21
 github.com/masterzen/winrm
 github.com/masterzen/winrm/soap
-# github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
-## explicit; go 1.19
+# github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
+## explicit; go 1.20
 github.com/maxbrunsfeld/counterfeiter/v6
 github.com/maxbrunsfeld/counterfeiter/v6/arguments
 github.com/maxbrunsfeld/counterfeiter/v6/command
@@ -153,7 +153,7 @@ github.com/mitchellh/mapstructure
 github.com/nu7hatch/gouuid
 # github.com/onsi/ginkgo v1.16.5
 ## explicit; go 1.16
-# github.com/onsi/ginkgo/v2 v2.13.2
+# github.com/onsi/ginkgo/v2 v2.14.0
 ## explicit; go 1.18
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -201,7 +201,7 @@ github.com/pkg/errors
 # github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde
 ## explicit
 github.com/tidwall/transform
-# github.com/vmware/govmomi v0.34.1
+# github.com/vmware/govmomi v0.34.2
 ## explicit; go 1.19
 github.com/vmware/govmomi
 github.com/vmware/govmomi/cns
@@ -254,7 +254,7 @@ github.com/vmware/govmomi/vim25/types
 github.com/vmware/govmomi/vim25/xml
 github.com/vmware/govmomi/vmdk
 github.com/vmware/govmomi/vsan/vsanfs/types
-# golang.org/x/crypto v0.17.0
+# golang.org/x/crypto v0.18.0
 ## explicit; go 1.18
 golang.org/x/crypto/md4
 golang.org/x/crypto/pbkdf2
@@ -264,7 +264,7 @@ golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/modfile
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.19.0
+# golang.org/x/net v0.20.0
 ## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/html
@@ -278,6 +278,7 @@ golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
 # golang.org/x/text v0.14.0
 ## explicit; go 1.18
+golang.org/x/text/cases
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/htmlindex
@@ -288,6 +289,7 @@ golang.org/x/text/encoding/korean
 golang.org/x/text/encoding/simplifiedchinese
 golang.org/x/text/encoding/traditionalchinese
 golang.org/x/text/encoding/unicode
+golang.org/x/text/internal
 golang.org/x/text/internal/language
 golang.org/x/text/internal/language/compact
 golang.org/x/text/internal/tag
@@ -295,7 +297,8 @@ golang.org/x/text/internal/utf8internal
 golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/transform
-# golang.org/x/tools v0.16.1
+golang.org/x/text/unicode/norm
+# golang.org/x/tools v0.17.0
 ## explicit; go 1.18
 golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/ast/inspector
