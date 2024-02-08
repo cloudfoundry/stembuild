@@ -313,4 +313,19 @@ AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys
         $result | Should -BeLike "#*#*"
     }
 
+    It "Disables the chacha20-poly1305 cipher to mitigate CVE-2023-48795" {
+
+        Mock Get-Content {
+@"
+# Ciphers and keying
+#RekeyLimit default none
+"@
+        } -ModuleName BOSH.SSH
+
+        $result = Modify-DefaultOpenSSHConfig -ConfigPath "some/path/sshd_config_default"
+
+        Assert-MockCalled Get-Content -Times 1 -ModuleName BOSH.SSH -Scope It -ParameterFilter { $Path -like "*sshd_config_default" }
+        $result | Should -BeLike "*#RekeyLimit default none`r`n# Disable cipher to mitigate CVE-2023-48795`r`nCiphers -chacha20-poly1305@openssh.com`r`n"
+    }
+
 }

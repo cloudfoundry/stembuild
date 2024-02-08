@@ -137,7 +137,8 @@ function Modify-DefaultOpenSSHConfig
 
     $ModifiedConfig = Get-Content $ConfigPath `
     | %{$_ -replace ".*Match Group administrators.*", "#$&"} `
-    | %{$_ -replace ".*AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys.*", "#$&" }
+    | %{$_ -replace ".*AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys.*", "#$&" } `
+    | %{$_ -replace "#RekeyLimit default none", "$&`r`n# Disable cipher to mitigate CVE-2023-48795`r`nCiphers -chacha20-poly1305@openssh.com`r`n"}
 
     return $ModifiedConfig
 }
