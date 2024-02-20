@@ -1,7 +1,9 @@
+.DS_Store
 .idea
 .envrc
 stembuild
 stembuild.exe
+StemcellAutomation.zip
 gordiff
 gordiff.exe
 temp
