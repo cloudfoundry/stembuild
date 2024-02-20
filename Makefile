@@ -7,6 +7,9 @@ STEMCELL_AUTOMATION_PS1 := $(shell ls stemcell-automation/*ps1 | grep -iv Test)
 BOSH_AGENT_REPO ?= ${HOME}/go/src/github.com/cloudfoundry/bosh-agent
 LGPO_URL = 'https://download.microsoft.com/download/8/5/C/85C25433-A1B0-4FFA-9429-7E023E7DA8D8/LGPO.zip'
 BOSH_GCS_URL = 'https://s3.amazonaws.com/bosh-gcscli/bosh-gcscli-0.0.6-windows-amd64.exe'
+BOSH_BLOBSTORE_DAV_URL = http://bosh-davcli-artifacts.s3.amazonaws.com
+BOSH_BLOBSTORE_S3_URL = http://bosh-s3cli-artifacts.s3.amazonaws.com
+BOSH_WINDOWS_DEPENDENCIES_URL = http://bosh-windows-dependencies.s3.amazonaws.com
 # Ignore things under cis-merge* directory because the paths contain spaces and make doesn't like
 # that
 PSMODULES_SOURCES = $(shell find ./modules | grep -v .git | grep -vi "test" | grep -v cis-merge)
@@ -83,17 +86,19 @@ assets/local/bosh-agent.exe: $(BOSH_AGENT_SOURCES)
 		cd -
 	mv $(BOSH_AGENT_REPO)/out/bosh-agent assets/local/bosh-agent.exe
 
-assets/local/bosh-blobstore-dav.exe: $(BOSH_AGENT_REPO)/integration/windows/fixtures/bosh-blobstore-dav.exe
-	@echo "### Creating/Updating assets/local/bosh-blobstore-dav.exe"
-	$(CP) $(BOSH_AGENT_REPO)/integration/windows/fixtures/bosh-blobstore-dav.exe assets/local
+assets/local/bosh-blobstore-dav.exe:
+	@echo "### Creating assets/local/bosh-blobstore-dav.exe"
+	$(eval BOSH_BLOBSTORE_DAV_FILE=$(shell curl -s $(BOSH_BLOBSTORE_DAV_URL) | xq -r '.ListBucketResult.Contents | last | .Key'))
+	curl -o assets/local/bosh-blobstore-dav.exe -L $(BOSH_BLOBSTORE_DAV_URL)/$(BOSH_BLOBSTORE_DAV_FILE)
 
 assets/local/bosh-blobstore-gcs.exe:
 	@echo "### Creating assets/local/bosh-blobstore-gcs.exe"
 	curl -o assets/local/bosh-blobstore-gcs.exe -L $(BOSH_GCS_URL)
 
-assets/local/bosh-blobstore-s3.exe: $(BOSH_AGENT_REPO)/integration/windows/fixtures/bosh-blobstore-s3.exe
-	@echo "### Creating/Updating assets/local/bosh-blobstore-s3.exe"
-	$(CP) $(BOSH_AGENT_REPO)/integration/windows/fixtures/bosh-blobstore-s3.exe assets/local
+assets/local/bosh-blobstore-s3.exe:
+	@echo "### Creating assets/local/bosh-blobstore-s3.exe"
+	$(eval BOSH_BLOBSTORE_S3_FILE=$(shell curl -s $(BOSH_BLOBSTORE_S3_URL) | xq -r '.ListBucketResult.Contents | last | .Key'))
+	curl -o assets/local/bosh-blobstore-s3.exe -L $(BOSH_BLOBSTORE_S3_URL)/$(BOSH_BLOBSTORE_S3_FILE)
 
 assets/local/bosh-psmodules.zip: $(PSMODULES_SOURCES)
 	@echo "### Creating/Updating assets/local/bosh-psmodules.zip"
@@ -118,9 +123,10 @@ assets/local/service_wrapper.xml: $(BOSH_AGENT_REPO)/integration/windows/fixture
 	@echo "### Creating/Updating assets/local/service_wrapper.xml"
 	$(CP) $(BOSH_AGENT_REPO)/integration/windows/fixtures/service_wrapper.xml assets/local
 
-assets/local/tar.exe: $(BOSH_AGENT_REPO)/integration/windows/fixtures/tar.exe
-	@echo "### Creating/Updating assets/local/tar.exe"
-	$(CP) $(BOSH_AGENT_REPO)/integration/windows/fixtures/tar.exe assets/local
+assets/local/tar.exe:
+	@echo "### Creating assets/local/tar.exe"
+	$(eval BOSH_WINDOWS_DEPENDENCIES_FILE=$(shell curl -s $(BOSH_WINDOWS_DEPENDENCIES_URL) | xq -r '.ListBucketResult.Contents | map(select(.Key | startswith("tar"))) | last | .Key'))
+	curl -o assets/local/tar.exe -L $(BOSH_WINDOWS_DEPENDENCIES_URL)/$(BOSH_WINDOWS_DEPENDENCIES_FILE)
 
 assets/local/agent.zip: assets/local/bosh-agent.exe assets/local/pipe.exe assets/local/service_wrapper.xml assets/local/service_wrapper.exe assets/local/bosh-blobstore-dav.exe assets/local/bosh-blobstore-gcs.exe assets/local/bosh-blobstore-s3.exe assets/local/job-service-wrapper.exe assets/local/tar.exe
 	@echo "### Creating/Updating assets/local/agent.zip"
