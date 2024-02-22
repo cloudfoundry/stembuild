@@ -225,21 +225,25 @@ dep sync
 The output should be nothing if there are no out-of-sync dependencies.
 
 
-## Compile stembuild for macOS
+## Compile stembuild locally
 
-You can use stembuild on macOS by following the below steps:
+Some of the make targets require the use of curl and [xq](https://github.com/sibprogrammer/xq?tab=readme-ov-file#installation)
+to download the latest dependencies from S3 to create the embedded StemcellAutomation.zip resource. The dependencies
+downloaded from s3 are the same ones used by [stembuild CI](https://github.com/cloudfoundry/greenhouse-ci/).
 
-- Download or clone the bosh-agent repository
+Download or clone the bosh-agent repository
 ```
 git clone https://github.com/cloudfoundry/bosh-agent.git
 ```
-- Download or clone the stembuild repository and navigate to it
+
+Download or clone the stembuild repository and navigate to it
 ```
 git clone https://github.com/cloudfoundry/stembuild.git
 cd stembuild
 ```
-- Download the latest released artifact from [Stemcell Automation GitHub Repo](https://github.com/cloudfoundry-incubator/bosh-windows-stemcell-automation/releases)
-- Use `make build` to build stembuild for macOS, providing the corresponding values for the bosh-agent path, Stemcell Version you would like to build, and the Stemcell Automation package you downloaded
+
+Use `make build` to build stembuild, providing the corresponding values for the bosh-agent path and stemcell version you
+would like to build, for example:
 ```
-BOSH_AGENT_REPO=PathToBoshAgentRepo make STEMCELL_VERSION=StemcellVersion AUTOMATION_PATH=PathToStemcellAutomationZip build
+BOSH_AGENT_REPO=../bosh-agent STEMCELL_VERSION=2019.70 make build
 ```
