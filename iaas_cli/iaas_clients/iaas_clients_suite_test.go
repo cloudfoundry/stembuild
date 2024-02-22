@@ -76,12 +76,12 @@ var _ = AfterSuite(func() {
 	if VM != nil {
 		task, err := VM.PowerOff(CTX)
 		Expect(err).ToNot(HaveOccurred())
-		err = task.Wait(CTX)
+		err = task.WaitEx(CTX)
 		Expect(err).ToNot(HaveOccurred())
 
 		task, err = VM.Destroy(CTX)
 		Expect(err).ToNot(HaveOccurred())
-		err = task.Wait(CTX)
+		err = task.WaitEx(CTX)
 		Expect(err).ToNot(HaveOccurred())
 	}
 })
