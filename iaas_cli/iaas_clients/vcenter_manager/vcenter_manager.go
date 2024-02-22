@@ -105,7 +105,7 @@ func (v *VCenterManager) CloneVM(ctx context.Context, vm *object.VirtualMachine,
 		return err
 	}
 
-	err = task.Wait(ctx)
+	err = task.WaitEx(ctx)
 	if err != nil {
 		return err
 	}
