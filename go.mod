@@ -21,7 +21,7 @@ require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/ChrisTrenkamp/goxpath v0.0.0-20210404020558-97928f7e12b6 // indirect
 	github.com/a8m/tree v0.0.0-20240104212747-2c8764a5f17e // indirect
-	github.com/bodgit/ntlmssp v0.0.0-20240208161302-b2d35758202d // indirect
+	github.com/bodgit/ntlmssp v0.0.0-20240228095955-23716d21118b // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/dougm/pretty v0.0.0-20171025230240-2ee9d7453c02 // indirect
 	github.com/dylanmei/iso8601 v0.1.0 // indirect
@@ -31,7 +31,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20240207164012-fb44976bdcd5 // indirect
+	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
 	github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde // indirect
-	golang.org/x/crypto v0.19.0 // indirect
+	golang.org/x/crypto v0.20.0 // indirect
 	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
