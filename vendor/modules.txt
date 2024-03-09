@@ -20,7 +20,7 @@ github.com/ChrisTrenkamp/goxpath/xconst
 # github.com/a8m/tree v0.0.0-20240104212747-2c8764a5f17e
 ## explicit; go 1.15
 github.com/a8m/tree
-# github.com/bodgit/ntlmssp v0.0.0-20240228095955-23716d21118b
+# github.com/bodgit/ntlmssp v0.0.0-20240305172805-6cb040b632c5
 ## explicit; go 1.18
 github.com/bodgit/ntlmssp
 github.com/bodgit/ntlmssp/http
@@ -153,7 +153,7 @@ github.com/mitchellh/mapstructure
 github.com/nu7hatch/gouuid
 # github.com/onsi/ginkgo v1.16.5
 ## explicit; go 1.16
-# github.com/onsi/ginkgo/v2 v2.15.0
+# github.com/onsi/ginkgo/v2 v2.16.0
 ## explicit; go 1.20
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -201,7 +201,7 @@ github.com/pkg/errors
 # github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde
 ## explicit
 github.com/tidwall/transform
-# github.com/vmware/govmomi v0.35.0
+# github.com/vmware/govmomi v0.36.0
 ## explicit; go 1.19
 github.com/vmware/govmomi
 github.com/vmware/govmomi/cns
@@ -254,24 +254,24 @@ github.com/vmware/govmomi/vim25/types
 github.com/vmware/govmomi/vim25/xml
 github.com/vmware/govmomi/vmdk
 github.com/vmware/govmomi/vsan/vsanfs/types
-# golang.org/x/crypto v0.20.0
+# golang.org/x/crypto v0.21.0
 ## explicit; go 1.18
 golang.org/x/crypto/md4
 golang.org/x/crypto/pbkdf2
-# golang.org/x/mod v0.15.0
+# golang.org/x/mod v0.16.0
 ## explicit; go 1.18
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/modfile
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.21.0
+# golang.org/x/net v0.22.0
 ## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
 golang.org/x/net/http2/hpack
-# golang.org/x/sys v0.17.0
+# golang.org/x/sys v0.18.0
 ## explicit; go 1.18
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -298,8 +298,9 @@ golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.18.0
-## explicit; go 1.18
+# golang.org/x/tools v0.19.0
+## explicit; go 1.19
+golang.org/x/tools/cover
 golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/ast/inspector
 golang.org/x/tools/go/gcexportdata
