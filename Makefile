@@ -88,7 +88,7 @@ assets/local/bosh-agent.exe: $(BOSH_AGENT_SOURCES)
 
 assets/local/bosh-blobstore-dav.exe:
 	@echo "### Creating assets/local/bosh-blobstore-dav.exe"
-	$(eval BOSH_BLOBSTORE_DAV_FILE=$(shell curl -s $(BOSH_BLOBSTORE_DAV_URL) | xq -r '.ListBucketResult.Contents | last | .Key'))
+	$(eval BOSH_BLOBSTORE_DAV_FILE=$(shell curl -s $(BOSH_BLOBSTORE_DAV_URL) | xq --xpath '//Key' | sort --version-sort | tail -1))
 	curl -o assets/local/bosh-blobstore-dav.exe -L $(BOSH_BLOBSTORE_DAV_URL)/$(BOSH_BLOBSTORE_DAV_FILE)
 
 assets/local/bosh-blobstore-gcs.exe:
@@ -97,7 +97,7 @@ assets/local/bosh-blobstore-gcs.exe:
 
 assets/local/bosh-blobstore-s3.exe:
 	@echo "### Creating assets/local/bosh-blobstore-s3.exe"
-	$(eval BOSH_BLOBSTORE_S3_FILE=$(shell curl -s $(BOSH_BLOBSTORE_S3_URL) | xq -r '.ListBucketResult.Contents | last | .Key'))
+	$(eval BOSH_BLOBSTORE_S3_FILE=$(shell curl -s $(BOSH_BLOBSTORE_S3_URL) | xq --xpath '//Key' | sort --version-sort | tail -1))
 	curl -o assets/local/bosh-blobstore-s3.exe -L $(BOSH_BLOBSTORE_S3_URL)/$(BOSH_BLOBSTORE_S3_FILE)
 
 assets/local/bosh-psmodules.zip: $(PSMODULES_SOURCES)
@@ -125,7 +125,7 @@ assets/local/service_wrapper.xml: $(BOSH_AGENT_REPO)/integration/windows/fixture
 
 assets/local/tar.exe:
 	@echo "### Creating assets/local/tar.exe"
-	$(eval BOSH_WINDOWS_DEPENDENCIES_FILE=$(shell curl -s $(BOSH_WINDOWS_DEPENDENCIES_URL) | xq -r '.ListBucketResult.Contents | map(select(.Key | startswith("tar"))) | last | .Key'))
+	$(eval BOSH_WINDOWS_DEPENDENCIES_FILE=$(shell curl -s $(BOSH_WINDOWS_DEPENDENCIES_URL) | xq --xpath '//Key[contains(text(), "tar")]' | sort --version-sort | tail -1))
 	curl -o assets/local/tar.exe -L $(BOSH_WINDOWS_DEPENDENCIES_URL)/$(BOSH_WINDOWS_DEPENDENCIES_FILE)
 
 assets/local/agent.zip: assets/local/bosh-agent.exe assets/local/pipe.exe assets/local/service_wrapper.xml assets/local/service_wrapper.exe assets/local/bosh-blobstore-dav.exe assets/local/bosh-blobstore-gcs.exe assets/local/bosh-blobstore-s3.exe assets/local/job-service-wrapper.exe assets/local/tar.exe
