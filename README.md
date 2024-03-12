@@ -245,5 +245,5 @@ cd stembuild
 Use `make build` to build stembuild, providing the corresponding values for the bosh-agent path and stemcell version you
 would like to build, for example:
 ```
-BOSH_AGENT_REPO=../bosh-agent STEMCELL_VERSION=2019.70 make build
+BOSH_AGENT_REPO=../bosh-agent STEMBUILD_VERSION=2019.70 make build
 ```
