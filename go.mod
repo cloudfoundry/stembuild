@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.31.1
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
 	github.com/pkg/errors v0.9.1
-	github.com/vmware/govmomi v0.36.0
+	github.com/vmware/govmomi v0.36.1
 	golang.org/x/sys v0.18.0
 )
 

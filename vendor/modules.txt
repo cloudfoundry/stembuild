@@ -201,7 +201,7 @@ github.com/pkg/errors
 # github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde
 ## explicit
 github.com/tidwall/transform
-# github.com/vmware/govmomi v0.36.0
+# github.com/vmware/govmomi v0.36.1
 ## explicit; go 1.19
 github.com/vmware/govmomi
 github.com/vmware/govmomi/cns
