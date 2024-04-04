@@ -91,6 +91,7 @@ function Write-AgentConfig {
                 "URI" = "http://169.254.169.254"
                 "UserDataPath" = "/latest/user-data/"
                 "InstanceIDPath" = "/latest/meta-data/instance-id/"
+                "TokenPath" = "/latest/api/token"
             })
             "UseRegistry" = $true
           }
