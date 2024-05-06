@@ -70,6 +70,7 @@ func (w *WinRM) UploadArtifact(sourceFilePath, destinationFilePath string) error
 		ConnectTimeout:        WinRmTimeout,
 		OperationTimeout:      WinRmTimeout,
 		MaxOperationsPerShell: 15,
+		AllowTimeout:          true,
 	})
 
 	if err != nil {
