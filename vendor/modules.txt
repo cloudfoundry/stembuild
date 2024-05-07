@@ -132,7 +132,7 @@ github.com/kr/text
 # github.com/masterzen/simplexml v0.0.0-20190410153822-31eea3082786
 ## explicit
 github.com/masterzen/simplexml/dom
-# github.com/masterzen/winrm v0.0.0-20231227165926-e811dad5ac77
+# github.com/masterzen/winrm v0.0.0-20231227165926-e811dad5ac77 => github.com/bosh-dep-forks/winrm v0.0.0-20240321234108-df0e10ca9199
 ## explicit; go 1.21
 github.com/masterzen/winrm
 github.com/masterzen/winrm/soap
@@ -187,7 +187,7 @@ github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
-# github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
+# github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f => github.com/bosh-dep-forks/winrmcp v0.0.0-20240506194308-1105f7feefc7
 ## explicit
 github.com/packer-community/winrmcp/winrmcp
 # github.com/pkg/errors v0.9.1
@@ -358,3 +358,5 @@ google.golang.org/protobuf/runtime/protoimpl
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
+# github.com/masterzen/winrm => github.com/bosh-dep-forks/winrm v0.0.0-20240321234108-df0e10ca9199
+# github.com/packer-community/winrmcp => github.com/bosh-dep-forks/winrmcp v0.0.0-20240506194308-1105f7feefc7
