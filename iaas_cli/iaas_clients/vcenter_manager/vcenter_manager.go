@@ -6,12 +6,13 @@ import (
 	"path"
 	"strings"
 
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/object"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/types"
+
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate

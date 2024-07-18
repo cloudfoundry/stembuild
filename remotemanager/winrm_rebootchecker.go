@@ -45,7 +45,7 @@ func NewRebootChecker(winrmRemoteManager RemoteManager) *RebootChecker {
 	return &RebootChecker{winrmRemoteManager}
 }
 
-// Inspired by Hashicorp Packer waitForRestart
+// RebootHasFinished inspired by Hashicorp Packer waitForRestart
 func (rc *RebootChecker) RebootHasFinished() (bool, error) {
 
 	exitCode, err := rc.remoteManager.ExecuteCommand(tryCheckReboot)

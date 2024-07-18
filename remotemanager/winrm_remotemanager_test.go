@@ -9,13 +9,13 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/cloudfoundry/stembuild/remotemanager"
-	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
 	"github.com/masterzen/winrm"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
+
+	"github.com/cloudfoundry/stembuild/remotemanager"
+	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
 )
 
 func setupTestServer() *Server {
@@ -153,6 +153,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 		})
+
 		It("returns error if winrmclient cannot be created", func() {
 			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
 			buildError := errors.New("unable to build a client")
@@ -176,7 +177,6 @@ var _ = Describe("WinRM RemoteManager", func() {
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(MatchError(fmt.Errorf("failed to create winrm shell: some shell creation error")))
-
 		})
 	})
 })

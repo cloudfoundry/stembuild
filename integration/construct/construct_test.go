@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/cloudfoundry/stembuild/test/helpers"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gexec"
+
+	"github.com/cloudfoundry/stembuild/test/helpers"
 )
 
 const (
@@ -31,6 +31,7 @@ var _ = Describe("stembuild construct", func() {
 	AfterEach(func() {
 		_ = os.Remove(filepath.Join(workingDir, "LGPO.zip"))
 	})
+
 	Context("run successfully", func() {
 		BeforeEach(func() {
 			err := CopyFile(filepath.Join(workingDir, "assets", "LGPO.zip"), filepath.Join(workingDir, "LGPO.zip"))
