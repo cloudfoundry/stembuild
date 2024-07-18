@@ -61,7 +61,7 @@ var _ = Describe("Package", func() {
 	})
 
 	AfterEach(func() {
-		os.RemoveAll(workingDir)
+		Expect(os.RemoveAll(workingDir)).To(Succeed())
 		if vmPath != "" {
 			cli.Run([]string{
 				"vm.destroy",
@@ -85,7 +85,8 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		session.Out.Write(out) //nolint:errcheck
+		_, err := session.Out.Write(out)
+		Expect(err).NotTo(HaveOccurred())
 		By(string(out))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
@@ -140,7 +141,8 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		session.Out.Write(out) //nolint:errcheck
+		_, err := session.Out.Write(out)
+		Expect(err).NotTo(HaveOccurred())
 		By(string(out))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
@@ -177,6 +179,7 @@ func copyFileFromTar(t string, f string, w io.Writer) {
 		if err == io.EOF {
 			break
 		}
+		Expect(err).NotTo(HaveOccurred())
 
 		if strings.Contains(header.Name, f) {
 			_, err = io.Copy(w, r)
