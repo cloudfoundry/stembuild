@@ -362,7 +362,7 @@ func (c *VmdkPackager) catchInterruptSignal() {
 	}
 }
 
-func (c VmdkPackager) Package() error {
+func (c *VmdkPackager) Package() error {
 
 	go c.catchInterruptSignal()
 
@@ -382,7 +382,7 @@ func (c VmdkPackager) Package() error {
 	return nil
 }
 
-func (c VmdkPackager) ValidateSourceParameters() error {
+func (c *VmdkPackager) ValidateSourceParameters() error {
 	if validVMDK, err := IsValidVMDK(c.BuildOptions.VMDKFile); err != nil {
 		return err
 	} else if !validVMDK {
@@ -411,8 +411,8 @@ func IsValidVMDK(vmdk string) (bool, error) {
 	return true, nil
 }
 
-func (p VmdkPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
-	fi, err := os.Stat(p.BuildOptions.VMDKFile)
+func (c *VmdkPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
+	fi, err := os.Stat(c.BuildOptions.VMDKFile)
 	if err != nil {
 		errorMsg := fmt.Sprintf("could not get vmdk info: %s", err)
 		return errors.New(errorMsg)
@@ -424,7 +424,7 @@ func (p VmdkPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) erro
 
 	minSpace := uint64(vmdkSize)*2 + (Gigabyte / 2)
 
-	enoughSpace, requiredSpace, err := hasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(p.BuildOptions.VMDKFile))
+	enoughSpace, requiredSpace, err := hasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(c.BuildOptions.VMDKFile))
 	if err != nil {
 		errorMsg := fmt.Sprintf("could not check free space on disk: %s", err)
 		return errors.New(errorMsg)
