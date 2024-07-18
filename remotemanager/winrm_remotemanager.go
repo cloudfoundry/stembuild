@@ -42,7 +42,11 @@ func (w *WinRM) CanReachVM() error {
 	if err != nil {
 		return fmt.Errorf("host %s is unreachable. Please ensure WinRM is enabled and the IP is correct: %s", w.host, err)
 	}
-	conn.Close()
+	err = conn.Close()
+	if err != nil {
+		return fmt.Errorf("could not close connection to host %s: %s", w.host, err)
+	}
+
 	return nil
 }
 
@@ -57,7 +61,11 @@ func (w *WinRM) CanLoginVM() error {
 	if err != nil {
 		return fmt.Errorf("failed to create winrm shell: %s", err)
 	}
-	s.Close()
+
+	err = s.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close winrm shell: %s", err)
+	}
 
 	return nil
 }
@@ -113,8 +121,10 @@ func (w *WinRM) ExecuteCommandWithTimeout(command string, timeout time.Duration)
 }
 
 func (w *WinRM) ExecuteCommand(command string) (int, error) {
-	//fmt.Printf("Executing %s\n", command)
 	exitCode, err := w.ExecuteCommandWithTimeout(command, WinRmTimeout)
-	//fmt.Printf("Exectued. exit code %d\n", exitCode)
-	return exitCode, err
+	if err != nil {
+		return exitCode, fmt.Errorf("error executing '%s': %w", command, err)
+	}
+
+	return exitCode, nil
 }
