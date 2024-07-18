@@ -1,10 +1,9 @@
 package remotemanager_test
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"log"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -21,25 +20,52 @@ import (
 func setupTestServer() *Server {
 	server := NewServer()
 
-	// Suppresses ginkgo server logs
-	server.HTTPTestServer.Config.ErrorLog = log.New(&bytes.Buffer{}, "", 0)
-
-	response := `
-<s:Envelope xmlns:s="https://www.w3.org/2003/05/soap-envelope" 
-            xmlns:a="https://schemas.xmlsoap.org/ws/2004/08/addressing" 
-            xmlns:w="https://schemas.dmtf.org/wbem/wsman/1/wsman.xsd">
-  <s:Header>
-    <w:ShellId>153600</w:ShellId>
-  </s:Header>
-  <s:Body/> 
-</s:Envelope>
-` // Looks for: //w:Selector[@Name='ShellId']
+	// winRMClient expects: `//w:Selector[@Name='ShellId']`
+	createShellResponse := `<s:Envelope xmlns:s="https://www.w3.org/2003/05/soap-envelope"
+	           xmlns:a="https://schemas.xmlsoap.org/ws/2004/08/addressing"
+	           xmlns:w="https://schemas.dmtf.org/wbem/wsman/1/wsman.xsd">
+	 <s:Header>
+	   <w:ShellId>153600</w:ShellId>
+	 </s:Header>
+	 <s:Body/>
+	</s:Envelope> `
 	server.AppendHandlers(
-		RespondWith(http.StatusOK, response, http.Header{
-			"Content-Type": {"application/soap+xml;charset=UTF-8"},
-		}),
+		CombineHandlers(
+			VerifyRequest("POST", "/wsman"),
+			VerifyContentType("application/soap+xml;charset=UTF-8"),
+			// body contains `<a:Action mustUnderstand="true">http://schemas.xmlsoap.org/ws/2004/09/transfer/Create</a:Action>`
+			func(w http.ResponseWriter, req *http.Request) {
+				body, err := io.ReadAll(req.Body)
+				Expect(err).NotTo(HaveOccurred())
+				err = req.Body.Close()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(body).To(MatchRegexp(`http://schemas.xmlsoap.org/ws/2004/09/transfer/Create`))
+			},
+			RespondWith(http.StatusOK, createShellResponse, http.Header{
+				"Content-Type": {"application/soap+xml;charset=UTF-8"},
+			}),
+		),
 	)
-	server.AllowUnhandledRequests = true
+
+	deleteShellResponse := ""
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest("POST", "/wsman"),
+			VerifyContentType("application/soap+xml;charset=UTF-8"),
+			// body contains `<a:Action mustUnderstand="true">http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete</a:Action>`
+			func(w http.ResponseWriter, req *http.Request) {
+				body, err := io.ReadAll(req.Body)
+				Expect(err).NotTo(HaveOccurred())
+				err = req.Body.Close()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(body).To(MatchRegexp(`http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete`))
+			},
+			RespondWith(http.StatusOK, deleteShellResponse, http.Header{
+				"Content-Type": {"application/soap+xml;charset=UTF-8"},
+			}),
+		),
+	)
+
 	return server
 }
 
@@ -67,8 +93,8 @@ var _ = Describe("WinRM RemoteManager", func() {
 			})
 
 		})
-		Context("when a command does not run successfully", func() {
 
+		Context("when a command does not run successfully", func() {
 			BeforeEach(func() {
 				fakeClient = &remotemanagerfakes.FakeWinRMClient{}
 				fakeClientFactory = &remotemanagerfakes.FakeWinRMClientFactoryI{}
@@ -88,6 +114,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 					Expect(exitCode).To(Equal(2))
 				})
 			})
+
 			Context("when a command returns a nonzero exit code but does not error", func() {
 				BeforeEach(func() {
 					fakeClient.RunReturns(2, nil)
@@ -101,6 +128,7 @@ var _ = Describe("WinRM RemoteManager", func() {
 					Expect(exitCode).To(Equal(2))
 				})
 			})
+
 			Context("when a command exits 0 but errors", func() {
 				BeforeEach(func() {
 					fakeClient.RunReturns(0, errors.New("command error"))
@@ -115,12 +143,12 @@ var _ = Describe("WinRM RemoteManager", func() {
 				})
 			})
 		})
-
 	})
+
 	Describe("CanLoginVM", func() {
 		var (
 			testServer  *Server
-			winRMClient *winrm.Client
+			winRMClient remotemanager.WinRMClient
 		)
 
 		BeforeEach(func() {
@@ -139,12 +167,12 @@ var _ = Describe("WinRM RemoteManager", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		var _ = AfterEach(func() {
+		AfterEach(func() {
 			testServer.Close()
 		})
 
 		It("returns nil if shell can be created", func() {
-			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
+			winRMClientFactory := &remotemanagerfakes.FakeWinRMClientFactoryI{}
 			winRMClientFactory.BuildReturns(winRMClient, nil)
 
 			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass", winRMClientFactory)
