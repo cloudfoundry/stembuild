@@ -85,9 +85,8 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		_, err := session.Out.Write(out)
-		Expect(err).NotTo(HaveOccurred())
-		By(string(out))
+		_, _ = session.Out.Write(out)
+		By(fmt.Sprintf("session.Out: '%s'", string(out)))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
 		expectedStemcellVersion := strings.Split(stembuildVersion, ".")[:2]
@@ -141,9 +140,8 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		_, err := session.Out.Write(out)
-		Expect(err).NotTo(HaveOccurred())
-		By(string(out))
+		_, _ = session.Out.Write(out)
+		By(fmt.Sprintf("session.Out: '%s'", string(out)))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
 		expectedStemcellVersion := strings.Split(stembuildVersion, ".")[:2]
@@ -171,7 +169,9 @@ func copyFileFromTar(t string, f string, w io.Writer) {
 	Expect(err).NotTo(HaveOccurred())
 	gzr, err := gzip.NewReader(z)
 	Expect(err).NotTo(HaveOccurred())
-	defer gzr.Close()
+	defer func() {
+		_ = gzr.Close()
+	}()
 
 	r := tar.NewReader(gzr)
 	for {
