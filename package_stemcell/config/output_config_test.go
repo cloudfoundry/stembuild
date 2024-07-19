@@ -18,30 +18,36 @@ var _ = Describe("OutputConfig", func() {
 				Expect(valid).To(BeFalse())
 			})
 		})
+
 		Context("a supported os is specified", func() {
 			It("2016 should be valid", func() {
 				valid := config.IsValidOS("2016")
 				Expect(valid).To(BeTrue())
 			})
+
 			It("2012R2 should be valid", func() {
 				valid := config.IsValidOS("2012R2")
 				Expect(valid).To(BeTrue())
 			})
+
 			It("1803 should be valid", func() {
 				valid := config.IsValidOS("1803")
 				Expect(valid).To(BeTrue())
 			})
+
 			It("2019 should be valid", func() {
 				valid := config.IsValidOS("2019")
 				Expect(valid).To(BeTrue())
 			})
 
 		})
+
 		Context("something other than a supported os is specified", func() {
 			It("should be invalid", func() {
 				valid := config.IsValidOS("bad-thing")
 				Expect(valid).To(BeFalse())
 			})
+
 			It("1709 should be invalid", func() {
 				valid := config.IsValidOS("1709")
 				Expect(valid).To(BeFalse())
@@ -56,15 +62,17 @@ var _ = Describe("OutputConfig", func() {
 				Expect(valid).To(BeFalse())
 			})
 		})
+
 		Context("stemcell version specified is valid pattern", func() {
 			It("should be valid", func() {
-				valids := []string{"4.4", "4.4-build.1", "4.4.4", "4.4.4-build.4"}
-				for _, version := range valids {
+				versions := []string{"4.4", "4.4-build.1", "4.4.4", "4.4.4-build.4"}
+				for _, version := range versions {
 					valid := config.IsValidStemcellVersion(version)
 					Expect(valid).To(BeTrue())
 				}
 			})
 		})
+
 		Context("stemcell version specified is invalid pattern", func() {
 			It("should be invalid", func() {
 				valid := config.IsValidStemcellVersion("4.4.4.4")
@@ -90,6 +98,7 @@ var _ = Describe("OutputConfig", func() {
 				_, err = os.Stat(filepath.Join(filepath.Join(".", "tmp")))
 				Expect(err).ToNot(HaveOccurred())
 			})
+
 			AfterEach(func() {
 				err := os.RemoveAll(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
@@ -103,6 +112,7 @@ var _ = Describe("OutputConfig", func() {
 				err = config.ValidateOrCreateOutputDir(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
 			})
+
 			AfterEach(func() {
 				err := os.RemoveAll(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
@@ -122,7 +132,7 @@ var _ = Describe("OutputConfig", func() {
 			It("should be an error", func() {
 				err := os.RemoveAll(filepath.Join(".", "tmp"))
 				Expect(err).ToNot(HaveOccurred())
-				err = config.ValidateOrCreateOutputDir(filepath.Join(".", "tmp", "subtmp"))
+				err = config.ValidateOrCreateOutputDir(filepath.Join(".", "tmp", "sub-dir"))
 				Expect(err).To(HaveOccurred())
 			})
 		})
