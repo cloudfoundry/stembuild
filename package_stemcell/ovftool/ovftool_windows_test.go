@@ -84,8 +84,6 @@ var _ = Describe("ovftool", func() {
 			GinkgoT().Setenv("PATH", tmpDir)
 
 			ovfPath, err := ovftool.Ovftool([]string{})
-			os.RemoveAll(tmpDir)
-
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ovfPath).To(Equal(filepath.Join(tmpDir, "ovftool.exe")))
 		})

@@ -59,7 +59,6 @@ var _ = Describe("Package", func() {
 	})
 
 	AfterEach(func() {
-		Expect(os.RemoveAll(workingDir)).To(Succeed())
 		if vmPath != "" {
 			cli.Run([]string{
 				"vm.destroy",
