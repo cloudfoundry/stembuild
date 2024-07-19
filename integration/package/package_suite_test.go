@@ -56,7 +56,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 var _ = SynchronizedAfterSuite(func() {
 }, func() {
 	if pathToCACert != "" {
-		os.RemoveAll(pathToCACert)
+		_ = os.RemoveAll(pathToCACert)
 	}
 })
 
