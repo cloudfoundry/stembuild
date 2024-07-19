@@ -254,7 +254,7 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 	return nil
 }
 
-// CreateImage, converts a vmdk to a gzip compressed image file and records the
+// CreateImage converts a vmdk to a gzip compressed image file and records the
 // sha1 sum of the resulting image.
 func (c *VmdkPackager) CreateImage() error {
 	c.Debugf("Creating [image] from [vmdk]: %s", c.BuildOptions.VMDKFile)

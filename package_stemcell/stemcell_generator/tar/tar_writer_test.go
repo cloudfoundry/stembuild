@@ -23,20 +23,13 @@ var _ = Describe("TarWriter", func() {
 		)
 
 		BeforeEach(func() {
-			tmpDir := os.TempDir()
-			var err error
-			workingDir, err = os.MkdirTemp(tmpDir, "TarWriterTest")
-			Expect(err).NotTo(HaveOccurred())
+			workingDir = GinkgoT().TempDir() // automatically cleaned up
 
 			fakeFile := bytes.NewReader([]byte{})
 			fakeTarable = &tarfakes.FakeTarable{}
 			fakeTarable.ReadStub = fakeFile.Read
 			fakeTarable.SizeStub = fakeFile.Size
 			fakeTarable.NameReturns("some-file")
-		})
-
-		AfterEach(func() {
-			os.RemoveAll(workingDir)
 		})
 
 		It("should not fail", func() {
@@ -74,27 +67,28 @@ var _ = Describe("TarWriter", func() {
 
 			fakeTarable1.ReadStub = fakeFile1.Read
 			fakeTarable1.SizeStub = fakeFile1.Size
-			fakeTarable1.NameReturns("firstfile")
+			fakeTarable1.NameReturns("first-file")
 
 			fakeTarable2.ReadStub = fakeFile2.Read
 			fakeTarable2.SizeStub = fakeFile2.Size
-			fakeTarable2.NameReturns("secondfile")
+			fakeTarable2.NameReturns("second-file")
 
 			err := os.Chdir(workingDir)
 			Expect(err).NotTo(HaveOccurred())
 
 			err = w.Write("some-zipped-tar", fakeTarable1, fakeTarable2) //nolint:ineffassign,staticcheck
+			Expect(err).NotTo(HaveOccurred())
 
 			var fileReader, _ = os.OpenFile("some-zipped-tar", os.O_RDONLY, 0777)
 
 			gzr, err := gzip.NewReader(fileReader)
 			Expect(err).ToNot(HaveOccurred())
 			defer gzr.Close()
-			tarfileReader := archiveTar.NewReader(gzr)
+			tarReader := archiveTar.NewReader(gzr)
 			var actualContents []string
 			var actualFilenames []string
 			for {
-				header, err := tarfileReader.Next()
+				header, err := tarReader.Next()
 				if err == io.EOF {
 					break
 				}
@@ -103,7 +97,7 @@ var _ = Describe("TarWriter", func() {
 				Expect(header.Mode).To(Equal(int64(os.FileMode(0644))))
 
 				buf := new(bytes.Buffer)
-				_, err = buf.ReadFrom(tarfileReader)
+				_, err = buf.ReadFrom(tarReader)
 				if err != nil {
 					break
 				}
@@ -111,8 +105,7 @@ var _ = Describe("TarWriter", func() {
 			}
 
 			Expect(actualContents).To(ConsistOf(expectedContents))
-			Expect(actualFilenames).To(ConsistOf("firstfile", "secondfile"))
-
+			Expect(actualFilenames).To(ConsistOf("first-file", "second-file"))
 		})
 	})
 })
