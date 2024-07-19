@@ -64,7 +64,8 @@ var _ = Describe("VcenterManagerFactory", func() {
 			})
 
 			_, err := managerFactory.VCenterManager(context.TODO())
-			parseErr, ok := err.(*url.Error)
+			var parseErr *url.Error
+			ok := errors.As(err, &parseErr)
 			Expect(ok).To(BeTrue())
 			Expect(parseErr.Op).To(Equal("parse"))
 		})
