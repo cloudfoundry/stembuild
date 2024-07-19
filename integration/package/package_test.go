@@ -29,7 +29,6 @@ var _ = Describe("Package", func() {
 		vcenterAdminCredentialUrl string
 		vcenterStembuildUsername  string
 		vcenterStembuildPassword  string
-		err                       error
 	)
 
 	BeforeEach(func() {
@@ -56,8 +55,7 @@ var _ = Describe("Package", func() {
 		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsernameVariable)
 		vcenterStembuildPassword = helpers.EnvMustExist(vcenterStembuildPasswordVariable)
 
-		workingDir, err = os.MkdirTemp(os.TempDir(), "stembuild-package-test")
-		Expect(err).NotTo(HaveOccurred())
+		workingDir = GinkgoT().TempDir() // automatically cleaned up
 	})
 
 	AfterEach(func() {
