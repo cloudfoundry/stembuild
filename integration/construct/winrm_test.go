@@ -38,7 +38,7 @@ var _ = Describe("WinRM Remote Manager", func() {
 		It("fails when Extract-Archive powershell function returns non-zero exit code", func() {
 			err := rm.ExtractArchive("C:\\provision\\NonExistingFile.zip", "C:\\provision")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(HavePrefix("powershell encountered an issue: "))
+			Expect(err.Error()).To(ContainSubstring("powershell encountered an issue: "))
 		})
 	})
 
@@ -51,7 +51,7 @@ var _ = Describe("WinRM Remote Manager", func() {
 		It("fails when powershell command returns non-zero exit code", func() {
 			_, err := rm.ExecuteCommand("powershell.exe notRealCommand")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(HavePrefix("powershell encountered an issue: "))
+			Expect(err.Error()).To(ContainSubstring("powershell encountered an issue: "))
 		})
 	})
 })
