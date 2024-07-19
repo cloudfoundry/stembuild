@@ -33,8 +33,8 @@ var _ = Describe("Factory", func() {
 				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VmdkPackager{}))
-				Expect(actualPackager).NotTo(BeAssignableToTypeOf(packagers.VCenterPackager{}))
+				Expect(actualPackager).To(BeAssignableToTypeOf(&packagers.VmdkPackager{}))
+				Expect(actualPackager).NotTo(BeAssignableToTypeOf(&packagers.VCenterPackager{}))
 			})
 		})
 
@@ -50,8 +50,8 @@ var _ = Describe("Factory", func() {
 				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(actualPackager).To(BeAssignableToTypeOf(packagers.VCenterPackager{}))
-				Expect(actualPackager).NotTo(BeAssignableToTypeOf(packagers.VmdkPackager{}))
+				Expect(actualPackager).To(BeAssignableToTypeOf(&packagers.VCenterPackager{}))
+				Expect(actualPackager).NotTo(BeAssignableToTypeOf(&packagers.VmdkPackager{}))
 			})
 		})
 

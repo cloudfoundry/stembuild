@@ -30,7 +30,7 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 	case config.VMDK:
 		options := package_parameters.VmdkPackageParameters{}
 		logger := colorlogger.ConstructLogger(logLevel, color, os.Stderr)
-		vmdkPackager := packagers.VmdkPackager{
+		vmdkPackager := &packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
 			Debugf:       logger.Debugf,
 			BuildOptions: options,
