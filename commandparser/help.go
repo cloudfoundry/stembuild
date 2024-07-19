@@ -8,8 +8,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/cloudfoundry/stembuild/version"
 	"github.com/google/subcommands"
+
+	"github.com/cloudfoundry/stembuild/version"
 )
 
 /*

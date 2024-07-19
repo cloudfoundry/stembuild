@@ -7,10 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/google/subcommands"
+
 	"github.com/cloudfoundry/stembuild/colorlogger"
 	"github.com/cloudfoundry/stembuild/filesystem"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
-	"github.com/google/subcommands"
 )
 
 //counterfeiter:generate . OSAndVersionGetter

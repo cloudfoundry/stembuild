@@ -5,12 +5,12 @@ import (
 	"errors"
 	"flag"
 
-	"github.com/cloudfoundry/stembuild/commandparser"
-	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
 	"github.com/google/subcommands"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/commandparser/commandparserfakes"
 )
 
 var _ = Describe("construct", func() {

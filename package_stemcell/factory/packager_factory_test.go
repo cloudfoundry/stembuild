@@ -1,12 +1,12 @@
 package factory_test
 
 import (
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 	"github.com/cloudfoundry/stembuild/package_stemcell/factory"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Factory", func() {

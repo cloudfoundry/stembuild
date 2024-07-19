@@ -8,13 +8,14 @@ import (
 	"path"
 	"strings"
 
+	"github.com/google/subcommands"
+
 	"github.com/cloudfoundry/stembuild/assets"
 	"github.com/cloudfoundry/stembuild/commandparser"
 	vmconstructfactory "github.com/cloudfoundry/stembuild/construct/factory"
 	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	packagerfactory "github.com/cloudfoundry/stembuild/package_stemcell/factory"
 	"github.com/cloudfoundry/stembuild/version"
-	"github.com/google/subcommands"
 )
 
 func main() {

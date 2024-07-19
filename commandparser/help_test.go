@@ -7,11 +7,12 @@ import (
 	"os"
 	"path"
 
-	"github.com/cloudfoundry/stembuild/commandparser"
-	"github.com/cloudfoundry/stembuild/version"
 	"github.com/google/subcommands"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"github.com/cloudfoundry/stembuild/commandparser"
+	"github.com/cloudfoundry/stembuild/version"
 )
 
 var _ = Describe("help", func() {

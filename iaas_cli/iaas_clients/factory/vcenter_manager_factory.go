@@ -5,12 +5,13 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/session"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/soap"
+
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate

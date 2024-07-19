@@ -4,13 +4,13 @@ import (
 	_ "reflect"
 	"time"
 
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/pkg/errors"
+
 	"github.com/cloudfoundry/stembuild/poller/pollerfakes"
 	"github.com/cloudfoundry/stembuild/remotemanager"
 	"github.com/cloudfoundry/stembuild/remotemanager/remotemanagerfakes"
-	"github.com/pkg/errors"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 )
 
 const expectedTryCheckRebootCommand = "shutdown /r /f /t 60 /c \"stembuild reboot test\""

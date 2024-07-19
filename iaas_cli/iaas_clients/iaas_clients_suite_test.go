@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/google/uuid"
-	"github.com/vmware/govmomi/object"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/vmware/govmomi/object"
+
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 )
 
 func TestIaasClients(t *testing.T) {

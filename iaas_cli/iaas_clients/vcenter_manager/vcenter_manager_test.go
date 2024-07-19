@@ -5,16 +5,16 @@ import (
 	"errors"
 	"runtime"
 
-	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"github.com/vmware/govmomi/guest"
 	"github.com/vmware/govmomi/object"
 	"github.com/vmware/govmomi/vim25"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
 )
 
 var _ = Describe("VcenterManager", func() {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/pkg/errors"
+
 	"github.com/cloudfoundry/stembuild/commandparser"
 	"github.com/cloudfoundry/stembuild/construct"
 	"github.com/cloudfoundry/stembuild/construct/archive"
@@ -13,7 +15,6 @@ import (
 	"github.com/cloudfoundry/stembuild/poller"
 	"github.com/cloudfoundry/stembuild/remotemanager"
 	"github.com/cloudfoundry/stembuild/version"
-	"github.com/pkg/errors"
 )
 
 type VMConstructFactory struct {
