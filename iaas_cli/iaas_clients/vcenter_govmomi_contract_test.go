@@ -88,9 +88,7 @@ var _ = Describe("VcenterClient", func() {
 					Skip("export VCENTER_CA_CERT=<a valid ca cert> to run this test")
 				}
 
-				tmpDir, err := os.MkdirTemp("", "vcenter-client-contract-tests")
-				defer os.RemoveAll(tmpDir)
-				Expect(err).ToNot(HaveOccurred())
+				tmpDir := GinkgoT().TempDir() // automatically cleaned up
 				f, err := os.CreateTemp(tmpDir, "valid-cert")
 				Expect(err).ToNot(HaveOccurred())
 

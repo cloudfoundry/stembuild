@@ -178,7 +178,7 @@ var _ = SynchronizedAfterSuite(func() {
 	_ = os.RemoveAll(tmpDir)
 }, func() {
 	if pathToCACert != "" {
-		os.RemoveAll(pathToCACert)
+		_ = os.RemoveAll(pathToCACert)
 	}
 })
 
@@ -305,7 +305,7 @@ func runIgnoringOutput(args []string) int {
 
 	_, w, _ := os.Pipe()
 
-	defer w.Close()
+	defer func() { _ = w.Close() }()
 
 	os.Stderr = w
 	os.Stdout = w

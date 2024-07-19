@@ -18,7 +18,6 @@ var targetVMPath string
 var vCenterCredentialUrl string
 
 var _ = BeforeSuite(func() {
-
 	vCenterCredentialUrl = os.Getenv("VCENTER_ADMIN_CREDENTIAL_URL")
 	Expect(vCenterCredentialUrl).NotTo(Equal(""), "VCENTER_ADMIN_CREDENTIAL_URL is required")
 
@@ -28,5 +27,4 @@ var _ = BeforeSuite(func() {
 	Expect(vmName).NotTo(Equal(""), "PACKAGE_TEST_VM_NAME is required")
 
 	targetVMPath = fmt.Sprintf("%s/%s", vmFolder, vmName)
-
 })

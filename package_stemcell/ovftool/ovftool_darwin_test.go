@@ -4,7 +4,9 @@
 package ovftool_test
 
 import (
+	"bytes"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -14,66 +16,47 @@ import (
 )
 
 var _ = Describe("ovftool darwin", func() {
-
 	Context("homeDirectory", func() {
-		var home = ""
-
-		BeforeEach(func() {
-			home = os.Getenv("HOME")
-		})
-
-		AfterEach(func() {
-			os.Setenv("HOME", home)
-		})
-
 		It("returns value of HOME environment variable is set", func() {
-			Expect(home).NotTo(Equal(""))
+			envHomedir := "/fake/envHomedir/dir"
+			GinkgoT().Setenv("HOME", envHomedir)
 
 			testHome := ovftool.HomeDirectory()
-			Expect(testHome).To(Equal(home))
+			Expect(testHome).To(Equal(envHomedir))
 		})
 
 		It("returns user HOME directory if HOME environment variable is not set", func() {
-			os.Unsetenv("HOME")
+			GinkgoT().Setenv("HOME", "")
+
+			osHomedirBytes, err := exec.Command("sh", "-c", "cd ~ && pwd").Output()
+			Expect(err).NotTo(HaveOccurred())
+			osHomedir := string(bytes.TrimSpace(osHomedirBytes))
 
 			testHome := ovftool.HomeDirectory()
-			Expect(testHome).To(Equal(home))
+			Expect(testHome).To(Equal(osHomedir))
 		})
-
 	})
 
 	Context("Ovftool", func() {
-		var oldPath string
-
 		BeforeEach(func() {
-			oldPath = os.Getenv("PATH")
-			os.Unsetenv("PATH")
-		})
-
-		AfterEach(func() {
-			os.Setenv("PATH", oldPath)
+			GinkgoT().Setenv("PATH", "")
 		})
 
 		It("when ovftool is on the path, its path is returned", func() {
-			tmpDir, err := os.MkdirTemp(os.TempDir(), "ovftmp")
+			tmpDir := GinkgoT().TempDir() // automatically cleaned up
+			err := os.WriteFile(filepath.Join(tmpDir, "ovftool"), []byte{}, 0700)
 			Expect(err).ToNot(HaveOccurred())
-			err = os.WriteFile(filepath.Join(tmpDir, "ovftool"), []byte{}, 0700)
-			Expect(err).ToNot(HaveOccurred())
-			os.Setenv("PATH", tmpDir)
+			GinkgoT().Setenv("PATH", tmpDir)
 
 			ovfPath, err := ovftool.Ovftool([]string{})
-			os.RemoveAll(tmpDir)
-
 			Expect(err).ToNot(HaveOccurred())
 			Expect(ovfPath).To(Equal(filepath.Join(tmpDir, "ovftool")))
 		})
 
 		It("fails when given invalid set of install paths", func() {
-			tmpDir, err := os.MkdirTemp(os.TempDir(), "ovftmp")
-			Expect(err).ToNot(HaveOccurred())
+			tmpDir := GinkgoT().TempDir() // automatically cleaned up
 
-			_, err = ovftool.Ovftool([]string{tmpDir})
-			os.RemoveAll(tmpDir)
+			_, err := ovftool.Ovftool([]string{tmpDir})
 
 			Expect(err).To(HaveOccurred())
 		})
@@ -87,18 +70,10 @@ var _ = Describe("ovftool darwin", func() {
 			var tmpDir, dummyDir string
 
 			BeforeEach(func() {
-				var err error
-				tmpDir, err = os.MkdirTemp(os.TempDir(), "ovftmp")
+				tmpDir = GinkgoT().TempDir()   // automatically cleaned up
+				dummyDir = GinkgoT().TempDir() // automatically cleaned up
+				err := os.WriteFile(filepath.Join(tmpDir, "ovftool"), []byte{}, 0700)
 				Expect(err).ToNot(HaveOccurred())
-				dummyDir, err = os.MkdirTemp(os.TempDir(), "trashdir")
-				Expect(err).ToNot(HaveOccurred())
-				err = os.WriteFile(filepath.Join(tmpDir, "ovftool"), []byte{}, 0700)
-				Expect(err).ToNot(HaveOccurred())
-			})
-
-			AfterEach(func() {
-				os.RemoveAll(tmpDir)
-				os.RemoveAll(dummyDir)
 			})
 
 			It("Returns the path to the ovftool", func() {

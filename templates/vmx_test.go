@@ -73,11 +73,7 @@ func TestVMXTemplate(t *testing.T) {
 }
 
 func TestWriteVMXTemplate(t *testing.T) {
-	tmpdir, err := os.MkdirTemp("", "test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	vmxPath := filepath.Join(tmpdir, "FooBarBaz.vmx")
+	vmxPath := filepath.Join(t.TempDir(), "FooBarBaz.vmx")
 
 	if err := templates.WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
 		t.Fatal(err)

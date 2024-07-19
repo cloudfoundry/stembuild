@@ -19,44 +19,35 @@ import (
 )
 
 var _ = Describe("VmdkPackager", func() {
-	var tmpDir string
 	var stembuildConfig package_parameters.VmdkPackageParameters
-	var c packagers.VmdkPackager
+	var vmdkPackager packagers.VmdkPackager
 
 	BeforeEach(func() {
-		var err error
-		tmpDir, err = os.MkdirTemp("", "")
-		Expect(err).NotTo(HaveOccurred())
-
 		stembuildConfig = package_parameters.VmdkPackageParameters{
 			OSVersion: "2012R2",
 			Version:   "1200.1",
 		}
 
-		c = packagers.VmdkPackager{
+		vmdkPackager = packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
 			Debugf:       func(format string, a ...interface{}) {},
 			BuildOptions: stembuildConfig,
 		}
 	})
 
-	AfterEach(func() {
-		Expect(os.RemoveAll(tmpDir)).To(Succeed())
-	})
-
 	Describe("vmdk", func() {
 		Context("valid vmdk file specified", func() {
 			It("should be valid", func() {
-
 				vmdk, err := os.CreateTemp("", "temp.vmdk")
 				Expect(err).ToNot(HaveOccurred())
-				defer os.Remove(vmdk.Name())
+				defer func() { _ = os.Remove(vmdk.Name()) }()
 
 				valid, err := packagers.IsValidVMDK(vmdk.Name())
 				Expect(err).To(BeNil())
 				Expect(valid).To(BeTrue())
 			})
 		})
+
 		Context("invalid vmdk file specified", func() {
 			It("should be invalid", func() {
 				valid, err := packagers.IsValidVMDK(filepath.Join("..", "out", "invalid"))
@@ -67,29 +58,28 @@ var _ = Describe("VmdkPackager", func() {
 	})
 
 	Describe("CreateImage", func() {
-
 		It("successfully creates an image tarball", func() {
-			c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
-			err := c.CreateImage()
+			vmdkPackager.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+			err := vmdkPackager.CreateImage()
 			Expect(err).NotTo(HaveOccurred())
 
 			// the image will be saved to the VmdkPackager's temp directory
-			tmpdir, err := c.TempDir()
+			tmpdir, err := vmdkPackager.TempDir()
 			Expect(err).NotTo(HaveOccurred())
 
 			outputImagePath := filepath.Join(tmpdir, "image")
-			Expect(c.Image).To(Equal(outputImagePath))
+			Expect(vmdkPackager.Image).To(Equal(outputImagePath))
 
 			// Make sure the sha1 sum is correct
 			h := sha1.New()
-			f, err := os.Open(c.Image)
+			f, err := os.Open(vmdkPackager.Image)
 			Expect(err).NotTo(HaveOccurred())
 
 			_, err = io.Copy(h, f)
 			Expect(err).NotTo(HaveOccurred())
 
 			actualShasum := fmt.Sprintf("%x", h.Sum(nil))
-			Expect(c.Sha1sum).To(Equal(actualShasum))
+			Expect(vmdkPackager.Sha1sum).To(Equal(actualShasum))
 
 			// expect the image ova to contain only the following file names
 			expectedNames := []string{
@@ -98,7 +88,7 @@ var _ = Describe("VmdkPackager", func() {
 				"image-disk1.vmdk",
 			}
 
-			imageDir, err := helpers.ExtractGzipArchive(c.Image)
+			imageDir, err := helpers.ExtractGzipArchive(vmdkPackager.Image)
 			Expect(err).NotTo(HaveOccurred())
 			list, err := os.ReadDir(imageDir)
 			Expect(err).NotTo(HaveOccurred())
@@ -128,12 +118,12 @@ var _ = Describe("VmdkPackager", func() {
 
 		Context("When VMDK file is invalid", func() {
 			It("returns an error", func() {
-				c.BuildOptions.VMDKFile = ""
+				vmdkPackager.BuildOptions.VMDKFile = ""
 
 				mockCtrl = gomock.NewController(GinkgoT())
 				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
-				err := c.ValidateFreeSpaceForPackage(mockFileSystem)
+				err := vmdkPackager.ValidateFreeSpaceForPackage(mockFileSystem)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("could not get vmdk info"))
 
@@ -142,42 +132,42 @@ var _ = Describe("VmdkPackager", func() {
 
 		Context("When filesystem has enough free space for stemcell (twice the size of the expected free space)", func() {
 			It("does not return an error", func() {
-				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+				vmdkPackager.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
 
 				mockCtrl = gomock.NewController(GinkgoT())
 				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
-				vmdkFile, err := os.Stat(c.BuildOptions.VMDKFile)
+				vmdkFile, err := os.Stat(vmdkPackager.BuildOptions.VMDKFile)
 				Expect(err).ToNot(HaveOccurred())
 
 				testVmdkSize := vmdkFile.Size()
 				expectFreeSpace := uint64(testVmdkSize)*2 + (packagers.Gigabyte / 2)
 
-				directoryPath := filepath.Dir(c.BuildOptions.VMDKFile)
+				directoryPath := filepath.Dir(vmdkPackager.BuildOptions.VMDKFile)
 				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(expectFreeSpace*2), nil).AnyTimes()
 
-				err = c.ValidateFreeSpaceForPackage(mockFileSystem)
+				err = vmdkPackager.ValidateFreeSpaceForPackage(mockFileSystem)
 				Expect(err).To(Not(HaveOccurred()))
 
 			})
 		})
 		Context("When filesystem does not have enough free space for stemcell (half the size of the expected free space", func() {
 			It("returns error", func() {
-				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+				vmdkPackager.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
 
 				mockCtrl = gomock.NewController(GinkgoT())
 				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
-				vmdkFile, err := os.Stat(c.BuildOptions.VMDKFile)
+				vmdkFile, err := os.Stat(vmdkPackager.BuildOptions.VMDKFile)
 				Expect(err).ToNot(HaveOccurred())
 
 				testVmdkSize := vmdkFile.Size()
 				expectFreeSpace := uint64(testVmdkSize)*2 + (packagers.Gigabyte / 2)
 
-				directoryPath := filepath.Dir(c.BuildOptions.VMDKFile)
+				directoryPath := filepath.Dir(vmdkPackager.BuildOptions.VMDKFile)
 				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(expectFreeSpace/2), nil).AnyTimes()
 
-				err = c.ValidateFreeSpaceForPackage(mockFileSystem)
+				err = vmdkPackager.ValidateFreeSpaceForPackage(mockFileSystem)
 
 				Expect(err).To(HaveOccurred())
 
@@ -188,15 +178,15 @@ var _ = Describe("VmdkPackager", func() {
 
 		Context("When filesystem fails to provide free space", func() {
 			It("returns error specifying that given disk could not provide free space", func() {
-				c.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
+				vmdkPackager.BuildOptions.VMDKFile = filepath.Join("..", "..", "test", "data", "expected.vmdk")
 
 				mockCtrl = gomock.NewController(GinkgoT())
 				mockFileSystem = mockfilesystem.NewMockFileSystem(mockCtrl)
 
-				directoryPath := filepath.Dir(c.BuildOptions.VMDKFile)
+				directoryPath := filepath.Dir(vmdkPackager.BuildOptions.VMDKFile)
 				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(4), errors.New("some error")).AnyTimes()
 
-				err := c.ValidateFreeSpaceForPackage(mockFileSystem)
+				err := vmdkPackager.ValidateFreeSpaceForPackage(mockFileSystem)
 
 				Expect(err).To(HaveOccurred())
 				expectedErrorMsg := "could not check free space on disk: "

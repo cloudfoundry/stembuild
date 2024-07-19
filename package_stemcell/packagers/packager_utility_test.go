@@ -20,13 +20,8 @@ var _ bool = Describe("Packager Utility", func() {
 		var destinationDir string
 
 		BeforeEach(func() {
-			sourceDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-source")
-			destinationDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-destination")
-		})
-
-		AfterEach(func() {
-			os.RemoveAll(sourceDir)      //nolint:errcheck
-			os.RemoveAll(destinationDir) //nolint:errcheck
+			sourceDir = GinkgoT().TempDir()      // automatically cleaned up
+			destinationDir = GinkgoT().TempDir() // automatically cleaned up
 		})
 
 		It("should tar all files inside provided folder and return its sha1", func() {

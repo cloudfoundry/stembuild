@@ -15,25 +15,17 @@ var _ = Describe("ovftool", func() {
 
 	Context("findExecutable", func() {
 		var exeFolder, outFolder string
-
-		BeforeEach(func() {
-			var err error
-			exeFolder, err = os.MkdirTemp(os.TempDir(), "dummyExecutables")
-			Expect(err).NotTo(HaveOccurred())
-
-			outFolder = filepath.Join(exeFolder, "out")
-			Expect(os.Mkdir(outFolder, os.ModeDir|os.ModePerm)).To(Succeed())
-		})
-
-		AfterEach(func() {
-			err := os.RemoveAll(exeFolder)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
 		var ovftoolExe = "ovftool"
 		if runtime.GOOS == "windows" {
 			ovftoolExe += ".exe"
 		}
+
+		BeforeEach(func() {
+			exeFolder = GinkgoT().TempDir() // automatically cleaned up
+
+			outFolder = filepath.Join(exeFolder, "out")
+			Expect(os.Mkdir(outFolder, os.ModeDir|os.ModePerm)).To(Succeed())
+		})
 
 		It("given root that has executable and valid executable name, should return location of the executable", func() {
 			Expect(os.WriteFile(filepath.Join(outFolder, ovftoolExe), []byte{}, os.ModePerm)).To(Succeed())

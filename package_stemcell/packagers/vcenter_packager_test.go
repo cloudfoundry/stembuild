@@ -29,14 +29,10 @@ var _ = Describe("VcenterPackager", func() {
 	var fakeVcenterClient *packagersfakes.FakeIaasClient
 
 	BeforeEach(func() {
-		outputDir, _ = os.MkdirTemp(os.TempDir(), "vcenter-test-output-dir")
+		outputDir = GinkgoT().TempDir() // automatically cleaned up
 		sourceConfig = config.SourceConfig{Password: "password", URL: "url", Username: "username", VmInventoryPath: "path/valid-vm-name"}
 		outputConfig = config.OutputConfig{Os: "2012R2", StemcellVersion: "1200.2", OutputDir: outputDir}
 		fakeVcenterClient = &packagersfakes.FakeIaasClient{}
-	})
-
-	AfterEach(func() {
-		_ = os.RemoveAll(outputDir)
 	})
 
 	Context("ValidateSourceParameters", func() {
