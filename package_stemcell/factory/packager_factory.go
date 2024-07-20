@@ -41,6 +41,7 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 		vmdkPackager.BuildOptions.Version = outputConfig.StemcellVersion
 		vmdkPackager.BuildOptions.OutputDir = outputConfig.OutputDir
 		return vmdkPackager, nil
+	default:
+		return nil, errors.New("unable to determine packager")
 	}
-	return nil, errors.New("Unable to determine packager")
 }
