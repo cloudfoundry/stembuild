@@ -39,7 +39,6 @@ var _ = Describe("OutputConfig", func() {
 				valid := config.IsValidOS("2019")
 				Expect(valid).To(BeTrue())
 			})
-
 		})
 
 		Context("something other than a supported os is specified", func() {
@@ -53,8 +52,8 @@ var _ = Describe("OutputConfig", func() {
 				Expect(valid).To(BeFalse())
 			})
 		})
-
 	})
+
 	Describe("stemcell version", func() {
 		Context("no stemcell version specified", func() {
 			It("should be invalid", func() {
@@ -82,58 +81,80 @@ var _ = Describe("OutputConfig", func() {
 	})
 
 	Describe("validateOutputDir", func() {
+		var outputDir string
+
 		Context("no dir given", func() {
+			BeforeEach(func() {
+				outputDir = ""
+			})
+
 			It("should be an error", func() {
 				err := config.ValidateOrCreateOutputDir("")
 				Expect(err).To(HaveOccurred())
 			})
 		})
 
-		Context("valid relative directory that does not exist", func() {
-			It("should create the directory and not fail", func() {
-				err := os.RemoveAll(filepath.Join(".", "tmp"))
-				Expect(err).ToNot(HaveOccurred())
-				err = config.ValidateOrCreateOutputDir(filepath.Join(".", "tmp"))
-				Expect(err).ToNot(HaveOccurred())
-				_, err = os.Stat(filepath.Join(filepath.Join(".", "tmp")))
+		Context("with a valid relative directory", func() {
+			var workingDir string
+
+			BeforeEach(func() {
+				outputDir = filepath.Join(".", "some-directory")
+
+				workingDir = GinkgoT().TempDir()
+				err := os.Chdir(workingDir)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			AfterEach(func() {
-				err := os.RemoveAll(filepath.Join(".", "tmp"))
-				Expect(err).ToNot(HaveOccurred())
+			Context("that does not exist", func() {
+				It("should create the directory and not fail", func() {
+					err := config.ValidateOrCreateOutputDir(outputDir)
+					Expect(err).ToNot(HaveOccurred())
+
+					_, err = os.Stat(outputDir)
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("that already exists", func() {
+				BeforeEach(func() {
+					err := os.MkdirAll(outputDir, os.ModePerm)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("should not fail", func() {
+					_, err := os.Stat(outputDir)
+					Expect(err).ToNot(HaveOccurred())
+
+					err = config.ValidateOrCreateOutputDir(outputDir)
+					Expect(err).ToNot(HaveOccurred())
+				})
+			})
+
+			Context("when intermediate directories do not exist", func() {
+				It("should be an error", func() {
+					missingIntermediateDir := filepath.Join(outputDir, "does-not", "exist")
+					err := config.ValidateOrCreateOutputDir(missingIntermediateDir)
+					Expect(err).To(HaveOccurred())
+				})
 			})
 		})
 
-		Context("valid directory that already exists", func() {
+		Context("with valid absolute directory", func() {
+			BeforeEach(func() {
+				outputDir = GinkgoT().TempDir()
+			})
+
 			It("should not fail", func() {
-				err := os.Mkdir(filepath.Join(".", "tmp"), 0700)
-				Expect(err).ToNot(HaveOccurred())
-				err = config.ValidateOrCreateOutputDir(filepath.Join(".", "tmp"))
+				err := config.ValidateOrCreateOutputDir(outputDir)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			AfterEach(func() {
-				err := os.RemoveAll(filepath.Join(".", "tmp"))
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-
-		Context("valid absolute directory", func() {
-			It("should not fail", func() {
-				cwd, err := os.Getwd()
-				Expect(err).ToNot(HaveOccurred())
-				err = config.ValidateOrCreateOutputDir(cwd)
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-
-		Context("invalid directory because intermediate directories do not exist", func() {
-			It("should be an error", func() {
-				err := os.RemoveAll(filepath.Join(".", "tmp"))
-				Expect(err).ToNot(HaveOccurred())
-				err = config.ValidateOrCreateOutputDir(filepath.Join(".", "tmp", "sub-dir"))
-				Expect(err).To(HaveOccurred())
+			Context("when intermediate directories do not exist", func() {
+				It("should be an error", func() {
+					missingIntermediateDir := filepath.Join(outputDir, "does-not", "exist")
+					err := config.ValidateOrCreateOutputDir(missingIntermediateDir)
+					Expect(err).To(HaveOccurred())
+				})
 			})
 		})
 	})
