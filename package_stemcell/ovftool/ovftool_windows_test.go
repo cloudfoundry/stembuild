@@ -51,7 +51,7 @@ var _ = Describe("ovftool", func() {
 				var err error
 				key, err = registry.OpenKey(registry.CURRENT_USER, `SOFTWARE`, registry.WRITE)
 				Expect(err).ToNot(HaveOccurred())
-				_, exists, err := registry.CreateKey(key, `faketempkey`, registry.WRITE)
+				_, exists, err := registry.CreateKey(key, `fake-temp-key`, registry.WRITE)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(exists).To(BeFalse())
 				keypaths = []string{`\SOFTWARE\fake-temp-key`}
