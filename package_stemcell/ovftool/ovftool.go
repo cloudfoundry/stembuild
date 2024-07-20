@@ -26,11 +26,11 @@ func findExecutable(root, name string) (string, error) {
 	}
 	err := filepath.Walk(root, walkFn)
 	if file == "" {
-		if err == nil || err == stopWalk {
+		if err == nil || errors.Is(err, stopWalk) {
 			err = fmt.Errorf("executable file not found in: %s", root)
 		}
 		// CEV: this should never happen
-		if err == stopWalk {
+		if errors.Is(err, stopWalk) {
 			err = fmt.Errorf("executable file not found in: %s - exec.LookPath error.", root)
 		}
 		return "", &exec.Error{Name: name, Err: err}
