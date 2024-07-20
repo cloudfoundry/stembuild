@@ -91,8 +91,7 @@ var _ = Describe("ovftool", func() {
 		It("fails when given invalid set of install paths", func() {
 			tmpDir := GinkgoT().TempDir() // automatically cleaned up
 
-			_, err = ovftool.Ovftool([]string{tmpDir})
-
+			_, err := ovftool.Ovftool([]string{tmpDir})
 			Expect(err).To(HaveOccurred())
 		})
 
@@ -105,9 +104,10 @@ var _ = Describe("ovftool", func() {
 			var tmpDir, dummyDir string
 
 			BeforeEach(func() {
-				tmpDir := GinkgoT().TempDir()   // automatically cleaned up
-				dummyDir := GinkgoT().TempDir() // automatically cleaned up
-				err = os.WriteFile(filepath.Join(tmpDir, "ovftool.exe"), []byte{}, 0644)
+				tmpDir = GinkgoT().TempDir()   // automatically cleaned up
+				dummyDir = GinkgoT().TempDir() // automatically cleaned up
+
+				err := os.WriteFile(filepath.Join(tmpDir, "ovftool.exe"), []byte{}, 0644)
 				Expect(err).ToNot(HaveOccurred())
 			})
 
