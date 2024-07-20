@@ -4,6 +4,7 @@ import (
 	archiveTar "archive/tar"
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -39,7 +40,6 @@ var _ = Describe("TarWriter", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			err = w.Write("some-file", fakeTarable)
-
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -50,7 +50,6 @@ var _ = Describe("TarWriter", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			err = w.Write("some-file", fakeTarable)
-
 			Expect(err).NotTo(HaveOccurred())
 
 			tarBall := filepath.Join(workingDir, "some-file")
@@ -83,13 +82,14 @@ var _ = Describe("TarWriter", func() {
 
 			gzr, err := gzip.NewReader(fileReader)
 			Expect(err).ToNot(HaveOccurred())
-			defer gzr.Close()
+			defer func() { _ = gzr.Close() }()
+
 			tarReader := archiveTar.NewReader(gzr)
 			var actualContents []string
 			var actualFilenames []string
 			for {
 				header, err := tarReader.Next()
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					break
 				}
 				Expect(err).NotTo(HaveOccurred())
