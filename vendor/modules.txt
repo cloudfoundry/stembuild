@@ -60,7 +60,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20240711041743-f6c9dda6c6da
+# github.com/google/pprof v0.0.0-20240722153945-304e4f0156b8
 ## explicit; go 1.19
 github.com/google/pprof/profile
 # github.com/google/subcommands v1.2.0
@@ -198,8 +198,8 @@ github.com/pkg/errors
 # github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde
 ## explicit
 github.com/tidwall/transform
-# github.com/vmware/govmomi v0.38.0
-## explicit; go 1.19
+# github.com/vmware/govmomi v0.39.0
+## explicit; go 1.21
 github.com/vmware/govmomi
 github.com/vmware/govmomi/cns
 github.com/vmware/govmomi/cns/methods
@@ -226,6 +226,7 @@ github.com/vmware/govmomi/list
 github.com/vmware/govmomi/nfc
 github.com/vmware/govmomi/object
 github.com/vmware/govmomi/ovf
+github.com/vmware/govmomi/ovf/importer
 github.com/vmware/govmomi/pbm
 github.com/vmware/govmomi/pbm/methods
 github.com/vmware/govmomi/pbm/types
