@@ -45,7 +45,8 @@ var _ = Describe("Packager Utility", func() {
 
 			gzr, err := gzip.NewReader(fileReader)
 			Expect(err).ToNot(HaveOccurred())
-			defer gzr.Close()
+			defer func() { Expect(gzr.Close()).To(Succeed()) }()
+
 			tarReader := tar.NewReader(gzr)
 			count := 0
 			for {
@@ -64,13 +65,16 @@ var _ = Describe("Packager Utility", func() {
 			}
 			Expect(count).To(Equal(2))
 
-			tarballFile, err := os.Open(tarball) //nolint:ineffassign,staticcheck
-			defer tarballFile.Close()            //nolint:staticcheck
-			expectedSha1 := sha1.New()
-			io.Copy(expectedSha1, tarballFile) //nolint:errcheck
+			tarballFile, err := os.Open(tarball)
+			Expect(err).NotTo(HaveOccurred())
+			defer func() { Expect(tarballFile.Close()).To(Succeed()) }()
 
-			sum := fmt.Sprintf("%x", expectedSha1.Sum(nil))
-			Expect(sha1Sum).To(Equal(sum))
+			expectedSha1 := sha1.New()
+			_, err = io.Copy(expectedSha1, tarballFile)
+			Expect(err).NotTo(HaveOccurred())
+
+			expectedSha1Sum := fmt.Sprintf("%x", expectedSha1.Sum(nil))
+			Expect(sha1Sum).To(Equal(expectedSha1Sum))
 		})
 	})
 
