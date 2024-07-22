@@ -19,11 +19,16 @@ import (
 var _ = Describe("TarWriter", func() {
 	Describe("Write", func() {
 		var (
-			workingDir  string
-			fakeTarable *tarfakes.FakeTarable
+			originalWorkingDir string
+			workingDir         string
+			fakeTarable        *tarfakes.FakeTarable
 		)
 
 		BeforeEach(func() {
+			var err error
+			originalWorkingDir, err = os.Getwd()
+			Expect(err).NotTo(HaveOccurred())
+
 			workingDir = GinkgoT().TempDir() // automatically cleaned up
 
 			fakeFile := bytes.NewReader([]byte{})
@@ -31,6 +36,10 @@ var _ = Describe("TarWriter", func() {
 			fakeTarable.ReadStub = fakeFile.Read
 			fakeTarable.SizeStub = fakeFile.Size
 			fakeTarable.NameReturns("some-file")
+		})
+
+		AfterEach(func() {
+			Expect(os.Chdir(originalWorkingDir)).To(Succeed())
 		})
 
 		It("should not fail", func() {

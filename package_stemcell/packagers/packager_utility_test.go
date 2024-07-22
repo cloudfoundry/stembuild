@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ bool = Describe("Packager Utility", func() {
+var _ = Describe("Packager Utility", func() {
 	Context("TarGenerator", func() {
 		var sourceDir string
 		var destinationDir string

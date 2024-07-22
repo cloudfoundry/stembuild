@@ -95,14 +95,22 @@ var _ = Describe("OutputConfig", func() {
 		})
 
 		Context("with a valid relative directory", func() {
-			var workingDir string
+			var originalWorkingDir, workingDir string
 
 			BeforeEach(func() {
+				var err error
+				originalWorkingDir, err = os.Getwd()
+				Expect(err).NotTo(HaveOccurred())
+
 				outputDir = filepath.Join(".", "some-directory")
 
 				workingDir = GinkgoT().TempDir()
-				err := os.Chdir(workingDir)
+				err = os.Chdir(workingDir)
 				Expect(err).ToNot(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				Expect(os.Chdir(originalWorkingDir)).To(Succeed())
 			})
 
 			Context("that does not exist", func() {
