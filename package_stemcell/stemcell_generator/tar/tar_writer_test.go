@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -29,7 +30,10 @@ var _ = Describe("TarWriter", func() {
 			originalWorkingDir, err = os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 
-			workingDir = GinkgoT().TempDir() // automatically cleaned up
+			// Revert to manual cleanup which fails non-catastrophically on windows
+			//workingDir = GinkgoT().TempDir() // automatically cleaned up
+			workingDir, err = os.MkdirTemp(os.TempDir(), "TarWriterTest")
+			Expect(err).NotTo(HaveOccurred())
 
 			fakeFile := bytes.NewReader([]byte{})
 			fakeTarable = &tarfakes.FakeTarable{}
@@ -40,6 +44,12 @@ var _ = Describe("TarWriter", func() {
 
 		AfterEach(func() {
 			Expect(os.Chdir(originalWorkingDir)).To(Succeed())
+
+			// TODO: remove once GinkgoT().TempDir() is safe on windows
+			err := os.RemoveAll(workingDir)
+			if err != nil {
+				By(fmt.Sprintf("removing '%s' failed: %s", workingDir, err))
+			}
 		})
 
 		It("should not fail", func() {

@@ -29,10 +29,21 @@ var _ = Describe("VcenterPackager", func() {
 	var fakeVcenterClient *packagersfakes.FakeIaasClient
 
 	BeforeEach(func() {
-		outputDir = GinkgoT().TempDir() // automatically cleaned up
+		// Revert to manual cleanup which fails non-catastrophically on windows
+		//outputDir = GinkgoT().TempDir() // automatically cleaned up
+		outputDir, _ = os.MkdirTemp(os.TempDir(), "vcenter-test-output-dir")
+
 		sourceConfig = config.SourceConfig{Password: "password", URL: "url", Username: "username", VmInventoryPath: "path/valid-vm-name"}
 		outputConfig = config.OutputConfig{Os: "2012R2", StemcellVersion: "1200.2", OutputDir: outputDir}
 		fakeVcenterClient = &packagersfakes.FakeIaasClient{}
+	})
+
+	AfterEach(func() {
+		// TODO: remove once GinkgoT().TempDir() is safe on windows
+		err := os.RemoveAll(outputDir)
+		if err != nil {
+			By(fmt.Sprintf("removing '%s' failed: %s", outputDir, err))
+		}
 	})
 
 	Context("ValidateSourceParameters", func() {

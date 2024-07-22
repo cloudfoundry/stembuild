@@ -20,8 +20,23 @@ var _ = Describe("Packager Utility", func() {
 		var destinationDir string
 
 		BeforeEach(func() {
-			sourceDir = GinkgoT().TempDir()      // automatically cleaned up
-			destinationDir = GinkgoT().TempDir() // automatically cleaned up
+			// Revert to manual cleanup which fails non-catastrophically on windows
+			//sourceDir = GinkgoT().TempDir()      // automatically cleaned up
+			//destinationDir = GinkgoT().TempDir() // automatically cleaned up
+			sourceDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-source")
+			destinationDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-destination")
+		})
+
+		AfterEach(func() {
+			// TODO: remove once GinkgoT().TempDir() is safe on windows
+			err := os.RemoveAll(sourceDir)
+			if err != nil {
+				By(fmt.Sprintf("removing '%s' failed: %s", sourceDir, err))
+			}
+			err = os.RemoveAll(destinationDir)
+			if err != nil {
+				By(fmt.Sprintf("removing '%s' failed: %s", destinationDir, err))
+			}
 		})
 
 		It("should tar all files inside provided folder and return its sha1", func() {
