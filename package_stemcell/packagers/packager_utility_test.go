@@ -46,17 +46,17 @@ var _ = Describe("Packager Utility", func() {
 			gzr, err := gzip.NewReader(fileReader)
 			Expect(err).ToNot(HaveOccurred())
 			defer gzr.Close()
-			tarfileReader := tar.NewReader(gzr)
+			tarReader := tar.NewReader(gzr)
 			count := 0
 			for {
-				header, err := tarfileReader.Next()
+				header, err := tarReader.Next()
 				if err == io.EOF {
 					break
 				}
 				count++
 				Expect(err).NotTo(HaveOccurred())
 				buf := new(bytes.Buffer)
-				_, err = buf.ReadFrom(tarfileReader)
+				_, err = buf.ReadFrom(tarReader)
 				if err != nil {
 					break
 				}
