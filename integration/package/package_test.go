@@ -33,10 +33,9 @@ var _ = Describe("Package", func() {
 
 	BeforeEach(func() {
 		vcenterFolder := helpers.EnvMustExist(vcenterFolderVariable)
-
 		packageTestVMName := fmt.Sprintf("stembuild-package-test-%d", rand.Int())
 
-		baseVMWithPath := fmt.Sprintf(vcenterFolder + "/" + baseVMName)
+		baseVMWithPath := strings.Join([]string{vcenterFolder, baseVMName}, "/")
 		vmPath = strings.Join([]string{vcenterFolder, packageTestVMName}, "/")
 
 		vcenterAdminCredentialUrl = helpers.EnvMustExist(vcenterAdminCredentialUrlVariable)
