@@ -38,13 +38,14 @@ func NewWinRM(host string, username string, password string, clientFactory WinRM
 }
 
 func (w *WinRM) CanReachVM() error {
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", w.host, WinRmPort), time.Duration(time.Second*60))
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", w.host, WinRmPort), time.Second*60)
 	if err != nil {
-		return fmt.Errorf("host %s is unreachable. Please ensure WinRM is enabled and the IP is correct: %s", w.host, err)
+		return fmt.Errorf("host %s is unreachable; lease ensure WinRM is enabled and the IP is correct: %w", w.host, err)
 	}
+
 	err = conn.Close()
 	if err != nil {
-		return fmt.Errorf("could not close connection to host %s: %s", w.host, err)
+		return fmt.Errorf("could not close connection to host %s: %w", w.host, err)
 	}
 
 	return nil
@@ -54,17 +55,17 @@ func (w *WinRM) CanLoginVM() error {
 	winrmClient, err := w.clientFactory.Build(WinRmTimeout)
 
 	if err != nil {
-		return fmt.Errorf("failed to create winrm client: %s", err)
+		return fmt.Errorf("failed to create winrm client: %w", err)
 	}
 
 	s, err := winrmClient.CreateShell()
 	if err != nil {
-		return fmt.Errorf("failed to create winrm shell: %s", err)
+		return fmt.Errorf("failed to create winrm shell: %w", err)
 	}
 
 	err = s.Close()
 	if err != nil {
-		return fmt.Errorf("failed to close winrm shell: %s", err)
+		return fmt.Errorf("failed to close winrm shell: %w", err)
 	}
 
 	return nil

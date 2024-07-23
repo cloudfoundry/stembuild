@@ -178,33 +178,34 @@ var _ = Describe("WinRM RemoteManager", func() {
 			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass", winRMClientFactory)
 
 			err := remotemanager.CanLoginVM()
-
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("returns error if winrmclient cannot be created", func() {
 			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
-			buildError := errors.New("unable to build a client")
-			winRMClientFactory.BuildReturns(nil, buildError)
+			buildErr := errors.New("unable to build a client")
+			winRMClientFactory.BuildReturns(nil, buildErr)
 
 			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass", winRMClientFactory)
-			err := remotemanager.CanLoginVM()
 
+			err := remotemanager.CanLoginVM()
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(fmt.Errorf("failed to create winrm client: %s", buildError)))
+			Expect(err).To(MatchError(fmt.Errorf("failed to create winrm client: %w", buildErr)))
 		})
+
 		It("returns error if shell cannot be created", func() {
 			winRMClientFactory := new(remotemanagerfakes.FakeWinRMClientFactoryI)
 			winRMClient := new(remotemanagerfakes.FakeWinRMClient)
 			winRMClientFactory.BuildReturns(winRMClient, nil)
 
-			winRMClient.CreateShellReturns(nil, errors.New("some shell creation error"))
+			shellErr := errors.New("some shell creation error")
+			winRMClient.CreateShellReturns(nil, shellErr)
+
 			remotemanager := remotemanager.NewWinRM("some-host", "some-user", "some-pass", winRMClientFactory)
 
 			err := remotemanager.CanLoginVM()
-
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(MatchError(fmt.Errorf("failed to create winrm shell: some shell creation error")))
+			Expect(err).To(MatchError(fmt.Errorf("failed to create winrm shell: %w", shellErr)))
 		})
 	})
 })
