@@ -4,7 +4,6 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"crypto/sha1"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,7 +11,6 @@ import (
 )
 
 func WriteManifest(manifestContents, manifestPath string) error {
-
 	manifestPath = filepath.Join(manifestPath, "stemcell.MF")
 
 	f, err := os.OpenFile(manifestPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
@@ -21,9 +19,16 @@ func WriteManifest(manifestContents, manifestPath string) error {
 	}
 	defer f.Close()
 
-	if _, err := fmt.Fprintf(f, manifestContents); err != nil { //nolint:staticcheck
-		os.Remove(manifestPath) //nolint:errcheck
-		return fmt.Errorf("writing stemcell.MF (%s): %s", manifestPath, err)
+	_, err = fmt.Fprint(f, manifestContents)
+	if err != nil {
+		err = fmt.Errorf("writing stemcell.MF (%s): %w", manifestPath, err)
+
+		removeErr := os.Remove(manifestPath)
+		if removeErr != nil {
+			err = fmt.Errorf("removing stemcell.MF (%s): %w %w", manifestPath, removeErr, err)
+		}
+
+		return err
 	}
 	return nil
 }
@@ -46,76 +51,82 @@ stemcell_formats:
 
 }
 
-func TarGenerator(destinationfileName string, sourceDirName string) (string, error) {
-
-	sourcedir, err := os.Open(sourceDirName)
+func TarGenerator(destFileName string, sourceDirName string) (string, error) {
+	sourceDir, err := os.Open(sourceDirName)
 	if err != nil {
 		return "", fmt.Errorf("unable to open %s", sourceDirName)
 	}
-	defer sourcedir.Close()
+	defer sourceDir.Close()
 
-	// get list of files
-	files, err := sourcedir.Readdir(0)
+	files, err := sourceDir.Readdir(0)
 	if err != nil {
 		return "", fmt.Errorf("unable to list files in %s", sourceDirName)
 	}
 
 	// create tar file
-	destinationFile, err := os.Create(destinationfileName)
+	destFile, err := os.Create(destFileName)
 	if err != nil {
-		return "", fmt.Errorf("unable to create destination file with name %s", destinationfileName)
+		return "", fmt.Errorf("unable to create destination file with name %s", destFileName)
 	}
-	defer destinationFile.Close()
+	defer destFile.Close()
 
 	sha1Hash := sha1.New()
-	gzw := gzip.NewWriter(io.MultiWriter(destinationFile, sha1Hash))
-	tarfileWriter := tar.NewWriter(gzw)
+	gzw := gzip.NewWriter(io.MultiWriter(destFile, sha1Hash))
+	tarWriter := tar.NewWriter(gzw)
 
 	for _, fileInfo := range files {
-
 		if fileInfo.IsDir() {
 			continue
 		}
 
-		file, err := os.Open(sourcedir.Name() + string(filepath.Separator) + fileInfo.Name())
+		err = writeFileHeader(fileInfo, tarWriter)
 		if err != nil {
-			return "", fmt.Errorf("unable to open files in %s", sourceDirName)
-		}
-		defer file.Close()
-
-		// prepare the tar header
-		header := new(tar.Header)
-		header.Name = fileInfo.Name()
-		header.Size = fileInfo.Size()
-		header.Mode = int64(fileInfo.Mode())
-		header.ModTime = fileInfo.ModTime()
-
-		err = tarfileWriter.WriteHeader(header)
-		if err != nil {
-			return "", errors.New("unable to write to header of destination tar file")
+			return "", fmt.Errorf("unable to write to header of destination tar file %w", err)
 		}
 
-		_, err = io.Copy(tarfileWriter, file)
+		err = writeFilePathToTar(filepath.Join(sourceDir.Name(), fileInfo.Name()), tarWriter)
 		if err != nil {
-			return "", errors.New("unable to write contents to destination tar file")
+			return "", fmt.Errorf("unable to write contents to destination tar file %w", err)
 		}
 	}
 
-	//Shouldn't be a deferred call as closing the tar writer flushes padding and writes footer which impacts the sha1sum
-
-	err = tarfileWriter.Close()
+	err = tarWriter.Close() // can not be deferred; closing the tar writer flushes data; this changes the checksum
 	if err != nil {
-		return "", errors.New("unable to close tar file")
+		return "", fmt.Errorf("unable to close tar file %w", err)
 	}
 	err = gzw.Close()
 	if err != nil {
-		return "", errors.New("unable to close tar file (gzip)")
+		return "", fmt.Errorf("unable to close tar file (gzip) %w", err)
 	}
 
 	return fmt.Sprintf("%x", sha1Hash.Sum(nil)), nil
 }
 
+func writeFileHeader(fileInfo os.FileInfo, tarWriter *tar.Writer) error {
+	header := new(tar.Header)
+	header.Name = fileInfo.Name()
+	header.Size = fileInfo.Size()
+	header.Mode = int64(fileInfo.Mode())
+	header.ModTime = fileInfo.ModTime()
+
+	return tarWriter.WriteHeader(header)
+}
+
+func writeFilePathToTar(filepath string, tarWriter *tar.Writer) error {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return fmt.Errorf("unable to open file '%s'", filepath)
+	}
+	defer file.Close()
+
+	_, err = io.Copy(tarWriter, file)
+	if err != nil {
+		return fmt.Errorf("unable to copy file '%s' to tarball %w", filepath, err)
+	}
+
+	return nil
+}
+
 func StemcellFilename(version, os string) string {
-	return fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz",
-		version, os)
+	return fmt.Sprintf("bosh-stemcell-%s-vsphere-esxi-windows%s-go_agent.tgz", version, os)
 }
