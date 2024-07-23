@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/stembuild/colorlogger"
 	mockfilesystem "github.com/cloudfoundry/stembuild/filesystem/mock"
 	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
@@ -30,8 +31,8 @@ var _ = Describe("VmdkPackager", func() {
 
 		vmdkPackager = packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
-			Debugf:       func(format string, a ...interface{}) {},
 			BuildOptions: stembuildConfig,
+			Logger:       colorlogger.New(0, false, GinkgoWriter),
 		}
 	})
 
