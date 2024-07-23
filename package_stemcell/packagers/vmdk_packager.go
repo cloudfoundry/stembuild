@@ -33,30 +33,7 @@ type VmdkPackager struct {
 	BuildOptions package_parameters.VmdkPackageParameters
 }
 
-type CancelReadSeeker struct {
-	rs   io.ReadSeeker
-	stop chan struct{}
-}
-
 var ErrInterupt = errors.New("interrupt")
-
-func (r *CancelReadSeeker) Seek(offset int64, whence int) (int64, error) {
-	select {
-	case <-r.stop:
-		return 0, ErrInterupt
-	default:
-		return r.rs.Seek(offset, whence)
-	}
-}
-
-func (r *CancelReadSeeker) Read(p []byte) (int, error) {
-	select {
-	case <-r.stop:
-		return 0, ErrInterupt
-	default:
-		return r.rs.Read(p)
-	}
-}
 
 type CancelWriter struct {
 	w    io.Writer
