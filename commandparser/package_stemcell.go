@@ -23,7 +23,7 @@ type OSAndVersionGetter interface {
 
 //counterfeiter:generate . PackagerFactory
 type PackagerFactory interface {
-	Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logLevel int, color bool) (Packager, error)
+	Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logger colorlogger.Logger) (Packager, error)
 }
 
 //counterfeiter:generate . Packager
@@ -129,7 +129,8 @@ func (p *PackageCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{
 		return subcommands.ExitFailure
 	}
 
-	packager, err := p.packagerFactory.Packager(p.sourceConfig, p.outputConfig, logLevel, p.GlobalFlags.Color)
+	logger := colorlogger.New(logLevel, p.GlobalFlags.Color, os.Stderr)
+	packager, err := p.packagerFactory.Packager(p.sourceConfig, p.outputConfig, logger)
 	if err != nil {
 		p.packagerMessenger.CannotCreatePackager(err)
 		return subcommands.ExitFailure

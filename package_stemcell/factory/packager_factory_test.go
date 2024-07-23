@@ -4,6 +4,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/stembuild/colorlogger"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 	"github.com/cloudfoundry/stembuild/package_stemcell/factory"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
@@ -18,9 +19,11 @@ var _ = Describe("Factory", func() {
 	}
 
 	var packagerFactory *factory.PackagerFactory
+	var logger colorlogger.Logger
 
 	BeforeEach(func() {
 		packagerFactory = &factory.PackagerFactory{}
+		logger = colorlogger.New(0, false, GinkgoWriter)
 	})
 
 	Describe("GetPackager", func() {
@@ -30,7 +33,7 @@ var _ = Describe("Factory", func() {
 					Vmdk: "path/to/a/vmdk",
 				}
 
-				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
+				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, logger)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(actualPackager).To(BeAssignableToTypeOf(&packagers.VmdkPackager{}))
@@ -47,7 +50,7 @@ var _ = Describe("Factory", func() {
 					VmInventoryPath: "some-vm-inventory-path",
 				}
 
-				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
+				actualPackager, err := packagerFactory.Packager(sourceConfig, outputConfig, logger)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(actualPackager).To(BeAssignableToTypeOf(&packagers.VCenterPackager{}))
@@ -62,7 +65,7 @@ var _ = Describe("Factory", func() {
 					VmInventoryPath: "some-vm",
 				}
 
-				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
+				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, logger)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("configuration provided for VMDK & vCenter sources"))
 				Expect(packager).To(BeNil())
@@ -77,7 +80,7 @@ var _ = Describe("Factory", func() {
 					URL:             "some-url",
 				}
 
-				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
+				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, logger)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("missing vCenter configurations"))
 				Expect(packager).To(BeNil())
@@ -88,7 +91,7 @@ var _ = Describe("Factory", func() {
 			It("returns an error", func() {
 				sourceConfig := config.SourceConfig{}
 
-				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, 0, false)
+				packager, err := packagerFactory.Packager(sourceConfig, outputConfig, logger)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("no configuration was provided"))
 				Expect(packager).To(BeNil())

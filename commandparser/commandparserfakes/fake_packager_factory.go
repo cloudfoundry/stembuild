@@ -4,18 +4,18 @@ package commandparserfakes
 import (
 	"sync"
 
+	"github.com/cloudfoundry/stembuild/colorlogger"
 	"github.com/cloudfoundry/stembuild/commandparser"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 )
 
 type FakePackagerFactory struct {
-	PackagerStub        func(config.SourceConfig, config.OutputConfig, int, bool) (commandparser.Packager, error)
+	PackagerStub        func(config.SourceConfig, config.OutputConfig, colorlogger.Logger) (commandparser.Packager, error)
 	packagerMutex       sync.RWMutex
 	packagerArgsForCall []struct {
 		arg1 config.SourceConfig
 		arg2 config.OutputConfig
-		arg3 int
-		arg4 bool
+		arg3 colorlogger.Logger
 	}
 	packagerReturns struct {
 		result1 commandparser.Packager
@@ -29,21 +29,20 @@ type FakePackagerFactory struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePackagerFactory) Packager(arg1 config.SourceConfig, arg2 config.OutputConfig, arg3 int, arg4 bool) (commandparser.Packager, error) {
+func (fake *FakePackagerFactory) Packager(arg1 config.SourceConfig, arg2 config.OutputConfig, arg3 colorlogger.Logger) (commandparser.Packager, error) {
 	fake.packagerMutex.Lock()
 	ret, specificReturn := fake.packagerReturnsOnCall[len(fake.packagerArgsForCall)]
 	fake.packagerArgsForCall = append(fake.packagerArgsForCall, struct {
 		arg1 config.SourceConfig
 		arg2 config.OutputConfig
-		arg3 int
-		arg4 bool
-	}{arg1, arg2, arg3, arg4})
+		arg3 colorlogger.Logger
+	}{arg1, arg2, arg3})
 	stub := fake.PackagerStub
 	fakeReturns := fake.packagerReturns
-	fake.recordInvocation("Packager", []interface{}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("Packager", []interface{}{arg1, arg2, arg3})
 	fake.packagerMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -57,17 +56,17 @@ func (fake *FakePackagerFactory) PackagerCallCount() int {
 	return len(fake.packagerArgsForCall)
 }
 
-func (fake *FakePackagerFactory) PackagerCalls(stub func(config.SourceConfig, config.OutputConfig, int, bool) (commandparser.Packager, error)) {
+func (fake *FakePackagerFactory) PackagerCalls(stub func(config.SourceConfig, config.OutputConfig, colorlogger.Logger) (commandparser.Packager, error)) {
 	fake.packagerMutex.Lock()
 	defer fake.packagerMutex.Unlock()
 	fake.PackagerStub = stub
 }
 
-func (fake *FakePackagerFactory) PackagerArgsForCall(i int) (config.SourceConfig, config.OutputConfig, int, bool) {
+func (fake *FakePackagerFactory) PackagerArgsForCall(i int) (config.SourceConfig, config.OutputConfig, colorlogger.Logger) {
 	fake.packagerMutex.RLock()
 	defer fake.packagerMutex.RUnlock()
 	argsForCall := fake.packagerArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
 func (fake *FakePackagerFactory) PackagerReturns(result1 commandparser.Packager, result2 error) {

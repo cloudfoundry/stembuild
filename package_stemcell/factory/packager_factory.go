@@ -2,7 +2,6 @@ package factory
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"github.com/cloudfoundry/stembuild/colorlogger"
@@ -16,7 +15,7 @@ import (
 
 type PackagerFactory struct{}
 
-func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logLevel int, color bool) (commandparser.Packager, error) {
+func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logger colorlogger.Logger) (commandparser.Packager, error) {
 	source, err := sourceConfig.GetSource()
 	if err != nil {
 		return nil, err
@@ -29,7 +28,7 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 		return vCenterPackager, nil
 	case config.VMDK:
 		options := package_parameters.VmdkPackageParameters{}
-		logger := colorlogger.New(logLevel, color, os.Stderr)
+
 		vmdkPackager := &packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
 			Debugf:       logger.Printf,
