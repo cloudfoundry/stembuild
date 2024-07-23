@@ -62,7 +62,7 @@ var _ = Describe("package_stemcell", func() {
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
 				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				actualSourceConfig, _, _, _ := packagerFactory.PackagerArgsForCall(0)
+				actualSourceConfig, _, _ := packagerFactory.PackagerArgsForCall(0)
 				Expect(actualSourceConfig.Vmdk).To(Equal("some_vmdk_file"))
 			})
 
@@ -82,7 +82,7 @@ var _ = Describe("package_stemcell", func() {
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
 				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				actualSourceConfig, _, _, _ := packagerFactory.PackagerArgsForCall(0)
+				actualSourceConfig, _, _ := packagerFactory.PackagerArgsForCall(0)
 				Expect(actualSourceConfig.URL).To(Equal("https://vcenter.test"))
 				Expect(actualSourceConfig.Username).To(Equal("test-user"))
 				Expect(actualSourceConfig.Password).To(Equal("verysecure"))
@@ -100,7 +100,7 @@ var _ = Describe("package_stemcell", func() {
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
 				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				_, actualOutputConfig, _, _ := packagerFactory.PackagerArgsForCall(0)
+				_, actualOutputConfig, _ := packagerFactory.PackagerArgsForCall(0)
 				Expect(actualOutputConfig.OutputDir).To(Equal("some_output_dir"))
 			})
 
@@ -114,7 +114,7 @@ var _ = Describe("package_stemcell", func() {
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
 				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				_, actualOutputConfig, _, _ := packagerFactory.PackagerArgsForCall(0)
+				_, actualOutputConfig, _ := packagerFactory.PackagerArgsForCall(0)
 				Expect(actualOutputConfig.OutputDir).To(Equal("some_output_dir"))
 				Expect(actualOutputConfig.StemcellVersion).To(Equal("2019.2"))
 				Expect(actualOutputConfig.Os).To(Equal("2019"))
@@ -132,7 +132,7 @@ var _ = Describe("package_stemcell", func() {
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
 				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				_, actualOutputConfig, _, _ := packagerFactory.PackagerArgsForCall(0)
+				_, actualOutputConfig, _ := packagerFactory.PackagerArgsForCall(0)
 				Expect(actualOutputConfig.StemcellVersion).To(Equal("1803.27.36"))
 
 				Expect(oSAndVersionGetter.GetVersionWithPatchNumberCallCount()).To(Equal(1))
