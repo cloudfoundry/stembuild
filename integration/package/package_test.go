@@ -54,10 +54,19 @@ var _ = Describe("Package", func() {
 		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsernameVariable)
 		vcenterStembuildPassword = helpers.EnvMustExist(vcenterStembuildPasswordVariable)
 
-		workingDir = GinkgoT().TempDir() // automatically cleaned up
+		//workingDir = GinkgoT().TempDir() // automatically cleaned up
+		var err error
+		workingDir, err = os.MkdirTemp(os.TempDir(), "stembuild-package-test")
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
+		// TODO: remove once GinkgoT().TempDir() is safe on windows
+		err := os.RemoveAll(workingDir)
+		if err != nil {
+			By(fmt.Sprintf("removing '%s' failed: %s", workingDir, err))
+		}
+
 		if vmPath != "" {
 			cli.Run([]string{
 				"vm.destroy",
