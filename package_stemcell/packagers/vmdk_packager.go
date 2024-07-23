@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/cloudfoundry/stembuild/colorlogger"
 	"github.com/cloudfoundry/stembuild/filesystem"
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
 	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
@@ -29,8 +30,8 @@ type VmdkPackager struct {
 	Sha1sum      string
 	tmpdir       string
 	Stop         chan struct{}
-	Debugf       func(format string, a ...interface{})
 	BuildOptions package_parameters.VmdkPackageParameters
+	Logger       colorlogger.Logger
 }
 
 var ErrInterrupt = errors.New("interrupt")
@@ -74,7 +75,7 @@ func (c *VmdkPackager) Reader(r io.Reader) *CancelReader {
 }
 
 func (c *VmdkPackager) StopConfig() {
-	c.Debugf("stopping config")
+	c.Logger.Printf("stopping config")
 	defer c.Cleanup() // make sure this runs!
 	close(c.Stop)
 }
@@ -85,13 +86,13 @@ func (c *VmdkPackager) Cleanup() {
 	}
 	// check if directory exists to make Cleanup idempotent
 	if _, err := os.Stat(c.tmpdir); err == nil {
-		c.Debugf("deleting temp directory: %s", c.tmpdir)
+		c.Logger.Printf("deleting temp directory: %s", c.tmpdir)
 		os.RemoveAll(c.tmpdir)
 	}
 }
 
 func (c *VmdkPackager) AddTarFile(tr *tar.Writer, name string) error {
-	c.Debugf("adding file (%s) to tar archive", name)
+	c.Logger.Printf("adding file (%s) to tar archive", name)
 	f, err := os.Open(name)
 	if err != nil {
 		return err
@@ -117,7 +118,7 @@ func (c *VmdkPackager) AddTarFile(tr *tar.Writer, name string) error {
 func (c *VmdkPackager) TempDir() (string, error) {
 	if c.tmpdir != "" {
 		if _, err := os.Stat(c.tmpdir); err != nil {
-			c.Debugf("unable to stat temp dir (%s) was it deleted?", c.tmpdir)
+			c.Logger.Printf("unable to stat temp dir (%s) was it deleted?", c.tmpdir)
 			return "", fmt.Errorf("opening temp directory: %s", c.tmpdir)
 		}
 		return c.tmpdir, nil
@@ -127,12 +128,12 @@ func (c *VmdkPackager) TempDir() (string, error) {
 		return "", fmt.Errorf("creating temp directory: %s", err)
 	}
 	c.tmpdir = name
-	c.Debugf("created temp directory: %s", name)
+	c.Logger.Printf("created temp directory: %s", name)
 	return c.tmpdir, nil
 }
 
 func (c *VmdkPackager) CreateStemcell() error {
-	c.Debugf("creating stemcell")
+	c.Logger.Printf("creating stemcell")
 
 	// programming errors - panic!
 	if c.Manifest == "" {
@@ -153,7 +154,7 @@ func (c *VmdkPackager) CreateStemcell() error {
 		return err
 	}
 	defer stemcell.Close()
-	c.Debugf("created temp stemcell: %s", c.Stemcell)
+	c.Logger.Printf("created temp stemcell: %s", c.Stemcell)
 
 	errorf := func(format string, a ...interface{}) error {
 		stemcell.Close()
@@ -165,12 +166,12 @@ func (c *VmdkPackager) CreateStemcell() error {
 	w := gzip.NewWriter(c.Writer(stemcell))
 	tr := tar.NewWriter(w)
 
-	c.Debugf("adding image file to stemcell tarball: %s", c.Image)
+	c.Logger.Printf("adding image file to stemcell tarball: %s", c.Image)
 	if err := c.AddTarFile(tr, c.Image); err != nil {
 		return errorf("creating stemcell: %s", err)
 	}
 
-	c.Debugf("adding manifest file to stemcell tarball: %s", c.Manifest)
+	c.Logger.Printf("adding manifest file to stemcell tarball: %s", c.Manifest)
 	if err := c.AddTarFile(tr, c.Manifest); err != nil {
 		return errorf("creating stemcell: %s", err)
 	}
@@ -183,7 +184,7 @@ func (c *VmdkPackager) CreateStemcell() error {
 		return errorf("creating stemcell: %s", err)
 	}
 
-	c.Debugf("created stemcell in: %s", time.Since(t))
+	c.Logger.Printf("created stemcell in: %s", time.Since(t))
 
 	return nil
 }
@@ -209,7 +210,7 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("ovftool: %s", err)
 	}
-	c.Debugf("converting vmx to ova with cmd: %s %s", cmd.Path, cmd.Args[1:])
+	c.Logger.Printf("converting vmx to ova with cmd: %s %s", cmd.Path, cmd.Args[1:])
 
 	// Wait for process exit or interupt
 	errCh := make(chan error, 1)
@@ -218,7 +219,7 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 	select {
 	case <-c.Stop:
 		if cmd.Process != nil {
-			c.Debugf("received stop signall killing ovftool process")
+			c.Logger.Printf("received stop signall killing ovftool process")
 			cmd.Process.Kill() //nolint:errcheck
 		}
 		return ErrInterrupt
@@ -234,7 +235,7 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 // CreateImage converts a vmdk to a gzip compressed image file and records the
 // sha1 sum of the resulting image.
 func (c *VmdkPackager) CreateImage() error {
-	c.Debugf("Creating [image] from [vmdk]: %s", c.BuildOptions.VMDKFile)
+	c.Logger.Printf("Creating [image] from [vmdk]: %s", c.BuildOptions.VMDKFile)
 
 	tmpdir, err := c.TempDir()
 	if err != nil {
@@ -290,7 +291,7 @@ func (c *VmdkPackager) CreateImage() error {
 	}
 
 	c.Sha1sum = fmt.Sprintf("%x", h.Sum(nil))
-	c.Debugf("Sha1 of image (%s): %s", c.Image, c.Sha1sum)
+	c.Logger.Printf("Sha1 of image (%s): %s", c.Image, c.Sha1sum)
 	return nil
 }
 
@@ -314,7 +315,7 @@ func (c *VmdkPackager) ConvertVMDK() (string, error) {
 	}
 
 	stemcellPath := filepath.Join(c.BuildOptions.OutputDir, filepath.Base(c.Stemcell))
-	c.Debugf("moving stemcell (%s) to: %s", c.Stemcell, stemcellPath)
+	c.Logger.Printf("moving stemcell (%s) to: %s", c.Stemcell, stemcellPath)
 
 	if err := os.Rename(c.Stemcell, stemcellPath); err != nil {
 		return "", err
@@ -327,7 +328,7 @@ func (c *VmdkPackager) catchInterruptSignal() {
 	signal.Notify(ch, os.Interrupt)
 	stopping := false
 	for sig := range ch {
-		c.Debugf("received signal: %s", sig)
+		c.Logger.Printf("received signal: %s", sig)
 		if stopping {
 			fmt.Fprintf(os.Stderr, "received second (%s) signal - exiting now\n", sig)
 			c.Cleanup() // remove temp dir
@@ -352,7 +353,7 @@ func (c *VmdkPackager) Package() error {
 		return err
 	}
 
-	c.Debugf("created stemcell (%s) in: %s", stemcellPath, time.Since(start))
+	c.Logger.Printf("created stemcell (%s) in: %s", stemcellPath, time.Since(start))
 	fmt.Printf("created stemcell: %s", stemcellPath)
 
 	c.Cleanup()

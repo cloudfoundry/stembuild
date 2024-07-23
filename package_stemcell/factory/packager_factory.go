@@ -20,6 +20,7 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 	if err != nil {
 		return nil, err
 	}
+
 	switch source {
 	case config.VCENTER:
 		runner := &iaas_cli.GovcRunner{}
@@ -27,12 +28,13 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 		vCenterPackager := &packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: client}
 		return vCenterPackager, nil
 	case config.VMDK:
-		options := package_parameters.VmdkPackageParameters{}
+		options :=
+			package_parameters.VmdkPackageParameters{}
 
 		vmdkPackager := &packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
-			Debugf:       logger.Printf,
 			BuildOptions: options,
+			Logger:       logger,
 		}
 
 		vmdkPackager.BuildOptions.VMDKFile = sourceConfig.Vmdk
