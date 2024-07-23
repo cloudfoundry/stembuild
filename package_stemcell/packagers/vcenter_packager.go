@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/cloudfoundry/stembuild/colorlogger"
 	"github.com/cloudfoundry/stembuild/filesystem"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 )
@@ -27,6 +28,7 @@ type VCenterPackager struct {
 	SourceConfig config.SourceConfig
 	OutputConfig config.OutputConfig
 	Client       IaasClient
+	Logger       colorlogger.Logger
 }
 
 func (v VCenterPackager) Package() error {
