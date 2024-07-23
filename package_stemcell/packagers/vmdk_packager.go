@@ -33,7 +33,7 @@ type VmdkPackager struct {
 	BuildOptions package_parameters.VmdkPackageParameters
 }
 
-var ErrInterupt = errors.New("interrupt")
+var ErrInterrupt = errors.New("interrupt")
 
 type CancelWriter struct {
 	w    io.Writer
@@ -43,7 +43,7 @@ type CancelWriter struct {
 func (w *CancelWriter) Write(p []byte) (int, error) {
 	select {
 	case <-w.stop:
-		return 0, ErrInterupt
+		return 0, ErrInterrupt
 	default:
 		return w.w.Write(p)
 	}
@@ -57,7 +57,7 @@ type CancelReader struct {
 func (r *CancelReader) Read(p []byte) (int, error) {
 	select {
 	case <-r.stop:
-		return 0, ErrInterupt
+		return 0, ErrInterrupt
 	default:
 		return r.r.Read(p)
 	}
@@ -221,7 +221,7 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 			c.Debugf("received stop signall killing ovftool process")
 			cmd.Process.Kill() //nolint:errcheck
 		}
-		return ErrInterupt
+		return ErrInterrupt
 	case err := <-errCh:
 		if err != nil {
 			return fmt.Errorf(errFmt, err, stderr.String())
