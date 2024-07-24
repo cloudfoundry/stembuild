@@ -9,7 +9,6 @@ import (
 	"github.com/cloudfoundry/stembuild/iaas_cli"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
-	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 )
 
 type Factory struct{}
@@ -39,7 +38,7 @@ func (f *Factory) NewPackager(sourceConfig config.SourceConfig, outputConfig con
 		}, nil
 	case config.VMDK:
 		options :=
-			package_parameters.VmdkPackageParameters{
+			config.VmdkOptions{
 				VMDKFile:  sourceConfig.Vmdk,
 				OSVersion: strings.ToUpper(outputConfig.Os),
 				Version:   outputConfig.StemcellVersion,

@@ -14,17 +14,17 @@ import (
 
 	"github.com/cloudfoundry/stembuild/colorlogger"
 	mockfilesystem "github.com/cloudfoundry/stembuild/filesystem/mock"
-	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 	"github.com/cloudfoundry/stembuild/package_stemcell/packager"
 	"github.com/cloudfoundry/stembuild/test/helpers"
 )
 
 var _ = Describe("VmdkPackager", func() {
-	var stembuildConfig package_parameters.VmdkPackageParameters
+	var stembuildConfig config.VmdkOptions
 	var vmdkPackager packager.VmdkPackager
 
 	BeforeEach(func() {
-		stembuildConfig = package_parameters.VmdkPackageParameters{
+		stembuildConfig = config.VmdkOptions{
 			OSVersion: "2012R2",
 			Version:   "1200.1",
 		}
