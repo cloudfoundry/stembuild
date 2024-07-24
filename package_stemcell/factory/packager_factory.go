@@ -40,19 +40,18 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 		}, nil
 	case config.VMDK:
 		options :=
-			package_parameters.VmdkPackageParameters{}
+			package_parameters.VmdkPackageParameters{
+				VMDKFile:  sourceConfig.Vmdk,
+				OSVersion: strings.ToUpper(outputConfig.Os),
+				Version:   outputConfig.StemcellVersion,
+				OutputDir: outputConfig.OutputDir,
+			}
 
-		vmdkPackager := &packagers.VmdkPackager{
+		return &packagers.VmdkPackager{
 			Stop:         make(chan struct{}),
 			BuildOptions: options,
 			Logger:       logger,
-		}
-
-		vmdkPackager.BuildOptions.VMDKFile = sourceConfig.Vmdk
-		vmdkPackager.BuildOptions.OSVersion = strings.ToUpper(outputConfig.Os)
-		vmdkPackager.BuildOptions.Version = outputConfig.StemcellVersion
-		vmdkPackager.BuildOptions.OutputDir = outputConfig.OutputDir
-		return vmdkPackager, nil
+		}, nil
 	default:
 		return nil, errors.New("unable to determine packager")
 	}
