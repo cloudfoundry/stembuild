@@ -35,7 +35,7 @@ type VCenterManager interface {
 
 //counterfeiter:generate . VMPreparerFactory
 type VMPreparerFactory interface {
-	VMPreparer(config config.SourceConfig, vCenterManager VCenterManager) (VmConstruct, error)
+	New(config config.SourceConfig, vCenterManager VCenterManager) (VmConstruct, error)
 }
 
 //counterfeiter:generate . ManagerFactory
@@ -154,7 +154,7 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		return subcommands.ExitFailure
 	}
 
-	vmConstruct, err := p.prepFactory.VMPreparer(p.sourceConfig, vCenterManager)
+	vmConstruct, err := p.prepFactory.New(p.sourceConfig, vCenterManager)
 	if err != nil {
 		p.messenger.CannotPrepareVM(err)
 		return subcommands.ExitFailure
