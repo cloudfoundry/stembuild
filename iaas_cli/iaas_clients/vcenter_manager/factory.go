@@ -1,4 +1,4 @@
-package vcenter_client_factory
+package vcenter_manager
 
 import (
 	"context"
@@ -10,8 +10,6 @@ import (
 	"github.com/vmware/govmomi/session"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/soap"
-
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
@@ -63,7 +61,7 @@ func (f *ManagerFactory) SetConfig(config FactoryConfig) {
 	f.Config = config
 }
 
-func (f *ManagerFactory) VCenterManager(ctx context.Context) (*vcenter_manager.VCenterManager, error) {
+func (f *ManagerFactory) VCenterManager(ctx context.Context) (*VCenterManager, error) {
 
 	govmomiClient, err := f.govmomiClient(ctx)
 	if err != nil {
@@ -72,7 +70,7 @@ func (f *ManagerFactory) VCenterManager(ctx context.Context) (*vcenter_manager.V
 
 	finder := f.Config.FinderCreator.NewFinder(govmomiClient.Client, false)
 
-	return vcenter_manager.NewVCenterManager(govmomiClient, govmomiClient.Client, finder, f.Config.Username, f.Config.Password)
+	return NewVCenterManager(govmomiClient, govmomiClient.Client, finder, f.Config.Username, f.Config.Password)
 
 }
 
