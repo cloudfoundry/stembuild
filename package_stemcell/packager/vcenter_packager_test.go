@@ -1,4 +1,4 @@
-package packagers_test
+package packager_test
 
 import (
 	"archive/tar"
@@ -14,8 +14,8 @@ import (
 
 	"github.com/cloudfoundry/stembuild/filesystem"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
-	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
-	"github.com/cloudfoundry/stembuild/package_stemcell/packagers/packagersfakes"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packager"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packager/packagerfakes"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -26,7 +26,7 @@ var _ = Describe("VcenterPackager", func() {
 	var outputDir string
 	var sourceConfig config.SourceConfig
 	var outputConfig config.OutputConfig
-	var fakeVcenterClient *packagersfakes.FakeIaasClient
+	var fakeVcenterClient *packagerfakes.FakeIaasClient
 
 	BeforeEach(func() {
 		// Revert to manual cleanup which fails non-catastrophically on windows
@@ -35,7 +35,7 @@ var _ = Describe("VcenterPackager", func() {
 
 		sourceConfig = config.SourceConfig{Password: "password", URL: "url", Username: "username", VmInventoryPath: "path/valid-vm-name"}
 		outputConfig = config.OutputConfig{Os: "2012R2", StemcellVersion: "1200.2", OutputDir: outputDir}
-		fakeVcenterClient = &packagersfakes.FakeIaasClient{}
+		fakeVcenterClient = &packagerfakes.FakeIaasClient{}
 	})
 
 	AfterEach(func() {
@@ -49,7 +49,7 @@ var _ = Describe("VcenterPackager", func() {
 	Context("ValidateSourceParameters", func() {
 		It("returns an error if the vCenter url is invalid", func() {
 			fakeVcenterClient.ValidateUrlReturns(errors.New("vcenter client url error"))
-			packager := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
+			packager := packager.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
 
 			err := packager.ValidateSourceParameters()
 
@@ -60,7 +60,7 @@ var _ = Describe("VcenterPackager", func() {
 		})
 		It("returns an error if the vCenter credentials are not valid", func() {
 			fakeVcenterClient.ValidateCredentialsReturns(errors.New("vcenter client credential error"))
-			packager := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
+			packager := packager.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
 
 			err := packager.ValidateSourceParameters()
 
@@ -71,7 +71,7 @@ var _ = Describe("VcenterPackager", func() {
 
 		It("returns an error if VM given does not exist ", func() {
 			fakeVcenterClient.FindVMReturns(errors.New("vcenter client vm error"))
-			packager := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
+			packager := packager.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
 
 			err := packager.ValidateSourceParameters()
 
@@ -80,7 +80,7 @@ var _ = Describe("VcenterPackager", func() {
 			Expect(err.Error()).To(Equal("vcenter client vm error"))
 		})
 		It("returns no error if all source parameters are valid", func() {
-			packager := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
+			packager := packager.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
 
 			err := packager.ValidateSourceParameters()
 
@@ -89,7 +89,7 @@ var _ = Describe("VcenterPackager", func() {
 	})
 	Context("ValidateFreeSpace", func() {
 		It("is a NOOP", func() {
-			packager := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
+			packager := packager.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
 			err := packager.ValidateFreeSpaceForPackage(&filesystem.OSFileSystem{})
 
 			Expect(err).To(Not(HaveOccurred()))
@@ -97,7 +97,7 @@ var _ = Describe("VcenterPackager", func() {
 	})
 
 	Describe("Package", func() {
-		var packager *packagers.VCenterPackager
+		var vcenterPackager *packager.VCenterPackager
 
 		AfterEach(func() {
 			_ = os.RemoveAll("./valid-vm-name")
@@ -105,7 +105,7 @@ var _ = Describe("VcenterPackager", func() {
 		})
 
 		BeforeEach(func() {
-			packager = &packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
+			vcenterPackager = &packager.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
 
 			fakeVcenterClient.ExportVMStub = func(vmInventoryPath string, destination string) error {
 				vmName := path.Base(vmInventoryPath)
@@ -119,11 +119,11 @@ var _ = Describe("VcenterPackager", func() {
 		})
 
 		It("creates a valid stemcell in the output directory", func() {
-			err := packager.Package()
+			err := vcenterPackager.Package()
 
 			Expect(err).To(Not(HaveOccurred()))
-			stemcellFilename := packagers.StemcellFilename(packager.OutputConfig.StemcellVersion, packager.OutputConfig.Os)
-			stemcellFile := filepath.Join(packager.OutputConfig.OutputDir, stemcellFilename)
+			stemcellFilename := packager.StemcellFilename(vcenterPackager.OutputConfig.StemcellVersion, vcenterPackager.OutputConfig.Os)
+			stemcellFile := filepath.Join(vcenterPackager.OutputConfig.OutputDir, stemcellFilename)
 			_, err = os.Stat(stemcellFile)
 
 			Expect(err).NotTo(HaveOccurred())
@@ -186,7 +186,7 @@ stemcell_formats:
 			expectedDeviceList := []string{"ethernet-1", "floppy-8000", "floppy-9000"}
 			fakeVcenterClient.ListDevicesReturns(fullDeviceList, nil)
 
-			err := packager.Package()
+			err := vcenterPackager.Package()
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -202,7 +202,7 @@ stemcell_formats:
 			expectedDeviceList := []string{"cdrom-12", "cdrom-123"}
 			fakeVcenterClient.ListDevicesReturns(fullDeviceList, nil)
 
-			err := packager.Package()
+			err := vcenterPackager.Package()
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -216,7 +216,7 @@ stemcell_formats:
 		It("Throws an error if the VCenter client fails to list devices", func() {
 			fakeVcenterClient.ListDevicesReturns([]string{}, errors.New("some client error"))
 
-			err := packager.Package()
+			err := vcenterPackager.Package()
 			Expect(err).To(MatchError("some client error"))
 		})
 
@@ -224,12 +224,12 @@ stemcell_formats:
 			fakeVcenterClient.ListDevicesReturns([]string{"floppy-8000"}, nil)
 			fakeVcenterClient.RemoveDeviceReturns(errors.New("some client error"))
 
-			err := packager.Package()
+			err := vcenterPackager.Package()
 			Expect(err).To(MatchError("some client error"))
 		})
 
 		It("Returns a error message if exporting the VM fails", func() {
-			packager := packagers.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
+			packager := packager.VCenterPackager{SourceConfig: sourceConfig, OutputConfig: outputConfig, Client: fakeVcenterClient}
 			fakeVcenterClient.ExportVMReturns(errors.New("some client error"))
 			err := packager.Package()
 

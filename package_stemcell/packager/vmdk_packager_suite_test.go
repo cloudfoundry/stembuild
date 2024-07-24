@@ -1,4 +1,4 @@
-package packagers_test
+package packager_test
 
 import (
 	"testing"

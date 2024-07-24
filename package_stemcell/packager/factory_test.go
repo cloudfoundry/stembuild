@@ -1,4 +1,4 @@
-package packagers_test
+package packager_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/stembuild/colorlogger"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
-	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packager"
 )
 
 var _ = Describe("Factory", func() {
@@ -17,11 +17,11 @@ var _ = Describe("Factory", func() {
 		OutputDir:       "/tmp/outputDir",
 	}
 
-	var packagerFactory *packagers.Factory
+	var packagerFactory *packager.Factory
 	var logger colorlogger.Logger
 
 	BeforeEach(func() {
-		packagerFactory = &packagers.Factory{}
+		packagerFactory = &packager.Factory{}
 		logger = colorlogger.New(0, false, GinkgoWriter)
 	})
 
@@ -35,8 +35,8 @@ var _ = Describe("Factory", func() {
 				actualPackager, err := packagerFactory.NewPackager(sourceConfig, outputConfig, logger)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(actualPackager).To(BeAssignableToTypeOf(&packagers.VmdkPackager{}))
-				Expect(actualPackager).NotTo(BeAssignableToTypeOf(&packagers.VCenterPackager{}))
+				Expect(actualPackager).To(BeAssignableToTypeOf(&packager.VmdkPackager{}))
+				Expect(actualPackager).NotTo(BeAssignableToTypeOf(&packager.VCenterPackager{}))
 			})
 		})
 
@@ -52,8 +52,8 @@ var _ = Describe("Factory", func() {
 				actualPackager, err := packagerFactory.NewPackager(sourceConfig, outputConfig, logger)
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(actualPackager).To(BeAssignableToTypeOf(&packagers.VCenterPackager{}))
-				Expect(actualPackager).NotTo(BeAssignableToTypeOf(&packagers.VmdkPackager{}))
+				Expect(actualPackager).To(BeAssignableToTypeOf(&packager.VCenterPackager{}))
+				Expect(actualPackager).NotTo(BeAssignableToTypeOf(&packager.VmdkPackager{}))
 			})
 		})
 
