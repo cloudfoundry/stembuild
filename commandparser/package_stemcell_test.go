@@ -37,7 +37,7 @@ var _ = Describe("package_stemcell", func() {
 			packager = new(commandparserfakes.FakePackager)
 			packagerMessenger = new(commandparserfakes.FakePackagerMessenger)
 
-			packagerFactory.PackagerReturns(packager, nil)
+			packagerFactory.NewPackagerReturns(packager, nil)
 
 			PkgCmd = commandparser.NewPackageCommand(oSAndVersionGetter, packagerFactory, packagerMessenger)
 			PkgCmd.SetFlags(f)
@@ -61,8 +61,8 @@ var _ = Describe("package_stemcell", func() {
 				exitStatus := PkgCmd.Execute(context.Background(), f)
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
-				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				actualSourceConfig, _, _ := packagerFactory.PackagerArgsForCall(0)
+				Expect(packagerFactory.NewPackagerCallCount()).To(Equal(1))
+				actualSourceConfig, _, _ := packagerFactory.NewPackagerArgsForCall(0)
 				Expect(actualSourceConfig.Vmdk).To(Equal("some_vmdk_file"))
 			})
 
@@ -81,8 +81,8 @@ var _ = Describe("package_stemcell", func() {
 				exitStatus := PkgCmd.Execute(context.Background(), f)
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
-				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				actualSourceConfig, _, _ := packagerFactory.PackagerArgsForCall(0)
+				Expect(packagerFactory.NewPackagerCallCount()).To(Equal(1))
+				actualSourceConfig, _, _ := packagerFactory.NewPackagerArgsForCall(0)
 				Expect(actualSourceConfig.URL).To(Equal("https://vcenter.test"))
 				Expect(actualSourceConfig.Username).To(Equal("test-user"))
 				Expect(actualSourceConfig.Password).To(Equal("verysecure"))
@@ -99,8 +99,8 @@ var _ = Describe("package_stemcell", func() {
 				exitStatus := PkgCmd.Execute(context.Background(), f)
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
-				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				_, actualOutputConfig, _ := packagerFactory.PackagerArgsForCall(0)
+				Expect(packagerFactory.NewPackagerCallCount()).To(Equal(1))
+				_, actualOutputConfig, _ := packagerFactory.NewPackagerArgsForCall(0)
 				Expect(actualOutputConfig.OutputDir).To(Equal("some_output_dir"))
 			})
 
@@ -113,8 +113,8 @@ var _ = Describe("package_stemcell", func() {
 				exitStatus := PkgCmd.Execute(context.Background(), f)
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
-				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				_, actualOutputConfig, _ := packagerFactory.PackagerArgsForCall(0)
+				Expect(packagerFactory.NewPackagerCallCount()).To(Equal(1))
+				_, actualOutputConfig, _ := packagerFactory.NewPackagerArgsForCall(0)
 				Expect(actualOutputConfig.OutputDir).To(Equal("some_output_dir"))
 				Expect(actualOutputConfig.StemcellVersion).To(Equal("2019.2"))
 				Expect(actualOutputConfig.Os).To(Equal("2019"))
@@ -131,8 +131,8 @@ var _ = Describe("package_stemcell", func() {
 				exitStatus := PkgCmd.Execute(context.Background(), f)
 				Expect(exitStatus).To(Equal(subcommands.ExitSuccess))
 
-				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
-				_, actualOutputConfig, _ := packagerFactory.PackagerArgsForCall(0)
+				Expect(packagerFactory.NewPackagerCallCount()).To(Equal(1))
+				_, actualOutputConfig, _ := packagerFactory.NewPackagerArgsForCall(0)
 				Expect(actualOutputConfig.StemcellVersion).To(Equal("1803.27.36"))
 
 				Expect(oSAndVersionGetter.GetVersionWithPatchNumberCallCount()).To(Equal(1))
@@ -157,7 +157,7 @@ var _ = Describe("package_stemcell", func() {
 			})
 
 			It("package is not called if the packager factory returns an error", func() {
-				packagerFactory.PackagerReturns(nil, errors.New("Couldn't make a packager!"))
+				packagerFactory.NewPackagerReturns(nil, errors.New("Couldn't make a packager!"))
 
 				err := f.Parse(defaultArgs)
 				Expect(err).ToNot(HaveOccurred())
@@ -165,7 +165,7 @@ var _ = Describe("package_stemcell", func() {
 				exitStatus := PkgCmd.Execute(context.Background(), f)
 				Expect(exitStatus).To(Equal(subcommands.ExitFailure))
 
-				Expect(packagerFactory.PackagerCallCount()).To(Equal(1))
+				Expect(packagerFactory.NewPackagerCallCount()).To(Equal(1))
 				Expect(packager.PackageCallCount()).To(Equal(0))
 
 				Expect(packagerMessenger.CannotCreatePackagerCallCount()).To(Equal(1))

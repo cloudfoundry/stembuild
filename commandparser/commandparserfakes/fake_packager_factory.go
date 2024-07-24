@@ -10,18 +10,18 @@ import (
 )
 
 type FakePackagerFactory struct {
-	PackagerStub        func(config.SourceConfig, config.OutputConfig, colorlogger.Logger) (commandparser.Packager, error)
-	packagerMutex       sync.RWMutex
-	packagerArgsForCall []struct {
+	NewPackagerStub        func(config.SourceConfig, config.OutputConfig, colorlogger.Logger) (commandparser.Packager, error)
+	newPackagerMutex       sync.RWMutex
+	newPackagerArgsForCall []struct {
 		arg1 config.SourceConfig
 		arg2 config.OutputConfig
 		arg3 colorlogger.Logger
 	}
-	packagerReturns struct {
+	newPackagerReturns struct {
 		result1 commandparser.Packager
 		result2 error
 	}
-	packagerReturnsOnCall map[int]struct {
+	newPackagerReturnsOnCall map[int]struct {
 		result1 commandparser.Packager
 		result2 error
 	}
@@ -29,18 +29,18 @@ type FakePackagerFactory struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePackagerFactory) Packager(arg1 config.SourceConfig, arg2 config.OutputConfig, arg3 colorlogger.Logger) (commandparser.Packager, error) {
-	fake.packagerMutex.Lock()
-	ret, specificReturn := fake.packagerReturnsOnCall[len(fake.packagerArgsForCall)]
-	fake.packagerArgsForCall = append(fake.packagerArgsForCall, struct {
+func (fake *FakePackagerFactory) NewPackager(arg1 config.SourceConfig, arg2 config.OutputConfig, arg3 colorlogger.Logger) (commandparser.Packager, error) {
+	fake.newPackagerMutex.Lock()
+	ret, specificReturn := fake.newPackagerReturnsOnCall[len(fake.newPackagerArgsForCall)]
+	fake.newPackagerArgsForCall = append(fake.newPackagerArgsForCall, struct {
 		arg1 config.SourceConfig
 		arg2 config.OutputConfig
 		arg3 colorlogger.Logger
 	}{arg1, arg2, arg3})
-	stub := fake.PackagerStub
-	fakeReturns := fake.packagerReturns
-	fake.recordInvocation("Packager", []interface{}{arg1, arg2, arg3})
-	fake.packagerMutex.Unlock()
+	stub := fake.NewPackagerStub
+	fakeReturns := fake.newPackagerReturns
+	fake.recordInvocation("NewPackager", []interface{}{arg1, arg2, arg3})
+	fake.newPackagerMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3)
 	}
@@ -50,46 +50,46 @@ func (fake *FakePackagerFactory) Packager(arg1 config.SourceConfig, arg2 config.
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakePackagerFactory) PackagerCallCount() int {
-	fake.packagerMutex.RLock()
-	defer fake.packagerMutex.RUnlock()
-	return len(fake.packagerArgsForCall)
+func (fake *FakePackagerFactory) NewPackagerCallCount() int {
+	fake.newPackagerMutex.RLock()
+	defer fake.newPackagerMutex.RUnlock()
+	return len(fake.newPackagerArgsForCall)
 }
 
-func (fake *FakePackagerFactory) PackagerCalls(stub func(config.SourceConfig, config.OutputConfig, colorlogger.Logger) (commandparser.Packager, error)) {
-	fake.packagerMutex.Lock()
-	defer fake.packagerMutex.Unlock()
-	fake.PackagerStub = stub
+func (fake *FakePackagerFactory) NewPackagerCalls(stub func(config.SourceConfig, config.OutputConfig, colorlogger.Logger) (commandparser.Packager, error)) {
+	fake.newPackagerMutex.Lock()
+	defer fake.newPackagerMutex.Unlock()
+	fake.NewPackagerStub = stub
 }
 
-func (fake *FakePackagerFactory) PackagerArgsForCall(i int) (config.SourceConfig, config.OutputConfig, colorlogger.Logger) {
-	fake.packagerMutex.RLock()
-	defer fake.packagerMutex.RUnlock()
-	argsForCall := fake.packagerArgsForCall[i]
+func (fake *FakePackagerFactory) NewPackagerArgsForCall(i int) (config.SourceConfig, config.OutputConfig, colorlogger.Logger) {
+	fake.newPackagerMutex.RLock()
+	defer fake.newPackagerMutex.RUnlock()
+	argsForCall := fake.newPackagerArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakePackagerFactory) PackagerReturns(result1 commandparser.Packager, result2 error) {
-	fake.packagerMutex.Lock()
-	defer fake.packagerMutex.Unlock()
-	fake.PackagerStub = nil
-	fake.packagerReturns = struct {
+func (fake *FakePackagerFactory) NewPackagerReturns(result1 commandparser.Packager, result2 error) {
+	fake.newPackagerMutex.Lock()
+	defer fake.newPackagerMutex.Unlock()
+	fake.NewPackagerStub = nil
+	fake.newPackagerReturns = struct {
 		result1 commandparser.Packager
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakePackagerFactory) PackagerReturnsOnCall(i int, result1 commandparser.Packager, result2 error) {
-	fake.packagerMutex.Lock()
-	defer fake.packagerMutex.Unlock()
-	fake.PackagerStub = nil
-	if fake.packagerReturnsOnCall == nil {
-		fake.packagerReturnsOnCall = make(map[int]struct {
+func (fake *FakePackagerFactory) NewPackagerReturnsOnCall(i int, result1 commandparser.Packager, result2 error) {
+	fake.newPackagerMutex.Lock()
+	defer fake.newPackagerMutex.Unlock()
+	fake.NewPackagerStub = nil
+	if fake.newPackagerReturnsOnCall == nil {
+		fake.newPackagerReturnsOnCall = make(map[int]struct {
 			result1 commandparser.Packager
 			result2 error
 		})
 	}
-	fake.packagerReturnsOnCall[i] = struct {
+	fake.newPackagerReturnsOnCall[i] = struct {
 		result1 commandparser.Packager
 		result2 error
 	}{result1, result2}
@@ -98,8 +98,8 @@ func (fake *FakePackagerFactory) PackagerReturnsOnCall(i int, result1 commandpar
 func (fake *FakePackagerFactory) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.packagerMutex.RLock()
-	defer fake.packagerMutex.RUnlock()
+	fake.newPackagerMutex.RLock()
+	defer fake.newPackagerMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

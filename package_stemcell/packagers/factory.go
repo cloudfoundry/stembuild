@@ -1,4 +1,4 @@
-package factory
+package packagers
 
 import (
 	"errors"
@@ -10,12 +10,11 @@ import (
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
-	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 )
 
-type PackagerFactory struct{}
+type Factory struct{}
 
-func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logger colorlogger.Logger) (commandparser.Packager, error) {
+func (f *Factory) NewPackager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logger colorlogger.Logger) (commandparser.Packager, error) {
 	source, err := sourceConfig.GetSource()
 	if err != nil {
 		return nil, err
@@ -32,7 +31,7 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 				&iaas_cli.GovcRunner{},
 			)
 
-		return &packagers.VCenterPackager{
+		return &VCenterPackager{
 			SourceConfig: sourceConfig,
 			OutputConfig: outputConfig,
 			Client:       client,
@@ -47,7 +46,7 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 				OutputDir: outputConfig.OutputDir,
 			}
 
-		return &packagers.VmdkPackager{
+		return &VmdkPackager{
 			Stop:         make(chan struct{}),
 			BuildOptions: options,
 			Logger:       logger,
