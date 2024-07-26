@@ -8,10 +8,79 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry/stembuild/templates"
 )
+
+const (
+	vmdkPath         = "FooBarBaz.vmdk"
+	virtualHWVersion = 60
+)
+
+var _ = Describe("VMX test", func() {
+	Context("VMX template render", func() {
+		var buf bytes.Buffer
+
+		BeforeEach(func() {
+			buf.Reset()
+		})
+
+		It("should render a VMX template", func() {
+			var buf bytes.Buffer
+			err := templates.VMXTemplate(vmdkPath, virtualHWVersion, &buf)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = checkVMXTemplate(virtualHWVersion, vmdkPath, buf.String())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should error when VMX filename is unspecified", func() {
+			err := templates.VMXTemplate("", 0, &buf)
+			Expect(err).To(HaveOccurred())
+		})
+	})
+
+	Context("VMX template write", func() {
+		var tmpDir string
+
+		BeforeEach(func() {
+			var err error
+			tmpDir, err = os.MkdirTemp("", "vmx-test-")
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			_ = os.RemoveAll(tmpDir)
+		})
+
+		It("should write VMX template to file", func() {
+			vmxPath := filepath.Join(tmpDir, "FooBarBaz.vmx")
+
+			err := templates.WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			b, err := os.ReadFile(vmxPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = checkVMXTemplate(virtualHWVersion, vmdkPath, string(b))
+			Expect(err).ToNot(HaveOccurred())
+
+			err = os.Remove(vmxPath)
+			Expect(err).ToNot(HaveOccurred())
+
+			// vmx file is deleted if there is an error
+			err = templates.WriteVMXTemplate("", 0, vmxPath)
+			Expect(err).To(HaveOccurred())
+
+			_, err = os.Stat(vmxPath)
+			Expect(err).To(HaveOccurred())
+		})
+	})
+
+})
 
 func parseVMX(vmx string) (map[string]string, error) {
 	m := make(map[string]string)
@@ -39,60 +108,21 @@ func parseVMX(vmx string) (map[string]string, error) {
 	return m, nil
 }
 
-func checkVMXTemplate(t *testing.T, hwVersion int, vmdkPath, vmxContent string) {
-	const vmdkPathKeyName = "scsi0:0.fileName"
-	const hwVersionKeyName = "virtualHW.version"
+func checkVMXTemplate(hwVersion int, vmdkPath, vmxContent string) error {
+	vmdkPathKeyName := "scsi0:0.fileName"
+	hwVersionKeyName := "virtualHW.version"
 
 	m, err := parseVMX(vmxContent)
 	if err != nil {
-		t.Fatal(err)
+		return err
 	}
 	if s := m[vmdkPathKeyName]; s != vmdkPath {
-		t.Errorf("VMXTemplate: key: %q want: %q got: %q", vmdkPathKeyName, vmdkPath, s)
+		return fmt.Errorf("VMXTemplate: key: %q want: %q got: %q", vmdkPathKeyName, vmdkPath, s)
 	}
 
 	expectedHWVersion := strconv.Itoa(hwVersion)
 	if s := m[hwVersionKeyName]; s != expectedHWVersion {
-		t.Errorf("VMXTemplate: key: %q want: %q got: %q", hwVersionKeyName, expectedHWVersion, s)
+		return fmt.Errorf("VMXTemplate: key: %q want: %q got: %q", hwVersionKeyName, expectedHWVersion, s)
 	}
-}
-
-const vmdkPath = "FooBarBaz.vmdk"
-const virtualHWVersion = 60
-
-func TestVMXTemplate(t *testing.T) {
-	var buf bytes.Buffer
-	if err := templates.VMXTemplate(vmdkPath, virtualHWVersion, &buf); err != nil {
-		t.Fatal(err)
-	}
-	checkVMXTemplate(t, virtualHWVersion, vmdkPath, buf.String())
-
-	if err := templates.VMXTemplate("", 0, &buf); err == nil {
-		t.Error("VMXTemplate: expected error for empty vmx filename")
-	}
-}
-
-func TestWriteVMXTemplate(t *testing.T) {
-	vmxPath := filepath.Join(t.TempDir(), "FooBarBaz.vmx")
-
-	if err := templates.WriteVMXTemplate(vmdkPath, virtualHWVersion, vmxPath); err != nil {
-		t.Fatal(err)
-	}
-	b, err := os.ReadFile(vmxPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	checkVMXTemplate(t, virtualHWVersion, vmdkPath, string(b))
-
-	if err := os.Remove(vmxPath); err != nil {
-		t.Fatal(err)
-	}
-
-	// vmx file is deleted if there is an error
-	if err := templates.WriteVMXTemplate("", 0, vmxPath); err == nil {
-		t.Error("WriteVMXTemplate: expected error for empty vmx filename")
-	}
-	if _, err := os.Stat(vmxPath); err == nil {
-		t.Errorf("WriteVMXTemplate: failed to delete vmx file on error: %s", vmxPath)
-	}
+	return nil
 }
