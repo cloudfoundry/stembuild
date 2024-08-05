@@ -6,15 +6,14 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry/stembuild/commandparser"
-	vcenter_client_factory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
 
 type FakeManagerFactory struct {
-	SetConfigStub        func(vcenter_client_factory.FactoryConfig)
+	SetConfigStub        func(vcenter_manager.FactoryConfig)
 	setConfigMutex       sync.RWMutex
 	setConfigArgsForCall []struct {
-		arg1 vcenter_client_factory.FactoryConfig
+		arg1 vcenter_manager.FactoryConfig
 	}
 	VCenterManagerStub        func(context.Context) (*vcenter_manager.VCenterManager, error)
 	vCenterManagerMutex       sync.RWMutex
@@ -33,10 +32,10 @@ type FakeManagerFactory struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeManagerFactory) SetConfig(arg1 vcenter_client_factory.FactoryConfig) {
+func (fake *FakeManagerFactory) SetConfig(arg1 vcenter_manager.FactoryConfig) {
 	fake.setConfigMutex.Lock()
 	fake.setConfigArgsForCall = append(fake.setConfigArgsForCall, struct {
-		arg1 vcenter_client_factory.FactoryConfig
+		arg1 vcenter_manager.FactoryConfig
 	}{arg1})
 	stub := fake.SetConfigStub
 	fake.recordInvocation("SetConfig", []interface{}{arg1})
@@ -52,13 +51,13 @@ func (fake *FakeManagerFactory) SetConfigCallCount() int {
 	return len(fake.setConfigArgsForCall)
 }
 
-func (fake *FakeManagerFactory) SetConfigCalls(stub func(vcenter_client_factory.FactoryConfig)) {
+func (fake *FakeManagerFactory) SetConfigCalls(stub func(vcenter_manager.FactoryConfig)) {
 	fake.setConfigMutex.Lock()
 	defer fake.setConfigMutex.Unlock()
 	fake.SetConfigStub = stub
 }
 
-func (fake *FakeManagerFactory) SetConfigArgsForCall(i int) vcenter_client_factory.FactoryConfig {
+func (fake *FakeManagerFactory) SetConfigArgsForCall(i int) vcenter_manager.FactoryConfig {
 	fake.setConfigMutex.RLock()
 	defer fake.setConfigMutex.RUnlock()
 	argsForCall := fake.setConfigArgsForCall[i]

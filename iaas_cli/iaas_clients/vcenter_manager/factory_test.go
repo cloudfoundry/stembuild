@@ -1,4 +1,4 @@
-package vcenter_client_factory_test
+package vcenter_manager_test
 
 import (
 	"context"
@@ -10,34 +10,33 @@ import (
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/vim25"
 
-	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
-	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory/factoryfakes"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager/vcenter_managerfakes"
 )
 
 var _ = Describe("VcenterManagerFactory", func() {
 
 	var (
-		managerFactory *vcenterclientfactory.ManagerFactory
+		managerFactory *vcenter_manager.ManagerFactory
 	)
 
 	BeforeEach(func() {
-		managerFactory = &vcenterclientfactory.ManagerFactory{}
+		managerFactory = &vcenter_manager.ManagerFactory{}
 	})
 
 	Context("VCenterManager", func() {
 		It("returns a vcenter manager", func() {
 
 			fakeVimClient := &vim25.Client{}
-			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
+			fakeClientCreator := &vcenter_managerfakes.FakeVim25ClientCreator{}
 
 			fakeClientCreator.NewClientReturns(fakeVimClient, nil)
 
 			fakeFinder := &find.Finder{}
-			fakeFinderCreator := &factoryfakes.FakeFinderCreator{}
+			fakeFinderCreator := &vcenter_managerfakes.FakeFinderCreator{}
 			fakeFinderCreator.NewFinderReturns(fakeFinder)
 
-			managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
+			managerFactory.SetConfig(vcenter_manager.FactoryConfig{
 				VCenterServer:  "example.com",
 				Username:       "user",
 				Password:       "pass",
@@ -54,9 +53,9 @@ var _ = Describe("VcenterManagerFactory", func() {
 		})
 
 		It("returns an error if the vcenter server cannot be parsed", func() {
-			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
+			fakeClientCreator := &vcenter_managerfakes.FakeVim25ClientCreator{}
 
-			managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
+			managerFactory.SetConfig(vcenter_manager.FactoryConfig{
 				VCenterServer: " :", // make soap.ParseURL fail with
 				Username:      "user",
 				Password:      "pass",
@@ -73,10 +72,10 @@ var _ = Describe("VcenterManagerFactory", func() {
 		It("returns an error if a vim25 client cannot be created", func() {
 
 			clientErr := errors.New("can't make a client")
-			fakeClientCreator := &factoryfakes.FakeVim25ClientCreator{}
+			fakeClientCreator := &vcenter_managerfakes.FakeVim25ClientCreator{}
 			fakeClientCreator.NewClientReturns(nil, clientErr)
 
-			managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
+			managerFactory.SetConfig(vcenter_manager.FactoryConfig{
 				VCenterServer: "example.com",
 				Username:      "user",
 				Password:      "pass",

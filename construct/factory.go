@@ -1,4 +1,4 @@
-package vmconstruct_factory
+package construct
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/cloudfoundry/stembuild/commandparser"
-	"github.com/cloudfoundry/stembuild/construct"
 	"github.com/cloudfoundry/stembuild/construct/archive"
 	"github.com/cloudfoundry/stembuild/construct/config"
 	"github.com/cloudfoundry/stembuild/iaas_cli"
@@ -17,14 +16,14 @@ import (
 	"github.com/cloudfoundry/stembuild/version"
 )
 
-type VMConstructFactory struct {
+type Factory struct {
 }
 
-func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManager commandparser.VCenterManager) (commandparser.VmConstruct, error) {
+func (f *Factory) New(config config.SourceConfig, vCenterManager commandparser.VCenterManager) (commandparser.VmConstruct, error) {
 	runner := &iaas_cli.GovcRunner{}
 	client := iaas_clients.NewVcenterClient(config.VCenterUsername, config.VCenterPassword, config.VCenterUrl, config.CaCertFile, runner)
 
-	messenger := construct.NewMessenger(os.Stdout)
+	messenger := NewMessenger(os.Stdout)
 
 	ctx := context.Background()
 	err := vCenterManager.Login(ctx)
@@ -44,7 +43,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 		return nil, err
 	}
 
-	winRMManager := &construct.WinRMManager{
+	winRMManager := &WinRMManager{
 		GuestManager: guestManager,
 		Unarchiver:   &archive.Zip{},
 	}
@@ -53,7 +52,7 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 	winRmClientFactory := remotemanager.NewWinRmClientFactory(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword)
 	remoteManager := remotemanager.NewWinRM(config.GuestVmIp, config.GuestVMUsername, config.GuestVMPassword, winRmClientFactory)
 
-	vmConnectionValidator := &construct.WinRMConnectionValidator{
+	vmConnectionValidator := &WinRMConnectionValidator{
 		RemoteManager: remoteManager,
 	}
 
@@ -63,9 +62,9 @@ func (f *VMConstructFactory) VMPreparer(config config.SourceConfig, vCenterManag
 
 	rebootWaiter := remotemanager.NewRebootWaiter(rebootPoller, rebootChecker)
 
-	scriptExecutor := construct.NewScriptExecutor(remoteManager)
+	scriptExecutor := NewScriptExecutor(remoteManager)
 
-	return construct.NewVMConstruct(
+	return NewVMConstruct(
 		ctx,
 		remoteManager,
 		config.GuestVMUsername,

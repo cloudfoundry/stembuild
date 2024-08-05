@@ -12,9 +12,9 @@ import (
 
 	"github.com/cloudfoundry/stembuild/assets"
 	"github.com/cloudfoundry/stembuild/commandparser"
-	vmconstructfactory "github.com/cloudfoundry/stembuild/construct/factory"
-	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
-	packagerfactory "github.com/cloudfoundry/stembuild/package_stemcell/factory"
+	"github.com/cloudfoundry/stembuild/construct"
+	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packager"
 	"github.com/cloudfoundry/stembuild/version"
 )
 
@@ -35,9 +35,9 @@ func main() {
 	}
 
 	var gf commandparser.GlobalFlags
-	packageCmd := commandparser.NewPackageCommand(version.NewVersionGetter(), &packagerfactory.PackagerFactory{}, &commandparser.PackageMessenger{Output: os.Stderr})
+	packageCmd := commandparser.NewPackageCommand(version.NewVersionGetter(), &packager.Factory{}, &commandparser.PackageMessenger{Output: os.Stderr})
 	packageCmd.GlobalFlags = &gf
-	constructCmd := commandparser.NewConstructCmd(context.Background(), &vmconstructfactory.VMConstructFactory{}, &vcenterclientfactory.ManagerFactory{}, &commandparser.ConstructValidator{}, &commandparser.ConstructCmdMessenger{OutputChannel: os.Stderr})
+	constructCmd := commandparser.NewConstructCmd(context.Background(), &construct.Factory{}, &vcenter_manager.ManagerFactory{}, &commandparser.ConstructValidator{}, &commandparser.ConstructCmdMessenger{OutputChannel: os.Stderr})
 	constructCmd.GlobalFlags = &gf
 
 	var commands = make([]subcommands.Command, 0)
