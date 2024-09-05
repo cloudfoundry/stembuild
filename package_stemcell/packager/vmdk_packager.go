@@ -1,4 +1,4 @@
-package packagers
+package packager
 
 import (
 	"archive/tar"
@@ -16,8 +16,8 @@ import (
 
 	"github.com/cloudfoundry/stembuild/colorlogger"
 	"github.com/cloudfoundry/stembuild/filesystem"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
 	"github.com/cloudfoundry/stembuild/package_stemcell/ovftool"
-	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
 	"github.com/cloudfoundry/stembuild/templates"
 )
 
@@ -30,7 +30,7 @@ type VmdkPackager struct {
 	Sha1sum      string
 	tmpdir       string
 	Stop         chan struct{}
-	BuildOptions package_parameters.VmdkPackageParameters
+	BuildOptions config.VmdkOptions
 	Logger       colorlogger.Logger
 }
 

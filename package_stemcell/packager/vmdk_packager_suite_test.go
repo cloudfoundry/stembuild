@@ -1,4 +1,4 @@
-package vmconstruct_factory
+package packager_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestFactory(t *testing.T) {
+func TestStemcell(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "VmConstruct Factory Suite")
+	RunSpecs(t, "Stemcell Suite")
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/vmware/govmomi/object"
 
 	"github.com/cloudfoundry/stembuild/construct/config"
-	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/guest_manager"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
@@ -35,13 +34,13 @@ type VCenterManager interface {
 
 //counterfeiter:generate . VMPreparerFactory
 type VMPreparerFactory interface {
-	VMPreparer(config config.SourceConfig, vCenterManager VCenterManager) (VmConstruct, error)
+	New(config config.SourceConfig, vCenterManager VCenterManager) (VmConstruct, error)
 }
 
 //counterfeiter:generate . ManagerFactory
 type ManagerFactory interface {
 	VCenterManager(ctx context.Context) (*vcenter_manager.VCenterManager, error)
-	SetConfig(config vcenterclientfactory.FactoryConfig)
+	SetConfig(config vcenter_manager.FactoryConfig)
 }
 
 //counterfeiter:generate . ConstructCmdValidator
@@ -139,12 +138,12 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		return subcommands.ExitFailure
 	}
 
-	p.managerFactory.SetConfig(vcenterclientfactory.FactoryConfig{
+	p.managerFactory.SetConfig(vcenter_manager.FactoryConfig{
 		VCenterServer:  p.sourceConfig.VCenterUrl,
 		Username:       p.sourceConfig.VCenterUsername,
 		Password:       p.sourceConfig.VCenterPassword,
-		ClientCreator:  &vcenterclientfactory.ClientCreator{},
-		FinderCreator:  &vcenterclientfactory.GovmomiFinderCreator{},
+		ClientCreator:  &vcenter_manager.ClientCreator{},
+		FinderCreator:  &vcenter_manager.GovmomiFinderCreator{},
 		RootCACertPath: p.sourceConfig.CaCertFile,
 	})
 
@@ -154,7 +153,7 @@ func (p *ConstructCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interfac
 		return subcommands.ExitFailure
 	}
 
-	vmConstruct, err := p.prepFactory.VMPreparer(p.sourceConfig, vCenterManager)
+	vmConstruct, err := p.prepFactory.New(p.sourceConfig, vCenterManager)
 	if err != nil {
 		p.messenger.CannotPrepareVM(err)
 		return subcommands.ExitFailure

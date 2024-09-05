@@ -157,7 +157,7 @@ var _ = Describe("construct", func() {
 			fakeValidator = &commandparserfakes.FakeConstructCmdValidator{}
 			fakeMessenger = &commandparserfakes.FakeConstructMessenger{}
 			fakeManagerFactory = &commandparserfakes.FakeManagerFactory{}
-			fakeFactory.VMPreparerReturns(fakeVmConstruct, nil)
+			fakeFactory.NewReturns(fakeVmConstruct, nil)
 
 			ConstrCmd = commandparser.NewConstructCmd(context.Background(), fakeFactory, fakeManagerFactory, fakeValidator, fakeMessenger)
 			ConstrCmd.SetFlags(f)

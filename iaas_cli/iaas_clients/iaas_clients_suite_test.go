@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/vmware/govmomi/object"
 
-	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/factory"
+	vcenterclientfactory "github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients/vcenter_manager"
 )
 
 func TestIaasClients(t *testing.T) {

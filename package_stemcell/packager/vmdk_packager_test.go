@@ -1,4 +1,4 @@
-package packagers_test
+package packager_test
 
 import (
 	"crypto/sha1"
@@ -14,22 +14,22 @@ import (
 
 	"github.com/cloudfoundry/stembuild/colorlogger"
 	mockfilesystem "github.com/cloudfoundry/stembuild/filesystem/mock"
-	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
-	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
+	"github.com/cloudfoundry/stembuild/package_stemcell/config"
+	"github.com/cloudfoundry/stembuild/package_stemcell/packager"
 	"github.com/cloudfoundry/stembuild/test/helpers"
 )
 
 var _ = Describe("VmdkPackager", func() {
-	var stembuildConfig package_parameters.VmdkPackageParameters
-	var vmdkPackager packagers.VmdkPackager
+	var stembuildConfig config.VmdkOptions
+	var vmdkPackager packager.VmdkPackager
 
 	BeforeEach(func() {
-		stembuildConfig = package_parameters.VmdkPackageParameters{
+		stembuildConfig = config.VmdkOptions{
 			OSVersion: "2012R2",
 			Version:   "1200.1",
 		}
 
-		vmdkPackager = packagers.VmdkPackager{
+		vmdkPackager = packager.VmdkPackager{
 			Stop:         make(chan struct{}),
 			BuildOptions: stembuildConfig,
 			Logger:       colorlogger.New(0, false, GinkgoWriter),
@@ -43,7 +43,7 @@ var _ = Describe("VmdkPackager", func() {
 				Expect(err).ToNot(HaveOccurred())
 				defer func() { _ = os.Remove(vmdk.Name()) }()
 
-				valid, err := packagers.IsValidVMDK(vmdk.Name())
+				valid, err := packager.IsValidVMDK(vmdk.Name())
 				Expect(err).To(BeNil())
 				Expect(valid).To(BeTrue())
 			})
@@ -51,7 +51,7 @@ var _ = Describe("VmdkPackager", func() {
 
 		Context("invalid vmdk file specified", func() {
 			It("should be invalid", func() {
-				valid, err := packagers.IsValidVMDK(filepath.Join("..", "out", "invalid"))
+				valid, err := packager.IsValidVMDK(filepath.Join("..", "out", "invalid"))
 				Expect(err).To(HaveOccurred())
 				Expect(valid).To(BeFalse())
 			})
@@ -142,7 +142,7 @@ var _ = Describe("VmdkPackager", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				testVmdkSize := vmdkFile.Size()
-				expectFreeSpace := uint64(testVmdkSize)*2 + (packagers.Gigabyte / 2)
+				expectFreeSpace := uint64(testVmdkSize)*2 + (packager.Gigabyte / 2)
 
 				directoryPath := filepath.Dir(vmdkPackager.BuildOptions.VMDKFile)
 				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(expectFreeSpace*2), nil).AnyTimes()
@@ -163,7 +163,7 @@ var _ = Describe("VmdkPackager", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				testVmdkSize := vmdkFile.Size()
-				expectFreeSpace := uint64(testVmdkSize)*2 + (packagers.Gigabyte / 2)
+				expectFreeSpace := uint64(testVmdkSize)*2 + (packager.Gigabyte / 2)
 
 				directoryPath := filepath.Dir(vmdkPackager.BuildOptions.VMDKFile)
 				mockFileSystem.EXPECT().GetAvailableDiskSpace(directoryPath).Return(uint64(expectFreeSpace/2), nil).AnyTimes()

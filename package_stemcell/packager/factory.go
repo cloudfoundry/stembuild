@@ -1,4 +1,4 @@
-package factory
+package packager
 
 import (
 	"errors"
@@ -9,13 +9,11 @@ import (
 	"github.com/cloudfoundry/stembuild/iaas_cli"
 	"github.com/cloudfoundry/stembuild/iaas_cli/iaas_clients"
 	"github.com/cloudfoundry/stembuild/package_stemcell/config"
-	"github.com/cloudfoundry/stembuild/package_stemcell/package_parameters"
-	"github.com/cloudfoundry/stembuild/package_stemcell/packagers"
 )
 
-type PackagerFactory struct{}
+type Factory struct{}
 
-func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logger colorlogger.Logger) (commandparser.Packager, error) {
+func (f *Factory) NewPackager(sourceConfig config.SourceConfig, outputConfig config.OutputConfig, logger colorlogger.Logger) (commandparser.Packager, error) {
 	source, err := sourceConfig.GetSource()
 	if err != nil {
 		return nil, err
@@ -32,7 +30,7 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 				&iaas_cli.GovcRunner{},
 			)
 
-		return &packagers.VCenterPackager{
+		return &VCenterPackager{
 			SourceConfig: sourceConfig,
 			OutputConfig: outputConfig,
 			Client:       client,
@@ -40,19 +38,18 @@ func (f *PackagerFactory) Packager(sourceConfig config.SourceConfig, outputConfi
 		}, nil
 	case config.VMDK:
 		options :=
-			package_parameters.VmdkPackageParameters{}
+			config.VmdkOptions{
+				VMDKFile:  sourceConfig.Vmdk,
+				OSVersion: strings.ToUpper(outputConfig.Os),
+				Version:   outputConfig.StemcellVersion,
+				OutputDir: outputConfig.OutputDir,
+			}
 
-		vmdkPackager := &packagers.VmdkPackager{
+		return &VmdkPackager{
 			Stop:         make(chan struct{}),
 			BuildOptions: options,
 			Logger:       logger,
-		}
-
-		vmdkPackager.BuildOptions.VMDKFile = sourceConfig.Vmdk
-		vmdkPackager.BuildOptions.OSVersion = strings.ToUpper(outputConfig.Os)
-		vmdkPackager.BuildOptions.Version = outputConfig.StemcellVersion
-		vmdkPackager.BuildOptions.OutputDir = outputConfig.OutputDir
-		return vmdkPackager, nil
+		}, nil
 	default:
 		return nil, errors.New("unable to determine packager")
 	}

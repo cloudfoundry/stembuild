@@ -1,4 +1,4 @@
-package packagers
+package packager
 
 import (
 	"errors"

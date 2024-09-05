@@ -1,4 +1,4 @@
-package vmconstruct_factory
+package construct_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
@@ -13,14 +13,14 @@ import (
 var _ = Describe("Factory", func() {
 	Describe("GetVMPreparer", func() {
 		var (
-			factory *VMConstructFactory
+			factory *construct.Factory
 		)
 
 		BeforeEach(func() {
-			factory = &VMConstructFactory{}
+			factory = &construct.Factory{}
 		})
 
-		It("should return a VMPreparer", func() {
+		It("should return a New", func() {
 			fakeVCenterManager := &commandparserfakes.FakeVCenterManager{}
 
 			sourceConfig := config.SourceConfig{
@@ -33,7 +33,7 @@ var _ = Describe("Factory", func() {
 				VmInventoryPath: "some-vm-inventory-path",
 			}
 
-			vmPreparer, err := factory.VMPreparer(sourceConfig, fakeVCenterManager)
+			vmPreparer, err := factory.New(sourceConfig, fakeVCenterManager)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(vmPreparer).To(BeAssignableToTypeOf(&construct.VMConstruct{}))
 		})
@@ -45,7 +45,7 @@ var _ = Describe("Factory", func() {
 			fakeVCenterManager.LoginReturns(loginFailure)
 			sourceConfig := config.SourceConfig{}
 
-			vmPreparer, err := factory.VMPreparer(sourceConfig, fakeVCenterManager)
+			vmPreparer, err := factory.New(sourceConfig, fakeVCenterManager)
 
 			Expect(vmPreparer).To(BeNil())
 			Expect(err).To(HaveOccurred())
