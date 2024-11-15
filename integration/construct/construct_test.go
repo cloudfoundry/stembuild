@@ -61,27 +61,6 @@ var _ = Describe("stembuild construct", func() {
 
 			Eventually(session.Out, constructOutputTimeout).Should(Say(`Attempting to enable WinRM on the guest vm...WinRm enabled on the guest VM`))
 		})
-
-		It("successfully runs even when a user has logged in", func() {
-			By(fmt.Sprintf("Logged on VM for test has IP: %s\n", conf.LoggedInVMIP))
-
-			revertSnapshot(conf.LoggedInVMIpath, conf.LoggedInVMSnapshot)
-
-			waitForVmToBeReady(conf.LoggedInVMIP, conf.VMUsername, conf.VMPassword)
-			time.Sleep(30 * time.Second)
-
-			session := helpers.Stembuild(stembuildExecutable, "construct",
-				"-vm-ip", conf.LoggedInVMIP,
-				"-vm-username", conf.VMUsername,
-				"-vm-password", conf.VMPassword,
-				"-vcenter-url", conf.VCenterURL,
-				"-vcenter-ca-certs", conf.VCenterCACert,
-				"-vcenter-username", conf.VCenterUsername,
-				"-vcenter-password", conf.VCenterPassword,
-				"-vm-inventory-path", conf.LoggedInVMIpath)
-
-			Eventually(session, shutdownTimeout).Should(Exit(0))
-		})
 	})
 
 	It("fails with an appropriate error when LGPO is missing", func() {

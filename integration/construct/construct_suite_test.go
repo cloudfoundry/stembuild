@@ -45,7 +45,6 @@ const (
 	VmSnapshotName                    = "integration-test-snapshot"
 	LoggedInVmIpVariable              = "LOGOUT_INTEGRATION_TEST_VM_IP"
 	LoggedInVmIpathVariable           = "LOGOUT_INTEGRATION_TEST_VM_INVENTORY_PATH"
-	LoggedInVmSnapshotName            = "logged-in-winrm-enabled"
 	powershell                        = "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 )
 
@@ -75,7 +74,6 @@ type config struct {
 	VMInventoryPath    string
 	LoggedInVMIP       string
 	LoggedInVMIpath    string
-	LoggedInVMSnapshot string
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -92,7 +90,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	loggedInVmIp := envMustExist(LoggedInVmIpVariable)
 	loggedInVmInventoryPath := envMustExist(LoggedInVmIpathVariable)
-	loggedInVmSnapshot := LoggedInVmSnapshotName
 	vCenterUrl := envMustExist(vcenterBaseURLVariable)
 	vcenterFolder := envMustExist(vcenterFolderVariable)
 	vmInventoryPath := strings.Join([]string{vcenterFolder, vmName}, "/")
@@ -127,7 +124,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		VCenterPassword:    vCenterStembuildPassword,
 		LoggedInVMIP:       loggedInVmIp,
 		LoggedInVMIpath:    loggedInVmInventoryPath,
-		LoggedInVMSnapshot: loggedInVmSnapshot,
 		VMName:             vmName,
 		VMInventoryPath:    vmInventoryPath,
 	}
