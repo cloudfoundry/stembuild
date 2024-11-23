@@ -43,8 +43,6 @@ const (
 	vcenterStembuildPasswordVariable  = "VCENTER_PASSWORD"
 	StembuildVersionVariable          = "STEMBUILD_VERSION"
 	VmSnapshotName                    = "integration-test-snapshot"
-	LoggedInVmIpVariable              = "LOGOUT_INTEGRATION_TEST_VM_IP"
-	LoggedInVmIpathVariable           = "LOGOUT_INTEGRATION_TEST_VM_INVENTORY_PATH"
 	powershell                        = "C:\\Windows\\System32\\WindowsPowerShell\\V1.0\\powershell.exe"
 )
 
@@ -60,20 +58,18 @@ var (
 )
 
 type config struct {
-	TargetIP           string
-	NetworkGateway     string
-	SubnetMask         string
-	VMUsername         string
-	VMPassword         string
-	VMName             string
-	VMNetwork          string
-	VCenterURL         string
-	VCenterCACert      string
-	VCenterUsername    string
-	VCenterPassword    string
-	VMInventoryPath    string
-	LoggedInVMIP       string
-	LoggedInVMIpath    string
+	TargetIP        string
+	NetworkGateway  string
+	SubnetMask      string
+	VMUsername      string
+	VMPassword      string
+	VMName          string
+	VMNetwork       string
+	VCenterURL      string
+	VCenterCACert   string
+	VCenterUsername string
+	VCenterPassword string
+	VMInventoryPath string
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -88,8 +84,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	targetVMIP := envMustExist(TargetVmIPVariable)
 	vmName := envMustExist(VMNameVariable)
 
-	loggedInVmIp := envMustExist(LoggedInVmIpVariable)
-	loggedInVmInventoryPath := envMustExist(LoggedInVmIpathVariable)
 	vCenterUrl := envMustExist(vcenterBaseURLVariable)
 	vcenterFolder := envMustExist(vcenterFolderVariable)
 	vmInventoryPath := strings.Join([]string{vcenterFolder, vmName}, "/")
@@ -115,17 +109,15 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).NotTo(HaveOccurred())
 
 	conf = config{
-		TargetIP:           targetVMIP,
-		VMUsername:         vmUsername,
-		VMPassword:         vmPassword,
-		VCenterCACert:      pathToCACert,
-		VCenterURL:         vCenterUrl,
-		VCenterUsername:    vCenterStembuildUser,
-		VCenterPassword:    vCenterStembuildPassword,
-		LoggedInVMIP:       loggedInVmIp,
-		LoggedInVMIpath:    loggedInVmInventoryPath,
-		VMName:             vmName,
-		VMInventoryPath:    vmInventoryPath,
+		TargetIP:        targetVMIP,
+		VMUsername:      vmUsername,
+		VMPassword:      vmPassword,
+		VCenterCACert:   pathToCACert,
+		VCenterURL:      vCenterUrl,
+		VCenterUsername: vCenterStembuildUser,
+		VCenterPassword: vCenterStembuildPassword,
+		VMName:          vmName,
+		VMInventoryPath: vmInventoryPath,
 	}
 
 	enableWinRM()
