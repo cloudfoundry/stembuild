@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.36.1
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
 	github.com/pkg/errors v0.9.1
-	github.com/vmware/govmomi v0.46.2
+	github.com/vmware/govmomi v0.46.3
 	golang.org/x/sys v0.28.0
 )
 
@@ -46,7 +46,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
 	github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde // indirect
-	golang.org/x/crypto v0.30.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.32.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect

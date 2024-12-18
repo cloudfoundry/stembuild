@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2024 VMware, Inc. All Rights Reserved.
+Copyright (c) 2024-2024 VMware, Inc. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ type save struct {
 	verbose bool
 	recurse bool
 	one     bool
+	license bool
 	kind    kinds
 	summary map[string]int
 }
@@ -60,6 +61,7 @@ func (cmd *save) Register(ctx context.Context, f *flag.FlagSet) {
 	f.BoolVar(&cmd.one, "1", false, "Save ROOT only, without its children")
 	f.StringVar(&cmd.dir, "d", "", "Save objects in directory")
 	f.BoolVar(&cmd.force, "f", false, "Remove existing object directory")
+	f.BoolVar(&cmd.license, "l", false, "Include license properties")
 	f.BoolVar(&cmd.recurse, "r", true, "Include children of the container view root")
 	f.Var(&cmd.kind, "type", "Resource types to save.  Defaults to all types")
 	f.BoolVar(&cmd.verbose, "v", false, "Verbose output")
@@ -168,6 +170,14 @@ func saveAlarmManager(ctx context.Context, c *vim25.Client, ref types.ManagedObj
 	return []saveMethod{{"GetAlarm", res}, {"", content}}, nil
 }
 
+func saveLicenseAssignmentManager(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) ([]saveMethod, error) {
+	res, err := methods.QueryAssignedLicenses(ctx, c, &types.QueryAssignedLicenses{This: ref})
+	if err != nil {
+		return nil, err
+	}
+	return []saveMethod{{"QueryAssignedLicenses", res}}, nil
+}
+
 // saveObjects maps object types to functions that can save data that isn't available via the PropertyCollector
 var saveObjects = map[string]func(context.Context, *vim25.Client, types.ManagedObjectReference) ([]saveMethod, error){
 	"VmwareDistributedVirtualSwitch": saveDVS,
@@ -175,6 +185,7 @@ var saveObjects = map[string]func(context.Context, *vim25.Client, types.ManagedO
 	"HostNetworkSystem":              saveHostNetworkSystem,
 	"HostSystem":                     saveHostSystem,
 	"AlarmManager":                   saveAlarmManager,
+	"LicenseAssignmentManager":       saveLicenseAssignmentManager,
 }
 
 func (cmd *save) save(content []types.ObjectContent) error {
@@ -199,6 +210,9 @@ func (cmd *save) save(content []types.ObjectContent) error {
 			objs, err := method(context.Background(), c, x.Obj)
 			if err != nil {
 				if fault.Is(err, &types.HostNotConnected{}) {
+					continue
+				}
+				if fault.Is(err, &types.NotSupported{}) {
 					continue
 				}
 				return err
@@ -226,6 +240,10 @@ func (cmd *save) save(content []types.ObjectContent) error {
 }
 
 func (cmd *save) Run(ctx context.Context, f *flag.FlagSet) error {
+	if f.NArg() > 1 {
+		return flag.ErrHelp
+	}
+
 	cmd.summary = make(map[string]int)
 	c, err := cmd.Client()
 	if err != nil {
@@ -290,21 +308,36 @@ func (cmd *save) Run(ctx context.Context, f *flag.FlagSet) error {
 
 		for _, p := range content[0].PropSet {
 			if c, ok := p.Val.(types.ServiceContent); ok {
+				var path []string
+				var selectSet []types.BaseSelectionSpec
+				var propSet []types.PropertySpec
 				for _, ref := range mo.References(c) {
 					all := types.NewBool(true)
 					switch ref.Type {
-					case "LicenseManager", "ServiceManager":
+					case "LicenseManager":
+						selectSet = []types.BaseSelectionSpec{&types.TraversalSpec{
+							Type: ref.Type,
+							Path: "licenseAssignmentManager",
+						}}
+						propSet = []types.PropertySpec{{Type: "LicenseAssignmentManager", All: all}}
+						// avoid saving "licenses" property by default as it includes the keys
+						if cmd.license == false {
+							path = []string{selectSet[0].(*types.TraversalSpec).Path}
+							all, selectSet, propSet = nil, nil, nil
+						}
+					case "ServiceManager":
 						all = nil
 					}
 					req.SpecSet = append(req.SpecSet, types.PropertyFilterSpec{
 						ObjectSet: []types.ObjectSpec{{
-							Obj: ref,
+							Obj:       ref,
+							SelectSet: selectSet,
 						}},
-						PropSet: []types.PropertySpec{{
+						PropSet: append(propSet, types.PropertySpec{
 							Type:    ref.Type,
 							All:     all,
-							PathSet: nil,
-						}},
+							PathSet: path,
+						}),
 					})
 				}
 				break
