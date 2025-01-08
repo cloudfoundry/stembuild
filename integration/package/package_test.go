@@ -15,8 +15,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-	"github.com/vmware/govmomi/govc/cli"
-	_ "github.com/vmware/govmomi/govc/vm"
+	"github.com/vmware/govmomi/cli"
+	_ "github.com/vmware/govmomi/cli/vm"
 
 	"github.com/cloudfoundry/stembuild/test/helpers"
 )
@@ -54,7 +54,7 @@ var _ = Describe("Package", func() {
 		vcenterStembuildUsername = helpers.EnvMustExist(vcenterStembuildUsernameVariable)
 		vcenterStembuildPassword = helpers.EnvMustExist(vcenterStembuildPasswordVariable)
 
-		//workingDir = GinkgoT().TempDir() // automatically cleaned up
+		// workingDir = GinkgoT().TempDir() // automatically cleaned up
 		var err error
 		workingDir, err = os.MkdirTemp(os.TempDir(), "stembuild-package-test")
 		Expect(err).NotTo(HaveOccurred())

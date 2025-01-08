@@ -199,26 +199,26 @@ github.com/pkg/errors
 # github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde
 ## explicit
 github.com/tidwall/transform
-# github.com/vmware/govmomi v0.46.3
-## explicit; go 1.22
+# github.com/vmware/govmomi v0.47.1
+## explicit; go 1.21
 github.com/vmware/govmomi
+github.com/vmware/govmomi/cli
+github.com/vmware/govmomi/cli/about
+github.com/vmware/govmomi/cli/device
+github.com/vmware/govmomi/cli/device/cdrom
+github.com/vmware/govmomi/cli/esx
+github.com/vmware/govmomi/cli/export
+github.com/vmware/govmomi/cli/flags
+github.com/vmware/govmomi/cli/importx
+github.com/vmware/govmomi/cli/object
+github.com/vmware/govmomi/cli/vm
+github.com/vmware/govmomi/cli/vm/guest
+github.com/vmware/govmomi/cli/vm/snapshot
 github.com/vmware/govmomi/cns
 github.com/vmware/govmomi/cns/methods
 github.com/vmware/govmomi/cns/types
 github.com/vmware/govmomi/fault
 github.com/vmware/govmomi/find
-github.com/vmware/govmomi/govc/about
-github.com/vmware/govmomi/govc/cli
-github.com/vmware/govmomi/govc/device
-github.com/vmware/govmomi/govc/device/cdrom
-github.com/vmware/govmomi/govc/export
-github.com/vmware/govmomi/govc/flags
-github.com/vmware/govmomi/govc/host/esxcli
-github.com/vmware/govmomi/govc/importx
-github.com/vmware/govmomi/govc/object
-github.com/vmware/govmomi/govc/vm
-github.com/vmware/govmomi/govc/vm/guest
-github.com/vmware/govmomi/govc/vm/snapshot
 github.com/vmware/govmomi/guest
 github.com/vmware/govmomi/guest/toolbox
 github.com/vmware/govmomi/history
@@ -254,7 +254,7 @@ github.com/vmware/govmomi/vim25/types
 github.com/vmware/govmomi/vim25/xml
 github.com/vmware/govmomi/vmdk
 github.com/vmware/govmomi/vsan/vsanfs/types
-# golang.org/x/crypto v0.31.0
+# golang.org/x/crypto v0.32.0
 ## explicit; go 1.20
 golang.org/x/crypto/md4
 golang.org/x/crypto/pbkdf2
@@ -264,7 +264,7 @@ golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/modfile
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.33.0
+# golang.org/x/net v0.34.0
 ## explicit; go 1.18
 golang.org/x/net/html
 golang.org/x/net/html/atom
@@ -273,7 +273,7 @@ golang.org/x/net/http2/hpack
 # golang.org/x/sync v0.10.0
 ## explicit; go 1.18
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.28.0
+# golang.org/x/sys v0.29.0
 ## explicit; go 1.18
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -300,7 +300,7 @@ golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.28.0
+# golang.org/x/tools v0.29.0
 ## explicit; go 1.22.0
 golang.org/x/tools/cover
 golang.org/x/tools/go/ast/astutil

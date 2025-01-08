@@ -5,14 +5,14 @@ import (
 	"io"
 	"os"
 
-	_ "github.com/vmware/govmomi/govc/about"
-	"github.com/vmware/govmomi/govc/cli"
-	_ "github.com/vmware/govmomi/govc/device"
-	_ "github.com/vmware/govmomi/govc/device/cdrom"
-	_ "github.com/vmware/govmomi/govc/export"
-	_ "github.com/vmware/govmomi/govc/object"
-	_ "github.com/vmware/govmomi/govc/vm"
-	_ "github.com/vmware/govmomi/govc/vm/guest"
+	"github.com/vmware/govmomi/cli"
+	_ "github.com/vmware/govmomi/cli/about"
+	_ "github.com/vmware/govmomi/cli/device"
+	_ "github.com/vmware/govmomi/cli/device/cdrom"
+	_ "github.com/vmware/govmomi/cli/export"
+	_ "github.com/vmware/govmomi/cli/object"
+	_ "github.com/vmware/govmomi/cli/vm"
+	_ "github.com/vmware/govmomi/cli/vm/guest"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
