@@ -60,7 +60,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20250121033306-997b0b79cac0
+# github.com/google/pprof v0.0.0-20250128161936-077ca0a936bf
 ## explicit; go 1.22
 github.com/google/pprof/profile
 # github.com/google/subcommands v1.2.0
@@ -199,7 +199,7 @@ github.com/pkg/errors
 # github.com/tidwall/transform v0.0.0-20201103190739-32f242e2dbde
 ## explicit
 github.com/tidwall/transform
-# github.com/vmware/govmomi v0.47.1
+# github.com/vmware/govmomi v0.48.0
 ## explicit; go 1.21
 github.com/vmware/govmomi
 github.com/vmware/govmomi/cli
