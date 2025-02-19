@@ -1,6 +1,6 @@
 module github.com/cloudfoundry/stembuild
 
-go 1.22.0
+go 1.23.0
 
 require (
 	github.com/concourse/pool-resource v1.1.1
@@ -8,7 +8,7 @@ require (
 	github.com/google/subcommands v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/masterzen/winrm v0.0.0-20240702205601-3fad6e106085
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.1
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.2
 	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/packer-community/winrmcp v0.0.0-20221126162354-6e900dd2c68f
