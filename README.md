@@ -37,7 +37,8 @@ stembuild construct -vm-ip <IP of VM> -vm-username <vm username> -vm-password <v
 ```
 
 ### Requirements
-- LGPO.zip in current working directory
+- LGPO.zip in current working directory. This is a zip of LGPO.exe from Microsoft that is compatible with the current version of Windows. https://www.microsoft.com/en-us/download/details.aspx?id=55319
+- Constructed assets/StemcellAutomation.zip (contents described below)
 - Running Windows VM with:
 	- Up-to-date Operating System
 	- Reachable by IP over port 5985
@@ -113,14 +114,14 @@ Flags:
 
 ```
 
-### Compiling & Running Stembuild Locally
+### Running Stembuild Locally
 
 Assuming you've followed [these instructions](https://bosh.io/docs/windows-stemcell-create/) and you've created a Windows VM at 10.9.9.115 whose Administrator's password is "c1oudc0w".
 
 ```bash
-    export TARGET_VM_PASSWORD=c1oudc0w VCENTER_PASSWORD='Admin!23'
-BOSH_AGENT_REPO=~/workspace/bosh-agent STEMBUILD_VERSION=2019.2 make
-GOVC_INSECURE=true out/stembuild -debug \
+export TARGET_VM_PASSWORD=c1oudc0w VCENTER_PASSWORD='Admin!23'
+
+GOVC_INSECURE=true stembuild -debug \
   construct \
   -vm-ip 10.9.9.115 \
   -vm-username Administrator \
@@ -129,7 +130,8 @@ GOVC_INSECURE=true out/stembuild -debug \
   -vcenter-username administrator@vsphere.local \
   -vcenter-password $VCENTER_PASSWORD \
   -vm-inventory-path "/dc/vm/Discovered virtual machine/w2019-stemcell"
-GOVC_INSECURE=true out/stembuild -debug \
+
+GOVC_INSECURE=true stembuild -debug \
   package \
   -vcenter-url vcenter-70.nono.io \
   -vcenter-username administrator@vsphere.local \
@@ -227,23 +229,66 @@ The output should be nothing if there are no out-of-sync dependencies.
 
 ## Compile stembuild locally
 
-Some of the make targets require the use of curl and [xq](https://github.com/sibprogrammer/xq?tab=readme-ov-file#installation)
-to download the latest dependencies from S3 to create the embedded StemcellAutomation.zip resource. The dependencies
-downloaded from s3 are the same ones used by [stembuild CI](https://github.com/cloudfoundry/greenhouse-ci/).
-
-Download or clone the bosh-agent repository
-```
-git clone https://github.com/cloudfoundry/bosh-agent.git
-```
-
 Download or clone the stembuild repository and navigate to it
 ```
 git clone https://github.com/cloudfoundry/stembuild.git
 cd stembuild
 ```
 
-Use `make build` to build stembuild, providing the corresponding values for the bosh-agent path and stemcell version you
+You will need to construct `assets/StemcellAutomation.zip`. This file represents various BOSH executables necessary to build a working stemcell.
+
+**assets/StemcellAutomation.zip files:**
+| File | Source / Description |
+|-|-|
+| OpenSSH-Win64.zip     | https://github.com/PowerShell/Win32-OpenSSH/releases |
+| bosh-psmodules.zip    | https://github.com/cloudfoundry/bosh-psmodules/tree/master/modules |
+| agent.zip             | A zip constructed using various BOSH executables. See list of necessary files below. |
+| deps.json             | A JSON file with the SHA256 checksums and optionally the version for each component in this zip. See format below. |
+
+**agent.zip files:**
+| File | Source / Description |
+|-|-|
+| bosh-agent.exe               | https://github.com/cloudfoundry/bosh-agent/ |
+| sha                          | Git commit SHA from the bosh-agent repo |
+| deps/pipe.exe                | https://github.com/cloudfoundry/bosh-agent/tree/main/jobsupervisor/pipe |
+| deps/bosh-blobstore-gcs.exe  | https://github.com/cloudfoundry/bosh-gcscli |
+| deps/bosh-blobstore-dav.exe  | https://github.com/cloudfoundry/bosh-davcli |
+| deps/bosh-blobstore-s3.exe   | https://github.com/cloudfoundry/bosh-s3cli |
+| deps/tar.exe                 | https://github.com/cloudfoundry/bsdtar/ |
+| deps/job-service-wrapper.exe | https://github.com/bosh-dep-forks/winsw |
+| service_wrapper.exe          | https://github.com/bosh-dep-forks/winsw |
+| service_wrapper.xml          | https://github.com/cloudfoundry/bosh-agent/blob/main/integration/windows/fixtures/service_wrapper.xml |
+
+**deps.json format:**
+```json
+{
+  "OpenSSH-Win64.zip": {
+    "sha": "SOME-SHA256",
+  },
+  "bosh-psmodules.zip": {
+    "sha": "SOME-SHA256",
+  },
+  "agent.zip": {
+    "sha": "SOME-SHA256",
+  },
+  "LGPO.zip": {
+    "sha": "SOME-SHA256",
+    "version": "3"
+  }
+}
+```
+
+Once you have these files, run `./bin/build-stemcell-automation-zip.sh`:
+```bash
+OPENSSH_ZIP=OpenSSH-Win64.zip \
+BOSH_PSMODULES_ZIP="bosh-psmodules.zip" \
+AGENT_ZIP="agent.zip" \
+DEPS_JSON="deps.json" \
+./bin/build-stemcell-automation-zip.sh
+```
+
+Use `make build` to build stembuild, providing the corresponding values for the stemcell version you
 would like to build, for example:
 ```
-BOSH_AGENT_REPO=../bosh-agent STEMBUILD_VERSION=2019.70 make build
+STEMBUILD_VERSION=2019.70 make build
 ```
