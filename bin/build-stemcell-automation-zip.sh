@@ -17,7 +17,7 @@ cp "${AGENT_ZIP}" "${TEMP_DIR}/agent.zip"
 cp "${DEPS_JSON}" "${TEMP_DIR}/deps.json"
 cp ${STEMCELL_AUTOMATION_PS1} "$TEMP_DIR"
 
-rm "${ROOT_DIR}/assets/StemcellAutomation.zip"
+rm -f "${ROOT_DIR}/assets/StemcellAutomation.zip"
 
 zip -rj "${ROOT_DIR}/assets/StemcellAutomation.zip" "$TEMP_DIR"
 
