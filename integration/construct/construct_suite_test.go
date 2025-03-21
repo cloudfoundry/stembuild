@@ -92,6 +92,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	vCenterStembuildUser := envMustExist(vcenterStembuildUsernameVariable)
 	vCenterStembuildPassword := envMustExist(vcenterStembuildPasswordVariable)
 
+	fmt.Println("***** Env variables *****")
+	fmt.Println(os.Environ())
+	fmt.Println("***** Env variables *****")
+
 	rawCA := envMustExist(VcenterCACert)
 	t, err := os.CreateTemp("", "ca-cert")
 	Expect(err).ToNot(HaveOccurred())

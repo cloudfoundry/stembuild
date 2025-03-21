@@ -35,6 +35,9 @@ var (
 )
 
 var _ = SynchronizedBeforeSuite(func() []byte {
+	fmt.Println("***** Env variables *****")
+	fmt.Println(os.Environ())
+	fmt.Println("***** Env variables *****")
 	rawCA := envMustExist(VcenterCACert)
 	t, err := os.CreateTemp("", "ca-cert")
 	Expect(err).ToNot(HaveOccurred())
