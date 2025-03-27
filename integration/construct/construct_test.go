@@ -29,7 +29,10 @@ var _ = Describe("stembuild construct", func() {
 	})
 
 	AfterEach(func() {
-		_ = os.Remove(filepath.Join(workingDir, "LGPO.zip"))
+		err := os.Remove(filepath.Join(workingDir, "LGPO.zip"))
+		if err != nil {
+			By(fmt.Sprintf("removing '%s/LGPO.zip' failed: %s", workingDir, err))
+		}
 	})
 
 	Context("run successfully", func() {
