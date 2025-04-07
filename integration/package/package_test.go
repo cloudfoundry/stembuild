@@ -90,7 +90,7 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		_, _ = session.Out.Write(out)
+		session.Out.Write(out) //nolint:errcheck
 		By(fmt.Sprintf("session.Out: '%s'", string(out)))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
@@ -145,7 +145,7 @@ var _ = Describe("Package", func() {
 
 		Eventually(session, 60*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 		var out []byte
-		_, _ = session.Out.Write(out)
+		session.Out.Write(out) //nolint:errcheck
 		By(fmt.Sprintf("session.Out: '%s'", string(out)))
 
 		expectedOSVersion := strings.Split(stembuildVersion, ".")[0]
@@ -174,9 +174,7 @@ func copyFileFromTar(t string, f string, w io.Writer) {
 	Expect(err).NotTo(HaveOccurred())
 	gzr, err := gzip.NewReader(z)
 	Expect(err).NotTo(HaveOccurred())
-	defer func() {
-		_ = gzr.Close()
-	}()
+	defer gzr.Close() //nolint:errcheck
 
 	r := tar.NewReader(gzr)
 	for {

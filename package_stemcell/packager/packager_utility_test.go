@@ -23,8 +23,8 @@ var _ = Describe("Packager Utility", func() {
 			// Revert to manual cleanup which fails non-catastrophically on windows
 			//sourceDir = GinkgoT().TempDir()      // automatically cleaned up
 			//destinationDir = GinkgoT().TempDir() // automatically cleaned up
-			sourceDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-source")
-			destinationDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-destination")
+			sourceDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-source")           //nolint:errcheck
+			destinationDir, _ = os.MkdirTemp(os.TempDir(), "packager-utility-test-destination") //nolint:errcheck
 		})
 
 		AfterEach(func() {
@@ -56,7 +56,7 @@ var _ = Describe("Packager Utility", func() {
 
 			_, err = os.Stat(tarball)
 			Expect(err).NotTo(HaveOccurred())
-			var fileReader, _ = os.OpenFile(tarball, os.O_RDONLY, 0777)
+			var fileReader, _ = os.OpenFile(tarball, os.O_RDONLY, 0777) //nolint:errcheck
 
 			gzr, err := gzip.NewReader(fileReader)
 			Expect(err).ToNot(HaveOccurred())

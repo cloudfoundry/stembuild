@@ -45,7 +45,7 @@ var _ = Describe("WinRM RebootChecker", func() {
 			rc.RebootHasFinishedReturns(false, nil)
 			waiter := remotemanager.NewRebootWaiter(fakePoller, rc)
 
-			_ = waiter.WaitForRebootFinished()
+			waiter.WaitForRebootFinished() //nolint:errcheck
 
 			Expect(fakePoller.PollCallCount()).To(Equal(1))
 			Expect(rc.RebootHasFinishedCallCount()).To(Equal(numberOfPollCalls))

@@ -31,8 +31,8 @@ func (r *GovcRunner) Run(args []string) int {
 }
 
 func (r *GovcRunner) RunWithOutput(args []string) (string, int, error) {
-	old := os.Stdout // keep backup of the real stdout
-	reader, w, _ := os.Pipe()
+	old := os.Stdout          // keep backup of the real stdout
+	reader, w, _ := os.Pipe() //nolint:errcheck
 	os.Stdout = w
 
 	print()

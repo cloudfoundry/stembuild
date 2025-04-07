@@ -17,7 +17,7 @@ func WriteManifest(manifestContents, manifestPath string) error {
 	if err != nil {
 		return fmt.Errorf("creating stemcell.MF (%s): %s", manifestPath, err)
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 
 	_, err = fmt.Fprint(f, manifestContents)
 	if err != nil {
@@ -56,7 +56,7 @@ func TarGenerator(destFileName string, sourceDirName string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("unable to open %s", sourceDirName)
 	}
-	defer sourceDir.Close()
+	defer sourceDir.Close() //nolint:errcheck
 
 	files, err := sourceDir.Readdir(0)
 	if err != nil {
@@ -68,7 +68,7 @@ func TarGenerator(destFileName string, sourceDirName string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("unable to create destination file with name %s", destFileName)
 	}
-	defer destFile.Close()
+	defer destFile.Close() //nolint:errcheck
 
 	sha1Hash := sha1.New()
 	gzw := gzip.NewWriter(io.MultiWriter(destFile, sha1Hash))
@@ -117,7 +117,7 @@ func writeFilePathToTar(filepath string, tarWriter *tar.Writer) error {
 	if err != nil {
 		return fmt.Errorf("unable to open file '%s'", filepath)
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck
 
 	_, err = io.Copy(tarWriter, file)
 	if err != nil {

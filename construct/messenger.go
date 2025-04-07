@@ -86,7 +86,7 @@ func (m *Messenger) ExecutePostRebootWarning(warning string) {
 }
 
 func (m *Messenger) UploadFileStarted(artifact string) {
-	m.out.Write([]byte(fmt.Sprintf("\tUploading %s to target VM...", artifact))) //nolint:errcheck
+	m.out.Write([]byte(fmt.Sprintf("\tUploading %s to target VM...", artifact))) //nolint:errcheck,staticcheck
 }
 
 func (m *Messenger) UploadFileSucceeded() {
@@ -116,13 +116,13 @@ func (m *Messenger) DownloadFileFailed(errorMessage string) {
 func (m *Messenger) logValidateOSWarning(log string, errorMessage string) {
 	matchingVersionWarning := "Ensure the version of the stemcell you're trying to build matches the corresponding base ISO you're using.\n" +
 		"For example: If you're building 2019.x, then you should be using 'Windows Server 2019' only"
-	m.out.Write([]byte(fmt.Sprintf("Warning: %s:\n%s\n%s", log, matchingVersionWarning, errorMessage))) //nolint:errcheck
+	m.out.Write([]byte(fmt.Sprintf("Warning: %s:\n%s\n%s", log, matchingVersionWarning, errorMessage))) //nolint:errcheck,staticcheck
 }
 
 func (m *Messenger) WaitingForShutdown() {
 	t := time.Now()
 	timeStampFormat := "2006-01-02T15:04:05.999999-07:00"
-	m.out.Write([]byte(fmt.Sprintf("%s Still preparing VM...\n", t.Format(timeStampFormat)))) //nolint:errcheck
+	m.out.Write([]byte(fmt.Sprintf("%s Still preparing VM...\n", t.Format(timeStampFormat)))) //nolint:errcheck,staticcheck
 }
 
 func (m *Messenger) ShutdownCompleted() {

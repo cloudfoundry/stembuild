@@ -81,7 +81,7 @@ func (v VCenterPackager) executeOnMatchingDevice(action func(a, b string) error,
 	}
 
 	for _, deviceName := range deviceList {
-		matched, _ := regexp.MatchString(devicePattern, deviceName)
+		matched, _ := regexp.MatchString(devicePattern, deviceName) //nolint:errcheck
 		if matched {
 			err = action(v.SourceConfig.VmInventoryPath, deviceName)
 			if err != nil {

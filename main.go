@@ -23,14 +23,14 @@ func main() {
 	for _, env := range envs {
 		envName := strings.Split(env, "=")[0]
 		if strings.HasPrefix(envName, "GOVC_") || strings.HasPrefix(envName, "GOVMOMI_") {
-			_, _ = fmt.Fprintf(os.Stderr, "Warning: The following environment variable is set and might override flags provided to stembuild: %s\n", envName)
+			fmt.Fprintf(os.Stderr, "Warning: The following environment variable is set and might override flags provided to stembuild: %s\n", envName) //nolint:errcheck
 		}
 	}
 
 	s := "./StemcellAutomation.zip"
 	err := os.WriteFile(s, assets.StemcellAutomation, 0644)
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, "Unable to write StemcellAutomation.zip")
+		fmt.Fprintln(os.Stderr, "Unable to write StemcellAutomation.zip") //nolint:errcheck
 		os.Exit(1)
 	}
 
@@ -63,15 +63,15 @@ func main() {
 	// Override the default usage text of Google's Subcommand with our own
 	fs.Usage = func() { sh.Explain(commander.Error) }
 
-	_ = fs.Parse(os.Args[1:])
+	fs.Parse(os.Args[1:]) //nolint:errcheck
 	if gf.ShowVersion {
-		_, _ = fmt.Fprintf(os.Stdout, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version)
-		_ = os.Remove(s)
+		fmt.Fprintf(os.Stdout, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version) //nolint:errcheck
+		os.Remove(s)                                                                                                        //nolint:errcheck
 		os.Exit(0)
 	}
 
 	ctx := context.Background()
 	i := int(commander.Execute(ctx))
-	_ = os.Remove(s)
+	os.Remove(s) //nolint:errcheck
 	os.Exit(i)
 }

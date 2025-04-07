@@ -78,7 +78,7 @@ func (c *VcenterClient) ListDevices(vmInventoryPath string) ([]string, error) {
 
 	entries := strings.Split(o, "\n")
 	devices := []string{}
-	r, _ := regexp.Compile(`\S+`)
+	r := regexp.MustCompile(`\S+`)
 	for _, entry := range entries {
 		if entry != "" {
 			devices = append(devices, r.FindString(entry))

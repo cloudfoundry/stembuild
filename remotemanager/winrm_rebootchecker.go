@@ -70,7 +70,7 @@ func (rc *RebootChecker) RebootHasFinished() (bool, error) {
 		if abortExitCode == 0 {
 			return true, nil
 		} else {
-			return false, errors.New("unable to abort reboot.")
+			return false, errors.New("unable to abort reboot.") //nolint:staticcheck
 		}
 
 	}
