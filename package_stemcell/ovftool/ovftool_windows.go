@@ -31,7 +31,7 @@ func vmwareInstallPaths(keypaths []string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("opening VMware Workstation and OVF Tool registry keys: %s", err)
 	}
-	defer key.Close()
+	defer key.Close() //nolint:errcheck
 
 	var paths []string
 	for _, k := range []string{"InstallPath64", "InstallPath"} {

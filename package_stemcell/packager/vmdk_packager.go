@@ -87,7 +87,7 @@ func (c *VmdkPackager) Cleanup() {
 	// check if directory exists to make Cleanup idempotent
 	if _, err := os.Stat(c.tmpdir); err == nil {
 		c.Logger.Printf("deleting temp directory: %s", c.tmpdir)
-		os.RemoveAll(c.tmpdir)
+		os.RemoveAll(c.tmpdir) //nolint:errcheck
 	}
 }
 
@@ -97,7 +97,7 @@ func (c *VmdkPackager) AddTarFile(tr *tar.Writer, name string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 	fi, err := f.Stat()
 	if err != nil {
 		return err
@@ -153,12 +153,12 @@ func (c *VmdkPackager) CreateStemcell() error {
 	if err != nil {
 		return err
 	}
-	defer stemcell.Close()
+	defer stemcell.Close() //nolint:errcheck
 	c.Logger.Printf("created temp stemcell: %s", c.Stemcell)
 
 	errorf := func(format string, a ...interface{}) error {
-		stemcell.Close()
-		os.Remove(c.Stemcell)
+		stemcell.Close()      //nolint:errcheck
+		os.Remove(c.Stemcell) //nolint:errcheck
 		return fmt.Errorf(format, a...)
 	}
 
@@ -225,7 +225,7 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 		return ErrInterrupt
 	case err := <-errCh:
 		if err != nil {
-			return fmt.Errorf(errFmt, err, stderr.String())
+			return fmt.Errorf(errFmt, err, stderr.String()) //nolint:staticcheck
 		}
 	}
 
@@ -269,7 +269,7 @@ func (c *VmdkPackager) CreateImage() error {
 	if err != nil {
 		return err
 	}
-	defer r.Close()
+	defer r.Close() //nolint:errcheck
 
 	// image file (writer)
 	c.Image = filepath.Join(tmpdir, "image")
@@ -277,7 +277,7 @@ func (c *VmdkPackager) CreateImage() error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 
 	// calculate sha1 while writing image file
 	h := sha1.New()
@@ -330,12 +330,12 @@ func (c *VmdkPackager) catchInterruptSignal() {
 	for sig := range ch {
 		c.Logger.Printf("received signal: %s", sig)
 		if stopping {
-			fmt.Fprintf(os.Stderr, "received second (%s) signal - exiting now\n", sig)
-			c.Cleanup() // remove temp dir
+			fmt.Fprintf(os.Stderr, "received second (%s) signal - exiting now\n", sig) //nolint:errcheck
+			c.Cleanup()                                                                // remove temp dir
 			os.Exit(1)
 		}
 		stopping = true
-		fmt.Fprintf(os.Stderr, "received (%s) signal cleaning up\n", sig)
+		fmt.Fprintf(os.Stderr, "received (%s) signal cleaning up\n", sig) //nolint:errcheck
 		c.StopConfig()
 	}
 }
@@ -348,8 +348,8 @@ func (c *VmdkPackager) Package() error {
 
 	stemcellPath, err := c.ConvertVMDK()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-		c.Cleanup() // remove temp dir
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err) //nolint:errcheck
+		c.Cleanup()                                // remove temp dir
 		return err
 	}
 

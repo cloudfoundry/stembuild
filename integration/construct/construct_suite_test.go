@@ -157,16 +157,16 @@ var _ = SynchronizedAfterSuite(func() {
 			for _, item := range childItems {
 				if item.IsDir() && strings.HasPrefix(filepath.Base(item.Name()), "pool-resource") {
 					By(fmt.Sprintf("Cleaning up temporary pool resource %s\n", item.Name()))
-					_ = os.RemoveAll(item.Name())
+					os.RemoveAll(item.Name()) //nolint:errcheck
 				}
 			}
 		}
 	}
 
-	_ = os.RemoveAll(tmpDir)
+	os.RemoveAll(tmpDir) //nolint:errcheck
 }, func() {
 	if pathToCACert != "" {
-		_ = os.RemoveAll(pathToCACert)
+		os.RemoveAll(pathToCACert) //nolint:errcheck
 	}
 })
 
@@ -291,9 +291,9 @@ func runIgnoringOutput(args []string) int {
 	oldStderr := os.Stderr
 	oldStdout := os.Stdout
 
-	_, w, _ := os.Pipe()
+	_, w, _ := os.Pipe() //nolint:errcheck
 
-	defer func() { _ = w.Close() }()
+	defer w.Close() //nolint:errcheck
 
 	os.Stderr = w
 	os.Stdout = w

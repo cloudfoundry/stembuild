@@ -101,9 +101,9 @@ func WriteVMXTemplate(vmdkPath string, virtualHWVersion int, vmxPath string) err
 		return err
 	}
 	err = VMXTemplate(vmdkPath, virtualHWVersion, f)
-	f.Close()
+	f.Close() //nolint:errcheck
 	if err != nil {
-		os.Remove(vmxPath)
+		os.Remove(vmxPath) //nolint:errcheck
 	}
 	return err
 }

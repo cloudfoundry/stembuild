@@ -31,7 +31,7 @@ var _ = Describe("VcenterPackager", func() {
 	BeforeEach(func() {
 		// Revert to manual cleanup which fails non-catastrophically on windows
 		//outputDir = GinkgoT().TempDir() // automatically cleaned up
-		outputDir, _ = os.MkdirTemp(os.TempDir(), "vcenter-test-output-dir")
+		outputDir, _ = os.MkdirTemp(os.TempDir(), "vcenter-test-output-dir") //nolint:errcheck
 
 		sourceConfig = config.SourceConfig{Password: "password", URL: "url", Username: "username", VmInventoryPath: "path/valid-vm-name"}
 		outputConfig = config.OutputConfig{Os: "2012R2", StemcellVersion: "1200.2", OutputDir: outputDir}
@@ -100,8 +100,8 @@ var _ = Describe("VcenterPackager", func() {
 		var vcenterPackager *packager.VCenterPackager
 
 		AfterEach(func() {
-			_ = os.RemoveAll("./valid-vm-name")
-			_ = os.RemoveAll("image")
+			os.RemoveAll("./valid-vm-name") //nolint:errcheck
+			os.RemoveAll("image")           //nolint:errcheck
 		})
 
 		BeforeEach(func() {
@@ -141,10 +141,10 @@ stemcell_formats:
 - vsphere-ovf
 - vsphere-ova
 `
-			var fileReader, _ = os.OpenFile(stemcellFile, os.O_RDONLY, 0777)
+			var fileReader, _ = os.OpenFile(stemcellFile, os.O_RDONLY, 0777) //nolint:errcheck
 			gzr, err := gzip.NewReader(fileReader)
 			Expect(err).ToNot(HaveOccurred())
-			defer gzr.Close()
+			defer gzr.Close() //nolint:errcheck
 			tarfileReader := tar.NewReader(gzr)
 			count := 0
 

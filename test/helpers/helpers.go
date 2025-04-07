@@ -13,9 +13,9 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gexec"
+	. "github.com/onsi/ginkgo/v2"    //nolint:staticcheck
+	. "github.com/onsi/gomega"       //nolint:staticcheck
+	. "github.com/onsi/gomega/gexec" //nolint:staticcheck
 )
 
 func recursiveFileList(destDir, searchDir string) ([]string, []string, []string, error) {
@@ -25,15 +25,15 @@ func recursiveFileList(destDir, searchDir string) ([]string, []string, []string,
 	leafSearchDir := searchDir
 	lastSepIndex := strings.LastIndex(searchDir, string(filepath.Separator))
 	if lastSepIndex >= 0 {
-		leafSearchDir = searchDir[lastSepIndex:len(searchDir)] //nolint:gosimple
+		leafSearchDir = searchDir[lastSepIndex:len(searchDir)] //nolint:staticcheck
 	}
 
 	e := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
-			dirList = append(dirList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)])) //nolint:gosimple
+			dirList = append(dirList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)])) //nolint:staticcheck
 		} else {
 			srcFileList = append(srcFileList, path)
-			destFileList = append(destFileList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)])) //nolint:gosimple
+			destFileList = append(destFileList, filepath.Join(destDir, leafSearchDir, path[len(searchDir):len(path)])) //nolint:staticcheck
 		}
 		return err
 	})
@@ -69,18 +69,18 @@ func CopyRecursive(destRoot, srcRoot string) error {
 		}
 	}
 
-	for i, _ := range srcFileList { //nolint:gosimple
+	for i, _ := range srcFileList { //nolint:staticcheck
 		srcFile, err := os.Open(srcFileList[i])
 		if err != nil {
 			return err
 		}
-		defer srcFile.Close()
+		defer srcFile.Close() //nolint:errcheck
 
 		destFile, err := os.Create(destFileList[i])
 		if err != nil {
 			return err
 		}
-		defer destFile.Close()
+		defer destFile.Close() //nolint:errcheck
 
 		_, err = io.Copy(destFile, srcFile)
 		if err != nil {
@@ -125,7 +125,7 @@ func extractArchive(archive io.Reader, dirname string) error {
 		if err != nil {
 			return fmt.Errorf("tar: opening file (%s): %s", path, err)
 		}
-		defer f.Close()
+		defer f.Close() //nolint:errcheck
 
 		if _, err := io.Copy(f, tr); err != nil {
 			return fmt.Errorf("tar: writing file (%s): %s", path, err)
@@ -149,7 +149,7 @@ func ExtractGzipArchive(name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 
 	w, err := gzip.NewReader(f)
 	if err != nil {

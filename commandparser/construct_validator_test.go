@@ -47,7 +47,7 @@ var _ = Describe("ConstructValidator", func() {
 	})
 
 	Describe("LGPOInDirectory", func() {
-		wd, _ := os.Getwd()
+		wd, _ := os.Getwd() //nolint:errcheck
 		LGPOPath := filepath.Join(wd, "LGPO.zip")
 
 		It("should return true if LGPO exists in the directory", func() {

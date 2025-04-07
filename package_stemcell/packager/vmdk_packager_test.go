@@ -41,7 +41,7 @@ var _ = Describe("VmdkPackager", func() {
 			It("should be valid", func() {
 				vmdk, err := os.CreateTemp("", "temp.vmdk")
 				Expect(err).ToNot(HaveOccurred())
-				defer func() { _ = os.Remove(vmdk.Name()) }()
+				defer os.Remove(vmdk.Name()) //nolint:errcheck
 
 				valid, err := packager.IsValidVMDK(vmdk.Name())
 				Expect(err).To(BeNil())

@@ -53,7 +53,7 @@ var _ = Describe("VMX test", func() {
 		})
 
 		AfterEach(func() {
-			_ = os.RemoveAll(tmpDir)
+			os.RemoveAll(tmpDir) //nolint:errcheck
 		})
 
 		It("should write VMX template to file", func() {

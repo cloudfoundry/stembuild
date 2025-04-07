@@ -10,7 +10,7 @@ type ConstructCmdMessenger struct {
 }
 
 func (m *ConstructCmdMessenger) printMessage(message string) {
-	fmt.Fprintln(m.OutputChannel, message)
+	fmt.Fprintln(m.OutputChannel, message) //nolint:errcheck
 }
 
 func (m *ConstructCmdMessenger) ArgumentsNotProvided() {

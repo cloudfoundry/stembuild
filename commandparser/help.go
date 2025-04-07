@@ -63,24 +63,24 @@ func (h *stembuildHelp) Execute(c context.Context, f *flag.FlagSet, args ...inte
 
 func (h *stembuildHelp) Explain(w io.Writer) {
 
-	_, _ = fmt.Fprintf(w, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version)
-	_, _ = fmt.Fprintf(w, "Usage: %s <global options> <command> <command flags>\n\n", path.Base(os.Args[0]))
+	fmt.Fprintf(w, "%s version %s, Windows Stemcell Building Tool\n\n", path.Base(os.Args[0]), version.Version) //nolint:errcheck
+	fmt.Fprintf(w, "Usage: %s <global options> <command> <command flags>\n\n", path.Base(os.Args[0]))           //nolint:errcheck
 
-	_, _ = fmt.Fprint(w, "Commands:\n")
+	fmt.Fprint(w, "Commands:\n") //nolint:errcheck
 	for _, command := range *h.commands {
 		if len(command.Name()) < 5 { // This help align the synopses when the commands are of different lengths
-			_, _ = fmt.Fprintf(w, "  %s\t\t%s\n", command.Name(), command.Synopsis())
+			fmt.Fprintf(w, "  %s\t\t%s\n", command.Name(), command.Synopsis()) //nolint:errcheck
 		} else {
-			_, _ = fmt.Fprintf(w, "  %s\t%s\n", command.Name(), command.Synopsis())
+			fmt.Fprintf(w, "  %s\t%s\n", command.Name(), command.Synopsis()) //nolint:errcheck
 		}
 	}
 
-	_, _ = fmt.Fprint(w, "\nGlobal Options:\n")
+	fmt.Fprint(w, "\nGlobal Options:\n") //nolint:errcheck
 	h.topLevelFlags.VisitAll(func(f *flag.Flag) {
 		if len(f.Name) > 1 {
-			_, _ = fmt.Fprintf(w, "  -%s\t%s\n", f.Name, f.Usage)
+			fmt.Fprintf(w, "  -%s\t%s\n", f.Name, f.Usage) //nolint:errcheck
 		} else {
-			_, _ = fmt.Fprintf(w, "  -%s\t\t%s\n", f.Name, f.Usage)
+			fmt.Fprintf(w, "  -%s\t\t%s\n", f.Name, f.Usage) //nolint:errcheck
 		}
 	})
 }
