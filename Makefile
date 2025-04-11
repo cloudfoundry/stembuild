@@ -30,10 +30,10 @@ format :
 	go fmt ./...
 
 integration : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/v2/ginkgo -r -vv --randomize-all --keep-going --flake-attempts 2 --timeout 3h integration
+	go run github.com/onsi/ginkgo/v2/ginkgo -r -vv --randomize-all --keep-going --flake-attempts 2 --timeout 3h --output-interceptor-mode=none integration
 
 integration/construct : generate-fake-stemcell-automation
-	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --keep-going --flake-attempts 2 --timeout 3h integration/construct
+	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --keep-going --flake-attempts 2 --timeout 3h --output-interceptor-mode=none integration/construct
 
 integration-badger : generate-fake-stemcell-automation
 	go run github.com/onsi/ginkgo/v2/ginkgo -r -v --randomize-all --until-it-fails --timeout 3h integration
