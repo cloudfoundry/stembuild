@@ -8,7 +8,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-2019, ubuntu-latest]
-    name: lint
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
@@ -19,3 +18,19 @@ jobs:
       run: |
         make generate-fake-stemcell-automation
     - uses: golangci/golangci-lint-action@v7
+  test:
+    strategy:
+      matrix:
+        os: [windows-2019, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+    - name: Provide `StemcellAutomation.zip` for `go:embed` consumption in `assets` package
+      run: |
+        make generate-fake-stemcell-automation
+    # skip specs for "packager", "ovftool" because "ovftool" be installed
+    - run: |
+        go run github.com/onsi/ginkgo/v2/ginkgo run -r --keep-going --randomize-all --randomize-suites --skip-package integration,iaas_cli,ovftool,packager
