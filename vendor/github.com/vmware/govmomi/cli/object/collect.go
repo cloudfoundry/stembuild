@@ -1,18 +1,6 @@
-/*
-Copyright (c) 2017-2024 VMware, Inc. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// © Broadcom. All Rights Reserved.
+// The term “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
+// SPDX-License-Identifier: Apache-2.0
 
 package object
 
@@ -117,7 +105,10 @@ Examples:
     jq -r 'select(.hardware.device[].macAddress == "00:50:56:99:c4:27") | .name'`, atable)
 }
 
-var stringer = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
+var (
+	stringer = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
+	writer   = reflect.TypeOf((*flags.OutputWriter)(nil)).Elem()
+)
 
 type change struct {
 	cmd    *collect
@@ -250,7 +241,7 @@ func (pc *change) Write(w io.Writer) error {
 	return tw.Flush()
 }
 
-func (pc *change) Dump() interface{} {
+func (pc *change) Dump() any {
 	if pc.cmd.simple && len(pc.Update.ChangeSet) == 1 {
 		val := pc.Update.ChangeSet[0].Val
 		if val != nil {
@@ -299,7 +290,7 @@ type dumpFilter struct {
 	types.CreateFilter
 }
 
-func (f *dumpFilter) Dump() interface{} {
+func (f *dumpFilter) Dump() any {
 	return f.CreateFilter
 }
 
@@ -309,10 +300,10 @@ func (f *dumpFilter) Write(w io.Writer) error {
 }
 
 type dumpEntity struct {
-	entity interface{}
+	entity any
 }
 
-func (e *dumpEntity) Dump() interface{} {
+func (e *dumpEntity) Dump() any {
 	return e.entity
 }
 
@@ -419,9 +410,6 @@ func (cmd *collect) Run(ctx context.Context, f *flag.FlagSet) error {
 	}
 
 	if cmd.object {
-		if !cmd.All() {
-			cmd.Dump = true
-		}
 		req := types.RetrieveProperties{
 			SpecSet: []types.PropertyFilterSpec{filter.Spec},
 		}
@@ -436,6 +424,13 @@ func (cmd *collect) Run(ctx context.Context, f *flag.FlagSet) error {
 		obj, err := mo.ObjectContentToType(content[0])
 		if err != nil {
 			return err
+		}
+		if !cmd.All() {
+			rval := reflect.ValueOf(obj)
+			if rval.Type().Implements(writer) {
+				return cmd.WriteResult(rval.Interface().(flags.OutputWriter))
+			}
+			cmd.Dump = true // fallback to -dump output
 		}
 		return cmd.WriteResult(&dumpEntity{obj})
 	}
