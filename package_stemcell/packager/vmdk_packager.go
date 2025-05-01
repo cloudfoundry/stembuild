@@ -207,12 +207,14 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 
 	cmd := exec.Command(ovfpath, vmx, ova)
 	cmd.Stderr = &stderr
-	if err := cmd.Start(); err != nil {
+
+	err = cmd.Start()
+	if err != nil {
 		return fmt.Errorf("ovftool: %s", err)
 	}
 	c.Logger.Printf("converting vmx to ova with cmd: %s %s", cmd.Path, cmd.Args[1:])
 
-	// Wait for process exit or interupt
+	// Wait for process exit or interrupt
 	errCh := make(chan error, 1)
 	go func() { errCh <- cmd.Wait() }()
 
@@ -223,9 +225,9 @@ func (c *VmdkPackager) ConvertVMX2OVA(vmx, ova string) error {
 			cmd.Process.Kill() //nolint:errcheck
 		}
 		return ErrInterrupt
-	case err := <-errCh:
-		if err != nil {
-			return fmt.Errorf(errFmt, err, stderr.String()) //nolint:staticcheck
+	case chanErr := <-errCh:
+		if chanErr != nil {
+			return fmt.Errorf(errFmt, chanErr, stderr.String()) //nolint:staticcheck
 		}
 	}
 
@@ -392,8 +394,7 @@ func IsValidVMDK(vmdk string) (bool, error) {
 func (c *VmdkPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) error {
 	fi, err := os.Stat(c.BuildOptions.VMDKFile)
 	if err != nil {
-		errorMsg := fmt.Sprintf("could not get vmdk info: %s", err)
-		return errors.New(errorMsg)
+		return fmt.Errorf("could not get vmdk info: %s", err)
 	}
 	vmdkSize := fi.Size()
 
@@ -404,21 +405,16 @@ func (c *VmdkPackager) ValidateFreeSpaceForPackage(fs filesystem.FileSystem) err
 
 	enoughSpace, requiredSpace, err := hasAtLeastFreeDiskSpace(minSpace, fs, filepath.Dir(c.BuildOptions.VMDKFile))
 	if err != nil {
-		errorMsg := fmt.Sprintf("could not check free space on disk: %s", err)
-		return errors.New(errorMsg)
+		return fmt.Errorf("could not check free space on disk: %s", err)
 	}
 
 	if !enoughSpace {
-		errorMsg := fmt.Sprintf("Not enough space to create stemcell. Free up %d MB and try again", requiredSpace/(1024*1024))
-		return errors.New(errorMsg)
-
+		return fmt.Errorf("Not enough space to create stemcell. Free up %d MB and try again", requiredSpace/(1024*1024)) //nolint:staticcheck
 	}
 	return nil
-
 }
 
 func hasAtLeastFreeDiskSpace(minFreeSpace uint64, fs filesystem.FileSystem, path string) (bool, uint64, error) {
-
 	freeSpace, err := fs.GetAvailableDiskSpace(path)
 
 	if err != nil {

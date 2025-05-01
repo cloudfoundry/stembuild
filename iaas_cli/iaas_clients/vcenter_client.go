@@ -2,7 +2,6 @@ package iaas_clients
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -21,27 +20,34 @@ type VcenterClient struct {
 }
 
 func NewVcenterClient(username string, password string, u string, caCertFile string, runner iaas_cli.CliRunner) *VcenterClient {
-
 	encodedUser := url.QueryEscape(username)
 	encodedPassword := url.QueryEscape(password)
 	urlWithCredentials := fmt.Sprintf("%s:%s@%s", encodedUser, encodedPassword, u)
 	urlWithRedactedPassword := fmt.Sprintf("%s:REDACTED@%s", encodedUser, u)
-	return &VcenterClient{Url: u, credentialUrl: urlWithCredentials, redactedUrl: urlWithRedactedPassword, caCertFile: caCertFile, Runner: runner}
+
+	return &VcenterClient{
+		Url:           u,
+		credentialUrl: urlWithCredentials,
+		redactedUrl:   urlWithRedactedPassword,
+		caCertFile:    caCertFile,
+		Runner:        runner,
+	}
 }
 
 func (c *VcenterClient) ValidateUrl() error {
 	args := []string{"about", "-u", c.Url}
-	errMsg := fmt.Sprintf("vcenter_client - unable to validate url: %s", c.Url)
+	errMsg := "unable to validate url"
 	if c.caCertFile != "" {
 		args = append(args, fmt.Sprintf("-tls-ca-certs=%s", c.caCertFile))
-		errMsg = fmt.Sprintf("vcenter_client - invalid ca certs or url: %s", c.Url)
+		errMsg = "invalid ca certs or url"
 	}
+
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
-		return errors.New(errMsg)
+		return fmt.Errorf("vcenter_client - %s: %s", errMsg, c.Url)
 	}
-	return nil
 
+	return nil
 }
 
 func (c *VcenterClient) ValidateCredentials() error {
@@ -84,6 +90,7 @@ func (c *VcenterClient) ListDevices(vmInventoryPath string) ([]string, error) {
 			devices = append(devices, r.FindString(entry))
 		}
 	}
+
 	return devices, nil
 }
 func (c *VcenterClient) RemoveDevice(vmInventoryPath string, deviceName string) error {
@@ -92,16 +99,17 @@ func (c *VcenterClient) RemoveDevice(vmInventoryPath string, deviceName string) 
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be removed", deviceName)
 	}
+
 	return nil
 }
 
 func (c *VcenterClient) EjectCDRom(vmInventoryPath string, deviceName string) error {
-
 	args := c.buildGovcCommand("device.cdrom.eject", "-vm", vmInventoryPath, "-device", deviceName)
 	errCode := c.Runner.Run(args)
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be ejected", deviceName)
 	}
+
 	return nil
 }
 
@@ -115,6 +123,7 @@ func (c *VcenterClient) ExportVM(vmInventoryPath string, destination string) err
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be exported", vmInventoryPath)
 	}
+
 	return nil
 }
 
@@ -125,6 +134,7 @@ func (c *VcenterClient) UploadArtifact(vmInventoryPath, artifact, destination, u
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - %s could not be uploaded", artifact)
 	}
+
 	return nil
 }
 
@@ -136,6 +146,7 @@ func (c *VcenterClient) MakeDirectory(vmInventoryPath, path, username, password 
 	if errCode != 0 {
 		return fmt.Errorf("vcenter_client - directory `%s` could not be created", path)
 	}
+
 	return nil
 }
 
@@ -150,8 +161,8 @@ func (c *VcenterClient) Start(vmInventoryPath, username, password, command strin
 	if exitCode != 0 {
 		return "", fmt.Errorf("vcenter_client - '%s' returned exit code: %d", command, exitCode)
 	}
-	// We trim this suffix since govc outputs the pid with an '\n' in the output
-	return strings.TrimSuffix(pid, "\n"), nil
+
+	return strings.TrimSuffix(pid, "\n"), nil // trim since govc outputs the pid with an '\n' in the output
 }
 
 type govcPS struct {
@@ -195,6 +206,7 @@ func (c *VcenterClient) buildGovcCommand(args ...string) []string {
 		commonArgs = append(commonArgs, fmt.Sprintf("-tls-ca-certs=%s", c.caCertFile))
 	}
 	args = append(args[:1], append(commonArgs, args[1:]...)...)
+
 	return args
 }
 
@@ -204,6 +216,7 @@ func (c *VcenterClient) IsPoweredOff(vmInventoryPath string) (bool, error) {
 	if exitCode != 0 {
 		return false, fmt.Errorf("vcenter_client - failed to get vm info, govc exit code: %d", exitCode)
 	}
+
 	if err != nil {
 		return false, fmt.Errorf("vcenter_client - failed to determine vm power state: %s", err)
 	}
