@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
-ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-STEMCELL_AUTOMATION_PS1=$(ls "${ROOT_DIR}"/stembuild/stemcell-automation/*ps1 | grep -iv Test)
+REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+STEMCELL_AUTOMATION_PS1=$(ls "${REPO_ROOT}"/stembuild/stemcell-automation/*ps1 | grep -iv Test)
 
 : "${OPENSSH_ZIP?"Please see README.md on where to obtain this."}"
 : "${BOSH_PSMODULES_ZIP?"Please see README.md on where to obtain this."}"
@@ -17,8 +17,8 @@ cp "${AGENT_ZIP}" "${TEMP_DIR}/agent.zip"
 cp "${DEPS_JSON}" "${TEMP_DIR}/deps.json"
 cp "${STEMCELL_AUTOMATION_PS1}" "${TEMP_DIR}"
 
-rm -f "${ROOT_DIR}/stembuild/assets/StemcellAutomation.zip"
+rm -f "${REPO_ROOT}/stembuild/assets/StemcellAutomation.zip"
 
-zip -rj "${ROOT_DIR}/stembuild/assets/StemcellAutomation.zip" "${TEMP_DIR}"
+zip -rj "${REPO_ROOT}/stembuild/assets/StemcellAutomation.zip" "${TEMP_DIR}"
 
 rm -r "${TEMP_DIR}"
