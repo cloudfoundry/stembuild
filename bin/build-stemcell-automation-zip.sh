@@ -14,10 +14,11 @@ cp "${OPENSSH_ZIP}" "${TEMP_DIR}/OpenSSH-Win64.zip"
 cp "${BOSH_PSMODULES_ZIP}" "${TEMP_DIR}/bosh-psmodules.zip"
 cp "${AGENT_ZIP}" "${TEMP_DIR}/agent.zip"
 cp "${DEPS_JSON}" "${TEMP_DIR}/deps.json"
-for file in $(ls "${REPO_ROOT}"/stembuild/stemcell-automation/*ps1 | grep -iv Test); do
-  cp "${file}" "${TEMP_DIR}"
+for file in ~/workspace/stembuild/stemcell-automation/*ps1; do
+  if ! [[ "${file}" =~ .*\.Tests\.ps1 ]]; then
+    cp "${file}" "${TEMP_DIR}"
+  fi
 done
-
 rm -f "${REPO_ROOT}/stembuild/assets/StemcellAutomation.zip"
 
 zip -rj "${REPO_ROOT}/stembuild/assets/StemcellAutomation.zip" "${TEMP_DIR}"
